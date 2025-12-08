@@ -64,6 +64,15 @@ async function calculateFortune() {
       const gender = route.query.gender
       const mbti = route.query.mbti
       const calendarType = route.query.calendar_type
+      const birthTime = route.query.birth_time
+      const chineseName = route.query.chinese_name
+
+      // 필수 값 검증
+      if (!birthDate || !gender) {
+        console.error('[FortuneLoading] 필수 값 누락:', { birthDate, gender })
+        showError('생년월일과 성별은 필수 입력 항목입니다.')
+        return
+      }
 
       // 생년월일 형식 변환
       let formattedDate = birthDate
@@ -81,9 +90,15 @@ async function calculateFortune() {
         calendar_type: calendarType || 'solar'
       }
 
-      // mbti가 있는 경우에만 추가
+      // 선택 항목들은 값이 있는 경우에만 추가
       if (mbti && mbti.trim()) {
         requestData.mbti = mbti.trim()
+      }
+      if (birthTime && birthTime.trim()) {
+        requestData.birth_time = birthTime.trim()
+      }
+      if (chineseName && chineseName.trim()) {
+        requestData.chinese_name = chineseName.trim()
       }
 
       console.log('[FortuneLoading] 비로그인 사용자 - calculate API 호출:', requestData)
