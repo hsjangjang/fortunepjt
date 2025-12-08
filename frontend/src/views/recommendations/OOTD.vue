@@ -39,7 +39,7 @@
                   <MapPin class="text-primary me-2" :size="20" />
                   <span class="fs-5">{{ weather.city || '대전 유성구' }}</span>
                 </div>
-                <div class="current-temp mb-2">{{ weather.temp !== null ? Math.round(weather.temp) : '--' }}°</div>
+                <div class="current-temp mb-2" style="font-size: 3.5rem; font-weight: 700;">{{ weather.temp !== null ? Math.round(weather.temp) : '--' }}°</div>
                 <div class="weather-desc">{{ weather.description || '날씨 정보 없음' }}</div>
                 <div class="temp-range">
                   <span>↑{{ weather.temp_max !== null ? Math.round(weather.temp_max) : '--' }}°</span> /
@@ -63,14 +63,14 @@
               <div class="rain-info-container" ref="rainInfoContainer"></div>
             </div>
 
-            <div class="row mt-3 text-center small border-top pt-3" style="border-color: rgba(255,255,255,0.1) !important;">
-              <div class="col-4 d-flex align-items-center justify-content-center">
+            <div class="row mt-3 text-center small border-top pt-3 text-nowrap" style="border-color: rgba(255,255,255,0.1) !important;">
+              <div class="col px-1 d-flex align-items-center justify-content-center">
                 <Droplets class="text-primary me-1" :size="14" /> 강수확률 <span>{{ weather.rain_prob || 0 }}%</span>
               </div>
-              <div class="col-4 d-flex align-items-center justify-content-center">
+              <div class="col px-1 d-flex align-items-center justify-content-center">
                 <Wind class="text-primary me-1" :size="14" /> 풍속 <span>{{ weather.wind_speed || 0 }}m/s</span>
               </div>
-              <div class="col-4 d-flex align-items-center justify-content-center">
+              <div class="col px-1 d-flex align-items-center justify-content-center">
                 <Umbrella class="text-primary me-1" :size="14" /> 강수량 <span>{{ weather.rain_amount || 0 }}mm</span>
               </div>
             </div>
@@ -148,20 +148,16 @@
                 <AlertCircle class="text-warning me-2" :size="20" />필수 아우터
               </h5>
             </div>
-            <div class="card-body">
-              <div class="row align-items-center">
-                <div class="col-md-3 text-center">
-                  <img :src="getOuterImage" alt="Outer" width="80" class="img-fluid drop-shadow" />
-                </div>
-                <div class="col-md-9">
-                  <h4>{{ outfit.outer || '코트' }}</h4>
-                  <p class="text-muted">{{ outfit.outer_desc || '오늘같은 날씨엔 꼭 필요합니다.' }}</p>
-                  <div>
-                    <span class="badge dynamic-color-badge">블랙</span>
-                    <span class="badge dynamic-color-badge">차콜</span>
-                    <span class="badge dynamic-color-badge">네이비</span>
-                  </div>
-                </div>
+            <div class="card-body text-center">
+              <div class="mb-3 d-flex justify-content-center">
+                <img :src="getOuterImage" alt="Outer" width="100" class="img-fluid drop-shadow" />
+              </div>
+              <h4>{{ outfit.outer || '코트' }}</h4>
+              <p class="text-muted">{{ outfit.outer_desc || '오늘같은 날씨엔 꼭 필요합니다.' }}</p>
+              <div class="d-flex justify-content-center gap-2 mt-2">
+                <span class="badge dynamic-color-badge">블랙</span>
+                <span class="badge dynamic-color-badge">차콜</span>
+                <span class="badge dynamic-color-badge">네이비</span>
               </div>
             </div>
           </div>
@@ -174,8 +170,8 @@
               </h5>
             </div>
             <div class="card-body">
-              <div class="d-flex flex-nowrap overflow-auto gap-3 pb-2 text-start px-2" style="scrollbar-width: none; -ms-overflow-style: none;">
-                <div v-for="acc in outfit.accessories" :key="acc.name" class="flex-shrink-0" style="width: 140px;">
+              <div class="row g-3 justify-content-center">
+                <div v-for="acc in outfit.accessories" :key="acc.name" class="col-4 col-md-3">
                   <div class="text-center p-3 h-100" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
                     <div class="mb-2 d-flex justify-content-center">
                       <img :src="getAccessoryImage(acc.name)" alt="Accessory" width="60" class="img-fluid drop-shadow" />
@@ -630,24 +626,6 @@ const renderChart = (hourlyData) => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false },
-        datalabels: { display: true }
-      },
-      scales: {
-        x: {
-          grid: { display: false, drawBorder: false },
-          ticks: {
-            color: 'rgba(255, 255, 255, 0.8)',
-            font: { size: 11 }
-          }
-        },
-        y: {
-          display: false,
-          min: Math.min(...temps) - 5,
-          max: Math.max(...temps) + 5
-        }
       },
       layout: {
         padding: { left: 25, right: 25, top: 20, bottom: 10 }
