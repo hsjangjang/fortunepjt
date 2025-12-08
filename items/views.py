@@ -206,54 +206,62 @@ class ColorAnalysisView(TemplateView):
         if not image:
             return JsonResponse({'success': False, 'message': '이미지를 업로드해주세요.'})
 
+        import tempfile
+        import os
+        temp_path = None
+
         try:
-            from django.core.files.storage import default_storage
             from .color_analyzer import ImageColorAnalyzer
 
-            # 임시 파일 저장
-            temp_path = default_storage.save(f'temp/{image.name}', image)
-            full_path = default_storage.path(temp_path)
+            # 임시 파일로 저장 (S3 환경에서도 동작하도록)
+            suffix = os.path.splitext(image.name)[1] or '.jpg'
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                for chunk in image.chunks():
+                    tmp.write(chunk)
+                temp_path = tmp.name
 
-            try:
-                # AI 분석
-                analyzer = ImageColorAnalyzer()
-                analysis_result = analyzer.analyze_image_with_ai(full_path)
+            # AI 분석
+            analyzer = ImageColorAnalyzer()
+            analysis_result = analyzer.analyze_image_with_ai(temp_path)
 
-                # 아이템명 결정
-                ai_category = analysis_result.get('ai_analysis', {}).get('category', '')
-                ai_item_name = analysis_result.get('ai_analysis', {}).get('item_name', '')
+            # 아이템명 결정
+            ai_category = analysis_result.get('ai_analysis', {}).get('category', '')
+            ai_item_name = analysis_result.get('ai_analysis', {}).get('item_name', '')
 
-                if ai_item_name:
-                    item_name_display = ai_item_name
-                elif ai_category:
-                    item_name_display = self._translate_category(ai_category)
-                elif analysis_result.get('method') == 'pillow':
-                    colors = analysis_result.get('colors', [])
-                    if colors:
-                        color_name = colors[0].get('korean_name', '알 수 없는')
-                        item_name_display = f'{color_name} 아이템'
-                    else:
-                        item_name_display = '분석된 아이템'
+            if ai_item_name:
+                item_name_display = ai_item_name
+            elif ai_category:
+                item_name_display = self._translate_category(ai_category)
+            elif analysis_result.get('method') == 'pillow':
+                colors = analysis_result.get('colors', [])
+                if colors:
+                    color_name = colors[0].get('korean_name', '알 수 없는')
+                    item_name_display = f'{color_name} 아이템'
                 else:
-                    item_name_display = '업로드된 아이템'
+                    item_name_display = '분석된 아이템'
+            else:
+                item_name_display = '업로드된 아이템'
 
-                return JsonResponse({
-                    'success': True,
-                    'analysis': analysis_result,
-                    'item_name': item_name_display,
-                    'suggested_name': item_name_display
-                })
-            finally:
-                # 임시 파일 삭제
-                try:
-                    import time
-                    time.sleep(0.1)
-                    default_storage.delete(temp_path)
-                except Exception:
-                    pass
+            return JsonResponse({
+                'success': True,
+                'analysis': analysis_result,
+                'item_name': item_name_display,
+                'suggested_name': item_name_display
+            })
 
         except Exception as e:
+            import traceback
+            print(f"[ColorAnalysis] 오류: {str(e)}")
+            print(traceback.format_exc())
             return JsonResponse({'success': False, 'message': f'분석 오류: {str(e)}'})
+
+        finally:
+            # 임시 파일 삭제
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except Exception:
+                    pass
 
 class ColorMatchView(APIView):
     def post(self, request):
