@@ -226,6 +226,18 @@ const handleLogout = async () => {
   .navbar-collapse.closing .nav-item {
     animation: slideOutUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
+
+  /* 모바일에서 드롭다운 메뉴 중앙 정렬 */
+  .dropdown-menu {
+    position: absolute;
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%);
+    text-align: center;
+    width: max-content;
+    min-width: 200px;
+    margin-top: 0.5rem;
+  }
 }
 
 @keyframes slideInDown {
