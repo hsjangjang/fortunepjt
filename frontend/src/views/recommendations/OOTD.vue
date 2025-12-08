@@ -1,10 +1,10 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-8 mx-auto">
+      <div class="col-lg-8 col-12 mx-auto px-1 px-md-3">
         <!-- Header -->
         <div class="glass-card mb-4">
-          <div class="card-body text-center py-4">
+          <div class="card-body text-center py-4 responsive-padding">
             <h1 class="display-5 fw-bold text-white">
               <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
             </h1>
@@ -847,5 +847,21 @@ onMounted(() => {
   font-size: 18px;
   font-weight: 500;
   opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding-left: 3% !important;
+    padding-right: 3% !important;
+  }
+  
+  /* Apply to weather card specifically if it uses fixed padding */
+  .weather-card {
+    padding: 1.5rem !important; /* Reduce from whatever it was */
+  }
+  
+  .glass-card {
+    border-radius: 12px;
+  }
 }
 </style>
