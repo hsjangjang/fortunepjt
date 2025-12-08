@@ -172,24 +172,24 @@
               </h4>
               <h5 class="text-center text-white opacity-90 mb-4">오늘 당신에게 행운을 가져다 줄 색상</h5>
 
-              <div v-if="fortune.lucky_colors && fortune.lucky_colors.length > 0" class="d-flex justify-content-center flex-wrap">
-                <div v-for="color in fortune.lucky_colors" :key="color" class="m-3 text-center">
-                  <div :style="`width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background: ${getColorHex(color)};`"></div>
-                  <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">{{ color }}</p>
+              <div v-if="fortune.lucky_colors && fortune.lucky_colors.length > 0" class="d-flex justify-content-center align-items-center gap-3 gap-md-5">
+                <div v-for="color in fortune.lucky_colors" :key="color" class="text-center">
+                  <div class="lucky-color-circle" :style="`background: ${getColorHex(color)};`"></div>
+                  <p class="mt-3 mb-0 fw-bold text-white responsive-text-shadow">{{ color }}</p>
                 </div>
               </div>
-              <div v-else class="d-flex justify-content-center flex-wrap">
-                <div class="m-3 text-center">
-                  <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background: #87CEEB;"></div>
-                  <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">하늘색</p>
+              <div v-else class="d-flex justify-content-center align-items-center gap-3 gap-md-5">
+                <div class="text-center">
+                  <div class="lucky-color-circle" style="background: #87CEEB;"></div>
+                  <p class="mt-3 mb-0 fw-bold text-white responsive-text-shadow">하늘색</p>
                 </div>
-                <div class="m-3 text-center">
-                  <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background: #90EE90;"></div>
-                  <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">연두색</p>
+                <div class="text-center">
+                  <div class="lucky-color-circle" style="background: #90EE90;"></div>
+                  <p class="mt-3 mb-0 fw-bold text-white responsive-text-shadow">연두색</p>
                 </div>
-                <div class="m-3 text-center">
-                  <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background: #800080;"></div>
-                  <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">보라색</p>
+                <div class="text-center">
+                  <div class="lucky-color-circle" style="background: #800080;"></div>
+                  <p class="mt-3 mb-0 fw-bold text-white responsive-text-shadow">보라색</p>
                 </div>
               </div>
 
@@ -799,6 +799,22 @@ onMounted(async () => {
   padding: 2rem !important;
 }
 
+/* Lucky Color Circle Responsive */
+.lucky-color-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 0 auto;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2);
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.responsive-text-shadow {
+  font-size: 1.1rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
 @media (max-width: 768px) {
   /* Percentage based padding for mobile */
   .responsive-padding {
@@ -810,6 +826,17 @@ onMounted(async () => {
   
   .glass-card {
     border-radius: 12px;
+  }
+
+  /* Responsive Lucky Color Circle */
+  .lucky-color-circle {
+    width: 60px;
+    height: 60px;
+    border-width: 2px;
+  }
+  
+  .responsive-text-shadow {
+    font-size: 0.9rem;
   }
 
   /* 2x3 Grid implementation */
