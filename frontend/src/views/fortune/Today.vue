@@ -71,6 +71,9 @@
                 <li class="nav-item">
                   <a class="nav-link" id="tab-work" data-bs-toggle="tab" href="#work">직장운</a>
                 </li>
+                <li class="nav-item">
+                  <a class="nav-link" id="tab-health" data-bs-toggle="tab" href="#health">건강운</a>
+                </li>
               </ul>
             </div>
             <div class="card-body p-4 p-md-5">
@@ -138,6 +141,19 @@
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.work || 80}%; background: linear-gradient(90deg, #10b981, #34d399);`" :data-target="fortune.fortune_scores?.work || 80"></div>
                   </div>
                   <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.work || '직장운 내용')"></p>
+                </div>
+
+                <!-- 건강운 -->
+                <div class="tab-pane fade" id="health">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h4 class="text-white"><i class="fas fa-heartbeat me-2" style="color: #ec4899;"></i> 건강운</h4>
+                    <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.health || 70 }} / 100</span>
+                  </div>
+                  <div class="sub-score-bar">
+                    <span class="score-text">{{ fortune.fortune_scores?.health || 70 }}%</span>
+                    <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.health || 70}%; background: linear-gradient(90deg, #ec4899, #f472b6);`" :data-target="fortune.fortune_scores?.health || 70"></div>
+                  </div>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.health || '건강운 내용')"></p>
                 </div>
               </div>
             </div>

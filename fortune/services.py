@@ -178,7 +178,8 @@ class FortuneCalculator:
                     'money': llm_scores.get('money', fortune_scores['money']),
                     'love': llm_scores.get('love', fortune_scores['love']),
                     'study': llm_scores.get('study', fortune_scores['study']),
-                    'work': llm_scores.get('work', fortune_scores['work'])
+                    'work': llm_scores.get('work', fortune_scores['work']),
+                    'health': llm_scores.get('health', fortune_scores['health'])
                 }
                 print(f"[DEBUG] LLM 점수 사용: {fortune_scores}")
 
@@ -288,7 +289,7 @@ class FortuneCalculator:
      * 반드시 '{zodiac_item_name}'이라는 단어를 설명에 포함해주세요!
      * 예: "{zodiac_item_name}은(는) {zodiac}인 당신에게 특별한 행운을 가져다줍니다. 오늘 하루 긍정적인 변화가 찾아올 것입니다."
    - **두 설명의 길이를 비슷하게 맞춰주세요 (차이 10자 이내)**
-7. **총운 점수**: 재물운, 애정운, 학업운, 직장운 점수의 평균을 반올림하여 총운 점수로 사용해주세요.
+7. **총운 점수**: 재물운, 애정운, 학업운, 직장운, 건강운 점수의 평균을 반올림하여 총운 점수로 사용해주세요.
 
 [출력 형식]
 반드시 아래 JSON 형식으로만 출력하세요 (마크다운 코드 블록 없이 순수 JSON만):
@@ -298,12 +299,14 @@ class FortuneCalculator:
     "love": "애정운 내용...",
     "study": "학업운 내용...",
     "work": "직장운 내용...",
+    "health": "건강운 내용...",
     "scores": {{{{
         "total": 총운점수,
         "money": 재물운점수,
         "love": 애정운점수,
         "study": 학업운점수,
-        "work": 직장운점수
+        "work": 직장운점수,
+        "health": 건강운점수
     }}}},
     "lucky_item": {{{{
         "description": "{lucky_item_name}은(는)... (2문장, 60~80자, 아이템 이름 포함 필수)",
@@ -391,9 +394,10 @@ class FortuneCalculator:
         love = max(50, min(100, base + random.randint(-15, 20) + ohaeng_bonus['love']))
         study = max(50, min(100, base + random.randint(-10, 10) + ohaeng_bonus['study']))
         work = max(50, min(100, base + random.randint(-10, 15) + ohaeng_bonus['work']))
+        health = max(50, min(100, base + random.randint(-10, 10)))
 
-        # 총운은 4개 운세의 평균
-        total = round((money + love + study + work) / 4)
+        # 총운은 5개 운세의 평균
+        total = round((money + love + study + work + health) / 5)
 
         return {
             'total': total,
@@ -401,6 +405,7 @@ class FortuneCalculator:
             'love': love,
             'study': study,
             'work': work,
+            'health': health,
         }
     
     def _generate_fortune_texts(self, scores: Dict, zodiac_sign: str, chinese_zodiac: str) -> Dict:
@@ -563,7 +568,37 @@ class FortuneCalculator:
                 "오늘은 눈에 띄는 성과보다는 실수를 줄이고 안정적으로 하루를 마무리하는 데 집중하세요. "
                 "어려운 시기는 곧 지나갈 것이니 인내심을 가지고 견뎌내세요."
             )
-        
+
+        # 건강운
+        health_score = scores.get('health', 70)
+        if health_score >= 80:
+            texts['health'] = (
+                "건강운이 매우 좋은 날입니다. 몸과 마음 모두 활력이 넘치며 평소보다 에너지가 넘칠 것입니다. "
+                "운동을 시작하거나 새로운 건강 습관을 들이기에 최적의 시기입니다. "
+                "오전에 가벼운 스트레칭이나 조깅을 하면 하루 종일 상쾌한 기분을 유지할 수 있습니다. "
+                "면역력도 좋은 상태이니 평소 미뤄왔던 야외 활동이나 스포츠를 즐겨보세요. "
+                "충분한 수분 섭취와 균형 잡힌 식사를 병행하면 건강이 더욱 좋아질 것입니다. "
+                "오늘의 좋은 컨디션을 유지하기 위해 규칙적인 생활 패턴을 이어가세요."
+            )
+        elif health_score >= 60:
+            texts['health'] = (
+                "건강운이 안정적인 날입니다. 큰 문제는 없지만 자기 관리에 신경 쓰면 더 좋아질 수 있습니다. "
+                "규칙적인 식사와 적당한 운동이 건강 유지의 핵심이 될 것입니다. "
+                "장시간 앉아있는 것은 피하고, 틈틈이 스트레칭을 해주는 것이 좋습니다. "
+                "카페인이나 자극적인 음식은 자제하고, 따뜻한 차나 물을 자주 마시세요. "
+                "피로가 쌓이지 않도록 충분한 수면을 취하고, 스트레스 관리에도 신경 쓰세요. "
+                "오늘은 무리하지 않고 자신의 페이스를 유지하는 것이 중요합니다."
+            )
+        else:
+            texts['health'] = (
+                "건강 관리에 특별히 주의가 필요한 날입니다. 무리한 활동은 피하고 충분한 휴식을 취하세요. "
+                "면역력이 다소 떨어져 있을 수 있으니 손 씻기와 개인 위생에 신경 써주세요. "
+                "소화가 잘 안 될 수 있으니 기름진 음식보다는 담백하고 따뜻한 음식을 선택하세요. "
+                "두통이나 피로감이 느껴진다면 잠시 눈을 감고 휴식을 취하는 것이 좋습니다. "
+                "격한 운동보다는 가벼운 산책이나 요가 같은 저강도 활동이 적합합니다. "
+                "오늘은 몸의 신호에 귀 기울이고, 자신을 돌보는 시간을 가져보세요."
+            )
+
         return texts
     
     def _determine_lucky_colors(
