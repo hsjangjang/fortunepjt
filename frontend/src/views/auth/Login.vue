@@ -10,7 +10,7 @@
 
             <form @submit.prevent="handleLogin">
               <div class="mb-3">
-                <label class="form-label text-white">이메일 또는 아이디</label>
+                <label class="form-label text-white">아이디</label>
                 <div class="input-group">
                   <span class="input-group-text bg-transparent text-white border-secondary"><i class="fas fa-user"></i></span>
                   <input

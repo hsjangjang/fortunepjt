@@ -13,7 +13,7 @@
 
       <div v-if="fortune" class="row justify-content-center mb-4">
         <div class="col-lg-8">
-          <div class="glass-card p-4 p-md-5">
+          <div class="glass-card p-3 p-md-5">
             <div class="fortune-circle">
               <svg width="220" height="220">
                 <defs>
@@ -54,8 +54,8 @@
       <div v-if="fortune" class="row justify-content-center mb-4">
         <div class="col-lg-8">
           <div class="glass-card overflow-hidden">
-            <div class="card-header border-0 p-4">
-              <ul class="nav nav-pills fortune-tabs nav-fill gap-2" role="tablist">
+            <div class="card-header border-0 p-3 p-md-4">
+              <ul class="nav nav-pills fortune-tabs gap-2 mobile-grid-tabs" role="tablist">
                 <li class="nav-item">
                   <a class="nav-link active" id="tab-total" data-bs-toggle="tab" href="#total">종합운</a>
                 </li>
@@ -76,7 +76,7 @@
                 </li>
               </ul>
             </div>
-            <div class="card-body p-4 p-md-5">
+            <div class="card-body p-3 p-md-5">
               <div class="tab-content">
                 <!-- 종합운 -->
                 <div class="tab-pane fade show active" id="total">
@@ -165,7 +165,7 @@
       <div v-if="fortune" class="row justify-content-center mb-4">
         <div class="col-lg-8">
           <div class="glass-card">
-            <div class="card-body p-4 p-md-5">
+            <div class="card-body p-3 p-md-5">
               <h4 class="text-white text-center mb-4">
                 <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
@@ -205,7 +205,7 @@
       <div v-if="fortune" class="row justify-content-center mb-4">
         <div class="col-lg-8">
           <div class="glass-card">
-            <div class="card-body p-4 p-md-5">
+            <div class="card-body p-3 p-md-5">
               <h4 class="text-white text-center mb-4">
                 <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
@@ -270,7 +270,7 @@
       <div v-if="fortune && !isMinor" class="row justify-content-center mb-4">
         <div class="col-lg-8">
           <div class="glass-card">
-            <div class="card-body p-4 p-md-5">
+            <div class="card-body p-3 p-md-5">
               <h4 class="text-white text-center mb-4">
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
@@ -730,21 +730,51 @@ onMounted(async () => {
 .nav-pills .nav-link {
   color: rgba(255,255,255,0.5);
   transition: all 0.3s;
-  border-right: 1px solid rgba(255,255,255,0.1);
-  border-radius: 0;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px; /* Slightly rounded for individual buttons */
+  width: 100%;
 }
 .nav-pills .nav-item:last-child .nav-link {
-  border-right: none;
+  border-right: 1px solid rgba(255,255,255,0.1); /* Ensure border exists */
 }
 .nav-pills .nav-link.active {
   color: white;
   background-color: transparent;
+  border-color: #a78bfa;
   font-weight: bold;
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
+}
+
+/* Mobile Grid for Tabs */
+.mobile-grid-tabs {
+  display: flex !important;
 }
 
 @media (max-width: 768px) {
   .glass-card {
-    padding: 1.5rem !important;
+    padding: 1rem !important; /* Reduced padding on mobile roots if needed */
+  }
+  
+  .card-body {
+    padding: 1rem !important; /* Force reduced padding on mobile */
+  }
+
+  /* 2x3 Grid implementation */
+  .mobile-grid-tabs {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(3, auto);
+    gap: 0.5rem !important;
+  }
+
+  .nav-pills .nav-item {
+    width: 100%;
+  }
+
+  .nav-pills .nav-link {
+    text-align: center;
+    padding: 0.5rem 0.25rem;
+    font-size: 0.95rem;
   }
 }
 </style>
