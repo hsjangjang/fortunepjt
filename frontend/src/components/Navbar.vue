@@ -188,24 +188,15 @@ onUnmounted(() => {
 })
 
 const handleLogout = async () => {
-  // 먼저 홈으로 즉시 이동 (이전 사용자 데이터 노출 방지)
-  await router.push('/')
-
   // UI 상태 초기화
   userDropdownOpen.value = false
   mobileMenuOpen.value = false
 
-  // 모든 Store 초기화 (보안: 이전 사용자 데이터 제거)
-  const { useFortuneStore } = await import('@/stores/fortune')
-  const { useRecommendationsStore } = await import('@/stores/recommendations')
-  const fortuneStore = useFortuneStore()
-  const recommendationsStore = useRecommendationsStore()
-
-  fortuneStore.clearFortune()
-  recommendationsStore.clearAll()
-
-  // 로그아웃 API 호출
+  // 로그아웃 API 호출 먼저 (인증 상태 변경)
   await authStore.logout()
+
+  // 홈으로 이동 (라우터 가드가 인증 필요 페이지 접근 차단)
+  await router.push('/')
 
   // Django: messages.success(request, '로그아웃되었습니다.')
   showToast('로그아웃되었습니다.', 'success')

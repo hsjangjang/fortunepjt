@@ -109,10 +109,9 @@ async function calculateFortune() {
     console.log('[FortuneLoading] Response:', data)
 
     if (data.success && data.fortune) {
-      // Fortune Store에 저장 (Django 세션과 동기화)
+      // Fortune Store에 저장 (action 사용으로 반응성 유지)
       const today = new Date().toISOString().split('T')[0]
-      fortuneStore.fortuneData = data.fortune
-      fortuneStore.fortuneDate = today
+      fortuneStore.setFortune(data.fortune, today)
 
       console.log('[FortuneLoading] Fortune Store에 저장 완료:', today)
 

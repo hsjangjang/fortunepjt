@@ -483,9 +483,8 @@ onMounted(async () => {
       if (response.data.success && response.data.fortune) {
         fortune.value = response.data.fortune
 
-        // Fortune Store에도 저장 (localStorage 동기화)
-        fortuneStore.fortuneData = response.data.fortune
-        fortuneStore.fortuneDate = today
+        // Fortune Store에도 저장 (action 사용으로 반응성 유지)
+        fortuneStore.setFortune(response.data.fortune, today)
       } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
         // 비로그인 + API 실패 + Store에 데이터 있음 → Store 데이터 사용
         console.log('[Today] API 실패, Fortune Store 데이터 사용')

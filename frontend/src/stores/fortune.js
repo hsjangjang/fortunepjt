@@ -144,6 +144,15 @@ export const useFortuneStore = defineStore('fortune', () => {
     console.log('[Fortune Store] 로컬 상태 초기화')
   }
 
+  /**
+   * 운세 데이터 직접 설정 (Loading.vue에서 사용)
+   */
+  function setFortune(fortune, date) {
+    fortuneData.value = fortune
+    fortuneDate.value = date
+    console.log('[Fortune Store] 운세 데이터 설정:', date)
+  }
+
   return {
     // State
     fortuneData,
@@ -161,6 +170,7 @@ export const useFortuneStore = defineStore('fortune', () => {
     checkTodayFortune,
     calculateFortune,
     resetFortune,
-    clearFortune
+    clearFortune,
+    setFortune
   }
 })
