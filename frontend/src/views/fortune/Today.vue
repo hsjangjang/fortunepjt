@@ -12,8 +12,8 @@
       </div>
 
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8">
-          <div class="glass-card p-3 p-md-5">
+        <div class="col-lg-8 col-12 px-2 px-md-3">
+          <div class="glass-card responsive-padding">
             <div class="fortune-circle">
               <svg width="220" height="220">
                 <defs>
@@ -52,9 +52,9 @@
 
       <!-- Fortune Details Tabs -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-12 px-2 px-md-3">
           <div class="glass-card overflow-hidden">
-            <div class="card-header border-0 p-3 p-md-4">
+            <div class="card-header border-0 responsive-padding-header">
               <ul class="nav nav-pills fortune-tabs gap-2 mobile-grid-tabs" role="tablist">
                 <li class="nav-item">
                   <a class="nav-link active" id="tab-total" data-bs-toggle="tab" href="#total">종합운</a>
@@ -76,7 +76,7 @@
                 </li>
               </ul>
             </div>
-            <div class="card-body p-3 p-md-5">
+            <div class="card-body responsive-padding">
               <div class="tab-content">
                 <!-- 종합운 -->
                 <div class="tab-pane fade show active" id="total">
@@ -146,12 +146,12 @@
                 <!-- 건강운 -->
                 <div class="tab-pane fade" id="health">
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="text-white"><i class="fas fa-heartbeat me-2" style="color: #ec4899;"></i> 건강운</h4>
+                    <h4 class="text-white"><i class="fas fa-heartbeat me-2" style="color: #2dd4bf;"></i> 건강운</h4>
                     <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.health || 70 }} / 100</span>
                   </div>
                   <div class="sub-score-bar">
                     <span class="score-text">{{ fortune.fortune_scores?.health || 70 }}%</span>
-                    <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.health || 70}%; background: linear-gradient(90deg, #ec4899, #f472b6);`" :data-target="fortune.fortune_scores?.health || 70"></div>
+                    <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.health || 70}%; background: linear-gradient(90deg, #2dd4bf, #99f6e4);`" :data-target="fortune.fortune_scores?.health || 70"></div>
                   </div>
                   <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.health || '건강운 내용')"></p>
                 </div>
@@ -163,9 +163,9 @@
 
       <!-- Lucky Colors Section -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-12 px-2 px-md-3">
           <div class="glass-card">
-            <div class="card-body p-3 p-md-5">
+            <div class="card-body responsive-padding">
               <h4 class="text-white text-center mb-4">
                 <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
@@ -203,9 +203,9 @@
 
       <!-- Lucky Item Section -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-12 px-2 px-md-3">
           <div class="glass-card">
-            <div class="card-body p-3 p-md-5">
+            <div class="card-body responsive-padding">
               <h4 class="text-white text-center mb-4">
                 <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
@@ -268,9 +268,9 @@
 
       <!-- Lucky Numbers Section (성인만 표시) -->
       <div v-if="fortune && !isMinor" class="row justify-content-center mb-4">
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-12 px-2 px-md-3">
           <div class="glass-card">
-            <div class="card-body p-3 p-md-5">
+            <div class="card-body responsive-padding">
               <h4 class="text-white text-center mb-4">
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
@@ -295,7 +295,7 @@
 
       <!-- Recommendations -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-12 px-2 px-md-3">
           <div class="row g-4">
             <div class="col-md-6">
               <div class="glass-card h-100 p-4 text-center hover-lift">
@@ -728,21 +728,62 @@ onMounted(async () => {
 }
 
 .nav-pills .nav-link {
-  color: rgba(255,255,255,0.5);
+  color: rgba(255,255,255,0.6);
   transition: all 0.3s;
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 8px; /* Slightly rounded for individual buttons */
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 12px; /* Rounded corners like the score box */
+  background: rgba(255, 255, 255, 0.05); /* Faint background */
   width: 100%;
+  padding: 0.6rem 0.5rem;
 }
 .nav-pills .nav-item:last-child .nav-link {
-  border-right: 1px solid rgba(255,255,255,0.1); /* Ensure border exists */
+  border-right: 1px solid rgba(255,255,255,0.15);
+}
+.nav-pills .nav-link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
 }
 .nav-pills .nav-link.active {
   color: white;
-  background-color: transparent;
-  border-color: #a78bfa;
   font-weight: bold;
+}
+
+/* Individual Active Colors for Tabs (Rounded Line Button Style) */
+/* Total: Purple */
+#tab-total.active {
+  background: rgba(124, 58, 237, 0.25);
+  border-color: #a78bfa;
   box-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
+}
+/* Money: Yellow */
+#tab-money.active {
+  background: rgba(245, 158, 11, 0.25);
+  border-color: #fbbf24;
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
+}
+/* Love: Red */
+#tab-love.active {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: #f87171;
+  box-shadow: 0 0 10px rgba(248, 113, 113, 0.2);
+}
+/* Study: Blue */
+#tab-study.active {
+  background: rgba(59, 130, 246, 0.25);
+  border-color: #60a5fa;
+  box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
+}
+/* Work: Green */
+#tab-work.active {
+  background: rgba(16, 185, 129, 0.25);
+  border-color: #34d399;
+  box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
+}
+/* Health: Teal */
+#tab-health.active {
+  background: rgba(45, 212, 191, 0.25);
+  border-color: #2dd4bf;
+  box-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
 }
 
 /* Mobile Grid for Tabs */
@@ -750,13 +791,25 @@ onMounted(async () => {
   display: flex !important;
 }
 
+/* Responsive Padding Utilities */
+.responsive-padding {
+  padding: 3rem !important; /* Desktop Default */
+}
+.responsive-padding-header {
+  padding: 2rem !important;
+}
+
 @media (max-width: 768px) {
-  .glass-card {
-    padding: 1rem !important; /* Reduced padding on mobile roots if needed */
+  /* Percentage based padding for mobile */
+  .responsive-padding {
+    padding: 5% !important; /* ~3-4% visual feel */
+  }
+  .responsive-padding-header {
+    padding: 4% !important;
   }
   
-  .card-body {
-    padding: 1rem !important; /* Force reduced padding on mobile */
+  .glass-card {
+    border-radius: 12px;
   }
 
   /* 2x3 Grid implementation */
@@ -764,7 +817,7 @@ onMounted(async () => {
     display: grid !important;
     grid-template-columns: repeat(2, 1fr);
     grid-template-rows: repeat(3, auto);
-    gap: 0.5rem !important;
+    gap: 0.75rem !important;
   }
 
   .nav-pills .nav-item {
@@ -773,8 +826,11 @@ onMounted(async () => {
 
   .nav-pills .nav-link {
     text-align: center;
-    padding: 0.5rem 0.25rem;
     font-size: 0.95rem;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 </style>
