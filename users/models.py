@@ -158,3 +158,27 @@ class User(AbstractUser):
         period = '오전' if hour < 12 else '오후'
         display_hour = 12 if hour == 0 else (hour - 12 if hour > 12 else hour)
         return f"{period} {display_hour:02d}:{minute}"
+
+
+class EmailVerificationCode(models.Model):
+    """이메일 인증코드 모델 (비밀번호 찾기용)"""
+    email = models.EmailField(verbose_name='이메일')
+    username = models.CharField(max_length=150, verbose_name='아이디')
+    code = models.CharField(max_length=6, verbose_name='인증코드')
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField(verbose_name='만료시간')
+    is_verified = models.BooleanField(default=False, verbose_name='인증완료')
+
+    class Meta:
+        db_table = 'email_verification_codes'
+        verbose_name = '이메일 인증코드'
+        verbose_name_plural = '이메일 인증코드들'
+
+    def __str__(self):
+        return f"{self.email} - {self.code}"
+
+    @property
+    def is_expired(self):
+        """만료 여부 확인"""
+        from django.utils import timezone
+        return timezone.now() > self.expires_at

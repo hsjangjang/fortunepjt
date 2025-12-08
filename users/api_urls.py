@@ -32,6 +32,10 @@ urlpatterns = [
     # 아이디 찾기
     path('find-username/', api_views.FindUsernameAPIView.as_view(), name='find_username'),
 
-    # 비밀번호 찾기 (임시 비밀번호 발급)
+    # 비밀번호 찾기 (2단계 인증)
+    path('password-reset/send-code/', api_views.SendPasswordResetCodeAPIView.as_view(), name='send_password_reset_code'),
+    path('password-reset/verify/', api_views.VerifyCodeAndResetPasswordAPIView.as_view(), name='verify_and_reset_password'),
+
+    # 비밀번호 찾기 (레거시 - 호환성 유지)
     path('find-password/', api_views.FindPasswordAPIView.as_view(), name='find_password'),
 ]
