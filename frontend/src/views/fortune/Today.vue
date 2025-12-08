@@ -469,21 +469,36 @@ onMounted(async () => {
   // Django 세션과 동기화된 운세 데이터 가져오기
   try {
     isLoading.value = true
-    const response = await apiClient.get('/api/fortune/today/')
+    const today = new Date().toISOString().split('T')[0]
 
-    if (response.data.success && response.data.fortune) {
-      fortune.value = response.data.fortune
+    // 1. 비로그인 사용자: Fortune Store에 이미 데이터가 있으면 사용
+    if (!authStore.isAuthenticated && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
+      console.log('[Today] Fortune Store에서 운세 로드 (비로그인)')
+      fortune.value = fortuneStore.fortuneData
+    } else {
+      // 2. 로그인 사용자 또는 Store에 데이터 없음: API 호출
+      console.log('[Today] API에서 운세 로드')
+      const response = await apiClient.get('/api/fortune/today/')
 
-      // Fortune Store에도 저장 (localStorage 동기화)
-      const today = new Date().toISOString().split('T')[0]
-      fortuneStore.fortuneData = response.data.fortune
-      fortuneStore.fortuneDate = today
+      if (response.data.success && response.data.fortune) {
+        fortune.value = response.data.fortune
 
+        // Fortune Store에도 저장 (localStorage 동기화)
+        fortuneStore.fortuneData = response.data.fortune
+        fortuneStore.fortuneDate = today
+      } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
+        // 비로그인 + API 실패 + Store에 데이터 있음 → Store 데이터 사용
+        console.log('[Today] API 실패, Fortune Store 데이터 사용')
+        fortune.value = fortuneStore.fortuneData
+      }
+    }
+
+    if (fortune.value) {
       // 미성년자 체크
       if (authStore.user?.birth_date) {
         const birthDate = new Date(authStore.user.birth_date)
-        const today = new Date()
-        const age = today.getFullYear() - birthDate.getFullYear()
+        const todayDate = new Date()
+        const age = todayDate.getFullYear() - birthDate.getFullYear()
         isMinor.value = age < 19
       }
 
@@ -511,14 +526,14 @@ onMounted(async () => {
           })
         })
       }, 100)
-    } else {
-      // 운세 데이터 없음 - 로딩 페이지로 이동
-      router.push('/fortune/loading')
     }
   } catch (error) {
     console.error('Failed to fetch fortune:', error)
-    // 에러 시 로딩 페이지로 이동
-    router.push('/fortune/loading')
+    // 비로그인 + Store에 데이터 있으면 사용
+    if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
+      console.log('[Today] API 에러, Fortune Store 데이터 사용')
+      fortune.value = fortuneStore.fortuneData
+    }
   } finally {
     isLoading.value = false
   }
