@@ -215,8 +215,23 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresFortune) {
     console.log('[Router Guard] 운세 필요한 페이지')
 
-    // 운세 데이터 확인 (API 호출) - 로그인/비로그인 모두 체크
-    const hasFortune = await fortuneStore.checkTodayFortune()
+    const today = new Date().toISOString().split('T')[0]
+    let hasFortune = false
+
+    // 비로그인 사용자: Store 데이터 먼저 확인 (API 호출 없이)
+    if (!authStore.isAuthenticated) {
+      // Store에 오늘 날짜의 운세가 있으면 통과
+      if (fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
+        console.log('[Router Guard] 비로그인 - Store에 오늘 운세 있음')
+        hasFortune = true
+      } else {
+        console.log('[Router Guard] 비로그인 - Store에 운세 없음')
+        hasFortune = false
+      }
+    } else {
+      // 로그인 사용자: API 호출로 확인
+      hasFortune = await fortuneStore.checkTodayFortune()
+    }
 
     console.log('[Router Guard] 운세 체크 완료')
     console.log('[Router Guard] hasFortune:', hasFortune)
