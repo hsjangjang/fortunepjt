@@ -1,9 +1,9 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-6 col-12 mx-auto px-1 px-md-3">
+      <div class="col-lg-6 mx-auto">
         <div class="glass-card shadow-lg">
-          <div class="card-body responsive-padding">
+          <div class="card-body p-5">
             <h2 class="text-center mb-4 text-white">
               <i class="fas fa-user-plus text-primary"></i> 회원가입
             </h2>
@@ -443,6 +443,19 @@ const handleRegister = async () => {
     router.push('/login')
   } catch (error) {
     showToast(error.message || '회원가입에 실패했습니다.', 'error')
+  }
+}
+</script>
+
+<style scoped>
+.btn-check-duplicate {
+  white-space: nowrap;
+  min-width: 80px;
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-check-duplicate:hover {
+  background-color: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
 }
 </style>
