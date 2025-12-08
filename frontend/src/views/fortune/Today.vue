@@ -469,7 +469,9 @@ onMounted(async () => {
   // Django 세션과 동기화된 운세 데이터 가져오기
   try {
     isLoading.value = true
-    const today = new Date().toISOString().split('T')[0]
+    // 로컬 시간 기준 오늘 날짜
+    const now = new Date()
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
     // 1. 비로그인 사용자: Fortune Store에 이미 데이터가 있으면 사용
     if (!authStore.isAuthenticated && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {

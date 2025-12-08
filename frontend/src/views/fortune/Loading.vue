@@ -110,7 +110,9 @@ async function calculateFortune() {
 
     if (data.success && data.fortune) {
       // Fortune Store에 저장 (action 사용으로 반응성 유지)
-      const today = new Date().toISOString().split('T')[0]
+      // 로컬 시간 기준 오늘 날짜
+      const now = new Date()
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
       fortuneStore.setFortune(data.fortune, today)
 
       console.log('[FortuneLoading] Fortune Store에 저장 완료:', today)

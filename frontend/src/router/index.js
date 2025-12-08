@@ -215,7 +215,9 @@ router.beforeEach(async (to, from, next) => {
   if (to.meta.requiresFortune) {
     console.log('[Router Guard] 운세 필요한 페이지')
 
-    const today = new Date().toISOString().split('T')[0]
+    // 로컬 시간 기준 오늘 날짜
+    const now = new Date()
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
     let hasFortune = false
 
     // 비로그인 사용자: Store 데이터 먼저 확인 (API 호출 없이)

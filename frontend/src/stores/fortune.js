@@ -8,9 +8,18 @@ export const useFortuneStore = defineStore('fortune', () => {
   const fortuneDate = ref(null)
   const loading = ref(false)
 
+  // 로컬 시간 기준 오늘 날짜 (YYYY-MM-DD)
+  const getLocalToday = () => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = String(now.getMonth() + 1).padStart(2, '0')
+    const day = String(now.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   // Getters
   const hasTodayFortune = computed(() => {
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalToday()
     return fortuneData.value !== null && fortuneDate.value === today
   })
 
@@ -37,10 +46,10 @@ export const useFortuneStore = defineStore('fortune', () => {
    * Django와 Vue가 동일한 DB 캐시를 공유하므로 완전히 동일한 운세 반환
    */
   async function checkTodayFortune() {
-    const today = new Date().toISOString().split('T')[0]
+    const today = getLocalToday()
 
     // 항상 API 호출 (DB 캐시에서 가져옴, Django와 동일한 소스)
-    console.log('[Fortune Store] DB 캐시에서 운세 확인')
+    console.log('[Fortune Store] DB 캐시에서 운세 확인, 오늘:', today)
     try {
       const response = await apiClient.get('/api/fortune/today/')
 
@@ -95,7 +104,7 @@ export const useFortuneStore = defineStore('fortune', () => {
 
       if (response.data.success && response.data.fortune) {
         fortuneData.value = response.data.fortune
-        fortuneDate.value = new Date().toISOString().split('T')[0]
+        fortuneDate.value = getLocalToday()
         console.log('[Fortune Store] 운세 계산 완료 및 DB 캐시에 저장')
         return { success: true, fortune: response.data.fortune }
       } else {
