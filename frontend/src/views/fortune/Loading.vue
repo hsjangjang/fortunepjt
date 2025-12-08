@@ -197,10 +197,11 @@ function showError(message) {
 .loading-error {
   color: #ff6b6b;
   margin-top: 20px;
-  display: none;
-}
-
-.loading-error.show {
-  display: block;
+  font-size: 1rem;
+  text-align: center;
+  padding: 10px 20px;
+  background: rgba(255, 107, 107, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 107, 107, 0.3);
 }
 </style>

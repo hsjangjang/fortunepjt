@@ -220,12 +220,18 @@ router.beforeEach(async (to, from, next) => {
 
     // 비로그인 사용자: Store 데이터 먼저 확인 (API 호출 없이)
     if (!authStore.isAuthenticated) {
+      console.log('[Router Guard] 비로그인 사용자 Store 체크:')
+      console.log('[Router Guard] - fortuneData:', fortuneStore.fortuneData)
+      console.log('[Router Guard] - fortuneDate:', fortuneStore.fortuneDate)
+      console.log('[Router Guard] - today:', today)
+      console.log('[Router Guard] - 날짜 일치:', fortuneStore.fortuneDate === today)
+
       // Store에 오늘 날짜의 운세가 있으면 통과
       if (fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
-        console.log('[Router Guard] 비로그인 - Store에 오늘 운세 있음')
+        console.log('[Router Guard] 비로그인 - Store에 오늘 운세 있음 → 통과')
         hasFortune = true
       } else {
-        console.log('[Router Guard] 비로그인 - Store에 운세 없음')
+        console.log('[Router Guard] 비로그인 - Store에 운세 없음 → 리다이렉트')
         hasFortune = false
       }
     } else {
