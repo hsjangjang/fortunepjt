@@ -334,7 +334,24 @@ const analyzeItem = async (file, imageData) => {
     }
   } catch (error) {
     console.error('분석 실패:', error)
-    alert('분석 중 오류가 발생했습니다.')
+
+    // 에러 타입에 따른 구체적인 메시지
+    let errorMessage = '분석 중 오류가 발생했습니다.'
+
+    if (error.response) {
+      const status = error.response.status
+      if (status === 413) {
+        errorMessage = '파일 용량이 너무 큽니다. 최대 10MB까지 업로드 가능합니다.'
+      } else if (status === 400) {
+        errorMessage = error.response.data?.message || '잘못된 요청입니다.'
+      } else if (status === 500) {
+        errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      }
+    } else if (error.request) {
+      errorMessage = '네트워크 연결을 확인해주세요.'
+    }
+
+    alert(errorMessage)
     resetUpload()
   }
 }

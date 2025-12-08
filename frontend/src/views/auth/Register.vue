@@ -1,9 +1,9 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-6 mx-auto">
+      <div class="col-lg-6 col-12 mx-auto px-1 px-md-3">
         <div class="glass-card shadow-lg">
-          <div class="card-body p-5">
+          <div class="card-body responsive-padding">
             <h2 class="text-center mb-4 text-white">
               <i class="fas fa-user-plus text-primary"></i> 회원가입
             </h2>
@@ -457,5 +457,16 @@ const handleRegister = async () => {
 .btn-check-duplicate:hover {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive Padding */
+.responsive-padding {
+  padding: 3rem !important;
+}
+
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding: 3% !important;
+  }
 }
 </style>

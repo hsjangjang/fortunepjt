@@ -78,28 +78,28 @@
     <div class="glass-card mb-5 p-5">
       <h2 class="text-center mb-5">어떻게 작동하나요?</h2>
       <div class="row text-center g-4">
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
           <div class="d-inline-flex align-items-center justify-content-center rounded-circle border border-primary border-opacity-50 mb-3" style="width: 60px; height: 60px; background: rgba(124, 58, 237, 0.1);">
             <span class="h4 mb-0 text-primary">1</span>
           </div>
           <h5>정보 입력</h5>
           <p class="text-muted small">생년월일과 성별 입력</p>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
           <div class="d-inline-flex align-items-center justify-content-center rounded-circle border border-primary border-opacity-50 mb-3" style="width: 60px; height: 60px; background: rgba(124, 58, 237, 0.1);">
             <span class="h4 mb-0 text-primary">2</span>
           </div>
           <h5>운세 계산</h5>
           <p class="text-muted small">사주, 별자리 분석</p>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
           <div class="d-inline-flex align-items-center justify-content-center rounded-circle border border-primary border-opacity-50 mb-3" style="width: 60px; height: 60px; background: rgba(124, 58, 237, 0.1);">
             <span class="h4 mb-0 text-primary">3</span>
           </div>
           <h5>AI 분석</h5>
           <p class="text-muted small">개인 맞춤 추천 생성</p>
         </div>
-        <div class="col-md-3">
+        <div class="col-6 col-md-3">
           <div class="d-inline-flex align-items-center justify-content-center rounded-circle border border-primary border-opacity-50 mb-3" style="width: 60px; height: 60px; background: rgba(124, 58, 237, 0.1);">
             <span class="h4 mb-0 text-primary">4</span>
           </div>
