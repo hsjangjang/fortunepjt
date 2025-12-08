@@ -190,49 +190,73 @@ class ItemAnalyzeAPIView(APIView):
                 'error': '이미지를 업로드해주세요.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        import tempfile
+        import os
+        temp_path = None
+
         try:
-            import tempfile
-            from django.core.files.storage import default_storage
+            # 임시 파일로 저장 (S3 환경에서도 동작하도록)
+            suffix = os.path.splitext(image.name)[1] or '.jpg'
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                for chunk in image.chunks():
+                    tmp.write(chunk)
+                temp_path = tmp.name
 
-            # 임시 파일 저장
-            temp_path = default_storage.save(f'temp/{image.name}', image)
-            full_path = default_storage.path(temp_path)
+            print(f"[ItemAnalyzeAPIView] 임시 파일 생성: {temp_path}")
 
-            try:
-                from .color_analyzer import ImageColorAnalyzer
-                analyzer = ImageColorAnalyzer()
-                analysis_result = analyzer.analyze_image_with_ai(full_path)
+            from .color_analyzer import ImageColorAnalyzer
+            analyzer = ImageColorAnalyzer()
+            analysis_result = analyzer.analyze_image_with_ai(temp_path)
 
-                # 카테고리 추천
-                ai_category = analysis_result.get('ai_analysis', {}).get('category', '')
-                category_mapping = {
-                    'wallet': '지갑', 'keyring': '키링', 'doll': '인형',
-                    'electronics': '전자기기', 'clothing': '의류',
-                    'accessory': '액세서리', 'food': '음식', 'etc': '기타'
-                }
-
-                if ai_category in category_mapping.values():
-                    item_name_display = ai_category
-                else:
-                    item_name_display = category_mapping.get(ai_category.lower(), ai_category)
-
+            # API 할당량 초과 에러 체크
+            if not analysis_result.get('success') and analysis_result.get('error_type') == 'quota_exceeded':
                 return Response({
-                    'success': True,
-                    'analysis': analysis_result,
-                    'suggested_name': item_name_display
-                })
-            finally:
-                # 임시 파일 삭제
-                try:
-                    default_storage.delete(temp_path)
-                except Exception:
-                    pass
+                    'success': False,
+                    'error': analysis_result.get('message', 'AI 분석 서비스가 일시적으로 제한되었습니다.'),
+                    'error_type': 'quota_exceeded'
+                }, status=503)
+
+            # 카테고리 추천
+            ai_category = analysis_result.get('ai_analysis', {}).get('category', '')
+            ai_item_name = analysis_result.get('ai_analysis', {}).get('item_name', '')
+            category_mapping = {
+                'wallet': '지갑', 'keyring': '키링', 'doll': '인형',
+                'electronics': '전자기기', 'clothing': '의류',
+                'accessory': '액세서리', 'food': '음식', 'etc': '기타'
+            }
+
+            # 아이템명 결정 (item_name 우선)
+            if ai_item_name:
+                item_name_display = ai_item_name
+            elif ai_category in category_mapping.values():
+                item_name_display = ai_category
+            else:
+                item_name_display = category_mapping.get(ai_category.lower(), ai_category) if ai_category else '아이템'
+
+            return Response({
+                'success': True,
+                'analysis': analysis_result,
+                'suggested_name': item_name_display,
+                'item_name': item_name_display
+            })
 
         except Exception as e:
+            import traceback
+            print(f"[ItemAnalyzeAPIView] Error: {str(e)}")
+            print(traceback.format_exc())
             return Response({
                 'success': False,
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        finally:
+            # 임시 파일 삭제
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                    print(f"[ItemAnalyzeAPIView] 임시 파일 삭제: {temp_path}")
+                except Exception as cleanup_error:
+                    print(f"[ItemAnalyzeAPIView] 임시 파일 삭제 실패: {cleanup_error}")
 
 
 class ItemFavoriteAPIView(APIView):

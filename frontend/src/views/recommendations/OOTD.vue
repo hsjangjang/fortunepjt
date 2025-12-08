@@ -94,12 +94,12 @@
                       <Star v-if="luckyColors" class="text-warning me-1" :size="12" />
                       {{ luckyColors ? '행운색 기반' : '추천 색상' }}
                     </h6>
-                    <div class="d-flex justify-content-center gap-3 flex-wrap">
-                      <span class="d-flex align-items-center text-white small">
+                    <div class="d-flex align-items-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
+                      <span class="d-flex align-items-center text-white small flex-shrink-0">
                         <span class="color-dot small me-1" :style="`background-color: ${colorMap[outfit.top_color] || '#ddd'}`"></span>
                         {{ outfit.top_color || '베이지' }}
                       </span>
-                      <span v-for="color in outfit.top_alt_colors" :key="color" class="d-flex align-items-center text-white small">
+                      <span v-for="color in outfit.top_alt_colors" :key="color" class="d-flex align-items-center text-white small flex-shrink-0">
                         <span class="color-dot small me-1" :style="`background-color: ${colorMap[color] || '#ddd'}`"></span>
                         {{ color }}
                       </span>
@@ -125,12 +125,12 @@
                       <Star v-if="luckyColors" class="text-warning me-1" :size="12" />
                       {{ luckyColors ? '행운색 기반' : '추천 색상' }}
                     </h6>
-                    <div class="d-flex justify-content-center gap-3 flex-wrap">
-                      <span class="d-flex align-items-center text-white small">
+                    <div class="d-flex align-items-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
+                      <span class="d-flex align-items-center text-white small flex-shrink-0">
                         <span class="color-dot small me-1" :style="`background-color: ${colorMap[outfit.bottom_color] || '#ddd'}`"></span>
                         {{ outfit.bottom_color || '블랙' }}
                       </span>
-                      <span v-for="color in outfit.bottom_alt_colors" :key="color" class="d-flex align-items-center text-white small">
+                      <span v-for="color in outfit.bottom_alt_colors" :key="color" class="d-flex align-items-center text-white small flex-shrink-0">
                         <span class="color-dot small me-1" :style="`background-color: ${colorMap[color] || '#ddd'}`"></span>
                         {{ color }}
                       </span>
