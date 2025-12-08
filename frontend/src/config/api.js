@@ -16,6 +16,21 @@ const apiClient = axios.create({
   withCredentials: false, // JWT 토큰 사용 시 쿠키 불필요
 })
 
+// 토큰 갱신 중복 방지 플래그
+let isRefreshing = false
+let failedQueue = []
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error)
+    } else {
+      prom.resolve(token)
+    }
+  })
+  failedQueue = []
+}
+
 // 요청 인터셉터 - 토큰 자동 추가
 apiClient.interceptors.request.use(
   (config) => {
@@ -39,19 +54,74 @@ apiClient.interceptors.request.use(
   }
 )
 
-// 응답 인터셉터 - 에러 처리
+// 응답 인터셉터 - 에러 처리 및 토큰 자동 갱신
 apiClient.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config
+
     if (error.response) {
-      // 401 Unauthorized - 로그인 필요
-      // 단, 로그인 API 요청에서는 리다이렉트하지 않음 (에러 메시지 표시 필요)
-      if (error.response.status === 401) {
-        const isLoginRequest = error.config.url?.includes('/api/auth/login')
-        if (!isLoginRequest) {
+      // 401 Unauthorized - 토큰 갱신 시도
+      if (error.response.status === 401 && !originalRequest._retry) {
+        // 로그인/갱신 요청에서는 갱신 시도하지 않음
+        const isAuthRequest = originalRequest.url?.includes('/api/auth/login') ||
+                              originalRequest.url?.includes('/api/auth/refresh')
+        if (isAuthRequest) {
+          return Promise.reject(error)
+        }
+
+        // 이미 갱신 중이면 큐에 추가
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject })
+          }).then(token => {
+            originalRequest.headers.Authorization = `Bearer ${token}`
+            return apiClient(originalRequest)
+          }).catch(err => {
+            return Promise.reject(err)
+          })
+        }
+
+        originalRequest._retry = true
+        isRefreshing = true
+
+        const refreshToken = localStorage.getItem('refresh_token')
+
+        if (!refreshToken) {
+          // refresh token이 없으면 로그아웃
+          isRefreshing = false
           localStorage.removeItem('access_token')
           localStorage.removeItem('refresh_token')
+          localStorage.removeItem('user')
           window.location.href = '/login'
+          return Promise.reject(error)
+        }
+
+        try {
+          // 토큰 갱신 요청
+          const response = await axios.post(`${API_BASE_URL}/api/auth/refresh/`, {
+            refresh: refreshToken
+          })
+
+          const newAccessToken = response.data.access
+          localStorage.setItem('access_token', newAccessToken)
+
+          // 대기 중인 요청들 처리
+          processQueue(null, newAccessToken)
+
+          // 원래 요청 재시도
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`
+          return apiClient(originalRequest)
+        } catch (refreshError) {
+          // 갱신 실패 - 로그아웃
+          processQueue(refreshError, null)
+          localStorage.removeItem('access_token')
+          localStorage.removeItem('refresh_token')
+          localStorage.removeItem('user')
+          window.location.href = '/login'
+          return Promise.reject(refreshError)
+        } finally {
+          isRefreshing = false
         }
       }
 
