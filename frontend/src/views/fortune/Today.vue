@@ -12,7 +12,7 @@
       </div>
 
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-2 px-md-3">
+        <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="glass-card responsive-padding">
             <div class="fortune-circle">
               <svg width="220" height="220">
@@ -52,7 +52,7 @@
 
       <!-- Fortune Details Tabs -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-2 px-md-3">
+        <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="glass-card overflow-hidden">
             <div class="card-header border-0 responsive-padding-header">
               <ul class="nav nav-pills fortune-tabs gap-2 mobile-grid-tabs" role="tablist">
@@ -163,7 +163,7 @@
 
       <!-- Lucky Colors Section -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-2 px-md-3">
+        <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="glass-card">
             <div class="card-body responsive-padding">
               <h4 class="text-white text-center mb-4">
@@ -203,7 +203,7 @@
 
       <!-- Lucky Item Section -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-2 px-md-3">
+        <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="glass-card">
             <div class="card-body responsive-padding">
               <h4 class="text-white text-center mb-4">
@@ -268,7 +268,7 @@
 
       <!-- Lucky Numbers Section (성인만 표시) -->
       <div v-if="fortune && !isMinor" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-2 px-md-3">
+        <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="glass-card">
             <div class="card-body responsive-padding">
               <h4 class="text-white text-center mb-4">
@@ -295,7 +295,7 @@
 
       <!-- Recommendations -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-2 px-md-3">
+        <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="row g-4">
             <div class="col-md-6">
               <div class="glass-card h-100 p-4 text-center hover-lift">
@@ -802,10 +802,10 @@ onMounted(async () => {
 @media (max-width: 768px) {
   /* Percentage based padding for mobile */
   .responsive-padding {
-    padding: 5% !important; /* ~3-4% visual feel */
+    padding: 3% !important; /* Minimized padding */
   }
   .responsive-padding-header {
-    padding: 4% !important;
+    padding: 3% !important;
   }
   
   .glass-card {
