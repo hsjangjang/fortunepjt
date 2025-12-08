@@ -1,9 +1,9 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-10 mx-auto">
+      <div class="col-lg-10 col-12 mx-auto px-1 px-md-3">
         <div class="glass-card">
-          <div class="card-body p-5">
+          <div class="card-body responsive-padding">
             <h2 class="text-center text-white mb-4">
               <i class="fas fa-search text-primary" style="color: #a78bfa !important;"></i> 아이템 행운도 측정
             </h2>
@@ -16,19 +16,34 @@
             <div v-if="!showResult"
                  class="upload-area"
                  :class="{ dragover: isDragging }"
-                 @click="triggerFileInput"
                  @dragover.prevent="isDragging = true"
                  @dragleave="isDragging = false"
                  @drop.prevent="handleDrop">
               <i class="fas fa-camera fa-3x mb-3" style="color: #a78bfa;"></i>
               <h4 class="text-white">아이템 사진을 업로드하세요</h4>
-              <p class="text-white opacity-50">
-                클릭하여 파일 선택 또는 드래그 앤 드롭<br>
+              <p class="text-white opacity-50 mb-4">
                 JPG, PNG 파일 (최대 10MB)
               </p>
+              <div class="d-flex justify-content-center gap-3 flex-wrap">
+                <button class="btn btn-primary rounded-pill px-4" @click="triggerCameraInput">
+                  <i class="fas fa-camera me-2"></i> 카메라로 촬영
+                </button>
+                <button class="btn btn-outline-light rounded-pill px-4" @click="triggerGalleryInput">
+                  <i class="fas fa-images me-2"></i> 갤러리에서 선택
+                </button>
+              </div>
+              <!-- 카메라용 input -->
               <input
                 type="file"
-                ref="fileInput"
+                ref="cameraInput"
+                accept="image/*"
+                capture="environment"
+                style="display: none;"
+                @change="handleFileSelect">
+              <!-- 갤러리용 input -->
+              <input
+                type="file"
+                ref="galleryInput"
                 accept="image/*"
                 style="display: none;"
                 @change="handleFileSelect">
@@ -187,7 +202,8 @@ const getImageUrl = (url) => {
   if (url.startsWith('http')) return url
   return `${API_BASE_URL}${url}`
 }
-const fileInput = ref(null)
+const cameraInput = ref(null)
+const galleryInput = ref(null)
 const isDragging = ref(false)
 const showResult = ref(false)
 const showItemModal = ref(false)
@@ -234,8 +250,12 @@ const formatDate = (dateString) => {
   return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
 }
 
-const triggerFileInput = () => {
-  fileInput.value.click()
+const triggerCameraInput = () => {
+  cameraInput.value.click()
+}
+
+const triggerGalleryInput = () => {
+  galleryInput.value.click()
 }
 
 const handleFileSelect = (event) => {
@@ -537,7 +557,8 @@ const resetUpload = () => {
   detectedItem.value = '분석중...'
   detectedColors.value = []
   displayLuckScore.value = 0
-  if (fileInput.value) fileInput.value.value = ''
+  if (cameraInput.value) cameraInput.value.value = ''
+  if (galleryInput.value) galleryInput.value.value = ''
 }
 
 const fetchFortuneData = async () => {

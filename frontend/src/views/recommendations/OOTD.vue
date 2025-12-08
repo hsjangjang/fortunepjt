@@ -711,26 +711,6 @@ onMounted(() => {
 
   applyDynamicColors()
 })
-</script>
-
-<style scoped>
-.weather-card {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  border-radius: 25px;
-  padding: 30px;
-  margin-bottom: 30px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-  position: relative;
-  overflow: hidden;
-}
-
-.weather-card::before {
-  content: '';
-  position: absolute;
-  top: -50px;
   right: -50px;
   width: 200px;
   height: 200px;
@@ -852,6 +832,11 @@ onMounted(() => {
   .responsive-padding {
     padding-left: 3% !important;
     padding-right: 3% !important;
+  }
+  
+  /* Apply to weather card specifically if it uses fixed padding */
+  .weather-card {
+    padding: 1.5rem !important; /* Reduce from whatever it was */
   }
   
   .glass-card {
