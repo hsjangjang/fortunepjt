@@ -188,19 +188,27 @@ onUnmounted(() => {
 })
 
 const handleLogout = async () => {
-  await authStore.logout()
+  // 먼저 홈으로 즉시 이동 (이전 사용자 데이터 노출 방지)
+  await router.push('/')
 
-  // Fortune Store 초기화 (Django 세션 초기화와 동일)
-  const { useFortuneStore } = await import('@/stores/fortune')
-  const fortuneStore = useFortuneStore()
-  fortuneStore.clearFortune()
-
+  // UI 상태 초기화
   userDropdownOpen.value = false
   mobileMenuOpen.value = false
+
+  // 모든 Store 초기화 (보안: 이전 사용자 데이터 제거)
+  const { useFortuneStore } = await import('@/stores/fortune')
+  const { useRecommendationsStore } = await import('@/stores/recommendations')
+  const fortuneStore = useFortuneStore()
+  const recommendationsStore = useRecommendationsStore()
+
+  fortuneStore.clearFortune()
+  recommendationsStore.clearAll()
+
+  // 로그아웃 API 호출
+  await authStore.logout()
+
   // Django: messages.success(request, '로그아웃되었습니다.')
   showToast('로그아웃되었습니다.', 'success')
-  // Django: return redirect('home') (LogoutView line 127, 132)
-  router.push('/')
 }
 </script>
 

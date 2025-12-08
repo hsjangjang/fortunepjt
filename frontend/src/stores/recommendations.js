@@ -66,6 +66,14 @@ export const useRecommendationsStore = defineStore('recommendations', () => {
     }
   }
 
+  // 로그아웃 시 모든 데이터 초기화
+  function clearAll() {
+    ootdData.value = null
+    menuData.value = null
+    weatherData.value = null
+    console.log('[Recommendations Store] 모든 데이터 초기화')
+  }
+
   return {
     ootdData,
     menuData,
@@ -73,6 +81,7 @@ export const useRecommendationsStore = defineStore('recommendations', () => {
     loading,
     getOOTD,
     getMenuRecommendation,
-    getWeather
+    getWeather,
+    clearAll
   }
 })
