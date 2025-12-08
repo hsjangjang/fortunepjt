@@ -1,9 +1,9 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-5 mx-auto">
+      <div class="col-lg-5 col-12 mx-auto px-1 px-md-3">
         <div class="glass-card shadow-lg">
-          <div class="card-body p-5">
+          <div class="card-body responsive-padding">
             <h2 class="text-center mb-4 text-white">
               <i class="fas fa-lock text-primary"></i> 비밀번호 재설정
             </h2>
@@ -96,3 +96,16 @@ const handleSubmit = async () => {
   }
 }
 </script>
+
+<style scoped>
+/* Responsive Padding */
+.responsive-padding {
+  padding: 3rem !important;
+}
+
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding: 3% !important;
+  }
+}
+</style>

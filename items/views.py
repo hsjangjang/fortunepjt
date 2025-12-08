@@ -224,6 +224,14 @@ class ColorAnalysisView(TemplateView):
             analyzer = ImageColorAnalyzer()
             analysis_result = analyzer.analyze_image_with_ai(temp_path)
 
+            # API 할당량 초과 에러 체크
+            if not analysis_result.get('success') and analysis_result.get('error_type') == 'quota_exceeded':
+                return JsonResponse({
+                    'success': False,
+                    'message': analysis_result.get('message', 'AI 분석 서비스가 일시적으로 제한되었습니다.'),
+                    'error_type': 'quota_exceeded'
+                }, status=503)
+
             # 아이템명 결정
             ai_category = analysis_result.get('ai_analysis', {}).get('category', '')
             ai_item_name = analysis_result.get('ai_analysis', {}).get('item_name', '')

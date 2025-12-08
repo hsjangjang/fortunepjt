@@ -74,8 +74,9 @@
                   </div>
                   <div class="col-md-6 text-center text-md-start">
                     <h5 class="text-primary-light">감지된 색상</h5>
-                    <div class="d-flex gap-2 justify-content-center justify-content-md-start">
+                    <div class="d-flex align-items-center gap-2 overflow-auto flex-nowrap pb-2" style="scrollbar-width: none;">
                       <div v-for="color in detectedColors" :key="color.hex"
+                           class="flex-shrink-0"
                            :style="`width: 40px; height: 40px; border-radius: 50%; background: ${color.hex}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
                     </div>
                   </div>
@@ -135,10 +136,10 @@
                       <span class="value">{{ luckyItems.zodiac }}</span>
                     </div>
                   </div>
-                  <div class="mt-3 pt-3 border-top border-secondary border-opacity-25">
-                    <span class="text-white opacity-75 me-2">행운색:</span>
+                  <div class="mt-3 pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center overflow-auto flex-nowrap pb-2" style="scrollbar-width: none;">
+                    <span class="text-white opacity-75 me-2 flex-shrink-0">행운색:</span>
                     <span v-for="color in luckyColorsWithHex" :key="color.name"
-                          class="badge rounded-pill me-1 border border-light border-opacity-25"
+                          class="badge rounded-pill me-1 border border-light border-opacity-25 flex-shrink-0"
                           :style="`background-color: ${color.hex}; color: ${getTextColor(color.hex)}; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
                       {{ color.name }}
                     </span>
@@ -349,6 +350,9 @@ const analyzeItem = async (file, imageData) => {
       const status = error.response.status
       if (status === 413) {
         errorMessage = '파일 용량이 너무 큽니다. 최대 10MB까지 업로드 가능합니다.'
+      } else if (status === 503) {
+        // API 할당량 초과
+        errorMessage = error.response.data?.message || 'AI 분석 서비스가 일시적으로 제한되었습니다. 잠시 후 다시 시도해주세요.'
       } else if (status === 400) {
         errorMessage = error.response.data?.message || '잘못된 요청입니다.'
       } else if (status === 500) {

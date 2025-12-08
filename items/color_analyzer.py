@@ -237,10 +237,23 @@ class ImageColorAnalyzer:
             }
             
         except Exception as e:
-            print(f"[ERROR] AI 분석 실패: {type(e).__name__}: {str(e)}")
+            error_str = str(e)
+            print(f"[ERROR] AI 분석 실패: {type(e).__name__}: {error_str}")
             import traceback
             traceback.print_exc()
-            # Fallback to Pillow analysis
+
+            # API 할당량 초과 에러 확인
+            if '429' in error_str or 'quota' in error_str.lower() or 'rate' in error_str.lower():
+                print("[ERROR] Gemini API 할당량 초과 - Pillow fallback 없이 에러 반환")
+                return {
+                    'success': False,
+                    'error': 'API 할당량 초과',
+                    'error_type': 'quota_exceeded',
+                    'message': 'AI 분석 서비스가 일시적으로 제한되었습니다. 잠시 후 다시 시도해주세요.',
+                    'colors': []
+                }
+
+            # 기타 에러는 Pillow fallback
             return self.analyze_image(image_path)
     
     def _english_to_korean_color(self, english_name):

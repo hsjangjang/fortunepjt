@@ -1,9 +1,9 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-8 mx-auto">
+      <div class="col-lg-8 col-12 mx-auto px-1 px-md-3">
         <div class="card glass-card">
-          <div class="card-body p-5">
+          <div class="card-body responsive-padding">
             <h2 class="text-center mb-4">
               <i class="fas fa-user-circle text-primary"></i> 내 프로필
             </h2>
@@ -424,5 +424,16 @@ h5 {
   background-color: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.5);
   color: #fff;
+}
+
+/* Responsive Padding */
+.responsive-padding {
+  padding: 3rem !important;
+}
+
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding: 3% !important;
+  }
 }
 </style>

@@ -9,11 +9,11 @@
               <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
             </h1>
             <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-3 d-flex justify-content-center align-items-center flex-wrap gap-3">
-              <span class="text-white-50 d-inline-flex align-items-center">
+            <div v-if="luckyColors && luckyColors.length" class="mt-3 d-flex align-items-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
+              <span class="text-white-50 d-inline-flex align-items-center flex-shrink-0">
                 <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
               </span>
-              <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white">
+              <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white flex-shrink-0">
                 <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
                 {{ color }}
               </span>
@@ -174,14 +174,14 @@
               </h5>
             </div>
             <div class="card-body">
-              <div class="row justify-content-center">
-                <div v-for="acc in outfit.accessories" :key="acc.name" class="col-md-4 col-6 mb-3">
-                  <div class="text-center p-3" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
+              <div class="d-flex flex-nowrap overflow-auto gap-3 pb-2 text-start px-2" style="scrollbar-width: none; -ms-overflow-style: none;">
+                <div v-for="acc in outfit.accessories" :key="acc.name" class="flex-shrink-0" style="width: 140px;">
+                  <div class="text-center p-3 h-100" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
                     <div class="mb-2 d-flex justify-content-center">
                       <img :src="getAccessoryImage(acc.name)" alt="Accessory" width="60" class="img-fluid drop-shadow" />
                     </div>
-                    <h6 class="text-white mt-2 mb-1">{{ acc.name }}</h6>
-                    <small class="text-muted">{{ acc.description }}</small>
+                    <h6 class="text-white mt-2 mb-1 text-truncate">{{ acc.name }}</h6>
+                    <small class="text-muted d-block text-truncate">{{ acc.description }}</small>
                   </div>
                 </div>
               </div>
