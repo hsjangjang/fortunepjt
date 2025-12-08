@@ -311,7 +311,8 @@ const analyzeItem = async (file, imageData) => {
 
   try {
     const response = await api.post('/api/items/analyze/', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' }
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000 // 파일 업로드는 60초 타임아웃
     })
     const data = response.data
 
@@ -334,6 +335,12 @@ const analyzeItem = async (file, imageData) => {
     }
   } catch (error) {
     console.error('분석 실패:', error)
+    console.error('에러 상세:', {
+      message: error.message,
+      code: error.code,
+      response: error.response,
+      request: error.request ? 'exists' : 'none'
+    })
 
     // 에러 타입에 따른 구체적인 메시지
     let errorMessage = '분석 중 오류가 발생했습니다.'
@@ -346,9 +353,16 @@ const analyzeItem = async (file, imageData) => {
         errorMessage = error.response.data?.message || '잘못된 요청입니다.'
       } else if (status === 500) {
         errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+      } else {
+        errorMessage = `서버 오류 (${status})`
       }
+    } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
+      errorMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.'
+    } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
+      // 413 에러가 Network Error로 올 수 있음 (nginx가 본문 없이 응답할 때)
+      errorMessage = '파일 업로드에 실패했습니다. 파일 크기를 확인해주세요. (최대 10MB)'
     } else if (error.request) {
-      errorMessage = '네트워크 연결을 확인해주세요.'
+      errorMessage = '서버 응답이 없습니다. 잠시 후 다시 시도해주세요.'
     }
 
     alert(errorMessage)
