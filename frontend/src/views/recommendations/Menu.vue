@@ -5,8 +5,8 @@
         <!-- Menu Header -->
         <div class="glass-card mb-4">
           <div class="card-body text-center py-4">
-            <h1 class="display-5 fw-bold">
-              <i class="fas fa-utensils text-success"></i> 오늘의 메뉴 추천
+            <h1 class="display-5 fw-bold text-white">
+              <i class="fas fa-utensils me-2" style="color: #a78bfa !important;"></i> 오늘의 메뉴 추천
             </h1>
             <p class="lead text-white-50">운세와 행운색을 기반으로 한 맞춤 메뉴</p>
           </div>
@@ -58,15 +58,17 @@
                     </span>
                   </div>
 
-                  <div class="menu-icon mb-4 animate-float">
-                    <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" width="120" class="img-fluid drop-shadow rounded-circle" style="border: 2px solid rgba(255,255,255,0.2);" />
+                  <div class="menu-icon mb-4 animate-float d-flex justify-content-center">
+                    <div class="rounded-circle overflow-hidden shadow-lg border border-2 border-white border-opacity-25" style="width: 150px; height: 150px;">
+                      <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
+                    </div>
                   </div>
 
                   <h3 class="fw-bold mb-2 text-white">{{ rec.menu.name }}</h3>
                   <p class="text-white-50 mb-4">{{ rec.menu.category }}</p>
 
                   <div class="mb-4">
-                    <span class="badge bg-primary bg-opacity-75 text-white px-3 py-2 rounded-pill">
+                    <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center" :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
                       <i class="fas fa-palette me-1"></i> {{ rec.color }}
                     </span>
                   </div>
@@ -321,6 +323,14 @@ onMounted(() => {
     fetchMenuRecommendations()
   }
 })
+
+const colorMap = {
+  '빨간색': '#EF4444', '진한 빨간색': '#B91C1C', '주황색': '#F59E0B', '노란색': '#FCD34D',
+  '초록색': '#10B981', '연두색': '#84CC16', '하늘색': '#38BDF8',
+  '파란색': '#3B82F6', '남색': '#1E3A8A', '보라색': '#8B5CF6',
+  '분홍색': '#F472B6', '갈색': '#92400E', '베이지': '#E7E5E4',
+  '검은색': '#000000', '흰색': '#FFFFFF', '회색': '#6B7280', '금색': '#FBBF24'
+}
 </script>
 
 <style scoped>

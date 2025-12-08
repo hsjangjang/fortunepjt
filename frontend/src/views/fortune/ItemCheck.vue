@@ -5,7 +5,7 @@
         <div class="glass-card">
           <div class="card-body p-5">
             <h2 class="text-center text-white mb-4">
-              <i class="fas fa-search text-primary"></i> 아이템 행운도 측정
+              <i class="fas fa-search text-primary" style="color: #a78bfa !important;"></i> 아이템 행운도 측정
             </h2>
             <p class="text-center text-white opacity-75 mb-5">
               가지고 있는 아이템을 촬영하거나 업로드하여<br>
@@ -20,7 +20,7 @@
                  @dragover.prevent="isDragging = true"
                  @dragleave="isDragging = false"
                  @drop.prevent="handleDrop">
-              <i class="fas fa-camera fa-4x text-primary mb-3"></i>
+              <i class="fas fa-camera fa-3x mb-3" style="color: #a78bfa;"></i>
               <h4 class="text-white">아이템 사진을 업로드하세요</h4>
               <p class="text-white opacity-50">
                 클릭하여 파일 선택 또는 드래그 앤 드롭<br>

@@ -3,15 +3,20 @@
     <div class="row">
       <div class="col-lg-8 mx-auto">
         <!-- Header -->
-        <div class="card glass-card mb-4">
+        <div class="glass-card mb-4">
           <div class="card-body text-center py-4">
-            <h1 class="display-5 fw-bold">OOTD 추천</h1>
-            <p class="lead text-muted">날씨와 행운색 기반 오늘의 코디</p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-3">
-              <span class="me-2 text-white-50 d-inline-flex align-items-center">
+            <h1 class="display-5 fw-bold text-white">
+              <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
+            </h1>
+            <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
+            <div v-if="luckyColors && luckyColors.length" class="mt-3 d-flex justify-content-center align-items-center flex-wrap gap-3">
+              <span class="text-white-50 d-inline-flex align-items-center">
                 <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
               </span>
-              <span v-for="color in luckyColors" :key="color" class="badge fs-6 px-3 py-2 me-1 dynamic-color-badge">{{ color }}</span>
+              <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white">
+                <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
+                {{ color }}
+              </span>
             </div>
           </div>
         </div>
@@ -85,12 +90,20 @@
                   <h4>{{ outfit.top || '니트' }}</h4>
                   <p class="text-muted">{{ outfit.top_desc || '따뜻하고 포근한 느낌' }}</p>
                   <div class="mt-3">
-                    <h6 class="text-white-50 d-flex align-items-center justify-content-center">
+                    <h6 class="text-white-50 d-flex align-items-center justify-content-center mb-2">
                       <Star v-if="luckyColors" class="text-warning me-1" :size="12" />
                       {{ luckyColors ? '행운색 기반' : '추천 색상' }}
                     </h6>
-                    <span class="badge dynamic-color-badge fs-6">{{ outfit.top_color || '베이지' }}</span>
-                    <span v-for="color in outfit.top_alt_colors" :key="color" class="badge dynamic-color-badge fs-6">{{ color }}</span>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                      <span class="d-flex align-items-center text-white small">
+                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[outfit.top_color] || '#ddd'}`"></span>
+                        {{ outfit.top_color || '베이지' }}
+                      </span>
+                      <span v-for="color in outfit.top_alt_colors" :key="color" class="d-flex align-items-center text-white small">
+                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[color] || '#ddd'}`"></span>
+                        {{ color }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -108,12 +121,20 @@
                   <h4>{{ outfit.bottom || '청바지' }}</h4>
                   <p class="text-muted">{{ outfit.bottom_desc || '편안한 일상 바지' }}</p>
                   <div class="mt-3">
-                    <h6 class="text-white-50 d-flex align-items-center justify-content-center">
+                    <h6 class="text-white-50 d-flex align-items-center justify-content-center mb-2">
                       <Star v-if="luckyColors" class="text-warning me-1" :size="12" />
                       {{ luckyColors ? '행운색 기반' : '추천 색상' }}
                     </h6>
-                    <span class="badge dynamic-color-badge fs-6">{{ outfit.bottom_color || '블랙' }}</span>
-                    <span v-for="color in outfit.bottom_alt_colors" :key="color" class="badge dynamic-color-badge fs-6">{{ color }}</span>
+                    <div class="d-flex justify-content-center gap-3 flex-wrap">
+                      <span class="d-flex align-items-center text-white small">
+                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[outfit.bottom_color] || '#ddd'}`"></span>
+                        {{ outfit.bottom_color || '블랙' }}
+                      </span>
+                      <span v-for="color in outfit.bottom_alt_colors" :key="color" class="d-flex align-items-center text-white small">
+                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[color] || '#ddd'}`"></span>
+                        {{ color }}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -121,8 +142,8 @@
           </div>
 
           <!-- Outer Recommendation -->
-          <div v-if="outfit.outer_required" class="card glass-card mb-4 outfit-card">
-            <div class="card-header bg-transparent border-bottom text-center" style="border-color: rgba(255,255,255,0.1);">
+          <div v-if="outfit.outer_required" class="card glass-card mb-4 outfit-card py-3">
+            <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
               <h5 class="mb-0 text-white d-flex align-items-center justify-content-center">
                 <AlertCircle class="text-warning me-2" :size="20" />필수 아우터
               </h5>
@@ -146,8 +167,8 @@
           </div>
 
           <!-- Accessories Recommendation -->
-          <div v-if="outfit.accessories && outfit.accessories.length" class="card glass-card mb-4 outfit-card">
-            <div class="card-header bg-transparent border-bottom text-center" style="border-color: rgba(255,255,255,0.1);">
+          <div v-if="outfit.accessories && outfit.accessories.length" class="card glass-card mb-4 outfit-card py-3">
+            <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
               <h5 class="mb-0 text-white d-flex align-items-center justify-content-center">
                 <Gem class="text-info me-2" :size="20" />추천 액세서리
               </h5>
@@ -770,9 +791,17 @@ onMounted(() => {
   transform: translateY(-5px);
 }
 
-.dynamic-color-badge {
-  margin: 0 4px 4px 0 !important;
-  padding: 6px 12px !important;
+.color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  display: inline-block;
+}
+
+.color-dot.small {
+  width: 10px;
+  height: 10px;
 }
 
 .weather-icon-svg {

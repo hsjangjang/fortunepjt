@@ -2,7 +2,7 @@
   <DefaultLayout>
     <div class="container py-5">
       <div class="row justify-content-center mb-5">
-        <div class="col-lg-10 text-center">
+        <div class="col-lg-8 text-center">
           <h1 class="display-4 text-white mb-3 fw-bold">
             <i class="fas fa-crystal-ball text-primary me-3"></i>
             오늘의 운세
@@ -12,8 +12,8 @@
       </div>
 
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-10">
-          <div class="glass-card p-5">
+        <div class="col-lg-8">
+          <div class="glass-card p-4 p-md-5">
             <div class="fortune-circle">
               <svg width="220" height="220">
                 <defs>
@@ -35,13 +35,13 @@
             <div class="row text-center mt-5 g-3 justify-content-center">
               <div class="col-md-4">
                 <h6 class="text-primary-light mb-2">별자리</h6>
-                <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2">
+                <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
                   {{ fortune.zodiac_sign || '-' }}
                 </span>
               </div>
               <div class="col-md-4">
                 <h6 class="text-primary-light mb-2">띠</h6>
-                <span class="badge rounded-pill bg-success bg-opacity-25 border border-success text-white fs-5 px-4 py-2">
+                <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
                   {{ fortune.chinese_zodiac || '-' }}
                 </span>
               </div>
@@ -52,7 +52,7 @@
 
       <!-- Fortune Details Tabs -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-10">
+        <div class="col-lg-8">
           <div class="glass-card overflow-hidden">
             <div class="card-header border-0 p-4">
               <ul class="nav nav-pills fortune-tabs nav-fill gap-2" role="tablist">
@@ -78,8 +78,8 @@
                 <!-- 종합운 -->
                 <div class="tab-pane fade show active" id="total">
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="text-white"><i class="fas fa-star text-warning me-2"></i> 종합운</h4>
-                    <span class="badge fs-6" style="background: rgba(124, 58, 237, 0.3); border: 1px solid rgba(124, 58, 237, 0.5); color: white;">{{ fortune.fortune_score || 0 }}/100점</span>
+                    <h4 class="text-white"><i class="fas fa-star text-primary me-2" style="color: #a78bfa !important;"></i> 종합운</h4>
+                    <span class="text-white opacity-50 small">{{ fortune.fortune_score || 0 }} / 100</span>
                   </div>
                   <div class="sub-score-bar">
                     <span class="score-text">{{ fortune.fortune_score || 0 }}%</span>
@@ -91,8 +91,8 @@
                 <!-- 재물운 -->
                 <div class="tab-pane fade" id="money">
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="text-white"><i class="fas fa-coins text-warning me-2"></i> 재물운</h4>
-                    <span class="badge fs-6" style="background: rgba(245, 158, 11, 0.3); border: 1px solid rgba(245, 158, 11, 0.5); color: white;">{{ fortune.fortune_scores?.money || 70 }}/100점</span>
+                    <h4 class="text-white"><i class="fas fa-coins text-warning me-2" style=" -webkit-text-stroke: 1px rgba(255,255,255,0.1);"></i> 재물운</h4>
+                    <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.money || 70 }} / 100</span>
                   </div>
                   <div class="sub-score-bar">
                     <span class="score-text">{{ fortune.fortune_scores?.money || 70 }}%</span>
@@ -105,7 +105,7 @@
                 <div class="tab-pane fade" id="love">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-heart text-danger me-2"></i> 연애운</h4>
-                    <span class="badge fs-6" style="background: rgba(239, 68, 68, 0.3); border: 1px solid rgba(239, 68, 68, 0.5); color: white;">{{ fortune.fortune_scores?.love || 65 }}/100점</span>
+                    <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.love || 65 }} / 100</span>
                   </div>
                   <div class="sub-score-bar">
                     <span class="score-text">{{ fortune.fortune_scores?.love || 65 }}%</span>
@@ -118,7 +118,7 @@
                 <div class="tab-pane fade" id="study">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-graduation-cap text-info me-2"></i> 학업운</h4>
-                    <span class="badge fs-6" style="background: rgba(59, 130, 246, 0.3); border: 1px solid rgba(59, 130, 246, 0.5); color: white;">{{ fortune.fortune_scores?.study || 75 }}/100점</span>
+                    <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.study || 75 }} / 100</span>
                   </div>
                   <div class="sub-score-bar">
                     <span class="score-text">{{ fortune.fortune_scores?.study || 75 }}%</span>
@@ -131,7 +131,7 @@
                 <div class="tab-pane fade" id="work">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-briefcase text-success me-2"></i> 직장운</h4>
-                    <span class="badge fs-6" style="background: rgba(16, 185, 129, 0.3); border: 1px solid rgba(16, 185, 129, 0.5); color: white;">{{ fortune.fortune_scores?.work || 80 }}/100점</span>
+                    <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.work || 80 }} / 100</span>
                   </div>
                   <div class="sub-score-bar">
                     <span class="score-text">{{ fortune.fortune_scores?.work || 80 }}%</span>
@@ -147,11 +147,11 @@
 
       <!-- Lucky Colors Section -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-10">
+        <div class="col-lg-8">
           <div class="glass-card">
             <div class="card-body p-4 p-md-5">
               <h4 class="text-white text-center mb-4">
-                <i class="fas fa-palette text-primary me-2"></i>
+                <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
               </h4>
               <h5 class="text-center text-white opacity-90 mb-4">오늘 당신에게 행운을 가져다 줄 색상</h5>
@@ -187,11 +187,11 @@
 
       <!-- Lucky Item Section -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-10">
+        <div class="col-lg-8">
           <div class="glass-card">
             <div class="card-body p-4 p-md-5">
               <h4 class="text-white text-center mb-4">
-                <i class="fas fa-gem text-warning me-2"></i>
+                <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
               </h4>
               <p class="text-center text-white opacity-75 mb-4">오늘 당신에게 행운을 가져다 줄 아이템들</p>
@@ -202,7 +202,7 @@
                        style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px; cursor: pointer;"
                        @click="showMainItemDesc = !showMainItemDesc">
                     <div class="mb-2">
-                      <span class="badge bg-primary">운세 기반</span>
+                      <span class="badge" style="background: #a78bfa; color: white;">운세 기반</span>
                     </div>
                     <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.emoji || '🎁' }}</span>
                     <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item?.main || '행운 아이템' }}</h5>
@@ -217,10 +217,10 @@
                 </div>
                 <div class="col-md-5 d-flex">
                   <div class="lucky-item-card text-center p-4 w-100 d-flex flex-column"
-                       style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 15px; cursor: pointer;"
+                       style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px; cursor: pointer;"
                        @click="showZodiacItemDesc = !showZodiacItemDesc">
                     <div class="mb-2">
-                      <span class="badge bg-info">{{ fortune.zodiac_sign }} 추천</span>
+                      <span class="badge" style="background: #a78bfa; color: white;">{{ fortune.zodiac_sign }} 추천</span>
                     </div>
                     <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.zodiac_emoji || '⭐' }}</span>
                     <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item?.zodiac || '별자리 아이템' }}</h5>
@@ -252,11 +252,11 @@
 
       <!-- Lucky Numbers Section (성인만 표시) -->
       <div v-if="fortune && !isMinor" class="row justify-content-center mb-4">
-        <div class="col-lg-10">
+        <div class="col-lg-8">
           <div class="glass-card">
             <div class="card-body p-4 p-md-5">
               <h4 class="text-white text-center mb-4">
-                <i class="fas fa-dice text-warning me-2"></i>
+                <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
               </h4>
               <div v-if="fortune.lotto_numbers && fortune.lotto_numbers.length > 0" class="lotto-numbers">
@@ -279,11 +279,11 @@
 
       <!-- Recommendations -->
       <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-10">
+        <div class="col-lg-8">
           <div class="row g-4">
             <div class="col-md-6">
               <div class="glass-card h-100 p-4 text-center hover-lift">
-                <i class="fas fa-tshirt fa-3x text-primary mb-3"></i>
+                <i class="fas fa-tshirt fa-3x mb-3" style="color: #a78bfa;"></i>
                 <h5 class="text-white">OOTD 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
                 <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4">
@@ -293,7 +293,7 @@
             </div>
             <div class="col-md-6">
               <div class="glass-card h-100 p-4 text-center hover-lift">
-                <i class="fas fa-utensils fa-3x text-success mb-3"></i>
+                <i class="fas fa-utensils fa-3x mb-3" style="color: #a78bfa;"></i>
                 <h5 class="text-white">메뉴 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">운세에 맞는 행운의 메뉴</p>
                 <router-link to="/recommendations/menu" class="btn btn-outline-light rounded-pill px-4">
@@ -625,6 +625,7 @@ onMounted(async () => {
   line-height: 1.8;
   color: rgba(255, 255, 255, 0.9);
   font-size: 1.1rem;
+  letter-spacing: -0.02em;
   text-align: justify;
   margin-top: 25px;
   padding: 20px;
@@ -706,5 +707,26 @@ onMounted(async () => {
 
 .lucky-item-card:hover .toggle-hint {
   color: rgba(255, 255, 255, 0.8);
+}
+
+.nav-pills .nav-link {
+  color: rgba(255,255,255,0.5);
+  transition: all 0.3s;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  border-radius: 0;
+}
+.nav-pills .nav-item:last-child .nav-link {
+  border-right: none;
+}
+.nav-pills .nav-link.active {
+  color: white;
+  background-color: transparent;
+  font-weight: bold;
+}
+
+@media (max-width: 768px) {
+  .glass-card {
+    padding: 1.5rem !important;
+  }
 }
 </style>

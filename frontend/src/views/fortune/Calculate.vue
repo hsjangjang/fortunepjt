@@ -19,23 +19,41 @@
 
               <div class="row mb-3">
                 <div class="col-md-4">
-                  <label class="form-label">생년월일 구분 <span class="text-danger">*</span></label>
+                  <label class="form-label">생년월일 구분 <span class="text-warning">*</span></label>
                   <select v-model="fortuneForm.calendar_type" class="form-select" required>
                     <option value="solar">양력</option>
                     <option value="lunar">음력</option>
                   </select>
                 </div>
                 <div class="col-md-8">
-                  <label class="form-label">생년월일 <span class="text-danger">*</span></label>
-                  <input
-                    type="date"
-                    v-model="fortuneForm.birth_date"
-                    @blur="validateBirthDate"
-                    class="form-control"
-                    min="1900-01-01"
-                    :max="maxDate"
-                    required
-                  >
+                  <label class="form-label">생년월일 <span class="text-warning">*</span></label>
+                  <!-- Mobile Native Date Picker -->
+                  <div class="d-md-none">
+                    <input
+                      type="date"
+                      v-model="fortuneForm.birth_date"
+                      @blur="validateBirthDate"
+                      class="form-control"
+                      min="1900-01-01"
+                      :max="maxDate"
+                      required
+                    >
+                  </div>
+                  <!-- Desktop Custom Dropdowns -->
+                  <div class="d-none d-md-flex gap-2">
+                    <select v-model="selectedYear" class="form-select" @change="updateBirthDate">
+                      <option value="" disabled>년도</option>
+                      <option v-for="year in yearOptions" :key="year" :value="year">{{ year }}년</option>
+                    </select>
+                    <select v-model="selectedMonth" class="form-select" @change="updateBirthDate">
+                      <option value="" disabled>월</option>
+                      <option v-for="month in 12" :key="month" :value="month">{{ month }}월</option>
+                    </select>
+                    <select v-model="selectedDay" class="form-select" @change="updateBirthDate">
+                      <option value="" disabled>일</option>
+                      <option v-for="day in daysInMonth" :key="day" :value="day">{{ day }}일</option>
+                    </select>
+                  </div>
                 </div>
               </div>
               <div class="mb-3">
@@ -43,7 +61,7 @@
               </div>
 
               <div class="mb-3">
-                <label class="form-label">성별 <span class="text-danger">*</span></label>
+                <label class="form-label">성별 <span class="text-warning">*</span></label>
                 <select v-model="fortuneForm.gender" class="form-select" required>
                   <option value="">선택하세요</option>
                   <option value="M">남성</option>
@@ -177,6 +195,35 @@ const fortuneForm = ref({
   mbti: '',
   personal_color: ''
 })
+
+// Desktop Date Picker Logic
+const selectedYear = ref('')
+const selectedMonth = ref('')
+const selectedDay = ref('')
+
+const yearOptions = computed(() => {
+  const currentYear = new Date().getFullYear()
+  const years = []
+  for (let y = currentYear; y >= 1900; y--) {
+    years.push(y)
+  }
+  return years
+})
+
+const daysInMonth = computed(() => {
+  if (!selectedYear.value || !selectedMonth.value) return 31
+  return new Date(selectedYear.value, selectedMonth.value, 0).getDate()
+})
+
+const updateBirthDate = () => {
+  if (selectedYear.value && selectedMonth.value && selectedDay.value) {
+    const y = selectedYear.value
+    const m = String(selectedMonth.value).padStart(2, '0')
+    const d = String(selectedDay.value).padStart(2, '0')
+    fortuneForm.value.birth_date = `${y}-${m}-${d}`
+    validateBirthDate()
+  }
+}
 
 const showTimePicker = (event) => {
   if (event.target.showPicker) {
