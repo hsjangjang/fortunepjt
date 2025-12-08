@@ -626,6 +626,28 @@ const renderChart = (hourlyData) => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false },
+        datalabels: { display: true }
+      },
+      scales: {
+        x: {
+          grid: { display: false, drawBorder: false },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.8)',
+            maxRotation: 0,
+            minRotation: 0,
+            autoSkip: true,
+            maxTicksLimit: 8,
+            font: { size: 11 }
+          }
+        },
+        y: {
+          display: false,
+          min: Math.min(...temps) - 5,
+          max: Math.max(...temps) + 5
+        }
       },
       layout: {
         padding: { left: 25, right: 25, top: 20, bottom: 10 }
