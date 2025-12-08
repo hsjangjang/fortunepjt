@@ -1,144 +1,3 @@
-<template>
-  <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-10 mx-auto">
-        <div class="glass-card">
-          <div class="card-body p-5">
-            <h2 class="text-center text-white mb-4">
-              <i class="fas fa-search text-primary" style="color: #a78bfa !important;"></i> 아이템 행운도 측정
-            </h2>
-            <p class="text-center text-white opacity-75 mb-5">
-              가지고 있는 아이템을 촬영하거나 업로드하여<br>
-              오늘의 행운 아이템과 얼마나 일치하는지 확인해보세요!
-            </p>
-
-            <!-- Upload Area -->
-            <div v-if="!showResult"
-                 class="upload-area"
-                 :class="{ dragover: isDragging }"
-                 @click="triggerFileInput"
-                 @dragover.prevent="isDragging = true"
-                 @dragleave="isDragging = false"
-                 @drop.prevent="handleDrop">
-              <i class="fas fa-camera fa-3x mb-3" style="color: #a78bfa;"></i>
-              <h4 class="text-white">아이템 사진을 업로드하세요</h4>
-              <p class="text-white opacity-50">
-                클릭하여 파일 선택 또는 드래그 앤 드롭<br>
-                JPG, PNG 파일 (최대 10MB)
-              </p>
-              <input
-                type="file"
-                ref="fileInput"
-                accept="image/*"
-                capture="environment"
-                style="display: none;"
-                @change="handleFileSelect">
-            </div>
-
-            <!-- Select from My Items Button -->
-            <div v-if="authStore.isAuthenticated && userItems.length && !showResult" class="text-center mt-4">
-              <button class="btn btn-outline-light rounded-pill px-4" @click="showItemModal = true">
-                <i class="fas fa-folder-open me-2"></i> 내 아이템에서 선택하기
-              </button>
-            </div>
-
-            <!-- Analysis Result -->
-            <div v-if="showResult" class="result-card glass-card mt-4 border-0" style="background: rgba(255, 255, 255, 0.05);">
-              <div class="card-body">
-                <h4 class="text-center text-white mb-4">분석 결과</h4>
-
-                <!-- Item Preview -->
-                <div class="text-center mb-4">
-                  <img :src="itemPreview" alt="업로드된 아이템" class="item-preview" style="border: 1px solid rgba(255,255,255,0.2);">
-                </div>
-
-                <!-- Detected Item Info -->
-                <div class="row mb-4">
-                  <div class="col-md-6 text-center text-md-start">
-                    <h5 class="text-primary-light">인식된 아이템</h5>
-                    <p class="fs-4 text-white fw-bold">{{ detectedItem }}</p>
-                  </div>
-                  <div class="col-md-6 text-center text-md-start">
-                    <h5 class="text-primary-light">감지된 색상</h5>
-                    <div class="d-flex gap-2 justify-content-center justify-content-md-start">
-                      <div v-for="color in detectedColors" :key="color.hex"
-                           :style="`width: 40px; height: 40px; border-radius: 50%; background: ${color.hex}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Luck Score -->
-                <div class="luck-score-circle">
-                  <svg width="200" height="200">
-                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20"></circle>
-                    <circle cx="100" cy="100" r="90" fill="none" stroke="url(#luckGradient)"
-                            stroke-width="20" stroke-dasharray="565" :stroke-dashoffset="luckProgressOffset"
-                            style="transition: stroke-dashoffset 1.5s ease-out; transform: rotate(-90deg); transform-origin: center;"></circle>
-                    <defs>
-                      <linearGradient id="luckGradient">
-                        <stop offset="0%" stop-color="#10b981"></stop>
-                        <stop offset="100%" stop-color="#3b82f6"></stop>
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div class="luck-score-text">
-                    <h1 class="text-white fw-bold mb-0">{{ displayLuckScore }}</h1>
-                    <p class="text-white opacity-75 mb-0">행운 지수</p>
-                  </div>
-                </div>
-
-                <!-- Color Match Visualization -->
-                <div class="color-match">
-                  <div class="text-center">
-                    <p class="text-white opacity-75 mb-2">아이템 색상</p>
-                    <div class="color-circle" :style="`background: ${itemColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
-                  </div>
-                  <div class="match-arrow text-white opacity-50">
-                    <i class="fas fa-arrows-alt-h"></i>
-                  </div>
-                  <div class="text-center">
-                    <p class="text-white opacity-75 mb-2">오늘의 행운색</p>
-                    <div class="color-circle" :style="`background: ${luckyColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
-                  </div>
-                </div>
-
-                <!-- Match Details -->
-                <div class="alert mt-4 text-center" style="background: rgba(124, 58, 237, 0.2); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
-                  <h5 class="text-white fw-bold mb-2">{{ matchTitle }}</h5>
-                  <p class="text-white opacity-90 mb-0">{{ matchDescription }}</p>
-                </div>
-
-                <!-- Today's Lucky Item Reference -->
-                <div class="glass-card mt-4 p-4" style="background: rgba(0,0,0,0.2);">
-                  <h6 class="text-white mb-3"><i class="fas fa-star text-warning me-2"></i> 오늘의 행운 아이템</h6>
-                  <div class="reference-grid">
-                    <div class="reference-item">
-                      <span class="label">메인</span>
-                      <span class="value">{{ luckyItems.main }}</span>
-                    </div>
-                    <div class="reference-item">
-                      <span class="label">별자리</span>
-                      <span class="value">{{ luckyItems.zodiac }}</span>
-                    </div>
-                  </div>
-                  <div class="mt-3 pt-3 border-top border-secondary border-opacity-25">
-                    <span class="text-white opacity-75 me-2">행운색:</span>
-                    <span v-for="color in luckyColorsWithHex" :key="color.name"
-                          class="badge rounded-pill me-1 border border-light border-opacity-25"
-                          :style="`background-color: ${color.hex}; color: ${getTextColor(color.hex)}; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
-                      {{ color.name }}
-                    </span>
-                  </div>
-                </div>
-
-                <div class="text-center mt-4">
-                  <button class="btn btn-primary btn-lg rounded-pill px-5" @click="resetUpload">
-                    <i class="fas fa-redo me-2"></i> 다른 아이템 측정하기
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
 
         <!-- Item Selection Modal -->
@@ -690,5 +549,20 @@ onMounted(() => {
   font-size: 0.95rem;
   margin-left: 0;
   word-break: keep-all;
+}
+/* Responsive Padding */
+.responsive-padding {
+  padding: 3rem;
+}
+
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding: 3% !important;
+  }
+  
+  .glass-card {
+    border-radius: 12px;
+    padding: 0 !important; /* Override any other padding */
+  }
 }
 </style>

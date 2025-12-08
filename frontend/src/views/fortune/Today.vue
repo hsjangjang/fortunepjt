@@ -275,7 +275,7 @@
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
               </h4>
-              <div v-if="fortune.lotto_numbers && fortune.lotto_numbers.length > 0" class="lotto-numbers">
+              <div v-if="fortune.lotto_numbers && fortune.lotto_numbers.length > 0" class="lotto-numbers d-flex justify-content-center flex-nowrap gap-2 gap-md-3">
                 <div v-for="number in fortune.lotto_numbers" :key="number"
                      class="lotto-ball"
                      :style="getLottoBallStyle(number)">
@@ -656,27 +656,6 @@ onMounted(async () => {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin: 30px 0;
-  flex-wrap: wrap;
-}
-
-.lotto-ball {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  color: white;
-  font-size: 1.4rem;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.3);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  text-shadow: 0 1px 2px rgba(0,0,0,0.5);
-}
-
-.hover-lift {
-  transition: transform 0.3s;
 }
 
 .hover-lift:hover {
@@ -837,6 +816,14 @@ onMounted(async () => {
   
   .responsive-text-shadow {
     font-size: 0.9rem;
+  }
+
+  /* Responsive Lotto Ball */
+  .lotto-ball {
+    width: 32px;
+    height: 32px;
+    font-size: 0.9rem;
+    border-width: 1px;
   }
 
   /* 2x3 Grid implementation */
