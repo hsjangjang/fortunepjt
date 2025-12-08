@@ -1,0 +1,563 @@
+"""
+아이템 이미지 색상 분석 모듈
+무료 버전: Pillow + 색상 클러스터링 사용
+AI 버전: Google Gemini Vision API
+"""
+from PIL import Image
+
+from collections import Counter
+import colorsys
+import json
+import os
+
+class ImageColorAnalyzer:
+    """이미지 색상 분석 클래스"""
+    
+    def __init__(self):
+        # 한국어 색상 이름 매핑
+        self.color_names = {
+            'red': '빨간색',
+            'orange': '주황색', 
+            'yellow': '노란색',
+            'green': '초록색',
+            'lightgreen': '연두색',
+            'blue': '파란색',
+            'skyblue': '하늘색',
+            'navy': '남색',
+            'purple': '보라색',
+            'pink': '분홍색',
+            'brown': '갈색',
+            'beige': '베이지색',
+            'gray': '회색',
+            'black': '검은색',
+            'white': '흰색'
+        }
+        
+        # RGB 범위별 색상 분류
+        self.color_ranges = {
+            'red': [(180, 0, 0), (255, 100, 100)],
+            'orange': [(255, 140, 0), (255, 200, 100)],
+            'yellow': [(200, 200, 0), (255, 255, 150)],
+            'green': [(0, 100, 0), (100, 255, 100)],
+            'lightgreen': [(100, 200, 100), (200, 255, 200)],
+            'blue': [(0, 0, 100), (100, 100, 255)],
+            'skyblue': [(100, 150, 200), (200, 230, 255)],
+            'navy': [(0, 0, 50), (50, 50, 150)],
+            'purple': [(100, 0, 100), (200, 100, 200)],
+            'pink': [(200, 100, 150), (255, 200, 230)],
+            'brown': [(100, 50, 0), (180, 120, 80)],
+            'beige': [(200, 180, 150), (250, 230, 200)],
+            'gray': [(100, 100, 100), (200, 200, 200)],
+            'black': [(0, 0, 0), (50, 50, 50)],
+            'white': [(230, 230, 230), (255, 255, 255)]
+        }
+    
+    def analyze_image_with_ai(self, image_path):
+        """Gemini Vision API를 사용한 AI 이미지 분석"""
+        print(f"[DEBUG] AI 분석 시작: {image_path}")
+        try:
+            import google.generativeai as genai
+            from django.conf import settings
+            
+            # API 키 설정
+            api_key = settings.GEMINI_API_KEY
+            print(f"[DEBUG] API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
+            
+            if not api_key:
+                raise ValueError("GEMINI_API_KEY not configured")
+            
+            genai.configure(api_key=api_key)
+            print("[DEBUG] Gemini 설정 완료")
+            
+            # 사용 가능한 모델 목록 확인
+            vision_model = None
+            try:
+                print("[DEBUG] 사용 가능한 모델 목록 확인 중...")
+                available_models = []
+                for m in genai.list_models():
+                    if 'generateContent' in m.supported_generation_methods:
+                        available_models.append(m.name)
+                        print(f"[DEBUG] - {m.name}")
+                
+                # 1순위: flash 모델 (무료)
+                for model_name in available_models:
+                    if 'flash' in model_name.lower() and 'image' not in model_name.lower():
+                        vision_model = model_name
+                        print(f"[DEBUG] Flash 모델 발견: {vision_model}")
+                        break
+                
+                # 2순위: vision 모델
+                if not vision_model:
+                    for model_name in available_models:
+                        if 'vision' in model_name.lower():
+                            vision_model = model_name
+                            break
+                
+                # 3순위: 아무 모델
+                if not vision_model and available_models:
+                    vision_model = available_models[0]
+                    
+            except Exception as e:
+                print(f"[WARNING] 모델 목록 조회 실패, 기본 모델 사용 시도: {e}")
+                vision_model = 'gemini-pro-vision'
+
+            if not vision_model:
+                raise ValueError("사용 가능한 모델을 찾을 수 없습니다")
+            
+            print(f"[DEBUG] 선택된 모델: {vision_model}")
+            model = genai.GenerativeModel(vision_model)
+            print("[DEBUG] 모델 초기화 완료")
+            
+            # 이미지 파일 읽기
+            with open(image_path, 'rb') as f:
+                image_data = f.read()
+            
+            image_parts = [
+                {
+                    "mime_type": "image/jpeg",
+                    "data": image_data
+                }
+            ]
+            
+            prompt = """
+            이 이미지에 있는 **물체**를 분석해주세요. 배경은 무시하고 주요 물체만 분석하세요.
+
+            다음 정보를 JSON 형식으로 제공해주세요:
+
+            1. item_name: 물체의 구체적인 이름 (한글로, 2-4글자)
+               - 예시: '마우스', '향수', '지갑', '키링', '인형', '껌', '사탕', '초콜릿', '이어폰', '목걸이', '반지', '팔찌', '립스틱', '볼펜', '텀블러' 등
+               - 구체적인 물건 이름을 사용하세요
+
+            2. primary_color: 물체의 **가장 넓은 면적을 차지하는** 주요 색상 (한글로)
+               - **반드시 아래 15가지 중 하나만 선택**:
+                 '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색'
+               - 배경색이나 작은 로고 색상은 제외하고 물체 자체의 색상만 판단
+               - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로 분류
+
+            3. secondary_colors: 보조 색상 배열
+               - **단색 물체(한 가지 색만 보이는 경우)는 반드시 빈 배열 []**
+               - 두 가지 이상의 색이 **전체 면적의 20% 이상**을 차지할 때만 추가
+               - 로고, 스티칭(박음질), 지퍼, 단추, 장식 등 작은 부분의 색상은 무시
+               - 그라데이션, 반사광, 그림자는 별도 색상으로 취급하지 않음
+               - **확실하지 않으면 빈 배열 []로 응답**
+
+            4. tags: 해시태그 3개 (아이템 특성과 행운 관련)
+               - 첫 번째: 아이템 종류 (예: '지갑', '향수', '키링')
+               - 두 번째: 관련 운세 (예: '금전운', '애정운', '건강운', '학업운', '직장운')
+               - 세 번째: 아이템 느낌이나 특성 (예: '고급스러움', '심플함', '귀여움', '세련됨')
+
+            **중요**:
+            - 반드시 유효한 JSON 형식으로만 응답
+            - 모든 값은 한글로 작성
+            - 마크다운 코드 블록(```) 절대 사용 금지
+            - 단색 물체는 secondary_colors를 빈 배열로!
+
+            예시 1 (검은 지갑):
+            {
+              "item_name": "지갑",
+              "primary_color": "검은색",
+              "secondary_colors": [],
+              "tags": ["지갑", "금전운", "고급스러움"]
+            }
+
+            예시 2 (분홍+금색 향수):
+            {
+              "item_name": "향수",
+              "primary_color": "분홍색",
+              "secondary_colors": ["금색"],
+              "tags": ["향수", "애정운", "화려함"]
+            }
+
+            예시 3 (검은 마우스):
+            {
+              "item_name": "마우스",
+              "primary_color": "검은색",
+              "secondary_colors": [],
+              "tags": ["마우스", "직장운", "심플함"]
+            }
+            """
+            
+            print("[DEBUG] Gemini API 호출 시작")
+            response = model.generate_content([prompt, image_parts[0]])
+            response.resolve()
+            response_text = response.text
+            print("[DEBUG] Gemini API 응답 수신 완료")
+            
+            if response_text.endswith('```'):
+                response_text = response_text[:-3]
+            if response_text.startswith('```json'):
+                response_text = response_text[7:]
+            elif response_text.startswith('```'):
+                response_text = response_text[3:]
+                
+            response_text = response_text.strip()
+            
+            print(f"[DEBUG] JSON 파싱 전: {response_text[:200]}...")
+            ai_result = json.loads(response_text)
+            print(f"[DEBUG] AI 분석 결과: {ai_result}")
+
+            # item_name을 category로도 저장 (하위 호환성)
+            if 'item_name' in ai_result and 'category' not in ai_result:
+                ai_result['category'] = ai_result['item_name']
+            
+            # 색상 정보를 표준 형식으로 변환
+            colors = []
+            if ai_result.get('primary_color'):
+                primary_color_name = ai_result['primary_color']
+                # AI가 한글로 응답하므로 그대로 사용
+                colors.append({
+                    'name': 'primary',
+                    'korean_name': primary_color_name,  # 한글 색상명 (AI가 직접 한글로 제공)
+                    'hex': self._color_name_to_hex(primary_color_name),  # 매칭용
+                    'rgb': (128, 128, 128),
+                    'percentage': 80.0
+                })
+
+            # 보조 색상 (있을 때만 추가, 최대 1개만)
+            secondary_colors = ai_result.get('secondary_colors', [])
+            if secondary_colors:  # 빈 배열이 아닐 때만
+                # 첫 번째 색상만 사용 (AI가 너무 많이 추가하는 경향이 있음)
+                for idx, sec_color in enumerate(secondary_colors[:1]):  # 최대 1개만!
+                    if sec_color:  # 빈 문자열 체크
+                        colors.append({
+                            'name': f'secondary_{idx}',
+                            'korean_name': sec_color,  # 한글 색상명 (AI가 직접 한글로 제공)
+                            'hex': self._color_name_to_hex(sec_color),
+                            'rgb': (100, 100, 100),
+                            'percentage': 10.0
+                        })
+            
+            print("[DEBUG] AI 분석 성공!")
+            return {
+                'success': True,
+                'colors': colors,
+                'dominant_color': colors[0] if colors else None,
+                'ai_analysis': ai_result,
+                'method': 'gemini_ai'
+            }
+            
+        except Exception as e:
+            print(f"[ERROR] AI 분석 실패: {type(e).__name__}: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            # Fallback to Pillow analysis
+            return self.analyze_image(image_path)
+    
+    def _english_to_korean_color(self, english_name):
+        """영문 색상명을 한글로 변환"""
+        english_lower = english_name.lower()
+
+        english_to_korean = {
+            'red': '빨간색',
+            'orange': '주황색',
+            'yellow': '노란색',
+            'green': '초록색',
+            'lightgreen': '연두색',
+            'blue': '파란색',
+            'skyblue': '하늘색',
+            'navy': '남색',
+            'purple': '보라색',
+            'pink': '분홍색',
+            'brown': '갈색',
+            'beige': '베이지색',
+            'gray': '회색',
+            'grey': '회색',
+            'black': '검은색',
+            'white': '흰색',
+            'gold': '금색',
+            'silver': '은색',
+            'tan': '베이지색',
+            'cream': '크림색'
+        }
+
+        return english_to_korean.get(english_lower, english_name)
+
+    def _color_name_to_hex(self, color_name):
+        """색상 이름을 HEX로 변환 (대략적)"""
+        color_name_lower = color_name.lower()
+        
+        color_map = {
+            # 기본 색상
+            '빨간색': '#FF0000', '빨강': '#FF0000', '레드': '#FF0000', '적색': '#FF0000',
+            '주황색': '#FFA500', '오렌지': '#FFA500', '주황': '#FFA500',
+            '노란색': '#FFD700', '노랑': '#FFD700', '옐로우': '#FFD700', '황색': '#FFD700',
+            '귤색': '#FF8C00', '밝은 귤색': '#FFA54F', '진한 주황색': '#FF8C00',
+            '초록색': '#00FF00', '초록': '#00FF00', '그린': '#00FF00', '녹색': '#00FF00',
+            '연두색': '#90EE90', '민트': '#98FF98', '민트 그린': '#98FF98', '연두': '#90EE90',
+            '파란색': '#0000FF', '파랑': '#0000FF', '블루': '#0000FF', '청색': '#0000FF',
+            '네이비': '#000080', '네이비 블루': '#000080', '남색': '#000080', '감청색': '#000080',
+            '하늘색': '#87CEEB', '스카이블루': '#87CEEB', '하늘': '#87CEEB', '연한 파란색': '#ADD8E6',
+            '보라색': '#800080', '보라': '#800080', '퍼플': '#800080', '자주색': '#8B008B', '자주': '#8B008B',
+            '핑크': '#FFC0CB', '분홍색': '#FFC0CB', '분홍': '#FFC0CB', '연분홍': '#FFB6C1',
+            '파스텔 핑크': '#FFB6C1', '연한 분홍색': '#FFB6C1',
+            '갈색': '#8B4513', '브라운': '#8B4513', '갈색': '#8B4513', '짙은 갈색': '#654321',
+            '베이지': '#F5DEB3', '베이지색': '#F5DEB3', '살구색': '#FFCC99', '살구': '#FFCC99',
+            '아이보리': '#FFFFF0', '크림색': '#FFFDD0',
+            '회색': '#808080', '그레이': '#808080', '차콜': '#36454F', '은색': '#C0C0C0',
+            '차콜 그레이': '#36454F', '짙은 회색': '#696969', '연한 회색': '#D3D3D3',
+            '검은색': '#000000', '검정': '#000000', '블랙': '#000000', '흑색': '#000000',
+            '흰색': '#FFFFFF', '하양': '#FFFFFF', '화이트': '#FFFFFF', '백색': '#FFFFFF',
+            '금색': '#FFD700', '골드': '#FFD700',
+            '은색': '#C0C0C0', '실버': '#C0C0C0',
+            '산호색': '#FF7F50', '산호': '#FF7F50', '코랄': '#FF7F50',
+            '진한 노란색': '#FFA500', '진노란색': '#FFA500', '겨자색': '#FFDB58',
+        }
+        
+        # 정확한 매칭
+        for key, hex_val in color_map.items():
+            if color_name_lower == key:
+                return hex_val
+        
+        # 부분 매칭 (포함 관계)
+        for key, hex_val in color_map.items():
+            if key in color_name_lower or color_name_lower in key:
+                return hex_val
+        
+        # 키워드 기반 매칭
+        if '노란' in color_name_lower or '노랑' in color_name_lower or '옐로' in color_name_lower or '황' in color_name_lower:
+            return '#FFD700'
+        elif '초록' in color_name_lower or '녹' in color_name_lower or '그린' in color_name_lower:
+            return '#00FF00'
+        elif '파란' in color_name_lower or '파랑' in color_name_lower or '청' in color_name_lower or '블루' in color_name_lower:
+            return '#0000FF'
+        elif '빨간' in color_name_lower or '빨강' in color_name_lower or '적' in color_name_lower or '레드' in color_name_lower:
+            return '#FF0000'
+        elif '검은' in color_name_lower or '검정' in color_name_lower or '흑' in color_name_lower or '블랙' in color_name_lower:
+            return '#000000'
+        elif '흰' in color_name_lower or '하얀' in color_name_lower or '백' in color_name_lower or '화이트' in color_name_lower:
+            return '#FFFFFF'
+        elif '회색' in color_name_lower or '그레이' in color_name_lower or '회' in color_name_lower:
+            return '#808080'
+        elif '갈색' in color_name_lower or '브라운' in color_name_lower:
+            return '#8B4513'
+        elif '보라' in color_name_lower or '퍼플' in color_name_lower or '자주' in color_name_lower:
+            return '#800080'
+        elif '핑크' in color_name_lower or '분홍' in color_name_lower:
+            return '#FFC0CB'
+        elif '주황' in color_name_lower or '오렌지' in color_name_lower:
+            return '#FFA500'
+        
+        # 기본값 (회색)
+        print(f"[WARNING] 알 수 없는 색상: {color_name}, 회색으로 표시")
+        return '#808080'
+    
+    def analyze_image(self, image_path):
+        """이미지 분석 메인 함수"""
+        try:
+            # 이미지 열기
+            img = Image.open(image_path)
+            
+            # RGB로 변환
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            # 성능을 위해 리사이즈
+            img.thumbnail((200, 200))
+            
+            # 주요 색상 추출
+            colors = self.extract_colors(img)
+            
+            # 색상 이름 매핑
+            named_colors = self.map_color_names(colors)
+            
+            return {
+                'success': True,
+                'colors': named_colors,
+                'dominant_color': named_colors[0] if named_colors else None,
+                'method': 'pillow'
+            }
+            
+        except Exception as e:
+            return {
+                'success': False,
+                'error': str(e),
+                'colors': []
+            }
+    
+    def extract_colors(self, img, num_colors=3):
+        """이미지에서 주요 색상 추출"""
+        # 픽셀 데이터 가져오기
+        pixels = list(img.getdata())
+        
+        # 색상 그룹화 (근사 색상 통합)
+        grouped_colors = self.group_similar_colors(pixels)
+        
+        # 상위 N개 색상 선택
+        top_colors = grouped_colors.most_common(num_colors)
+        
+        results = []
+        total_pixels = len(pixels)
+        
+        for color, count in top_colors:
+            percentage = (count / total_pixels) * 100
+            
+            results.append({
+                'rgb': color,
+                'hex': self.rgb_to_hex(color),
+                'percentage': round(percentage, 1)
+            })
+        
+        return results
+    
+    def group_similar_colors(self, pixels, tolerance=30):
+        """유사한 색상 그룹화"""
+        color_groups = Counter()
+        
+        for pixel in pixels:
+            # 가장 가까운 대표 색상 찾기
+            grouped_color = self.find_nearest_color_group(pixel, tolerance)
+            color_groups[grouped_color] += 1
+        
+        return color_groups
+    
+    def find_nearest_color_group(self, rgb, tolerance=30):
+        """주어진 RGB와 가장 가까운 색상 그룹 찾기"""
+        r, g, b = rgb
+        
+        # 단순화: 색상을 32단계로 양자화
+        step = 32
+        r = (r // step) * step
+        g = (g // step) * step
+        b = (b // step) * step
+        
+        return (r, g, b)
+    
+    def map_color_names(self, colors):
+        """RGB 색상을 한국어 이름으로 매핑"""
+        named_colors = []
+        
+        for color_data in colors:
+            rgb = color_data['rgb']
+            color_name = self.get_color_name(rgb)
+            
+            named_colors.append({
+                'name': color_name,
+                'korean_name': self.color_names.get(color_name, color_name),
+                'hex': color_data['hex'],
+                'rgb': rgb,
+                'percentage': color_data['percentage']
+            })
+        
+        return named_colors
+    
+    def get_color_name(self, rgb):
+        """RGB 값으로 색상 이름 결정"""
+        r, g, b = rgb
+        
+        # 명도 계산
+        brightness = (r + g + b) / 3
+        
+        # HSV로 변환하여 색상 판단
+        h, s, v = colorsys.rgb_to_hsv(r/255, g/255, b/255)
+        h = h * 360  # 각도로 변환
+        
+        # 1. 무채색 (Black, White, Gray) 판단
+        # 채도가 매우 낮으면 무채색
+        if s < 0.15:
+            if v > 0.85: # 매우 밝음 -> 흰색
+                return 'white'
+            elif v < 0.2: # 매우 어두움 -> 검은색
+                return 'black'
+            else:
+                return 'gray'
+                
+        # 2. 유채색이지만 명도가 너무 낮거나 높은 경우 처리
+        # 명도가 너무 낮으면 검은색 (기존 60 -> 30으로 완화)
+        if brightness < 30:
+            return 'black'
+            
+        # 명도가 너무 높고 채도가 낮으면 흰색
+        if brightness > 230 and s < 0.3:
+            return 'white'
+            
+        # 3. 색상(Hue) 기반 판단
+        if h < 15 or h >= 345:
+            return 'red'
+        elif h < 35:
+            return 'orange'
+        elif h < 70: # 노란색 범위 확장
+            return 'yellow'
+        elif h < 150: # 초록색 범위 조정
+            return 'green'
+        elif h < 190: # 하늘색/청록색
+            return 'skyblue'
+        elif h < 260: # 파란색
+            return 'blue'
+        elif h < 280: # 남색/보라
+            return 'navy'
+        elif h < 320: # 보라
+            return 'purple'
+        elif h < 345: # 핑크
+            return 'pink'
+        else:
+            return 'red'
+    
+    def rgb_to_hex(self, rgb):
+        """RGB를 HEX로 변환"""
+        return '#{:02x}{:02x}{:02x}'.format(int(rgb[0]), int(rgb[1]), int(rgb[2]))
+    
+    def calculate_lucky_color_match(self, item_colors, lucky_colors):
+        """아이템 색상과 행운색 매칭도 계산"""
+        max_match = 30  # 기본 점수
+        
+        for item_color in item_colors:
+            item_name = item_color['korean_name']
+            
+            for lucky_color in lucky_colors:
+                # 정확히 일치
+                if item_name == lucky_color:
+                    max_match = 100
+                    break
+                    
+                # 유사 색상
+                if self.are_similar_colors(item_name, lucky_color):
+                    max_match = max(max_match, 70)
+        
+        return {
+            'score': max_match,
+            'grade': self.get_match_grade(max_match),
+            'message': self.get_match_message(max_match)
+        }
+    
+    def are_similar_colors(self, color1, color2):
+        """두 색상이 유사한지 확인"""
+        similar_groups = [
+            ['빨간색', '주황색', '분홍색'],
+            ['파란색', '하늘색', '남색'],
+            ['초록색', '연두색'],
+            ['노란색', '베이지색', '아이보리색'],
+            ['검은색', '회색', '차콜색'],
+            ['흰색', '아이보리색', '베이지색'],
+            ['보라색', '분홍색']
+        ]
+        
+        for group in similar_groups:
+            if color1 in group and color2 in group:
+                return True
+        return False
+    
+    def get_match_grade(self, score):
+        """매칭 점수에 따른 등급"""
+        if score >= 90:
+            return 'S'
+        elif score >= 70:
+            return 'A'
+        elif score >= 50:
+            return 'B'
+        elif score >= 30:
+            return 'C'
+        else:
+            return 'D'
+    
+    def get_match_message(self, score):
+        """매칭 점수에 따른 메시지"""
+        if score >= 90:
+            return '완벽한 행운의 아이템입니다! 🌟'
+        elif score >= 70:
+            return '행운을 가져다 줄 좋은 아이템입니다! ✨'
+        elif score >= 50:
+            return '적당한 행운의 기운이 있습니다. 🍀'
+        elif score >= 30:
+            return '약간의 행운이 깃들어 있습니다. 💫'
+        else:
+            return '오늘은 다른 아이템을 시도해보세요. 💭'

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ item.item_name }} - Fortune Life{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card mb-4">
+            <div class="card-body text-center py-4">
+                <h1 class="display-5 mb-3">
+                    <i class="fas fa-search text-primary"></i> 아이템 상세 분석
+                </h1>
+                <p class="lead text-muted">AI가 분석한 아이템의 상세 정보입니다</p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="row g-0">
+                <div class="col-md-6">
+                    {% if item.image %}
+                    <img src="{{ item.image.url }}" class="img-fluid rounded-start h-100" alt="{{ item.item_name }}" style="object-fit: cover; min-height: 400px;">
+                    {% else %}
+                    <div class="d-flex align-items-center justify-content-center h-100 bg-light" style="min-height: 400px;">
+                        <span class="text-muted">이미지 없음</span>
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="col-md-6">
+                    <div class="card-body p-4">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <h2 class="card-title fw-bold mb-0">{{ item.item_name }}</h2>
+                            {% if item.is_favorite %}
+                            <span class="text-warning"><i class="fas fa-star fa-lg"></i></span>
+                            {% endif %}
+                        </div>
+                        
+                        <p class="text-muted mb-4">
+                            <span class="badge bg-secondary me-2">{{ item.get_item_category_display }}</span>
+                            <small>{{ item.created_at|date:"Y.m.d H:i" }} 등록</small>
+                        </p>
+
+                        <hr class="my-4">
+
+                        <h5 class="fw-bold mb-3"><i class="fas fa-palette text-primary"></i> 주요 색상</h5>
+                        {% if item.dominant_colors %}
+                        <div class="mb-4">
+                            {% for color in item.dominant_colors %}
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="rounded-circle border me-3" style="width: 30px; height: 30px; background-color: {{ color.hex }};"></div>
+                                <span class="fw-bold">{{ color.korean_name }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p class="text-muted mb-4">분석된 색상 정보가 없습니다.</p>
+                        {% endif %}
+
+                        {% if item.ai_analysis_result %}
+                        <h5 class="fw-bold mb-3"><i class="fas fa-robot text-success"></i> AI 분석 태그</h5>
+                        <div class="mb-4">
+                            {% for tag in item.ai_analysis_result.tags %}
+                            <span class="badge bg-light text-dark border me-1 mb-1">#{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 mt-5">
+                            <a href="{% url 'items:list' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-list"></i> 목록으로 돌아가기
+                            </a>
+                            <button class="btn btn-outline-danger" onclick="deleteItem({{ item.id }})">
+                                <i class="fas fa-trash"></i> 삭제하기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function deleteItem(itemId) {
+    if (!confirm('정말 이 아이템을 삭제하시겠습니까?')) {
+        return;
+    }
+    
+    fetch(`/api/items/${itemId}/delete/`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('삭제되었습니다.');
+            window.location.href = "{% url 'items:list' %}";
+        } else {
+            alert(data.message || '삭제 중 오류가 발생했습니다.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('삭제 중 오류가 발생했습니다.');
+    });
+}
+</script>
+{% endblock %}

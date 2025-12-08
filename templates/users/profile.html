@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+
+{% block title %}내 프로필 - Fortune Life{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card glass-card">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-user-circle text-primary"></i> 내 프로필
+                </h2>
+                
+                <form id="profile-form" method="POST" action="{% url 'users:profile_update' %}" style="display: none;">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>기본 정보</h5>
+                            <div class="row mb-3">
+                                <div class="col-4">
+                                    <label class="form-label">성</label>
+                                    <input type="text" name="last_name" class="form-control glass-input" value="{{ user.last_name }}" placeholder="예: 홍">
+                                </div>
+                                <div class="col-8">
+                                    <label class="form-label">이름</label>
+                                    <input type="text" name="first_name" class="form-control glass-input" value="{{ user.first_name }}" placeholder="예: 길동">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">이메일</label>
+                                <input type="email" name="email" class="form-control glass-input" value="{{ user.email }}">
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">생년월일</label>
+                                <input type="date" name="birth_date" class="form-control glass-input" value="{{ user.birth_date|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">성별</label>
+                                <select name="gender" class="form-select glass-input" required>
+                                    <option value="M" {% if user.gender == 'M' %}selected{% endif %}>남자</option>
+                                    <option value="F" {% if user.gender == 'F' %}selected{% endif %}>여자</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>추가 정보</h5>
+                            <div class="mb-3">
+                                <label class="form-label">MBTI</label>
+                                <select name="mbti" class="form-select glass-input">
+                                    <option value="">선택안함</option>
+                                    {% for mbti_code, mbti_name in mbti_choices %}
+                                    <option value="{{ mbti_code }}" {% if user.mbti == mbti_code %}selected{% endif %}>{{ mbti_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">퍼스널컬러</label>
+                                <select name="personal_color" class="form-select glass-input">
+                                    <option value="">선택안함</option>
+                                    <option value="spring_warm" {% if user.personal_color == 'spring_warm' %}selected{% endif %}>봄 웜톤</option>
+                                    <option value="summer_cool" {% if user.personal_color == 'summer_cool' %}selected{% endif %}>여름 쿨톤</option>
+                                    <option value="autumn_warm" {% if user.personal_color == 'autumn_warm' %}selected{% endif %}>가을 웜톤</option>
+                                    <option value="winter_cool" {% if user.personal_color == 'winter_cool' %}selected{% endif %}>겨울 쿨톤</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-primary me-2">
+                            <i class="fas fa-save"></i> 저장하기
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit()">
+                            <i class="fas fa-times"></i> 취소
+                        </button>
+                    </div>
+                </form>
+                
+                <div id="profile-view">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5>기본 정보</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="40%">이름:</th>
+                                    <td>{{ user.get_full_name|default:"미입력" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>아이디:</th>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <th>이메일:</th>
+                                    <td>{{ user.email|default:"미입력" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>생년월일:</th>
+                                    <td>{{ user.birth_date|date:"Y년 m월 d일" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>성별:</th>
+                                    <td>{% if user.gender == 'M' %}남자{% elif user.gender == 'F' %}여자{% else %}미입력{% endif %}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <h5>추가 정보</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <th width="40%">별자리:</th>
+                                    <td>{{ user.zodiac_sign|default:"계산중" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>띠:</th>
+                                    <td>{{ user.chinese_zodiac|default:"계산중" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>MBTI:</th>
+                                    <td>{{ user.mbti|default:"미입력" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>퍼스널컬러:</th>
+                                    <td>{{ user.get_personal_color_display|default:"미입력" }}</td>
+                                </tr>
+                                <tr>
+                                    <th>태어난 시간:</th>
+                                    <td>{{ user.birth_time_display|default:"미입력" }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="text-center">
+                        <a href="{% url 'fortune:today' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-star"></i> 오늘의 운세 보기
+                        </a>
+                        <button class="btn btn-outline-secondary" onclick="editProfile()">
+                            <i class="fas fa-edit"></i> 프로필 수정
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function editProfile() {
+    document.getElementById('profile-view').style.display = 'none';
+    document.getElementById('profile-form').style.display = 'block';
+}
+
+function cancelEdit() {
+    document.getElementById('profile-view').style.display = 'block';
+    document.getElementById('profile-form').style.display = 'none';
+}
+</script>
+{% endblock %}

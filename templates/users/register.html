@@ -1,0 +1,356 @@
+{% extends 'base.html' %}
+
+{% block title %}회원가입 - Fortune Life{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="glass-card shadow-lg">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4 text-white">
+                    <i class="fas fa-user-plus text-primary"></i> 회원가입
+                </h2>
+                
+                <form method="POST" action="{% url 'users:register' %}">
+                    {% csrf_token %}
+                    
+                    <h5 class="mb-3 text-white border-bottom border-secondary pb-2">계정 정보</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">아이디 <span class="text-danger">*</span></label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="text" name="username" id="username" class="form-control text-white bg-dark border-secondary flex-grow-1" required oninput="convertKoreanToEnglish(this); resetUsernameCheck();" style="ime-mode: disabled;">
+                            <button type="button" class="btn btn-outline-light btn-check-duplicate flex-shrink-0" onclick="checkUsername()">중복확인</button>
+                        </div>
+                        <small id="username-feedback" class="text-white-50">영문, 숫자 조합 4-20자</small>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">이메일</label>
+                        <div class="d-flex gap-2 align-items-center">
+                            <input type="email" name="email" id="email" class="form-control text-white bg-dark border-secondary flex-grow-1" placeholder="example@email.com" oninput="resetEmailCheck();">
+                            <button type="button" class="btn btn-outline-light btn-check-duplicate flex-shrink-0" onclick="checkEmail()">중복확인</button>
+                        </div>
+                        <small id="email-feedback" class="text-warning"><i class="fas fa-exclamation-triangle"></i> 비밀번호 분실 시 입력하신 이메일로 인증이 진행됩니다</small>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">비밀번호 <span class="text-danger">*</span></label>
+                            <input type="password" name="password1" class="form-control text-white bg-dark border-secondary" required>
+                            <small class="text-white-50">8자 이상, 영문/숫자/특수문자 포함</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">비밀번호 확인 <span class="text-danger">*</span></label>
+                            <input type="password" name="password2" class="form-control text-white bg-dark border-secondary" required>
+                        </div>
+                    </div>
+                    
+                    <h5 class="mb-3 mt-4 text-white border-bottom border-secondary pb-2">기본 정보</h5>
+
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label text-white">성 <span class="text-danger">*</span></label>
+                            <input type="text" name="last_name" class="form-control text-white bg-dark border-secondary" placeholder="예: 홍" required>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label text-white">이름 <span class="text-danger">*</span></label>
+                            <input type="text" name="first_name" class="form-control text-white bg-dark border-secondary" placeholder="예: 길동" required>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">생년월일 <span class="text-danger">*</span></label>
+                            <input type="date" name="birth_date" id="birth_date_register" class="form-control text-white bg-dark border-secondary"
+                                   min="1900-01-01" required>
+                            <script>
+                                const registerDateInput = document.getElementById('birth_date_register');
+                                // 최대 날짜를 오늘로 설정
+                                registerDateInput.max = new Date().toISOString().split("T")[0];
+
+                                // 추가 검증: 폼 제출 시 유효성 체크
+                                registerDateInput.addEventListener('blur', function() {
+                                    const selectedDate = new Date(this.value);
+                                    const today = new Date();
+                                    const minDate = new Date('1900-01-01');
+
+                                    if (selectedDate > today) {
+                                        alert('미래 날짜는 선택할 수 없습니다.');
+                                        this.value = '';
+                                    } else if (selectedDate < minDate) {
+                                        alert('1900년 이후 날짜를 선택해주세요.');
+                                        this.value = '';
+                                    }
+                                });
+                            </script>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">생년월일 구분 <span class="text-danger">*</span></label>
+                        <select name="calendar_type" class="form-select text-white bg-dark border-secondary" required>
+                            <option value="solar">양력</option>
+                            <option value="lunar">음력</option>
+                        </select>
+                        <small class="text-white-50">음력 생일인 경우 음력을 선택하세요</small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-white">성별 <span class="text-danger">*</span></label>
+                        <select name="gender" class="form-select text-white bg-dark border-secondary" required>
+                            <option value="">선택하세요</option>
+                            <option value="M">남자</option>
+                            <option value="F">여자</option>
+                        </select>
+                    </div>
+                    
+                    <h5 class="mb-3 mt-4 text-white border-bottom border-secondary pb-2">추가 정보 (선택)</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label text-white">태어난 시각</label>
+                        <div class="input-group">
+                            <select name="birth_hour" class="form-select text-white bg-dark border-secondary">
+                                <option value="">시</option>
+                            </select>
+                            <select name="birth_minute" class="form-select text-white bg-dark border-secondary">
+                                <option value="">분</option>
+                            </select>
+                        </div>
+                        <small class="text-white-50">더 정확한 사주 계산에 사용됩니다</small>
+                        <script>
+                            // 분 옵션 생성 (0~59)
+                            const minuteSelect = document.querySelector('select[name="birth_minute"]');
+                            for(let i=0; i<60; i++) {
+                                const val = i.toString().padStart(2, '0');
+                                const option = document.createElement('option');
+                                option.value = val;
+                                option.text = val + '분';
+                                minuteSelect.appendChild(option);
+                            }
+
+                            // 시 옵션 생성 (0~23)
+                            const hourSelect = document.querySelector('select[name="birth_hour"]');
+                            for(let i=0; i<24; i++) {
+                                const val = i.toString().padStart(2, '0');
+                                const option = document.createElement('option');
+                                option.value = val;
+                                option.text = val + '시';
+                                hourSelect.appendChild(option);
+                            }
+                        </script>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">MBTI</label>
+                            <select name="mbti" class="form-select text-white bg-dark border-secondary">
+                                <option value="">선택하세요</option>
+                                <option value="ISTJ">ISTJ</option>
+                                <option value="ISTP">ISTP</option>
+                                <option value="ISFJ">ISFJ</option>
+                                <option value="ISFP">ISFP</option>
+                                <option value="INTJ">INTJ</option>
+                                <option value="INTP">INTP</option>
+                                <option value="INFJ">INFJ</option>
+                                <option value="INFP">INFP</option>
+                                <option value="ESTP">ESTP</option>
+                                <option value="ESTJ">ESTJ</option>
+                                <option value="ESFP">ESFP</option>
+                                <option value="ESFJ">ESFJ</option>
+                                <option value="ENTP">ENTP</option>
+                                <option value="ENTJ">ENTJ</option>
+                                <option value="ENFP">ENFP</option>
+                                <option value="ENFJ">ENFJ</option>
+                            </select>
+                            <small class="text-white-50">맞춤형 말투 제공</small>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-white">퍼스널컬러</label>
+                            <select name="personal_color" class="form-select text-white bg-dark border-secondary">
+                                <option value="">선택하세요</option>
+                                <option value="spring_warm">봄 웜톤</option>
+                                <option value="summer_cool">여름 쿨톤</option>
+                                <option value="autumn_warm">가을 웜톤</option>
+                                <option value="winter_cool">겨울 쿨톤</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-white">한자 이름</label>
+                        <input type="text" name="chinese_name" class="form-control text-white bg-dark border-secondary" placeholder="예: 金哲秀">
+                        <small class="text-white-50">작명 원리를 통한 운세 보정</small>
+                    </div>
+                    
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-user-plus"></i> 회원가입
+                        </button>
+                    </div>
+                </form>
+                
+                <hr class="my-4 border-secondary">
+                
+                <div class="text-center">
+                    <p class="text-white mb-2">이미 회원이신가요?</p>
+                    <a href="{% url 'users:login' %}" class="btn btn-outline-light">
+                        로그인하기
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let isConverting = false;
+    let usernameChecked = false;
+    let emailChecked = false;
+
+    function convertKoreanToEnglish(input) {
+        if (isConverting) return;
+
+        const k2e = {
+            'ㅂ':'q','ㅈ':'w','ㄷ':'e','ㄱ':'r','ㅅ':'t',
+            'ㅛ':'y','ㅕ':'u','ㅑ':'i','ㅐ':'o','ㅔ':'p',
+            'ㅁ':'a','ㄴ':'s','ㅇ':'d','ㄹ':'f','ㅎ':'g',
+            'ㅗ':'h','ㅓ':'j','ㅏ':'k','ㅣ':'l',
+            'ㅋ':'z','ㅌ':'x','ㅊ':'c','ㅍ':'v','ㅠ':'b','ㅜ':'n','ㅡ':'m',
+            'ㅃ':'Q','ㅉ':'W','ㄸ':'E','ㄲ':'R','ㅆ':'T',
+            'ㅒ':'O','ㅖ':'P'
+        };
+
+        const value = input.value;
+        const start = input.selectionStart;
+        const end = input.selectionEnd;
+
+        let newValue = '';
+        for (let i = 0; i < value.length; i++) {
+            const char = value[i];
+            if (k2e[char]) {
+                newValue += k2e[char];
+            } else {
+                newValue += char;
+            }
+        }
+
+        newValue = newValue.replace(/[^A-Za-z0-9]/g, '');
+
+        if (value !== newValue) {
+            isConverting = true;
+            input.value = newValue;
+            input.setSelectionRange(Math.min(start, newValue.length), Math.min(end, newValue.length));
+            isConverting = false;
+        }
+    }
+
+    function resetUsernameCheck() {
+        usernameChecked = false;
+        const feedback = document.getElementById('username-feedback');
+        const input = document.getElementById('username');
+        feedback.textContent = '영문, 숫자 조합 4-20자';
+        feedback.className = 'text-white-50';
+        input.classList.remove('is-valid', 'is-invalid');
+    }
+
+    function resetEmailCheck() {
+        emailChecked = false;
+        const feedback = document.getElementById('email-feedback');
+        const input = document.getElementById('email');
+        feedback.innerHTML = '<i class="fas fa-exclamation-triangle"></i> 비밀번호 분실 시 입력하신 이메일로 인증이 진행됩니다';
+        feedback.className = 'text-warning';
+        input.classList.remove('is-valid', 'is-invalid');
+    }
+
+    function checkUsername() {
+        const feedback = document.getElementById('username-feedback');
+        const input = document.getElementById('username');
+        const username = input.value;
+
+        if (username.length < 4) {
+            alert('아이디는 4자 이상이어야 합니다.');
+            return;
+        }
+
+        fetch(`/api/auth/check-username/?username=${encodeURIComponent(username)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.available) {
+                    feedback.textContent = '✓ 사용 가능한 아이디입니다';
+                    feedback.className = 'text-success';
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                    usernameChecked = true;
+                } else {
+                    feedback.textContent = '✗ 이미 사용중인 아이디입니다';
+                    feedback.className = 'text-danger';
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+                    usernameChecked = false;
+                }
+            })
+            .catch(() => {
+                alert('중복 확인 중 오류가 발생했습니다.');
+            });
+    }
+
+    function checkEmail() {
+        const feedback = document.getElementById('email-feedback');
+        const input = document.getElementById('email');
+        const email = input.value;
+
+        if (!email) {
+            alert('이메일을 입력해주세요.');
+            return;
+        }
+
+        // 이메일 형식 검증
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            feedback.textContent = '✗ 올바른 이메일 형식이 아닙니다';
+            feedback.className = 'text-danger';
+            input.classList.remove('is-valid');
+            input.classList.add('is-invalid');
+            return;
+        }
+
+        fetch(`/api/auth/check-email/?email=${encodeURIComponent(email)}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data.available) {
+                    feedback.textContent = '✓ 사용 가능한 이메일입니다';
+                    feedback.className = 'text-success';
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                    emailChecked = true;
+                } else {
+                    feedback.textContent = '✗ 이미 사용중인 이메일입니다';
+                    feedback.className = 'text-danger';
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+                    emailChecked = false;
+                }
+            })
+            .catch(() => {
+                alert('중복 확인 중 오류가 발생했습니다.');
+            });
+    }
+
+    // 폼 제출 시 검증
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (!usernameChecked) {
+            e.preventDefault();
+            alert('아이디 중복확인을 해주세요.');
+            return;
+        }
+
+        const email = document.getElementById('email').value;
+        if (email && !emailChecked) {
+            e.preventDefault();
+            alert('이메일 중복확인을 해주세요.');
+            return;
+        }
+    });
+</script>
+{% endblock %}

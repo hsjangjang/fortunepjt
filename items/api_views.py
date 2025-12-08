@@ -1,0 +1,258 @@
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import UserItem
+
+
+class ItemListAPIView(APIView):
+    """아이템 목록 조회/생성 API"""
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def get(self, request):
+        """아이템 목록 조회"""
+        items = UserItem.objects.filter(user=request.user).order_by('-created_at')
+
+        # 필터링
+        category = request.query_params.get('category')
+        if category:
+            items = items.filter(main_category=category)
+
+        favorite_only = request.query_params.get('favorite')
+        if favorite_only == 'true':
+            items = items.filter(is_favorite=True)
+
+        items_data = [
+            {
+                'id': item.id,
+                'item_name': item.item_name,
+                'main_category': item.main_category,
+                'sub_categories': item.sub_categories,
+                'image': item.image.url if item.image else None,
+                'image_url': item.image.url if item.image else None,
+                'dominant_colors': item.dominant_colors,
+                'colors_json': item.colors_json,
+                'ai_analysis': item.ai_analysis_result,
+                'is_favorite': item.is_favorite,
+                'created_at': item.created_at.isoformat()
+            }
+            for item in items
+        ]
+
+        return Response({
+            'success': True,
+            'count': len(items_data),
+            'items': items_data
+        })
+
+    def post(self, request):
+        """아이템 생성"""
+        image = request.FILES.get('image')
+        if not image:
+            return Response({
+                'success': False,
+                'error': '이미지를 업로드해주세요.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            item = UserItem.objects.create(
+                user=request.user,
+                image=image,
+                item_name=request.data.get('item_name', '새 아이템'),
+                main_category=request.data.get('main_category', 'etc'),
+                sub_categories=request.data.getlist('sub_categories', []),
+            )
+
+            # 이미지 분석
+            from .color_analyzer import ImageColorAnalyzer
+            analyzer = ImageColorAnalyzer()
+            analysis_result = analyzer.analyze_image_with_ai(item.image.path)
+
+            if analysis_result['success']:
+                item.dominant_colors = analysis_result['colors']
+                item.ai_analysis_result = analysis_result.get('ai_analysis', {})
+                item.save()
+
+            return Response({
+                'success': True,
+                'message': '아이템이 등록되었습니다.',
+                'item': {
+                    'id': item.id,
+                    'item_name': item.item_name,
+                    'image_url': item.image.url,
+                    'dominant_colors': item.dominant_colors,
+                    'ai_analysis': item.ai_analysis_result
+                }
+            }, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ItemDetailAPIView(APIView):
+    """아이템 상세 조회/수정/삭제 API"""
+    permission_classes = [IsAuthenticated]
+
+    def get_object(self, pk, user):
+        try:
+            return UserItem.objects.get(pk=pk, user=user)
+        except UserItem.DoesNotExist:
+            return None
+
+    def get(self, request, pk):
+        """아이템 상세 조회"""
+        item = self.get_object(pk, request.user)
+        if not item:
+            return Response({
+                'success': False,
+                'error': '아이템을 찾을 수 없습니다.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        return Response({
+            'success': True,
+            'item': {
+                'id': item.id,
+                'item_name': item.item_name,
+                'main_category': item.main_category,
+                'sub_categories': item.sub_categories,
+                'image_url': item.image.url if item.image else None,
+                'dominant_colors': item.dominant_colors,
+                'ai_analysis': item.ai_analysis_result,
+                'is_favorite': item.is_favorite,
+                'created_at': item.created_at.isoformat(),
+                'updated_at': item.updated_at.isoformat()
+            }
+        })
+
+    def put(self, request, pk):
+        """아이템 수정"""
+        item = self.get_object(pk, request.user)
+        if not item:
+            return Response({
+                'success': False,
+                'error': '아이템을 찾을 수 없습니다.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        # 수정 가능한 필드들
+        if 'item_name' in request.data:
+            item.item_name = request.data['item_name']
+        if 'main_category' in request.data:
+            item.main_category = request.data['main_category']
+        if 'sub_categories' in request.data:
+            item.sub_categories = request.data['sub_categories']
+        if 'is_favorite' in request.data:
+            item.is_favorite = request.data['is_favorite']
+
+        item.save()
+
+        return Response({
+            'success': True,
+            'message': '아이템이 수정되었습니다.',
+            'item': {
+                'id': item.id,
+                'item_name': item.item_name,
+                'is_favorite': item.is_favorite
+            }
+        })
+
+    def delete(self, request, pk):
+        """아이템 삭제"""
+        item = self.get_object(pk, request.user)
+        if not item:
+            return Response({
+                'success': False,
+                'error': '아이템을 찾을 수 없습니다.'
+            }, status=status.HTTP_404_NOT_FOUND)
+
+        item.delete()
+        return Response({
+            'success': True,
+            'message': '아이템이 삭제되었습니다.'
+        })
+
+
+class ItemAnalyzeAPIView(APIView):
+    """이미지 분석 API (임시 분석)"""
+    permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
+
+    def post(self, request):
+        """이미지 분석만 수행 (저장하지 않음)"""
+        image = request.FILES.get('image')
+        if not image:
+            return Response({
+                'success': False,
+                'error': '이미지를 업로드해주세요.'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            import tempfile
+            from django.core.files.storage import default_storage
+
+            # 임시 파일 저장
+            temp_path = default_storage.save(f'temp/{image.name}', image)
+            full_path = default_storage.path(temp_path)
+
+            try:
+                from .color_analyzer import ImageColorAnalyzer
+                analyzer = ImageColorAnalyzer()
+                analysis_result = analyzer.analyze_image_with_ai(full_path)
+
+                # 카테고리 추천
+                ai_category = analysis_result.get('ai_analysis', {}).get('category', '')
+                category_mapping = {
+                    'wallet': '지갑', 'keyring': '키링', 'doll': '인형',
+                    'electronics': '전자기기', 'clothing': '의류',
+                    'accessory': '액세서리', 'food': '음식', 'etc': '기타'
+                }
+
+                if ai_category in category_mapping.values():
+                    item_name_display = ai_category
+                else:
+                    item_name_display = category_mapping.get(ai_category.lower(), ai_category)
+
+                return Response({
+                    'success': True,
+                    'analysis': analysis_result,
+                    'suggested_name': item_name_display
+                })
+            finally:
+                # 임시 파일 삭제
+                try:
+                    default_storage.delete(temp_path)
+                except Exception:
+                    pass
+
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class ItemFavoriteAPIView(APIView):
+    """아이템 즐겨찾기 토글 API"""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        """즐겨찾기 토글"""
+        try:
+            item = UserItem.objects.get(pk=pk, user=request.user)
+            item.is_favorite = not item.is_favorite
+            item.save()
+
+            return Response({
+                'success': True,
+                'is_favorite': item.is_favorite,
+                'message': '즐겨찾기에 추가되었습니다.' if item.is_favorite else '즐겨찾기에서 제거되었습니다.'
+            })
+        except UserItem.DoesNotExist:
+            return Response({
+                'success': False,
+                'error': '아이템을 찾을 수 없습니다.'
+            }, status=status.HTTP_404_NOT_FOUND)

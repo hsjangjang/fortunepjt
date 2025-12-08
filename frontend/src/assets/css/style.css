@@ -1,0 +1,576 @@
+/* Celestial Premium Theme */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
+
+:root {
+    /* Color Palette - Midnight & Gold */
+    --bg-dark: #0f172a;
+    --bg-darker: #020617;
+    --primary: #7c3aed;
+    --primary-light: #a78bfa;
+    --accent: #f59e0b;
+
+    /* Text Colors */
+    --text-main: #ffffff;
+    --text-muted: #cbd5e1;
+
+    /* Spacing & Radius */
+    --radius-sm: 8px;
+    --radius-md: 16px;
+    --radius-lg: 24px;
+    --radius-full: 9999px;
+
+    /* Shadows */
+    --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+    --shadow-glow: 0 0 20px rgba(124, 58, 237, 0.3);
+
+    /* Glassmorphism Variables */
+    --glass-bg: rgba(255, 255, 255, 0.05);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-highlight: rgba(255, 255, 255, 0.2);
+}
+
+/* Reset & Base */
+body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    background-color: var(--bg-darker);
+    background-image:
+        radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15), transparent 25%),
+        radial-gradient(circle at 85% 30%, rgba(59, 130, 246, 0.15), transparent 25%);
+    color: var(--text-main);
+    min-height: 100vh;
+    overflow-x: hidden;
+    line-height: 1.6;
+}
+
+/* Typography */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: white;
+}
+
+.display-title {
+    font-size: 3.5rem;
+    background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+}
+
+/* Bootstrap Overrides for Dark Theme */
+.text-muted {
+    color: var(--text-muted) !important;
+}
+
+.text-dark {
+    color: white !important;
+}
+
+/* Navbar */
+.navbar {
+    background: rgba(15, 23, 42, 0.8) !important;
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 1rem 0;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: white !important;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link {
+    color: var(--text-muted) !important;
+    font-weight: 500;
+    transition: color 0.2s, transform 0.2s ease;
+    padding: 0.5rem 1rem !important;
+    display: inline-block;
+}
+
+.nav-link:hover {
+    color: #FFD700 !important;
+    text-shadow:
+        -1px -1px 0 #000,
+        1px -1px 0 #000,
+        -1px 1px 0 #000,
+        1px 1px 0 #000;
+    transform: translateY(-3px);
+}
+
+/* 버튼 스타일 nav-link는 기존 hover 유지 */
+.nav-link.btn:hover {
+    color: #000 !important;
+    text-shadow: none;
+    transform: none;
+}
+
+/* Glass Card */
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-card:hover {
+    box-shadow: var(--shadow-glow);
+}
+
+/* Fix cursor flickering with stretched-link */
+.glass-card .stretched-link {
+    cursor: pointer;
+}
+
+.glass-card:has(.stretched-link) {
+    cursor: pointer;
+}
+
+.glass-card:has(.stretched-link):hover {
+    transform: translateY(-5px);
+}
+
+/* Prevent pointer events on all children inside stretched-link cards */
+.glass-card:has(.stretched-link) * {
+    pointer-events: none;
+}
+
+.glass-card:has(.stretched-link) .stretched-link {
+    pointer-events: auto;
+}
+
+/* Allow pointer events on buttons inside stretched-link cards */
+.glass-card:has(.stretched-link) .btn {
+    pointer-events: auto;
+}
+
+/* Prevent button hover effects when card is hovered (only when button itself is hovered) */
+.glass-card .btn-outline-light {
+    position: relative;
+    z-index: 1;
+}
+
+.glass-card .btn-outline-light:not(:hover) {
+    background: transparent !important;
+    color: white !important;
+    border-color: var(--glass-border) !important;
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+/* Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    border-radius: var(--radius-full);
+    transition: all 0.3s ease;
+    color: white !important;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(250, 204, 21, 0.5);
+    background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+    color: #000 !important;
+}
+
+.btn-outline-light {
+    border: 1px solid var(--glass-border);
+    color: white;
+    background: transparent;
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    border-radius: var(--radius-full);
+    transition: all 0.3s ease;
+}
+
+.btn-outline-light:hover,
+.btn-outline-light:active,
+.btn-outline-light.show {
+    background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+    border-color: #facc15;
+    color: #000 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(250, 204, 21, 0.5);
+}
+
+.btn-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, #6366f1 100%);
+    border: none;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+    background: linear-gradient(135deg, #fde047 0%, #facc15 100%);
+    color: #000 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(250, 204, 21, 0.5);
+}
+
+/* All other button types hover to yellow */
+.btn-success:hover,
+.btn-info:hover,
+.btn-warning:hover,
+.btn-danger:hover,
+.btn-secondary:hover,
+.btn-dark:hover {
+    background: linear-gradient(135deg, #fde047 0%, #facc15 100%) !important;
+    border-color: #facc15 !important;
+    color: #000 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(250, 204, 21, 0.5);
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.form-select option {
+    background: var(--bg-dark);
+    color: white;
+}
+
+/* Text Gradient */
+.text-gradient {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Hover Lift Effect */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+    background: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-md);
+}
+
+.dropdown-item {
+    color: var(--text-muted);
+    padding: 0.75rem 1.25rem;
+    transition: all 0.2s;
+}
+
+.dropdown-item:hover {
+    background: var(--glass-highlight);
+    color: white;
+}
+
+/* Animations */
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+/* Loading Spinner */
+.loading-spinner {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Visibility Improvements */
+.text-white-visible {
+    color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.opacity-visible {
+    opacity: 0.9 !important;
+}
+
+.form-text {
+    color: rgba(255, 255, 255, 0.7) !important;
+}
+
+/* Badge Styles */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 1em;
+}
+
+/* Card Styles */
+.card {
+    background: var(--glass-bg) !important;
+    border: 1px solid var(--glass-border) !important;
+    border-radius: var(--radius-lg);
+    color: var(--text-main);
+}
+
+.card .table {
+    color: var(--text-main);
+    background: transparent !important;
+}
+
+.card .table th,
+.card .table td {
+    background: transparent !important;
+    border-color: var(--glass-border) !important;
+    background-clip: padding-box;
+}
+
+.card .table th {
+    color: var(--text-muted);
+}
+
+.card .table td {
+    color: white;
+}
+
+.card h5 {
+    color: white;
+}
+
+.card .form-label {
+    color: var(--text-muted);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .display-title {
+        font-size: 2.5rem;
+    }
+
+    .glass-card {
+        padding: 1.5rem;
+    }
+}
+
+/* Lotto Numbers */
+.lotto-numbers {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.lotto-ball {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: white;
+    font-size: 1.4rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3), inset 0 -5px 10px rgba(0, 0, 0, 0.2), inset 0 5px 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Fortune Circle */
+.fortune-circle {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 0 auto;
+}
+
+.fortune-circle-bg {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.1);
+    stroke-width: 12;
+}
+
+.fortune-circle-progress {
+    fill: none;
+    stroke: url(#gradient);
+    stroke-width: 12;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: center;
+    stroke-dasharray: 628;
+    stroke-dashoffset: 628;
+    transition: stroke-dashoffset 2s ease-out;
+}
+
+.fortune-score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.fortune-score-text .score {
+    font-size: 3.5rem;
+    font-weight: 800;
+    color: white;
+    line-height: 1;
+}
+
+.fortune-score-text .label {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 5px;
+}
+
+/* Sub Score Bar */
+.sub-score-bar {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    height: 30px;
+    position: relative;
+    margin: 15px 0;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.sub-score-fill {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 1.5s ease-out;
+}
+
+.sub-score-bar .score-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.fortune-tabs .nav-link {
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.fortune-tabs .nav-link:hover {
+    color: white !important;
+    text-shadow: none;
+    transform: translateY(-3px);
+}
+
+.fortune-tabs .nav-link.active {
+    color: white;
+    background: rgba(124, 58, 237, 0.2);
+    border-bottom: 2px solid var(--primary);
+}
+
+/* Custom Tab Colors */
+#tab-total.active {
+    background: rgba(124, 58, 237, 0.5) !important;
+    /* Purple */
+    border-color: #7c3aed !important;
+}
+
+#tab-money.active {
+    background: rgba(245, 158, 11, 0.5) !important;
+    /* Yellow/Gold */
+    border-color: #f59e0b !important;
+}
+
+#tab-love.active {
+    background: rgba(236, 72, 153, 0.5) !important;
+    /* Pink */
+    border-color: #ec4899 !important;
+    color: white !important;
+}
+
+#tab-study.active {
+    background: rgba(59, 130, 246, 0.5) !important;
+    /* Blue */
+    border-color: #3b82f6 !important;
+}
+
+#tab-work.active {
+    background: rgba(16, 185, 129, 0.5) !important;
+    /* Green */
+    border-color: #10b981 !important;
+}
+
+.fortune-text {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 1.1rem;
+    line-height: 1.8;
+    margin-top: 20px;
+}
+
+/* Lucky Colors */
+.lucky-colors-container {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 30px 0;
+    flex-wrap: wrap;
+}
+
+.lucky-color-item {
+    text-align: center;
+}
+
+.lucky-color-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), inset 0 -5px 10px rgba(0, 0, 0, 0.2), inset 0 5px 10px rgba(255, 255, 255, 0.2);
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.lucky-color-circle:hover {
+    transform: scale(1.1);
+}
+
+.lucky-color-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
