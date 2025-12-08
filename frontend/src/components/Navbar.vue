@@ -6,7 +6,7 @@
         <MoonStar class="text-warning me-2" :size="24" />
         <span class="text-gradient fw-bold">Fortune Life</span>
       </router-link>
-      <button class="navbar-toggler border-0" type="button" @click="toggleMobileMenu" @mouseenter="handleTogglerMouseEnter">
+      <button class="navbar-toggler border-0" type="button" @click="toggleMobileMenu">
         <span class="navbar-toggler-icon"></span>
       </button>
       <div ref="collapseRef" class="collapse navbar-collapse" :class="{ show: mobileMenuOpen, closing: mobileMenuClosing }" @mouseleave="handleCollapseMouseLeave" @mouseenter="handleNavbarMouseEnter">
@@ -152,11 +152,6 @@ const toggleMobileMenu = () => {
 
 const toggleUserDropdown = () => {
   userDropdownOpen.value = !userDropdownOpen.value
-}
-
-// 토글 버튼 호버 시 메뉴 열기
-const handleTogglerMouseEnter = () => {
-  openMenu()
 }
 
 // navbar에서 마우스 떠날 때
