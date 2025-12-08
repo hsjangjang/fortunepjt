@@ -320,15 +320,20 @@ const resetEmailCheck = () => {
 
 // 아이디 중복 체크 (버튼 클릭)
 const checkUsername = async () => {
+  console.log('checkUsername 함수 호출됨')
   const username = registerForm.value.username
+  console.log('username:', username)
 
   if (!username || username.length < 4) {
+    console.log('유효성 검사 실패: 4자 미만')
     showToast('아이디는 4자 이상이어야 합니다.', 'error')
     return
   }
 
   try {
+    console.log('API 호출 시작')
     const response = await apiClient.get(`/api/auth/check-username/?username=${encodeURIComponent(username)}`)
+    console.log('API 응답:', response)
     if (response.data.available) {
       usernameStatus.value = {
         message: '✓ 사용 가능한 아이디입니다',
