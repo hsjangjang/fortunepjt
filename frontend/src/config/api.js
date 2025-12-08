@@ -2,8 +2,9 @@ import axios from 'axios'
 
 // API Base URL 설정
 // 개발: 빈 문자열 (Vite proxy 사용)
-// 배포: Vercel rewrites를 통해 프록시 (Mixed Content 방지)
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
+// 배포: CloudFront HTTPS URL 사용
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD ? 'https://d1rjzb95p17prq.cloudfront.net' : '')
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({

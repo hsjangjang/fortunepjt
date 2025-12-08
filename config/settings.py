@@ -34,6 +34,7 @@ else:
 ALLOWED_HOSTS += [
     '.elasticbeanstalk.com',
     '.vercel.app',
+    '.cloudfront.net',
     '172.31.11.44',  # EB 내부 IP (헬스체크용)
 ]
 
