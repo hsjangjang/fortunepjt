@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-12 mx-auto">
+      <div class="col-lg-12 col-12 mx-auto px-1 px-md-3">
         <!-- Menu Header -->
         <div class="glass-card mb-4">
           <div class="card-body text-center py-4">
@@ -24,7 +24,7 @@
 
           <!-- Fortune Info -->
           <div v-if="!isLoading && fortuneData" class="glass-card mb-4">
-            <div class="card-body">
+            <div class="card-body responsive-padding">
               <div class="row text-center">
                 <div class="col-md-4">
                   <h6 class="text-white-50">오늘의 운세 점수</h6>
@@ -50,7 +50,7 @@
                 <div class="position-absolute top-0 start-50 translate-middle-x mt-n4"
                      :style="`width: 150px; height: 150px; background: ${rec.bg_gradient}; filter: blur(60px); opacity: 0.2;`"></div>
 
-                <div class="card-body text-center p-4 position-relative">
+                <div class="card-body text-center p-4 responsive-padding position-relative">
                   <div class="mb-3">
                     <span class="badge rounded-pill border border-white border-opacity-25 px-3 py-2 text-white fs-5"
                           style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);">
@@ -86,7 +86,7 @@
           </div>
 
           <!-- Additional Recommendations -->
-          <div v-if="!isLoading" class="glass-card p-4">
+          <div v-if="!isLoading" class="glass-card p-4 responsive-padding">
             <div class="d-flex align-items-center mb-4 border-bottom border-white border-opacity-10 pb-3">
               <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
                 <i class="fas fa-utensils text-primary"></i>
@@ -352,6 +352,11 @@ const colorMap = {
   }
   50% {
     transform: translateY(-10px);
+  }
+}
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding: 3% !important;
   }
 }
 </style>

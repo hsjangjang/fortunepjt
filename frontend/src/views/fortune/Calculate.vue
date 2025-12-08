@@ -1,8 +1,8 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-6 mx-auto">
-        <div class="glass-card p-4 p-md-5">
+      <div class="col-lg-6 col-12 mx-auto px-1 px-md-3">
+        <div class="glass-card responsive-padding">
           <div class="card-body p-0">
             <h2 class="text-center mb-4 text-white">
               <i class="fas fa-calculator text-primary-light me-2"></i> 운세 계산
@@ -335,5 +335,14 @@ option {
   filter: invert(1);
   opacity: 0.8;
   cursor: pointer;
+}
+@media (max-width: 768px) {
+  .responsive-padding {
+    padding: 3% !important;
+  }
+  
+  .glass-card {
+    border-radius: 12px;
+  }
 }
 </style>
