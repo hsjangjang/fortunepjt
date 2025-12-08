@@ -2,9 +2,8 @@ import axios from 'axios'
 
 // API Base URL 설정
 // 개발: 빈 문자열 (Vite proxy 사용)
-// 배포: AWS EB URL 직접 사용
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
-  (import.meta.env.PROD ? 'http://pjt-env.eba-jnmm8j7x.ap-northeast-2.elasticbeanstalk.com' : '')
+// 배포: Vercel rewrites를 통해 프록시 (Mixed Content 방지)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || ''
 
 // Axios 인스턴스 생성
 const apiClient = axios.create({
