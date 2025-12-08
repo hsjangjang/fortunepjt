@@ -14,7 +14,7 @@
               </button>
             </div>
 
-            <form @submit.prevent="handleSubmit" v-if="!authStore.isAuthenticated">
+            <form @submit.prevent="handleSubmit" v-if="!authStore.isAuthenticated" novalidate>
               <h5 class="mb-3 text-white border-bottom border-light border-opacity-25 pb-2">필수 정보</h5>
 
               <div class="row mb-3">
@@ -212,17 +212,40 @@ const resetFortune = () => {
 }
 
 const handleSubmit = () => {
+  // 필수 항목 검증
+  if (!fortuneForm.value.birth_date) {
+    showToast('생년월일을 입력해주세요.', 'error')
+    return
+  }
+  if (!fortuneForm.value.gender) {
+    showToast('성별을 선택해주세요.', 'error')
+    return
+  }
+
+  // 쿼리 파라미터 구성 (빈 값은 제외)
+  const query = {
+    birth_date: fortuneForm.value.birth_date,
+    gender: fortuneForm.value.gender,
+    calendar_type: fortuneForm.value.calendar_type
+  }
+
+  // 선택 항목은 값이 있을 때만 추가
+  if (fortuneForm.value.birth_time) {
+    query.birth_time = fortuneForm.value.birth_time
+  }
+  if (fortuneForm.value.chinese_name) {
+    query.chinese_name = fortuneForm.value.chinese_name
+  }
+  if (fortuneForm.value.mbti) {
+    query.mbti = fortuneForm.value.mbti
+  }
+  if (fortuneForm.value.personal_color) {
+    query.personal_color = fortuneForm.value.personal_color
+  }
+
   router.push({
     path: '/fortune/loading',
-    query: {
-      birth_date: fortuneForm.value.birth_date,
-      gender: fortuneForm.value.gender,
-      calendar_type: fortuneForm.value.calendar_type,
-      birth_time: fortuneForm.value.birth_time,
-      chinese_name: fortuneForm.value.chinese_name,
-      mbti: fortuneForm.value.mbti,
-      personal_color: fortuneForm.value.personal_color
-    }
+    query
   })
 }
 </script>
