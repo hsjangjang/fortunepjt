@@ -30,6 +30,7 @@
                 type="file"
                 ref="fileInput"
                 accept="image/*"
+                capture="environment"
                 style="display: none;"
                 @change="handleFileSelect">
             </div>

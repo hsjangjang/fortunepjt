@@ -36,6 +36,7 @@
                     type="file"
                     class="form-control d-none"
                     accept="image/*"
+                    capture="environment"
                     required
                     @change="handleFileChange"
                   >

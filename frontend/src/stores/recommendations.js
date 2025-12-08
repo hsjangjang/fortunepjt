@@ -50,7 +50,7 @@ export const useRecommendationsStore = defineStore('recommendations', () => {
   async function getWeather(lat, lon) {
     loading.value = true
     try {
-      const response = await apiClient.post('/recommendations/weather/location/', {
+      const response = await apiClient.post('/api/recommendations/weather/location/', {
         lat,
         lon
       })
