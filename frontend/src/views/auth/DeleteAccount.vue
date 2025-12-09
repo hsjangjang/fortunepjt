@@ -25,10 +25,10 @@
             </div>
 
             <div class="d-grid gap-2">
-              <button class="btn btn-danger rounded-pill" @click="goToStep2">
+              <button class="btn btn-danger btn-lg rounded-pill" @click="goToStep2">
                 <i class="fas fa-arrow-right me-2"></i>탈퇴 진행하기
               </button>
-              <router-link to="/profile" class="btn btn-warning rounded-pill">
+              <router-link to="/profile" class="btn btn-warning btn-lg rounded-pill">
                 <i class="fas fa-arrow-left me-2"></i>취소하고 돌아가기
               </router-link>
             </div>
@@ -73,7 +73,7 @@
 
             <div class="d-grid gap-2">
               <button
-                class="btn btn-danger btn-lg"
+                class="btn btn-danger btn-lg rounded-pill"
                 @click="handleDeleteAccount"
                 :disabled="!canDelete || isDeleting"
               >
