@@ -48,7 +48,7 @@
                      :style="`width: 150px; height: 150px; background: ${rec.bg_gradient}; filter: blur(60px); opacity: 0.2;`"></div>
 
                   <div class="mb-3 position-relative">
-                    <span class="badge rounded-pill"
+                    <span class="badge rounded-pill px-3 py-2"
                           style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);">
                       {{ rec.rank === 1 ? '🥇 1순위 추천' : '🥈 2순위 추천' }}
                     </span>
