@@ -214,22 +214,36 @@
 
               <div v-if="fortune.lucky_item" class="d-flex flex-column gap-4">
                 <div class="lucky-item-card text-center p-4"
-                     style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
+                     style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px; cursor: pointer;"
+                     @click="showMainItemDesc = !showMainItemDesc">
                   <div class="mb-2">
                     <span class="badge" style="background: #a78bfa; color: white;">운세 기반</span>
                   </div>
                   <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.emoji || '🎁' }}</span>
-                  <h5 class="text-white fw-bold mb-3" style="word-break: keep-all;">{{ fortune.lucky_item?.main || '행운 아이템' }}</h5>
-                  <p class="text-white opacity-75 mb-0 lucky-item-desc" v-html="formatDescription(fortune.lucky_item?.description || '', fortune.lucky_item?.main)"></p>
+                  <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item?.main || '행운 아이템' }}</h5>
+                  <div class="item-desc-toggle" :class="{ 'show': showMainItemDesc }">
+                    <p class="text-white opacity-75 small mb-0" v-html="formatDescription(fortune.lucky_item?.description || '', fortune.lucky_item?.main)"></p>
+                  </div>
+                  <div class="toggle-hint mt-2">
+                    <i class="fas" :class="showMainItemDesc ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    <span class="small text-white opacity-50 ms-1">{{ showMainItemDesc ? '접기' : '설명 보기' }}</span>
+                  </div>
                 </div>
                 <div class="lucky-item-card text-center p-4"
-                     style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
+                     style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px; cursor: pointer;"
+                     @click="showZodiacItemDesc = !showZodiacItemDesc">
                   <div class="mb-2">
                     <span class="badge" style="background: #a78bfa; color: white;">{{ fortune.zodiac_sign }} 추천</span>
                   </div>
                   <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.zodiac_emoji || '⭐' }}</span>
-                  <h5 class="text-white fw-bold mb-3" style="word-break: keep-all;">{{ fortune.lucky_item?.zodiac || '별자리 아이템' }}</h5>
-                  <p class="text-white opacity-75 mb-0 lucky-item-desc" v-html="formatDescription(fortune.lucky_item?.zodiac_description || '', fortune.lucky_item?.zodiac)"></p>
+                  <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item?.zodiac || '별자리 아이템' }}</h5>
+                  <div class="item-desc-toggle" :class="{ 'show': showZodiacItemDesc }">
+                    <p class="text-white opacity-75 small mb-0" v-html="formatDescription(fortune.lucky_item?.zodiac_description || '', fortune.lucky_item?.zodiac)"></p>
+                  </div>
+                  <div class="toggle-hint mt-2">
+                    <i class="fas" :class="showZodiacItemDesc ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
+                    <span class="small text-white opacity-50 ms-1">{{ showZodiacItemDesc ? '접기' : '설명 보기' }}</span>
+                  </div>
                 </div>
               </div>
               <div v-else class="text-center">
@@ -331,6 +345,8 @@ const fortune = ref(null)
 const displayScore = ref(0)
 const isMinor = ref(false)
 const isLoading = ref(true)
+const showMainItemDesc = ref(false)
+const showZodiacItemDesc = ref(false)
 
 // 문장 단위 줄바꿈 포맷팅 + 아이템명 굵게/밑줄 표시
 const formatDescription = (text, itemName) => {
