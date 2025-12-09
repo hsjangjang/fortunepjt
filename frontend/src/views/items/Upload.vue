@@ -19,7 +19,8 @@
                 <label class="form-label">아이템 이미지</label>
                 <div
                   ref="uploadArea"
-                  class="upload-area border rounded p-5 text-center"
+                  class="upload-area border rounded text-center"
+                  :class="imagePreview ? 'p-3' : 'p-5'"
                   style="border-style: dashed !important; cursor: pointer;"
                   @click="triggerFileInput"
                   @dragenter.prevent="handleDragEnter"
@@ -27,10 +28,16 @@
                   @dragleave.prevent="handleDragLeave"
                   @drop.prevent="handleDrop"
                 >
-                  <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                  <p :class="fileName ? 'text-primary fw-bold' : 'text-muted'">
-                    {{ fileName || '이미지를 드래그하거나 클릭하여 업로드' }}
-                  </p>
+                  <!-- 이미지 미리보기 -->
+                  <div v-if="imagePreview" class="preview-container">
+                    <img :src="imagePreview" alt="미리보기" class="preview-image">
+                    <p class="text-primary small mt-2 mb-0">클릭하여 다른 이미지 선택</p>
+                  </div>
+                  <!-- 기본 업로드 안내 -->
+                  <div v-else>
+                    <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">이미지를 드래그하거나 클릭하여 업로드</p>
+                  </div>
                   <input
                     ref="fileInput"
                     type="file"
@@ -148,6 +155,7 @@ const authStore = useAuthStore()
 const uploadArea = ref(null)
 const fileInput = ref(null)
 const fileName = ref('')
+const imagePreview = ref(null)
 const isUploading = ref(false)
 
 const formData = ref({
@@ -192,6 +200,13 @@ const handleFileChange = (e) => {
   if (file) {
     formData.value.image = file
     fileName.value = `선택된 파일: ${file.name}`
+
+    // 이미지 미리보기 생성
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      imagePreview.value = event.target.result
+    }
+    reader.readAsDataURL(file)
   }
 }
 
@@ -222,6 +237,13 @@ const handleDrop = (e) => {
     const dataTransfer = new DataTransfer()
     dataTransfer.items.add(file)
     fileInput.value.files = dataTransfer.files
+
+    // 이미지 미리보기 생성
+    const reader = new FileReader()
+    reader.onload = (event) => {
+      imagePreview.value = event.target.result
+    }
+    reader.readAsDataURL(file)
   }
 }
 
@@ -286,5 +308,25 @@ const handleSubmit = async () => {
   justify-content: center;
   align-items: center;
   color: white;
+}
+
+.preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+  .preview-image {
+    max-height: 180px;
+  }
 }
 </style>
