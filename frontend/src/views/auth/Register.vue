@@ -114,6 +114,13 @@
                 required
                 placeholder="비밀번호를 입력하세요"
               >
+              <small class="form-text">
+                <ul class="mb-0 ps-3 mt-1">
+                  <li>8자 이상 입력해주세요</li>
+                  <li>숫자로만 이루어진 비밀번호는 사용할 수 없습니다</li>
+                  <li>너무 흔한 비밀번호는 사용할 수 없습니다</li>
+                </ul>
+              </small>
             </div>
 
             <div class="mb-3">

@@ -24,26 +24,6 @@
               </ul>
             </div>
 
-            <div class="mb-4">
-              <h5 class="text-white mb-3">현재 계정 정보</h5>
-              <table class="table table-borderless text-white">
-                <tbody>
-                  <tr>
-                    <th width="30%">아이디</th>
-                    <td>{{ authStore.user?.username }}</td>
-                  </tr>
-                  <tr>
-                    <th>이메일</th>
-                    <td>{{ authStore.user?.email || '미등록' }}</td>
-                  </tr>
-                  <tr>
-                    <th>가입일</th>
-                    <td>{{ formatDate(authStore.user?.created_at) }}</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
             <div class="d-grid gap-2">
               <button class="btn btn-danger btn-lg" @click="goToStep2">
                 <i class="fas fa-arrow-right me-2"></i>탈퇴 진행하기
