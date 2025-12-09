@@ -32,4 +32,41 @@ onMounted(async () => {
 
 <style>
 /* Django style.css를 import했으므로 추가 스타일 불필요 */
+
+/* 모바일 좌우 여백 최적화 - 전역 스타일 */
+@media (max-width: 768px) {
+  /* 컨테이너 좌우 패딩 축소 */
+  .container, .container-fluid {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  /* row 좌우 마진/패딩 축소 */
+  .row {
+    margin-left: -4px !important;
+    margin-right: -4px !important;
+  }
+
+  .row > [class*="col-"] {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+
+  /* glass-card 좌우 패딩 축소 (70% 수준) */
+  .glass-card {
+    padding-left: 0.8rem !important;
+    padding-right: 0.8rem !important;
+  }
+
+  /* responsive-padding 클래스 (기존 3% -> 2%) */
+  .responsive-padding {
+    padding: 1.2rem 0.6rem !important;
+  }
+
+  /* px-1 클래스 모바일에서 더 축소 */
+  .px-1 {
+    padding-left: 0.15rem !important;
+    padding-right: 0.15rem !important;
+  }
+}
 </style>

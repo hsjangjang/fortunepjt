@@ -146,8 +146,8 @@
                 </div>
 
                 <div class="text-center mt-4">
-                  <button class="btn btn-primary btn-lg rounded-pill px-5" @click="resetUpload">
-                    <i class="fas fa-redo me-2"></i> 다른 아이템 측정하기
+                  <button class="btn btn-primary btn-lg rounded-pill px-4" @click="resetUpload">
+                    <i class="fas fa-redo me-2"></i> 다시 측정
                   </button>
                 </div>
               </div>
@@ -743,5 +743,27 @@ onMounted(() => {
   font-size: 0.95rem;
   margin-left: 0;
   word-break: keep-all;
+}
+
+/* Result card compact padding */
+.result-card .card-body {
+  padding: 1rem 0.5rem !important;
+}
+
+@media (min-width: 768px) {
+  .result-card .card-body {
+    padding: 1.5rem !important;
+  }
+}
+
+/* Responsive Padding - 모바일에서 좌우 여백 최소화 */
+.responsive-padding {
+  padding: 1.5rem 0.5rem !important;
+}
+
+@media (min-width: 768px) {
+  .responsive-padding {
+    padding: 2rem !important;
+  }
 }
 </style>

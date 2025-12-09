@@ -1,2 +1,0 @@
-fatal: path 'frontend/src/views/fortune/ItemCheck.vue' exists, but not 'src/views/fortune/ItemCheck.vue'
-hint: Did you mean 'HEAD~1:frontend/src/views/fortune/ItemCheck.vue' aka 'HEAD~1:./src/views/fortune/ItemCheck.vue'?
