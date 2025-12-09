@@ -78,22 +78,24 @@
                 </div>
 
                 <!-- Luck Score -->
-                <div class="luck-score-circle">
-                  <svg width="200" height="200">
-                    <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20"></circle>
-                    <circle cx="100" cy="100" r="90" fill="none" stroke="url(#luckGradient)"
-                            stroke-width="20" stroke-dasharray="565" :stroke-dashoffset="luckProgressOffset"
-                            style="transition: stroke-dashoffset 1.5s ease-out; transform: rotate(-90deg); transform-origin: center;"></circle>
-                    <defs>
-                      <linearGradient id="luckGradient">
-                        <stop offset="0%" stop-color="#10b981"></stop>
-                        <stop offset="100%" stop-color="#3b82f6"></stop>
-                      </linearGradient>
-                    </defs>
-                  </svg>
-                  <div class="luck-score-text">
-                    <h1 class="text-white fw-bold mb-0">{{ displayLuckScore }}</h1>
-                    <p class="text-white opacity-75 mb-0">행운 지수</p>
+                <div class="text-center">
+                  <div class="luck-score-circle mx-auto">
+                    <svg width="200" height="200">
+                      <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20"></circle>
+                      <circle cx="100" cy="100" r="90" fill="none" stroke="url(#luckGradient)"
+                              stroke-width="20" stroke-dasharray="565" :stroke-dashoffset="luckProgressOffset"
+                              style="transition: stroke-dashoffset 1.5s ease-out; transform: rotate(-90deg); transform-origin: center;"></circle>
+                      <defs>
+                        <linearGradient id="luckGradient">
+                          <stop offset="0%" stop-color="#10b981"></stop>
+                          <stop offset="100%" stop-color="#3b82f6"></stop>
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div class="luck-score-text">
+                      <h1 class="text-white fw-bold mb-0">{{ displayLuckScore }}</h1>
+                      <p class="text-white opacity-75 mb-0">행운 지수</p>
+                    </div>
                   </div>
                 </div>
 
@@ -101,14 +103,14 @@
                 <div class="color-match">
                   <div class="text-center">
                     <p class="text-white opacity-75 mb-2">아이템 색상</p>
-                    <div class="color-circle" :style="`background: ${itemColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                    <div class="color-circle mx-auto" :style="`background: ${itemColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
                   </div>
                   <div class="match-arrow text-white opacity-50">
                     <i class="fas fa-arrows-alt-h"></i>
                   </div>
                   <div class="text-center">
                     <p class="text-white opacity-75 mb-2">오늘의 행운색</p>
-                    <div class="color-circle" :style="`background: ${luckyColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                    <div class="color-circle mx-auto" :style="`background: ${luckyColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
                   </div>
                 </div>
 
@@ -681,7 +683,7 @@ onMounted(() => {
   width: 200px;
   height: 200px;
   position: relative;
-  margin: 0 auto;
+  display: inline-block;
 }
 
 .luck-score-text {
