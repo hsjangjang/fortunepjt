@@ -23,6 +23,11 @@
               </router-link>
             </li>
             <li class="nav-item">
+              <router-link class="nav-link" to="/items">
+                <Package class="me-1" :size="18" /> 내 아이템
+              </router-link>
+            </li>
+            <li class="nav-item">
               <router-link class="nav-link" to="/recommendations/ootd">
                 <Shirt class="me-1" :size="18" /> OOTD
               </router-link>
@@ -68,7 +73,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import {
   MoonStar, Sparkles, Diamond, Shirt, UtensilsCrossed,
-  UserCircle, IdCard, PlusCircle, LogOut
+  UserCircle, IdCard, PlusCircle, LogOut, Package
 } from 'lucide-vue-next'
 
 const router = useRouter()
