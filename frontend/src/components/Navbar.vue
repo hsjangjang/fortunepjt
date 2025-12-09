@@ -232,6 +232,7 @@ const handleLogout = async () => {
 .navbar-collapse.show {
   max-height: 500px;
   opacity: 1;
+  overflow: visible;
 }
 
 .navbar-collapse.closing {
@@ -247,18 +248,6 @@ const handleLogout = async () => {
 
   .navbar-collapse.closing .nav-item {
     animation: slideOutUp 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-  }
-
-  /* 모바일에서 드롭다운 메뉴 중앙 정렬 */
-  .dropdown-menu {
-    position: absolute;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%);
-    text-align: center;
-    width: max-content;
-    min-width: 200px;
-    margin-top: 0.5rem;
   }
 }
 
@@ -292,9 +281,12 @@ const handleLogout = async () => {
     overflow: visible !important;
   }
 }
+</style>
 
+<!-- 드롭다운 스타일은 scoped가 아닌 전역으로 적용 -->
+<style>
 /* 드롭다운 메뉴 강제 표시 (show 클래스 적용 시) */
-.dropdown-menu.show {
+.navbar .dropdown-menu.show {
   display: block !important;
   opacity: 1 !important;
   visibility: visible !important;
@@ -302,17 +294,20 @@ const handleLogout = async () => {
 
 /* 모바일에서 드롭다운 위치 조정 */
 @media (max-width: 991.98px) {
-  .nav-item.dropdown {
+  .navbar .nav-item.dropdown {
     position: relative;
   }
 
-  .nav-item.dropdown .dropdown-menu {
+  .navbar .nav-item.dropdown .dropdown-menu {
     position: absolute !important;
     top: 100% !important;
     left: 50% !important;
+    right: auto !important;
     transform: translateX(-50%) !important;
     z-index: 1050 !important;
     min-width: 180px;
+    text-align: center;
+    margin-top: 0.5rem;
   }
 }
 </style>
