@@ -391,7 +391,7 @@ const selectExistingItem = (item) => {
   const aiItemName = aiAnalysis.item_name || item.item_name
   detectedItem.value = aiItemName
 
-  const colors = JSON.parse(item.colors_json || '[]')
+  const colors = item.dominant_colors || []
   detectedColors.value = colors.slice(0, 3)
 
   if (colors.length > 0) {

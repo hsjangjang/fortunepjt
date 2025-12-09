@@ -33,7 +33,6 @@ class ItemListAPIView(APIView):
                 'image': item.image.url if item.image else None,
                 'image_url': item.image.url if item.image else None,
                 'dominant_colors': item.dominant_colors,
-                'colors_json': item.colors_json,
                 'ai_analysis': item.ai_analysis_result,
                 'is_favorite': item.is_favorite,
                 'created_at': item.created_at.isoformat()

@@ -1,5 +1,4 @@
 from django.db import models
-from django.db import models
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -75,10 +74,6 @@ class UserItem(models.Model):
         upload_to='items/%Y/%m/',
         verbose_name='이미지'
     )
-    image_url = models.URLField(
-        blank=True,
-        verbose_name='이미지 URL'
-    )
     dominant_colors = models.JSONField(
         default=list,
         verbose_name='주요 색상들'
@@ -114,14 +109,3 @@ class UserItem(models.Model):
             return self.dominant_colors[0].get('color', '#000000')
         return '#000000'
 
-    @property
-    def colors_json(self):
-        """색상 정보를 JSON 문자열로 반환"""
-        import json
-        return json.dumps(self.dominant_colors or [])
-
-    @property
-    def ai_analysis_json(self):
-        """AI 분석 결과를 JSON 문자열로 반환"""
-        import json
-        return json.dumps(self.ai_analysis_result or {})

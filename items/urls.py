@@ -1,16 +1,10 @@
+# items/urls.py
+# 레거시 템플릿 뷰 URL은 모두 삭제됨
+# API 엔드포인트: items/api_urls.py 사용
+
 from django.urls import path
-from . import views
 
 app_name = 'items'
 
-urlpatterns = [
-    # 아이템 관리
-    path('', views.ItemListView.as_view(), name='list'),
-    path('upload/', views.ItemUploadView.as_view(), name='upload'),
-    path('<int:pk>/', views.ItemDetailView.as_view(), name='detail'),
-    path('<int:pk>/delete/', views.ItemDeleteView.as_view(), name='delete'),
-    
-    # 색상 분석
-    path('analyze/', views.ColorAnalysisView.as_view(), name='analyze'),
-    path('match/', views.ColorMatchView.as_view(), name='match'),
-]
+# 모든 기능이 API로 대체됨 - api_urls.py 참조
+urlpatterns = []
