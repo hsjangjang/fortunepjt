@@ -401,14 +401,26 @@ onMounted(() => {
   box-shadow: 0 0 0 0.2rem rgba(124, 58, 237, 0.25);
 }
 
+.table-borderless {
+  background: transparent !important;
+}
+
 .table-borderless th,
 .table-borderless td {
-  color: #fff;
+  color: #fff !important;
   padding: 0.5rem 0;
+  background: transparent !important;
 }
 
 .table-borderless th {
   font-weight: 600;
+}
+
+/* Bootstrap table 배경 오버라이드 */
+.table {
+  --bs-table-bg: transparent;
+  --bs-table-striped-bg: transparent;
+  background-color: transparent !important;
 }
 
 h5 {
