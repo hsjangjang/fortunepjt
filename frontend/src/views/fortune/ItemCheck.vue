@@ -100,17 +100,17 @@
                 </div>
 
                 <!-- Color Match Visualization -->
-                <div class="color-match">
-                  <div class="text-center">
-                    <p class="text-white opacity-75 mb-2">아이템 색상</p>
-                    <div class="color-circle mx-auto" :style="`background: ${itemColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                <div class="color-match-container">
+                  <div class="color-labels">
+                    <span class="text-white opacity-75">아이템 색상</span>
+                    <span class="text-white opacity-75">오늘의 행운색</span>
                   </div>
-                  <div class="match-arrow text-white opacity-50">
-                    <i class="fas fa-arrows-alt-h"></i>
-                  </div>
-                  <div class="text-center">
-                    <p class="text-white opacity-75 mb-2">오늘의 행운색</p>
-                    <div class="color-circle mx-auto" :style="`background: ${luckyColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                  <div class="color-circles">
+                    <div class="color-circle" :style="`background: ${itemColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                    <div class="match-arrow text-white opacity-50">
+                      <i class="fas fa-arrows-alt-h"></i>
+                    </div>
+                    <div class="color-circle" :style="`background: ${luckyColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
                   </div>
                 </div>
 
@@ -694,12 +694,23 @@ onMounted(() => {
   text-align: center;
 }
 
-.color-match {
+.color-match-container {
+  margin: 30px 0;
+  text-align: center;
+}
+
+.color-labels {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  margin-bottom: 10px;
+}
+
+.color-circles {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 30px;
-  margin: 30px 0;
+  gap: 15px;
 }
 
 .color-circle {
@@ -707,10 +718,11 @@ onMounted(() => {
   height: 60px;
   border-radius: 50%;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  flex-shrink: 0;
 }
 
 .match-arrow {
-  font-size: 2rem;
+  font-size: 1.5rem;
   color: #9ca3af;
 }
 
