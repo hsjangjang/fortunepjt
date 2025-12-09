@@ -151,50 +151,53 @@
               </div>
             </div>
 
-            <!-- Item Selection Modal -->
-            <div v-if="showItemModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-              <div class="modal-dialog modal-lg">
-                <div class="modal-content glass-card border-0" style="background: #1e293b;">
-                  <div class="modal-header border-bottom border-secondary border-opacity-25">
-                    <h5 class="modal-title text-white"><i class="fas fa-folder-open me-2"></i> 내 아이템 선택</h5>
-                    <button type="button" class="btn-close btn-close-white" @click="showItemModal = false"></button>
-                  </div>
-                  <div class="modal-body">
-                    <!-- 등록된 아이템이 없을 때 -->
-                    <div v-if="!userItems.length" class="text-center py-5">
-                      <i class="fas fa-box-open fa-3x text-white opacity-50 mb-3"></i>
-                      <p class="text-white opacity-75 mb-3">등록된 아이템이 없습니다.</p>
-                      <router-link to="/items/upload" class="btn btn-primary rounded-pill px-4">
-                        <i class="fas fa-plus me-2"></i> 아이템 등록하기
-                      </router-link>
-                    </div>
-                    <!-- 등록된 아이템이 있을 때 -->
-                    <div v-else class="row g-3">
-                      <div v-for="item in userItems" :key="item.id" class="col-md-4">
-                        <div class="card h-100 item-select-card border-0"
-                             style="cursor: pointer; background: rgba(255,255,255,0.05);"
-                             @click="selectExistingItem(item)">
-                          <img :src="getImageUrl(item.image)" class="card-img-top" :alt="item.item_name"
-                               style="height: 150px; object-fit: cover; opacity: 0.8;">
-                          <div class="card-body text-center p-2">
-                            <h6 class="mb-1 text-white">{{ item.item_name }}</h6>
-                            <small class="text-white opacity-50">{{ formatDate(item.created_at) }}</small>
-                          </div>
-                        </div>
-                      </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Item Selection Modal -->
+    <Teleport to="body">
+      <div v-if="showItemModal" class="modal-overlay" @click.self="showItemModal = false">
+        <div class="modal-container">
+          <div class="modal-content-box">
+            <div class="modal-header border-bottom border-secondary border-opacity-25">
+              <h5 class="modal-title text-white"><i class="fas fa-folder-open me-2"></i> 내 아이템 선택</h5>
+              <button type="button" class="btn-close btn-close-white" @click="showItemModal = false"></button>
+            </div>
+            <div class="modal-body">
+              <!-- 등록된 아이템이 없을 때 -->
+              <div v-if="!userItems.length" class="text-center py-5">
+                <i class="fas fa-box-open fa-3x text-white opacity-50 mb-3"></i>
+                <p class="text-white opacity-75 mb-3">등록된 아이템이 없습니다.</p>
+                <router-link to="/items/upload" class="btn btn-primary rounded-pill px-4" @click="showItemModal = false">
+                  <i class="fas fa-plus me-2"></i> 아이템 등록하기
+                </router-link>
+              </div>
+              <!-- 등록된 아이템이 있을 때 -->
+              <div v-else class="row g-3">
+                <div v-for="item in userItems" :key="item.id" class="col-md-4">
+                  <div class="card h-100 item-select-card border-0"
+                       style="cursor: pointer; background: rgba(255,255,255,0.05);"
+                       @click="selectExistingItem(item)">
+                    <img :src="getImageUrl(item.image)" class="card-img-top" :alt="item.item_name"
+                         style="height: 150px; object-fit: cover; opacity: 0.8;">
+                    <div class="card-body text-center p-2">
+                      <h6 class="mb-1 text-white">{{ item.item_name }}</h6>
+                      <small class="text-white opacity-50">{{ formatDate(item.created_at) }}</small>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
         </div>
       </div>
-    </div>
+    </Teleport>
   </DefaultLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
@@ -640,6 +643,15 @@ const fetchUserItems = async () => {
   }
 }
 
+// 모달 열릴 때 body 스크롤 막기
+watch(showItemModal, (isOpen) => {
+  if (isOpen) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
+
 onMounted(() => {
   fetchFortuneData()
   if (authStore.isAuthenticated) {
@@ -726,8 +738,49 @@ onMounted(() => {
   color: #9ca3af;
 }
 
-.modal.show {
-  display: block !important;
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.modal-container {
+  width: 100%;
+  max-width: 800px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content-box {
+  background: #1e293b;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content-box .modal-header {
+  padding: 1rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modal-content-box .modal-body {
+  padding: 1.5rem;
+  max-height: 60vh;
+  overflow-y: auto;
 }
 
 .reference-grid {
