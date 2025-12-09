@@ -152,7 +152,6 @@
                 </div>
               </div>
             </div>
-          </div>
         </div>
 
         <!-- Item Selection Modal -->
@@ -183,11 +182,11 @@
           </div>
         </div>
       </div>
+    </div>
   </DefaultLayout>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
