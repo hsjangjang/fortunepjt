@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-7 col-md-9 col-12 mx-auto px-2 px-md-3">
+      <div class="col-lg-6 col-md-8 col-11 mx-auto px-3 px-md-4">
         <div class="glass-card p-4 p-md-5">
           <h2 class="text-center mb-4 text-white">
             <i class="fas fa-user-plus me-2"></i>회원가입
@@ -13,21 +13,30 @@
 
             <div class="mb-3">
               <label class="form-label">아이디 <span class="text-warning">*</span></label>
-              <input
-                type="text"
-                v-model="form.username"
-                class="form-control"
-                required
-                placeholder="아이디를 입력하세요"
-              >
+              <div class="d-flex gap-2">
+                <input
+                  type="text"
+                  v-model="form.username"
+                  class="form-control"
+                  required
+                  placeholder="아이디를 입력하세요"
+                  :class="{ 'is-valid': usernameChecked && usernameAvailable, 'is-invalid': usernameChecked && !usernameAvailable }"
+                >
+                <button type="button" class="btn btn-outline-light btn-sm flex-shrink-0" @click="checkUsername" :disabled="!form.username">
+                  중복확인
+                </button>
+              </div>
+              <small v-if="usernameChecked" :class="usernameAvailable ? 'text-success' : 'text-danger'">
+                {{ usernameMessage }}
+              </small>
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-6">
+              <div class="col-md-6 mb-3 mb-md-0">
                 <label class="form-label">이름 <span class="text-warning">*</span></label>
                 <input
                   type="text"
-                  v-model="form.name"
+                  v-model="form.first_name"
                   class="form-control"
                   required
                   placeholder="실명을 입력하세요"
@@ -78,13 +87,22 @@
 
             <div class="mb-3">
               <label class="form-label">이메일 <span class="text-warning">*</span></label>
-              <input
-                type="email"
-                v-model="form.email"
-                class="form-control"
-                required
-                placeholder="example@email.com"
-              >
+              <div class="d-flex gap-2">
+                <input
+                  type="email"
+                  v-model="form.email"
+                  class="form-control"
+                  required
+                  placeholder="example@email.com"
+                  :class="{ 'is-valid': emailChecked && emailAvailable, 'is-invalid': emailChecked && !emailAvailable }"
+                >
+                <button type="button" class="btn btn-outline-light btn-sm flex-shrink-0" @click="checkEmail" :disabled="!form.email">
+                  중복확인
+                </button>
+              </div>
+              <small v-if="emailChecked" :class="emailAvailable ? 'text-success' : 'text-danger'">
+                {{ emailMessage }}
+              </small>
             </div>
 
             <div class="mb-3">
@@ -102,7 +120,7 @@
               <label class="form-label">비밀번호 확인 <span class="text-warning">*</span></label>
               <input
                 type="password"
-                v-model="form.password_confirm"
+                v-model="form.password2"
                 class="form-control"
                 required
                 placeholder="비밀번호를 다시 입력하세요"
@@ -182,29 +200,83 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
+import api from '@/services/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
 
 const form = ref({
   username: '',
-  name: '',
+  last_name: '',
+  first_name: '',
   birth_date: '',
   calendar_type: 'solar',
   gender: '',
   email: '',
   password: '',
-  password_confirm: '',
+  password2: '',
   birth_time: '',
   mbti: '',
   personal_color: ''
 })
 
-const maxDate = new Date().toISOString().split('T')[0]
+// 아이디 중복확인
+const usernameChecked = ref(false)
+const usernameAvailable = ref(false)
+const usernameMessage = ref('')
+
+// 이메일 중복확인
+const emailChecked = ref(false)
+const emailAvailable = ref(false)
+const emailMessage = ref('')
+
+// 아이디 변경시 중복확인 초기화
+watch(() => form.value.username, () => {
+  usernameChecked.value = false
+  usernameAvailable.value = false
+})
+
+// 이메일 변경시 중복확인 초기화
+watch(() => form.value.email, () => {
+  emailChecked.value = false
+  emailAvailable.value = false
+})
+
+const checkUsername = async () => {
+  if (!form.value.username) return
+  try {
+    const response = await api.get('/api/auth/check-username/', {
+      params: { username: form.value.username }
+    })
+    usernameChecked.value = true
+    usernameAvailable.value = response.data.available
+    usernameMessage.value = response.data.message
+  } catch (error) {
+    usernameChecked.value = true
+    usernameAvailable.value = false
+    usernameMessage.value = '중복 확인 중 오류가 발생했습니다.'
+  }
+}
+
+const checkEmail = async () => {
+  if (!form.value.email) return
+  try {
+    const response = await api.get('/api/auth/check-email/', {
+      params: { email: form.value.email }
+    })
+    emailChecked.value = true
+    emailAvailable.value = response.data.available
+    emailMessage.value = response.data.message
+  } catch (error) {
+    emailChecked.value = true
+    emailAvailable.value = false
+    emailMessage.value = '중복 확인 중 오류가 발생했습니다.'
+  }
+}
 
 // 생년월일 선택
 const selectedYear = ref('')
@@ -237,7 +309,7 @@ const updateBirthDate = () => {
 }
 
 const handleRegister = async () => {
-  if (form.value.password !== form.value.password_confirm) {
+  if (form.value.password !== form.value.password2) {
     alert('비밀번호가 일치하지 않습니다.')
     return
   }
@@ -248,7 +320,7 @@ const handleRegister = async () => {
     router.push('/login')
   } catch (error) {
     console.error('Registration failed:', error)
-    alert('회원가입에 실패했습니다. 다시 시도해주세요.')
+    alert(error.message || '회원가입에 실패했습니다. 다시 시도해주세요.')
   }
 }
 </script>
