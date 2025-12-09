@@ -2,6 +2,8 @@
 
 운세, 사주, 별자리를 기반으로 개인 맞춤형 일상(OOTD, 메뉴, 아이템)을 추천하는 AI 기반 웹 서비스입니다.
 
+**🌐 Live Demo**: https://frontend-wheat-three-93.vercel.app/
+
 ## 🎯 핵심 기능
 
 - 🎨 **AI 운세 계산**: Google Gemini 기반 사주, 별자리, MBTI 종합 분석
