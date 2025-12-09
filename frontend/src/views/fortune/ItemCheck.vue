@@ -49,7 +49,7 @@
             </div>
 
             <!-- Select from My Items Button -->
-            <div v-if="authStore.isAuthenticated && userItems.length && !showResult" class="text-center mt-4">
+            <div v-if="authStore.isAuthenticated && !showResult" class="text-center mt-4">
               <button class="btn btn-outline-light rounded-pill px-4" @click="showItemModal = true">
                 <i class="fas fa-folder-open me-2"></i> 내 아이템에서 선택하기
               </button>
