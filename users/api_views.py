@@ -197,8 +197,8 @@ class FindUsernameAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 이메일로 사용자 찾기
-            user = User.objects.get(email=email)
+            # 이메일로 사용자 찾기 (대소문자 구분 없이)
+            user = User.objects.get(email__iexact=email.strip())
 
             # 이메일로 아이디 전송
             send_mail(
@@ -264,8 +264,8 @@ class SendPasswordResetCodeAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 아이디와 이메일로 사용자 찾기
-            user = User.objects.get(username=username, email=email)
+            # 아이디와 이메일로 사용자 찾기 (대소문자 구분 없이)
+            user = User.objects.get(username=username, email__iexact=email.strip())
 
             # 기존 인증코드 삭제
             EmailVerificationCode.objects.filter(username=username, email=email).delete()
@@ -363,8 +363,8 @@ class VerifyCodeAndResetPasswordAPIView(APIView):
             verification.is_verified = True
             verification.save()
 
-            # 사용자 찾기
-            user = User.objects.get(username=username, email=email)
+            # 사용자 찾기 (대소문자 구분 없이)
+            user = User.objects.get(username=username, email__iexact=email.strip())
 
             # 임시 비밀번호 생성 (영문+숫자 10자리)
             temp_password = ''.join(secrets.choice(string.ascii_letters + string.digits) for _ in range(10))
