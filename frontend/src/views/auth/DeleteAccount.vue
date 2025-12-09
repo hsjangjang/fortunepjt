@@ -89,6 +89,21 @@
               </button>
             </div>
           </div>
+
+          <!-- Step 3: 탈퇴 완료 -->
+          <div v-else-if="step === 3" class="text-center py-5">
+            <div class="mb-4">
+              <i class="fas fa-heart text-danger" style="font-size: 5rem;"></i>
+            </div>
+            <h2 class="text-white mb-4">회원 탈퇴가 완료되었습니다</h2>
+            <h5 class="text-white-50 mb-4">
+              그동안 저희 서비스를 이용해주셔서 감사합니다.<br>
+              더 좋은 서비스로 보답드리겠습니다.
+            </h5>
+            <p class="text-white-50 mt-4">
+              <i class="fas fa-clock me-2"></i>{{ countdown }}초 후 홈 화면으로 이동합니다...
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -111,6 +126,8 @@ const step = ref(1)
 const confirmUsername = ref('')
 const confirmChecked = ref(false)
 const isDeleting = ref(false)
+const countdown = ref(5)
+let countdownTimer = null
 
 const canDelete = computed(() => {
   return confirmUsername.value === authStore.user?.username && confirmChecked.value
@@ -133,9 +150,19 @@ const handleDeleteAccount = async () => {
 
   try {
     await api.delete('/api/auth/me/')
-    showToast('회원 탈퇴가 완료되었습니다. 그동안 이용해주셔서 감사합니다.', 'success')
     await authStore.logout()
-    router.push('/')
+
+    // Step 3으로 이동하고 카운트다운 시작
+    step.value = 3
+    countdown.value = 5
+
+    countdownTimer = setInterval(() => {
+      countdown.value--
+      if (countdown.value <= 0) {
+        clearInterval(countdownTimer)
+        router.push('/')
+      }
+    }, 1000)
   } catch (error) {
     console.error('회원 탈퇴 실패:', error)
     showToast('회원 탈퇴에 실패했습니다. 다시 시도해주세요.', 'error')
