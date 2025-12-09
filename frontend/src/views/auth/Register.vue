@@ -116,9 +116,18 @@
               >
               <small class="form-text">
                 <ul class="mb-0 ps-3 mt-1">
-                  <li>8자 이상 입력해주세요</li>
-                  <li>숫자로만 이루어진 비밀번호는 사용할 수 없습니다</li>
-                  <li>너무 흔한 비밀번호는 사용할 수 없습니다</li>
+                  <li :class="{ 'text-success': passwordValidation.minLength }">
+                    <i :class="passwordValidation.minLength ? 'fas fa-check' : 'fas fa-times'" class="me-1"></i>
+                    8자 이상 입력해주세요
+                  </li>
+                  <li :class="{ 'text-success': passwordValidation.hasLetter }">
+                    <i :class="passwordValidation.hasLetter ? 'fas fa-check' : 'fas fa-times'" class="me-1"></i>
+                    영문자를 포함해주세요
+                  </li>
+                  <li :class="{ 'text-success': passwordValidation.hasNumber }">
+                    <i :class="passwordValidation.hasNumber ? 'fas fa-check' : 'fas fa-times'" class="me-1"></i>
+                    숫자를 포함해주세요
+                  </li>
                 </ul>
               </small>
             </div>
@@ -242,6 +251,13 @@ const usernameMessage = ref('')
 const emailChecked = ref(false)
 const emailAvailable = ref(false)
 const emailMessage = ref('')
+
+// 비밀번호 유효성 검사
+const passwordValidation = computed(() => ({
+  minLength: form.value.password.length >= 8,
+  hasLetter: /[a-zA-Z]/.test(form.value.password),
+  hasNumber: /[0-9]/.test(form.value.password)
+}))
 
 // 아이디 변경시 중복확인 초기화
 watch(() => form.value.username, () => {
