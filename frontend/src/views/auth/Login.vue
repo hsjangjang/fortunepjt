@@ -69,7 +69,8 @@
               <router-link to="/find-username" class="text-decoration-none text-white-50 small me-3">
                 아이디 찾기
               </router-link>
-              <router-link to="/find-password" class="text-decoration-none text-white-50 small">
+              <span class="text-white-50 small">|</span>
+              <router-link to="/find-password" class="text-decoration-none text-white-50 small ms-3">
                 비밀번호 찾기
               </router-link>
             </div>
