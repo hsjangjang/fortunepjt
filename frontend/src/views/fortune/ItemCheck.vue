@@ -162,7 +162,16 @@
                     <button type="button" class="btn-close btn-close-white" @click="showItemModal = false"></button>
                   </div>
                   <div class="modal-body">
-                    <div class="row g-3">
+                    <!-- 등록된 아이템이 없을 때 -->
+                    <div v-if="!userItems.length" class="text-center py-5">
+                      <i class="fas fa-box-open fa-3x text-white opacity-50 mb-3"></i>
+                      <p class="text-white opacity-75 mb-3">등록된 아이템이 없습니다.</p>
+                      <router-link to="/items/upload" class="btn btn-primary rounded-pill px-4">
+                        <i class="fas fa-plus me-2"></i> 아이템 등록하기
+                      </router-link>
+                    </div>
+                    <!-- 등록된 아이템이 있을 때 -->
+                    <div v-else class="row g-3">
                       <div v-for="item in userItems" :key="item.id" class="col-md-4">
                         <div class="card h-100 item-select-card border-0"
                              style="cursor: pointer; background: rgba(255,255,255,0.05);"
