@@ -181,7 +181,7 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', '')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-northeast-2')
 
-# S3 설정이 있으면 S3 스토리지 사용 (버킷명만 있어도 IAM Role로 접근 가능)
+# S3 설정이 있으면 S3 스토리지 사용
 if AWS_STORAGE_BUCKET_NAME:
     # S3 기본 설정
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
@@ -193,8 +193,15 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_QUERYSTRING_AUTH = False
     AWS_LOCATION = 'media'  # S3 버킷 내 media 폴더에 저장
 
-    # Media 파일을 S3에 저장
-    DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+    # Django 5.x용 STORAGES 설정
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 
 # Default primary key field type
