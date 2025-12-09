@@ -115,20 +115,20 @@
                 placeholder="비밀번호를 입력하세요"
               >
               <small class="form-text">
-                <ul class="mb-0 ps-3 mt-1">
-                  <li :class="{ 'text-success': passwordValidation.minLength }">
+                <div class="mt-1">
+                  <div :class="passwordValidation.minLength ? 'text-success' : 'text-danger'">
                     <i :class="passwordValidation.minLength ? 'fas fa-check' : 'fas fa-times'" class="me-1"></i>
                     8자 이상 입력해주세요
-                  </li>
-                  <li :class="{ 'text-success': passwordValidation.hasLetter }">
+                  </div>
+                  <div :class="passwordValidation.hasLetter ? 'text-success' : 'text-danger'">
                     <i :class="passwordValidation.hasLetter ? 'fas fa-check' : 'fas fa-times'" class="me-1"></i>
                     영문자를 포함해주세요
-                  </li>
-                  <li :class="{ 'text-success': passwordValidation.hasNumber }">
+                  </div>
+                  <div :class="passwordValidation.hasNumber ? 'text-success' : 'text-danger'">
                     <i :class="passwordValidation.hasNumber ? 'fas fa-check' : 'fas fa-times'" class="me-1"></i>
                     숫자를 포함해주세요
-                  </li>
-                </ul>
+                  </div>
+                </div>
               </small>
             </div>
 

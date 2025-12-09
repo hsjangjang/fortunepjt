@@ -171,7 +171,11 @@ const handleLogin = async () => {
     // Django: messages.success(request, f'{user.first_name}님, 환영합니다!')
     const firstName = authStore.user?.first_name || authStore.username
     showToast(`${firstName}님, 환영합니다!`, 'success')
-    router.push('/')
+
+    // 명시적으로 홈으로 이동 (replace로 히스토리 교체)
+    console.log('[Login] 홈으로 이동 시도...')
+    await router.replace('/')
+    console.log('[Login] 홈으로 이동 완료')
   } catch (error) {
     console.error('[Login] 로그인 실패:', error)
     // Django: messages.error(request, '아이디 또는 비밀번호가 올바르지 않습니다.')
