@@ -66,18 +66,14 @@
                 </div>
 
                 <!-- Detected Item Info -->
-                <div class="row mb-4">
-                  <div class="col-md-6 text-center text-md-start">
-                    <h5 class="text-primary-light">인식된 아이템</h5>
-                    <p class="fs-4 text-white fw-bold">{{ detectedItem }}</p>
-                  </div>
-                  <div class="col-md-6 text-center text-md-start">
-                    <h5 class="text-primary-light">감지된 색상</h5>
-                    <div class="d-flex align-items-center gap-2 overflow-auto flex-nowrap pb-2" style="scrollbar-width: none;">
-                      <div v-for="color in detectedColors" :key="color.hex"
-                           class="flex-shrink-0"
-                           :style="`width: 40px; height: 40px; border-radius: 50%; background: ${color.hex}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
-                    </div>
+                <div class="text-center mb-4">
+                  <h5 class="text-primary-light">인식된 아이템</h5>
+                  <p class="fs-4 text-white fw-bold mb-3">{{ detectedItem }}</p>
+                  <h5 class="text-primary-light">감지된 색상</h5>
+                  <div class="d-flex align-items-center justify-content-center gap-2 pb-2">
+                    <div v-for="color in detectedColors" :key="color.hex"
+                         class="flex-shrink-0"
+                         :style="`width: 40px; height: 40px; border-radius: 50%; background: ${color.hex}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
                   </div>
                 </div>
 
@@ -135,8 +131,8 @@
                       <span class="value">{{ luckyItems.zodiac }}</span>
                     </div>
                   </div>
-                  <div class="mt-3 pt-3 border-top border-secondary border-opacity-25 d-flex align-items-center overflow-auto flex-nowrap pb-2" style="scrollbar-width: none;">
-                    <span class="text-white opacity-75 me-2 flex-shrink-0">행운색:</span>
+                  <div class="mt-3 d-flex align-items-center justify-content-center flex-wrap gap-1">
+                    <span class="text-white opacity-75 me-2">행운색:</span>
                     <span v-for="color in luckyColorsWithHex" :key="color.name"
                           class="badge rounded-pill me-1 border border-light border-opacity-25 flex-shrink-0"
                           :style="`background-color: ${color.hex}; color: ${getTextColor(color.hex)}; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
@@ -724,9 +720,7 @@ onMounted(() => {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.75rem;
-  margin-bottom: 1rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0.5rem;
 }
 
 .reference-item {
