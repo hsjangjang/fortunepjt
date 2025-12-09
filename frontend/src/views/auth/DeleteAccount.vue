@@ -25,7 +25,7 @@
             </div>
 
             <div class="d-grid gap-2">
-              <button class="btn btn-danger btn-lg rounded-pill" @click="goToStep2">
+              <button class="btn btn-danger rounded-pill" @click="goToStep2">
                 <i class="fas fa-arrow-right me-2"></i>탈퇴 진행하기
               </button>
               <router-link to="/profile" class="btn btn-warning rounded-pill">
