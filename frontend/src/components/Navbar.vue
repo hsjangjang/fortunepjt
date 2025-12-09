@@ -34,7 +34,7 @@
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/recommendations/menu">
-                <UtensilsCrossed class="me-1" :size="18" /> 메뉴
+                <UtensilsCrossed class="me-1" :size="18" /> 식사 추천
               </router-link>
             </li>
             <li class="nav-item dropdown ms-lg-3">
