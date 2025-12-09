@@ -177,17 +177,16 @@
               <hr class="my-4">
 
               <div class="text-center">
-                <router-link to="/fortune/today" class="btn btn-primary mb-2 mb-md-0 me-md-2">
-                  <i class="fas fa-star"></i> 오늘의 운세 보기
+                <router-link to="/fortune/today" class="btn btn-primary rounded-pill px-4 mb-3">
+                  <i class="fas fa-star me-1"></i> 오늘의 운세 보기
                 </router-link>
               </div>
-              <div class="text-center mt-3">
-                <button class="btn btn-outline-secondary btn-sm" @click="editProfile">
-                  <i class="fas fa-edit"></i> 프로필 수정
+              <div class="text-center d-flex justify-content-center gap-2 flex-wrap">
+                <button class="btn btn-outline-light btn-sm rounded-pill px-3" @click="editProfile">
+                  <i class="fas fa-edit me-1"></i> 프로필 수정
                 </button>
-                <span class="text-white-50 mx-2">|</span>
-                <router-link to="/change-password" class="btn btn-outline-secondary btn-sm">
-                  <i class="fas fa-key"></i> 비밀번호 변경
+                <router-link to="/change-password" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                  <i class="fas fa-key me-1"></i> 비밀번호 변경
                 </router-link>
               </div>
             </div>
