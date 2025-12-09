@@ -49,9 +49,6 @@ class ItemListAPIView(APIView):
 
     def post(self, request):
         """아이템 생성"""
-        import tempfile
-        import os
-
         image = request.FILES.get('image')
         if not image:
             return Response({
@@ -59,22 +56,13 @@ class ItemListAPIView(APIView):
                 'error': '이미지를 업로드해주세요.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        temp_path = None
         try:
-            # 임시 파일로 저장 (S3 환경 대응)
-            suffix = os.path.splitext(image.name)[1] or '.jpg'
-            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-                for chunk in image.chunks():
-                    tmp.write(chunk)
-                temp_path = tmp.name
-
-            # 이미지 분석 (저장 전에 먼저 분석)
+            # 이미지 분석 (업로드 파일 직접 처리 - 임시 파일 관리 내장)
             from .color_analyzer import ImageColorAnalyzer
             analyzer = ImageColorAnalyzer()
-            analysis_result = analyzer.analyze_image_with_ai(temp_path)
+            analysis_result = analyzer.analyze_from_file_or_upload(image)
 
             # 아이템 생성
-            image.seek(0)  # 파일 포인터 리셋
             item = UserItem.objects.create(
                 user=request.user,
                 image=image,
@@ -108,14 +96,6 @@ class ItemListAPIView(APIView):
                 'success': False,
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        finally:
-            # 임시 파일 삭제
-            if temp_path and os.path.exists(temp_path):
-                try:
-                    os.remove(temp_path)
-                except Exception:
-                    pass
 
 
 class ItemDetailAPIView(APIView):
@@ -214,23 +194,10 @@ class ItemAnalyzeAPIView(APIView):
                 'error': '이미지를 업로드해주세요.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        import tempfile
-        import os
-        temp_path = None
-
         try:
-            # 임시 파일로 저장 (S3 환경에서도 동작하도록)
-            suffix = os.path.splitext(image.name)[1] or '.jpg'
-            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-                for chunk in image.chunks():
-                    tmp.write(chunk)
-                temp_path = tmp.name
-
-            print(f"[ItemAnalyzeAPIView] 임시 파일 생성: {temp_path}")
-
             from .color_analyzer import ImageColorAnalyzer
             analyzer = ImageColorAnalyzer()
-            analysis_result = analyzer.analyze_image_with_ai(temp_path)
+            analysis_result = analyzer.analyze_from_file_or_upload(image)
 
             # API 할당량 초과 에러 체크
             if not analysis_result.get('success') and analysis_result.get('error_type') == 'quota_exceeded':
@@ -272,15 +239,6 @@ class ItemAnalyzeAPIView(APIView):
                 'success': False,
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
-        finally:
-            # 임시 파일 삭제
-            if temp_path and os.path.exists(temp_path):
-                try:
-                    os.remove(temp_path)
-                    print(f"[ItemAnalyzeAPIView] 임시 파일 삭제: {temp_path}")
-                except Exception as cleanup_error:
-                    print(f"[ItemAnalyzeAPIView] 임시 파일 삭제 실패: {cleanup_error}")
 
 
 class ItemFavoriteAPIView(APIView):

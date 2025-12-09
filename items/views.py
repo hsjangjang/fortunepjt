@@ -135,9 +135,10 @@ class ItemUploadView(TemplateView):
             # 2. 이미지 분석 (AI 우선, 실패 시 기본 분석)
             from .color_analyzer import ImageColorAnalyzer
             analyzer = ImageColorAnalyzer()
-            
-            # AI 분석 시도
-            analysis_result = analyzer.analyze_image_with_ai(item.image.path)
+
+            # AI 분석 시도 (S3 환경 대응 - 업로드 파일에서 직접 분석)
+            image.seek(0)  # 파일 포인터 리셋
+            analysis_result = analyzer.analyze_from_file_or_upload(image)
             
             if analysis_result['success']:
                 # 3. 분석 결과 저장
@@ -206,23 +207,12 @@ class ColorAnalysisView(TemplateView):
         if not image:
             return JsonResponse({'success': False, 'message': '이미지를 업로드해주세요.'})
 
-        import tempfile
-        import os
-        temp_path = None
-
         try:
             from .color_analyzer import ImageColorAnalyzer
 
-            # 임시 파일로 저장 (S3 환경에서도 동작하도록)
-            suffix = os.path.splitext(image.name)[1] or '.jpg'
-            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
-                for chunk in image.chunks():
-                    tmp.write(chunk)
-                temp_path = tmp.name
-
-            # AI 분석
+            # AI 분석 (임시 파일 관리는 analyzer에서 처리)
             analyzer = ImageColorAnalyzer()
-            analysis_result = analyzer.analyze_image_with_ai(temp_path)
+            analysis_result = analyzer.analyze_from_file_or_upload(image)
 
             # API 할당량 초과 에러 체크
             if not analysis_result.get('success') and analysis_result.get('error_type') == 'quota_exceeded':
@@ -262,14 +252,6 @@ class ColorAnalysisView(TemplateView):
             print(f"[ColorAnalysis] 오류: {str(e)}")
             print(traceback.format_exc())
             return JsonResponse({'success': False, 'message': f'분석 오류: {str(e)}'})
-
-        finally:
-            # 임시 파일 삭제
-            if temp_path and os.path.exists(temp_path):
-                try:
-                    os.remove(temp_path)
-                except Exception:
-                    pass
 
 class ColorMatchView(APIView):
     def post(self, request):

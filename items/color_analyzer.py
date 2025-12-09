@@ -52,6 +52,67 @@ class ImageColorAnalyzer:
             'white': [(230, 230, 230), (255, 255, 255)]
         }
     
+    def analyze_from_file_or_upload(self, image_source):
+        """파일 경로 또는 업로드된 파일 객체에서 분석
+
+        Args:
+            image_source: 파일 경로(str) 또는 Django UploadedFile 객체
+
+        Returns:
+            분석 결과 dict
+        """
+        import tempfile
+        import os
+
+        temp_path = None
+        should_cleanup = False
+
+        try:
+            # 이미 파일 경로인 경우
+            if isinstance(image_source, str):
+                if os.path.exists(image_source):
+                    return self.analyze_image_with_ai(image_source)
+                else:
+                    # S3 URL이거나 존재하지 않는 경로
+                    raise ValueError(f"파일을 찾을 수 없습니다: {image_source}")
+
+            # Django UploadedFile 또는 파일 객체인 경우 -> 임시 파일 생성
+            file_name = getattr(image_source, 'name', 'image.jpg')
+            suffix = os.path.splitext(file_name)[1] or '.jpg'
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                # 파일 포인터 리셋 (이미 읽었을 수 있음)
+                if hasattr(image_source, 'seek'):
+                    image_source.seek(0)
+
+                # chunks() 메서드가 있으면 사용 (Django UploadedFile)
+                if hasattr(image_source, 'chunks'):
+                    for chunk in image_source.chunks():
+                        tmp.write(chunk)
+                else:
+                    # 일반 파일 객체
+                    tmp.write(image_source.read())
+
+                temp_path = tmp.name
+                should_cleanup = True
+
+            # 분석 수행
+            result = self.analyze_image_with_ai(temp_path)
+
+            # 파일 포인터 리셋 (나중에 저장할 때 필요)
+            if hasattr(image_source, 'seek'):
+                image_source.seek(0)
+
+            return result
+
+        finally:
+            # 임시 파일 정리
+            if should_cleanup and temp_path and os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except Exception:
+                    pass
+
     def analyze_image_with_ai(self, image_path):
         """Gemini Vision API를 사용한 AI 이미지 분석"""
         print(f"[DEBUG] AI 분석 시작: {image_path}")
