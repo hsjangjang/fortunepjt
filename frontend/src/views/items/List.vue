@@ -35,30 +35,43 @@
 
           <div v-if="items.length > 0" class="row">
             <div v-for="item in items" :key="item.id" class="col-md-4 mb-4">
-              <div class="card h-100 item-card">
+              <div class="card h-100 item-card border-0">
+                <div class="position-relative">
+                  <router-link :to="`/items/${item.id}`">
+                    <img
+                      :src="getImageUrl(item.image)"
+                      class="card-img-top"
+                      :alt="item.item_name"
+                      style="height: 200px; object-fit: cover; border-radius: 12px 12px 0 0;"
+                    >
+                  </router-link>
+                  <!-- 삭제 버튼 - 이미지 우상단 -->
+                  <button
+                    class="btn-delete"
+                    @click.stop="deleteItem(item.id)"
+                    title="삭제"
+                  >
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
                 <router-link
                   :to="`/items/${item.id}`"
-                  class="text-decoration-none text-dark h-100 d-flex flex-column"
+                  class="text-decoration-none h-100 d-flex flex-column"
                 >
-                  <img
-                    :src="getImageUrl(item.image)"
-                    class="card-img-top"
-                    :alt="item.item_name"
-                    style="height: 200px; object-fit: cover;"
-                  >
                   <div class="card-body flex-grow-1">
-                    <h5 class="card-title">{{ item.item_name }}</h5>
-                    <p class="card-text text-muted small">{{ item.category_display }}</p>
+                    <h5 class="card-title text-white mb-1">{{ item.item_name }}</h5>
+                    <p class="card-text small mb-2" style="color: rgba(255,255,255,0.5);">{{ item.category_display }}</p>
 
                     <!-- 색상 태그 -->
                     <div v-if="item.dominant_colors && item.dominant_colors.length > 0" class="mb-2">
                       <span
                         v-for="(color, index) in item.dominant_colors.slice(0, 3)"
                         :key="index"
-                        class="badge rounded-pill border me-1"
+                        class="badge rounded-pill me-1"
                         :style="{
                           backgroundColor: color.hex,
-                          color: (color.name === 'white' || color.name === 'yellow') ? '#000' : '#fff'
+                          color: (color.name === 'white' || color.name === 'yellow') ? '#000' : '#fff',
+                          border: '1px solid rgba(255,255,255,0.2)'
                         }"
                       >
                         {{ color.korean_name }}
@@ -69,22 +82,18 @@
                       <span
                         v-for="(tag, index) in item.ai_analysis.tags.slice(0, 3)"
                         :key="'tag-' + index"
-                        class="badge bg-secondary me-1"
+                        class="badge me-1"
+                        style="background: rgba(124, 58, 237, 0.3); color: #c4b5fd;"
                       >
                         #{{ tag }}
                       </span>
                     </div>
+                    <!-- 날짜 -->
+                    <div class="mt-auto pt-2">
+                      <small style="color: rgba(255,255,255,0.4);">{{ formatDate(item.created_at) }}</small>
+                    </div>
                   </div>
                 </router-link>
-                <div class="card-footer border-top-0 d-flex justify-content-between align-items-center" style="background-color: #f8f9fa;">
-                  <small class="text-muted">{{ formatDate(item.created_at) }}</small>
-                  <button
-                    class="btn btn-sm btn-outline-danger"
-                    @click.stop="deleteItem(item.id)"
-                  >
-                    <i class="fas fa-trash"></i>
-                  </button>
-                </div>
               </div>
             </div>
           </div>
@@ -169,10 +178,42 @@ onMounted(() => {
 
 <style scoped>
 .item-card {
-  transition: transform 0.2s;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  transition: transform 0.2s, box-shadow 0.2s;
+  overflow: hidden;
 }
+
 .item-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.item-card .card-body {
+  background: rgba(30, 41, 59, 0.8);
+}
+
+.btn-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(0, 0, 0, 0.5);
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-size: 12px;
+}
+
+.btn-delete:hover {
+  background: rgba(239, 68, 68, 0.9);
+  color: #fff;
+  transform: scale(1.1);
 }
 </style>
