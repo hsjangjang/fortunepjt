@@ -2,9 +2,8 @@
   <DefaultLayout>
     <div class="row">
       <div class="col-lg-6 col-12 mx-auto px-1 px-md-3">
-        <div class="glass-card responsive-padding shadow-lg">
-          <div class="card-body p-4 p-md-5">
-            <h2 class="text-center mb-5 text-white">
+          <div class="glass-card responsive-padding">
+            <h2 class="text-center mb-4 text-white">
               <i class="fas fa-calculator text-primary-light me-2"></i> 운세 계산
             </h2>
 
@@ -15,12 +14,12 @@
             </div>
 
             <form @submit.prevent="handleSubmit" v-if="!authStore.isAuthenticated" novalidate>
-              <h5 class="mb-4 text-white border-bottom border-light border-opacity-25 pb-2">필수 정보</h5>
+              <h5 class="mb-3 text-white border-bottom border-light border-opacity-25 pb-2">필수 정보</h5>
 
-              <div class="row mb-4">
-                <div class="col-md-4 mb-3 mb-md-0">
+              <div class="row mb-3">
+                <div class="col-md-4">
                   <label class="form-label">생년월일 구분 <span class="text-warning">*</span></label>
-                  <select v-model="fortuneForm.calendar_type" class="form-select py-3" required>
+                  <select v-model="fortuneForm.calendar_type" class="form-select" required>
                     <option value="solar">양력</option>
                     <option value="lunar">음력</option>
                   </select>
@@ -33,7 +32,7 @@
                       type="date"
                       v-model="fortuneForm.birth_date"
                       @blur="validateBirthDate"
-                      class="form-control py-3"
+                      class="form-control"
                       min="1900-01-01"
                       :max="maxDate"
                       required
@@ -41,64 +40,64 @@
                   </div>
                   <!-- Desktop Custom Dropdowns -->
                   <div class="d-none d-md-flex gap-2">
-                    <select v-model="selectedYear" class="form-select py-3" @change="updateBirthDate">
+                    <select v-model="selectedYear" class="form-select" @change="updateBirthDate">
                       <option value="" disabled>년도</option>
                       <option v-for="year in yearOptions" :key="year" :value="year">{{ year }}년</option>
                     </select>
-                    <select v-model="selectedMonth" class="form-select py-3" @change="updateBirthDate">
+                    <select v-model="selectedMonth" class="form-select" @change="updateBirthDate">
                       <option value="" disabled>월</option>
                       <option v-for="month in 12" :key="month" :value="month">{{ month }}월</option>
                     </select>
-                    <select v-model="selectedDay" class="form-select py-3" @change="updateBirthDate">
+                    <select v-model="selectedDay" class="form-select" @change="updateBirthDate">
                       <option value="" disabled>일</option>
                       <option v-for="day in daysInMonth" :key="day" :value="day">{{ day }}일</option>
                     </select>
                   </div>
                 </div>
               </div>
-              <div class="mb-4">
+              <div class="mb-3">
                 <small class="form-text">음력 생일인 경우 음력을 선택하세요</small>
               </div>
 
-              <div class="mb-4">
+              <div class="mb-3">
                 <label class="form-label">성별 <span class="text-warning">*</span></label>
-                <select v-model="fortuneForm.gender" class="form-select py-3" required>
+                <select v-model="fortuneForm.gender" class="form-select" required>
                   <option value="">선택하세요</option>
                   <option value="M">남성</option>
                   <option value="F">여성</option>
                 </select>
               </div>
 
-              <div class="my-5 border-top border-light border-opacity-25"></div>
+              <div class="my-4 border-top border-light border-opacity-25"></div>
 
-              <h5 class="mb-4 text-white">선택 정보</h5>
-              <p class="text-white opacity-visible small mb-4">더 정확한 운세를 위한 추가 정보입니다</p>
+              <h5 class="mb-3 text-white">선택 정보</h5>
+              <p class="text-white opacity-visible small mb-3">더 정확한 운세를 위한 추가 정보입니다</p>
 
-              <div class="mb-4">
+              <div class="mb-3">
                 <label class="form-label">태어난 시각</label>
                 <input
                   type="time"
                   v-model="fortuneForm.birth_time"
-                  class="form-control py-3"
+                  class="form-control"
                   @click="showTimePicker"
                 >
-                <small class="form-text mt-2 d-block">시주를 포함한 정확한 사주 계산에 사용됩니다</small>
+                <small class="form-text">시주를 포함한 정확한 사주 계산에 사용됩니다</small>
               </div>
 
-              <div class="mb-4">
+              <div class="mb-3">
                 <label class="form-label">한자 이름</label>
                 <input
                   type="text"
                   v-model="fortuneForm.chinese_name"
-                  class="form-control py-3"
+                  class="form-control"
                   placeholder="예: 金哲秀"
                 >
-                <small class="form-text mt-2 d-block">이름의 한자 획수를 통한 운세 보정</small>
+                <small class="form-text">이름의 한자 획수를 통한 운세 보정</small>
               </div>
 
-              <div class="mb-4">
+              <div class="mb-3">
                 <label class="form-label">MBTI</label>
-                <select v-model="fortuneForm.mbti" class="form-select py-3">
+                <select v-model="fortuneForm.mbti" class="form-select">
                   <option value="">선택하세요</option>
                   <option value="ISTJ">ISTJ</option>
                   <option value="ISTP">ISTP</option>
@@ -119,35 +118,34 @@
                 </select>
               </div>
 
-              <div class="mb-5">
+              <div class="mb-3">
                 <label class="form-label">퍼스널컬러</label>
-                <select v-model="fortuneForm.personal_color" class="form-select py-3">
+                <select v-model="fortuneForm.personal_color" class="form-select">
                   <option value="">선택하세요</option>
                   <option value="spring_warm">봄 웜톤</option>
                   <option value="summer_cool">여름 쿨톤</option>
                   <option value="autumn_warm">가을 웜톤</option>
                   <option value="winter_cool">겨울 쿨톤</option>
                 </select>
-                <small class="form-text mt-2 d-block">색상 추천에 반영됩니다</small>
+                <small class="form-text">색상 추천에 반영됩니다</small>
               </div>
 
               <div class="d-grid gap-2 mt-5">
-                <button type="submit" class="btn btn-gradient btn-lg rounded-pill fw-bold py-3">
+                <button type="submit" class="btn btn-gradient btn-lg rounded-pill fw-bold">
                   <i class="fas fa-star me-2"></i> 운세 확인하기
                 </button>
               </div>
             </form>
 
-            <div v-if="!authStore.isAuthenticated" class="text-center mt-5">
+            <div v-if="!authStore.isAuthenticated" class="text-center mt-4">
               <p class="text-white opacity-visible mb-3">
                 회원가입하면 매일 자동으로 운세를 확인할 수 있습니다
               </p>
-              <router-link to="/register" class="btn btn-outline-light rounded-pill px-4 py-2">
+              <router-link to="/register" class="btn btn-outline-light rounded-pill px-4">
                 회원가입하기
               </router-link>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </DefaultLayout>
@@ -304,7 +302,6 @@ const handleSubmit = () => {
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
   backdrop-filter: blur(5px);
-  /* transition: all 0.3s ease; */ /* Removed to prevent too many transitions if global has them, but good for focus */
 }
 
 .form-control:focus, .form-select:focus {
@@ -321,7 +318,6 @@ const handleSubmit = () => {
 .form-label {
   color: rgba(255, 255, 255, 0.95);
   font-weight: 500;
-  margin-bottom: 0.5rem; /* Ensure label spacing */
 }
 
 .form-text {
@@ -340,7 +336,7 @@ option {
 }
 @media (max-width: 768px) {
   .responsive-padding {
-    padding: 0 !important; /* On mobile let the card body padding take over or card flush */
+    padding: 3% !important;
   }
   
   .glass-card {

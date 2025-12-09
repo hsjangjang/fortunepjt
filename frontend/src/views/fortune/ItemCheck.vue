@@ -152,34 +152,34 @@
                 </div>
               </div>
             </div>
-        </div>
 
-        <!-- Item Selection Modal -->
-        <div v-if="showItemModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
-          <div class="modal-dialog modal-lg">
-            <div class="modal-content glass-card border-0" style="background: #1e293b;">
-              <div class="modal-header border-bottom border-secondary border-opacity-25">
-                <h5 class="modal-title text-white"><i class="fas fa-folder-open me-2"></i> 내 아이템 선택</h5>
-                <button type="button" class="btn-close btn-close-white" @click="showItemModal = false"></button>
-              </div>
-              <div class="modal-body">
-                <div class="row g-3">
-                  <div v-for="item in userItems" :key="item.id" class="col-md-4">
-                    <div class="card h-100 item-select-card border-0"
-                         style="cursor: pointer; background: rgba(255,255,255,0.05);"
-                         @click="selectExistingItem(item)">
-                      <img :src="getImageUrl(item.image)" class="card-img-top" :alt="item.item_name"
-                           style="height: 150px; object-fit: cover; opacity: 0.8;">
-                      <div class="card-body text-center p-2">
-                        <h6 class="mb-1 text-white">{{ item.item_name }}</h6>
-                        <small class="text-white opacity-50">{{ formatDate(item.created_at) }}</small>
+            <!-- Item Selection Modal -->
+            <div v-if="showItemModal" class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content glass-card border-0" style="background: #1e293b;">
+                  <div class="modal-header border-bottom border-secondary border-opacity-25">
+                    <h5 class="modal-title text-white"><i class="fas fa-folder-open me-2"></i> 내 아이템 선택</h5>
+                    <button type="button" class="btn-close btn-close-white" @click="showItemModal = false"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="row g-3">
+                      <div v-for="item in userItems" :key="item.id" class="col-md-4">
+                        <div class="card h-100 item-select-card border-0"
+                             style="cursor: pointer; background: rgba(255,255,255,0.05);"
+                             @click="selectExistingItem(item)">
+                          <img :src="getImageUrl(item.image)" class="card-img-top" :alt="item.item_name"
+                               style="height: 150px; object-fit: cover; opacity: 0.8;">
+                          <div class="card-body text-center p-2">
+                            <h6 class="mb-1 text-white">{{ item.item_name }}</h6>
+                            <small class="text-white opacity-50">{{ formatDate(item.created_at) }}</small>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
@@ -187,6 +187,7 @@
 </template>
 
 <script setup>
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
