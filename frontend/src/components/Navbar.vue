@@ -62,8 +62,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import {
@@ -72,6 +72,7 @@ import {
 } from 'lucide-vue-next'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const { showToast } = useToast()
 
@@ -150,9 +151,29 @@ const toggleMobileMenu = () => {
   }
 }
 
-const toggleUserDropdown = () => {
+const toggleUserDropdown = (e) => {
+  e.stopPropagation()
   userDropdownOpen.value = !userDropdownOpen.value
 }
+
+// 외부 클릭 시 드롭다운 닫기
+const handleClickOutside = (e) => {
+  const dropdown = document.getElementById('userDropdown')
+  const dropdownMenu = dropdown?.nextElementSibling
+  if (dropdown && !dropdown.contains(e.target) && dropdownMenu && !dropdownMenu.contains(e.target)) {
+    userDropdownOpen.value = false
+  }
+}
+
+// 라우트 변경 시 드롭다운/메뉴 닫기
+watch(route, () => {
+  userDropdownOpen.value = false
+  mobileMenuOpen.value = false
+})
+
+onMounted(() => {
+  document.addEventListener('click', handleClickOutside)
+})
 
 // navbar에서 마우스 떠날 때
 const handleNavbarMouseLeave = (e) => {
@@ -175,11 +196,12 @@ const handleNavbarMouseEnter = () => {
   cancelClose()
 }
 
-// 컴포넌트 언마운트 시 타이머 정리
+// 컴포넌트 언마운트 시 타이머 및 이벤트 리스너 정리
 onUnmounted(() => {
   if (closeTimeout) {
     clearTimeout(closeTimeout)
   }
+  document.removeEventListener('click', handleClickOutside)
 })
 
 const handleLogout = async () => {
