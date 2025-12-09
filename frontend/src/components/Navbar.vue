@@ -292,4 +292,27 @@ const handleLogout = async () => {
     overflow: visible !important;
   }
 }
+
+/* 드롭다운 메뉴 강제 표시 (show 클래스 적용 시) */
+.dropdown-menu.show {
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 모바일에서 드롭다운 위치 조정 */
+@media (max-width: 991.98px) {
+  .nav-item.dropdown {
+    position: relative;
+  }
+
+  .nav-item.dropdown .dropdown-menu {
+    position: absolute !important;
+    top: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 1050 !important;
+    min-width: 180px;
+  }
+}
 </style>
