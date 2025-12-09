@@ -212,11 +212,13 @@ const handleLogout = async () => {
   // 로그아웃 API 호출 먼저 (인증 상태 변경)
   await authStore.logout()
 
-  // 홈으로 이동 (라우터 가드가 인증 필요 페이지 접근 차단)
-  await router.push('/')
-
   // Django: messages.success(request, '로그아웃되었습니다.')
   showToast('로그아웃되었습니다.', 'success')
+
+  // 현재 페이지가 인증 필요 페이지면 홈으로 강제 이동
+  if (route.meta?.requiresAuth || route.meta?.requiresFortune) {
+    router.replace('/')
+  }
 }
 </script>
 
