@@ -203,11 +203,13 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const { showToast } = useToast()
 
 const form = ref({
   username: '',
@@ -310,17 +312,17 @@ const updateBirthDate = () => {
 
 const handleRegister = async () => {
   if (form.value.password !== form.value.password2) {
-    alert('비밀번호가 일치하지 않습니다.')
+    showToast('비밀번호가 일치하지 않습니다.', 'error')
     return
   }
 
   try {
     await authStore.register(form.value)
-    alert('회원가입이 완료되었습니다.')
+    showToast('회원가입이 완료되었습니다. 로그인 후 모든 서비스를 이용하실 수 있습니다.', 'success')
     router.push('/login')
   } catch (error) {
     console.error('Registration failed:', error)
-    alert(error.message || '회원가입에 실패했습니다. 다시 시도해주세요.')
+    showToast(error.message || '회원가입에 실패했습니다. 다시 시도해주세요.', 'error')
   }
 }
 </script>

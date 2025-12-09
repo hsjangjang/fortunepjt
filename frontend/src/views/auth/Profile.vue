@@ -193,9 +193,9 @@
               <hr class="my-4 border-light border-opacity-25">
 
               <div class="text-center">
-                <button class="btn btn-outline-danger btn-sm rounded-pill px-3" @click="handleDeleteAccount">
+                <router-link to="/delete-account" class="btn btn-outline-danger btn-sm rounded-pill px-3">
                   <i class="fas fa-user-times me-1"></i> 회원 탈퇴
-                </button>
+                </router-link>
               </div>
             </div>
         </div>
@@ -209,7 +209,6 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import api from '@/services/api'
 
 const authStore = useAuthStore()
 const { showToast } = useToast()
@@ -389,25 +388,6 @@ const handleProfileUpdate = async () => {
     }
   } catch (error) {
     showToast(error.message || '프로필 업데이트에 실패했습니다.', 'error')
-  }
-}
-
-// 회원 탈퇴
-const handleDeleteAccount = async () => {
-  const confirmed = confirm('정말로 회원 탈퇴하시겠습니까?\n탈퇴 후에는 계정을 복구할 수 없습니다.')
-  if (!confirmed) return
-
-  const doubleConfirmed = confirm('회원 탈퇴를 진행하면 모든 데이터가 삭제됩니다.\n정말로 탈퇴하시겠습니까?')
-  if (!doubleConfirmed) return
-
-  try {
-    await api.delete('/api/auth/me/')
-    showToast('회원 탈퇴가 완료되었습니다.', 'success')
-    await authStore.logout()
-    window.location.href = '/'
-  } catch (error) {
-    console.error('회원 탈퇴 실패:', error)
-    showToast('회원 탈퇴에 실패했습니다. 다시 시도해주세요.', 'error')
   }
 }
 

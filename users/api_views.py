@@ -108,14 +108,16 @@ class UserMeAPIView(APIView):
         }, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
-        """회원 탈퇴"""
+        """회원 탈퇴 - 완전 삭제"""
         user = request.user
-        user.is_active = False
-        user.save()
+        username = user.username
+
+        # 사용자 완전 삭제
+        user.delete()
 
         return Response({
             'success': True,
-            'message': '회원 탈퇴가 완료되었습니다.'
+            'message': f'{username} 회원 탈퇴가 완료되었습니다.'
         }, status=status.HTTP_200_OK)
 
 

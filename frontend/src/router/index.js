@@ -14,6 +14,7 @@ const PasswordResetConfirm = () => import('@/views/auth/PasswordResetConfirm.vue
 const FindUsername = () => import('@/views/auth/FindUsername.vue')
 const FindPassword = () => import('@/views/auth/FindPassword.vue')
 const ChangePassword = () => import('@/views/auth/ChangePassword.vue')
+const DeleteAccount = () => import('@/views/auth/DeleteAccount.vue')
 
 // Fortune
 const FortuneCalculate = () => import('@/views/fortune/Calculate.vue')
@@ -149,6 +150,14 @@ const router = createRouter({
       name: 'change-password',
       component: ChangePassword,
       meta: { title: '비밀번호 변경', requiresAuth: true }
+    },
+
+    // 회원 탈퇴
+    {
+      path: '/delete-account',
+      name: 'delete-account',
+      component: DeleteAccount,
+      meta: { title: '회원 탈퇴', requiresAuth: true }
     },
 
     // 비밀번호 재설정
