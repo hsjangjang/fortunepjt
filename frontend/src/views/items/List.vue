@@ -50,17 +50,28 @@
                     <h5 class="card-title">{{ item.item_name }}</h5>
                     <p class="card-text text-muted small">{{ item.category_display }}</p>
 
+                    <!-- 색상 태그 -->
                     <div v-if="item.dominant_colors && item.dominant_colors.length > 0" class="mb-2">
                       <span
                         v-for="(color, index) in item.dominant_colors.slice(0, 3)"
                         :key="index"
-                        class="badge rounded-pill border"
+                        class="badge rounded-pill border me-1"
                         :style="{
                           backgroundColor: color.hex,
                           color: (color.name === 'white' || color.name === 'yellow') ? '#000' : '#fff'
                         }"
                       >
                         {{ color.korean_name }}
+                      </span>
+                    </div>
+                    <!-- AI 분석 태그 -->
+                    <div v-if="item.ai_analysis && item.ai_analysis.tags && item.ai_analysis.tags.length > 0" class="mb-2">
+                      <span
+                        v-for="(tag, index) in item.ai_analysis.tags.slice(0, 3)"
+                        :key="'tag-' + index"
+                        class="badge bg-secondary me-1"
+                      >
+                        #{{ tag }}
                       </span>
                     </div>
                   </div>
