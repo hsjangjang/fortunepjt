@@ -49,6 +49,9 @@ class ItemListAPIView(APIView):
 
     def post(self, request):
         """아이템 생성"""
+        import tempfile
+        import os
+
         image = request.FILES.get('image')
         if not image:
             return Response({
@@ -56,7 +59,22 @@ class ItemListAPIView(APIView):
                 'error': '이미지를 업로드해주세요.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        temp_path = None
         try:
+            # 임시 파일로 저장 (S3 환경 대응)
+            suffix = os.path.splitext(image.name)[1] or '.jpg'
+            with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                for chunk in image.chunks():
+                    tmp.write(chunk)
+                temp_path = tmp.name
+
+            # 이미지 분석 (저장 전에 먼저 분석)
+            from .color_analyzer import ImageColorAnalyzer
+            analyzer = ImageColorAnalyzer()
+            analysis_result = analyzer.analyze_image_with_ai(temp_path)
+
+            # 아이템 생성
+            image.seek(0)  # 파일 포인터 리셋
             item = UserItem.objects.create(
                 user=request.user,
                 image=image,
@@ -65,12 +83,7 @@ class ItemListAPIView(APIView):
                 sub_categories=request.data.getlist('sub_categories', []),
             )
 
-            # 이미지 분석
-            from .color_analyzer import ImageColorAnalyzer
-            analyzer = ImageColorAnalyzer()
-            analysis_result = analyzer.analyze_image_with_ai(item.image.path)
-
-            if analysis_result['success']:
+            if analysis_result.get('success'):
                 item.dominant_colors = analysis_result['colors']
                 item.ai_analysis_result = analysis_result.get('ai_analysis', {})
                 item.save()
@@ -88,10 +101,21 @@ class ItemListAPIView(APIView):
             }, status=status.HTTP_201_CREATED)
 
         except Exception as e:
+            import traceback
+            print(f"[ItemListAPIView] Error: {str(e)}")
+            print(traceback.format_exc())
             return Response({
                 'success': False,
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        finally:
+            # 임시 파일 삭제
+            if temp_path and os.path.exists(temp_path):
+                try:
+                    os.remove(temp_path)
+                except Exception:
+                    pass
 
 
 class ItemDetailAPIView(APIView):
