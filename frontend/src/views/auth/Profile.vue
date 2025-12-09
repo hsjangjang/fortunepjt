@@ -1,13 +1,22 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-8 col-12 mx-auto px-1 px-md-3">
-        <div class="card glass-card">
-          <div class="card-body responsive-padding">
-            <h2 class="text-center mb-4">
-              <i class="fas fa-user-circle text-primary"></i> 내 프로필
+      <div class="col-lg-8 col-12 px-1 px-md-3">
+        <div class="glass-card responsive-padding shadow-lg">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="text-white mb-0">
+              <i class="fas fa-user-circle text-primary me-2"></i> 내 프로필
             </h2>
+            <button
+              v-if="!isEditing"
+              @click="editProfile"
+              class="btn btn-outline-light rounded-pill px-4"
+            >
+              <i class="fas fa-edit me-2"></i> 수정
+            </button>
+          </div>
 
+          <!-- 프로필 정보 표시 (읽기 모드) -->
             <!-- 프로필 수정 폼 -->
             <form v-if="isEditing" @submit.prevent="handleProfileUpdate" style="display: block;">
               <div class="row">
@@ -176,7 +185,6 @@
                 </button>
               </div>
             </div>
-          </div>
         </div>
       </div>
     </div>
@@ -379,12 +387,6 @@ onMounted(() => {
 
 <style scoped>
 /* Django 템플릿과 동일한 스타일 유지 */
-.glass-card {
-  background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
-  border-radius: 15px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-}
 
 .glass-input {
   background: rgba(255, 255, 255, 0.1);
@@ -426,14 +428,15 @@ h5 {
   color: #fff;
 }
 
-/* Responsive Padding */
+/* Responsive Padding Utilities - Strictly matching Today.vue */
 .responsive-padding {
-  padding: 3rem !important;
+  padding: 3rem !important; /* Desktop Default */
 }
 
 @media (max-width: 768px) {
+  /* Percentage based padding for mobile */
   .responsive-padding {
-    padding: 3% !important;
+    padding: 3% !important; /* Minimized padding */
   }
 }
 </style>

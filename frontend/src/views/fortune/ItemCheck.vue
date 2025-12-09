@@ -2,8 +2,7 @@
   <DefaultLayout>
     <div class="row">
       <div class="col-lg-10 col-12 mx-auto px-1 px-md-3">
-        <div class="glass-card">
-          <div class="card-body responsive-padding">
+        <div class="glass-card responsive-padding">
             <h2 class="text-center text-white mb-4">
               <i class="fas fa-search text-primary" style="color: #a78bfa !important;"></i> 아이템 행운도 측정
             </h2>
@@ -55,8 +54,8 @@
                 <i class="fas fa-folder-open me-2"></i> 내 아이템에서 선택하기
               </button>
             </div>
-
-            <!-- Analysis Result -->
+            
+             <!-- Analysis Result -->
             <div v-if="showResult" class="result-card glass-card mt-4 border-0" style="background: rgba(255, 255, 255, 0.05);">
               <div class="card-body">
                 <h4 class="text-center text-white mb-4">분석 결과</h4>
@@ -184,6 +183,7 @@
           </div>
         </div>
       </div>
+    </div>
     </div>
   </DefaultLayout>
 </template>

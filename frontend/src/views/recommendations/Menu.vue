@@ -3,13 +3,12 @@
     <div class="row">
       <div class="col-lg-12 col-12 mx-auto px-1 px-md-3">
         <!-- Menu Header -->
-        <div class="glass-card mb-4">
-          <div class="card-body text-center py-4">
+        <!-- Menu Header -->
+        <div class="glass-card mb-4 text-center py-4">
             <h1 class="display-5 fw-bold text-white">
               <i class="fas fa-utensils me-2" style="color: #a78bfa !important;"></i> 오늘의 메뉴 추천
             </h1>
             <p class="lead text-white-50">운세와 행운색을 기반으로 한 맞춤 메뉴</p>
-          </div>
         </div>
 
         <!-- 라우터 가드에서 인증/운세 체크 완료 후 진입 -->
@@ -23,8 +22,7 @@
           </div>
 
           <!-- Fortune Info -->
-          <div v-if="!isLoading && fortuneData" class="glass-card mb-4">
-            <div class="card-body responsive-padding">
+          <div v-if="!isLoading && fortuneData" class="glass-card mb-4 responsive-padding">
               <div class="row text-center">
                 <div class="col-md-4">
                   <h6 class="text-white-50">오늘의 운세 점수</h6>
@@ -39,44 +37,41 @@
                   <h4 class="text-white">{{ fortuneData.chinese_zodiac || '-' }}</h4>
                 </div>
               </div>
-            </div>
           </div>
 
           <!-- Main Menu Recommendations -->
           <div v-if="!isLoading" class="row">
             <div v-for="rec in recommendations" :key="rec.rank" class="col-md-6 mb-4">
-              <div class="glass-card h-100 position-relative overflow-hidden hover-lift">
+              <div class="glass-card h-100 position-relative overflow-hidden hover-lift text-center p-4 responsive-padding">
                 <!-- Subtle Gradient Background Glow -->
                 <div class="position-absolute top-0 start-50 translate-middle-x mt-n4"
                      :style="`width: 150px; height: 150px; background: ${rec.bg_gradient}; filter: blur(60px); opacity: 0.2;`"></div>
 
-                <div class="card-body text-center p-4 responsive-padding position-relative">
-                  <div class="mb-3">
+                  <div class="mb-3 position-relative">
                     <span class="badge rounded-pill border border-white border-opacity-25 px-3 py-2 text-white fs-5"
                           style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px);">
                       {{ rec.rank === 1 ? '🥇 1순위 추천' : '🥈 2순위 추천' }}
                     </span>
                   </div>
 
-                  <div class="menu-icon mb-4 animate-float d-flex justify-content-center">
+                  <div class="menu-icon mb-4 animate-float d-flex justify-content-center position-relative">
                     <div class="rounded-circle overflow-hidden shadow-lg border border-2 border-white border-opacity-25" style="width: 150px; height: 150px;">
                       <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
                     </div>
                   </div>
 
-                  <h3 class="fw-bold mb-2 text-white">{{ rec.menu.name }}</h3>
-                  <p class="text-white-50 mb-4">{{ rec.menu.category }}</p>
+                  <h3 class="fw-bold mb-2 text-white position-relative">{{ rec.menu.name }}</h3>
+                  <p class="text-white-50 mb-4 position-relative">{{ rec.menu.category }}</p>
 
-                  <div class="mb-4">
+                  <div class="mb-4 position-relative">
                     <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center" :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
                       <i class="fas fa-palette me-1"></i> {{ rec.color }}
                     </span>
                   </div>
 
-                  <div class="p-3 rounded-3" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                  <div class="p-3 rounded-3 position-relative" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
                     <p class="small mb-0 text-white">{{ rec.menu.desc }}</p>
                   </div>
-                </div>
               </div>
             </div>
 

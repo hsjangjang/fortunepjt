@@ -2,8 +2,7 @@
   <DefaultLayout>
     <div class="row">
       <div class="col-lg-6 col-12 mx-auto px-1 px-md-3">
-        <div class="glass-card responsive-padding">
-          <div class="card-body p-0">
+          <div class="glass-card responsive-padding">
             <h2 class="text-center mb-4 text-white">
               <i class="fas fa-calculator text-primary-light me-2"></i> 운세 계산
             </h2>
@@ -147,7 +146,6 @@
               </router-link>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </DefaultLayout>

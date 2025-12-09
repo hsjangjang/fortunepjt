@@ -3,13 +3,12 @@
     <div class="row">
       <div class="col-lg-8 col-12 mx-auto px-1 px-md-3">
         <!-- Header -->
-        <div class="glass-card mb-4">
-          <div class="card-body text-center py-4 responsive-padding">
+        <div class="glass-card mb-4 responsive-padding text-center py-4">
             <h1 class="display-5 fw-bold text-white">
               <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
             </h1>
             <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-3 d-flex align-items-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
+            <div v-if="luckyColors && luckyColors.length" class="mt-3 d-flex align-items-center justify-content-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
               <span class="text-white-50 d-inline-flex align-items-center flex-shrink-0">
                 <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
               </span>
@@ -18,7 +17,6 @@
                 {{ color }}
               </span>
             </div>
-          </div>
         </div>
 
         <!-- 라우터 가드에서 인증/운세 체크 완료 후 진입 -->
@@ -79,11 +77,11 @@
           <!-- Main OOTD Recommendation -->
           <div class="row">
             <div class="col-md-6 mb-4">
-              <div class="card glass-card outfit-card h-100">
+              <div class="card glass-card outfit-card h-100 p-0">
                 <div class="card-header bg-transparent border-bottom text-center" style="border-color: rgba(255,255,255,0.1);">
                   <h5 class="mb-0 text-white">오늘의 상의</h5>
                 </div>
-                <div class="card-body text-center">
+                <div class="card-body text-center responsive-padding">
                   <div class="mb-3 d-flex justify-content-center">
                     <img :src="getTopImage" alt="Top" width="100" class="img-fluid drop-shadow" />
                   </div>

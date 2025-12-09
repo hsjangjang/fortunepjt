@@ -2,8 +2,7 @@
   <DefaultLayout>
     <div class="row">
       <div class="col-lg-5 col-12 mx-auto px-1 px-md-3">
-        <div class="glass-card shadow-lg">
-          <div class="card-body responsive-padding">
+          <div class="glass-card shadow-lg responsive-padding">
             <h2 class="text-center mb-4 text-white">
               <i class="fas fa-sign-in-alt text-primary"></i> 로그인
             </h2>
@@ -75,7 +74,6 @@
               </router-link>
             </div>
           </div>
-        </div>
       </div>
     </div>
   </DefaultLayout>
