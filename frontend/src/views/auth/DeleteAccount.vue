@@ -40,7 +40,7 @@
               <i class="fas fa-exclamation-circle me-2 text-danger"></i>최종 확인
             </h2>
 
-            <div class="alert alert-danger mb-4">
+            <div class="alert alert-danger mb-4" justify-content-center>
               <i class="fas fa-exclamation-triangle me-2"></i>
               <strong>정말로 탈퇴하시겠습니까?</strong><br>
               이 작업은 되돌릴 수 없습니다.
