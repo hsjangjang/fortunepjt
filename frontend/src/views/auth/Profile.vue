@@ -1,7 +1,7 @@
 <template>
   <DefaultLayout>
     <div class="row">
-      <div class="col-lg-8 col-12 px-1 px-md-3">
+      <div class="col-lg-8 col-12 mx-auto px-1 px-md-3">
         <div class="glass-card responsive-padding shadow-lg">
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="text-white mb-0">
