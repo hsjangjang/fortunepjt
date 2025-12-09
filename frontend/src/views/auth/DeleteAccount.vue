@@ -40,9 +40,9 @@
               <i class="fas fa-exclamation-circle me-2 text-danger"></i>최종 확인
             </h2>
 
-            <div class="alert alert-danger mb-4" justify-content-center>
+            <div class="alert alert-danger mb-4 text-center">
               <i class="fas fa-exclamation-triangle me-2"></i>
-              <strong>정말로 탈퇴하시겠습니까?</strong><br>
+              <strong style="font-size: 1.25rem;">정말로 탈퇴하시겠습니까?</strong><br>
               이 작업은 되돌릴 수 없습니다.
             </div>
 
@@ -84,7 +84,7 @@
                   <i class="fas fa-user-times me-2"></i>회원 탈퇴 완료하기
                 </span>
               </button>
-              <button class="btn btn-outline-light" @click="step = 1">
+              <button class="btn btn-warning btn-lg rounded-pill" @click="step = 1">
                 <i class="fas fa-arrow-left me-2"></i>이전으로
               </button>
             </div>
