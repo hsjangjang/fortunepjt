@@ -82,11 +82,11 @@
 
           <!-- Additional Recommendations -->
           <div v-if="!isLoading" class="glass-card p-4 responsive-padding">
-            <div class="d-flex align-items-center mb-4 border-bottom border-white border-opacity-10 pb-3">
+            <div class="d-flex justify-content-center align-items-center mb-4 border-bottom border-white border-opacity-10 pb-3">
               <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
                 <i class="fas fa-utensils text-primary"></i>
               </div>
-              <h5 class="mb-0 text-white" justify-content-center align-items-center>그 외 추천 메뉴</h5>
+              <h5 class="mb-0 text-white">그 외 추천 메뉴</h5>
             </div>
 
             <div class="row text-center g-4">
