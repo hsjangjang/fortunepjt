@@ -150,23 +150,36 @@ class OOTDRecommendationAPIView(APIView):
         lon = float(request.query_params.get('lon', 127.3565))
         api_key = settings.KMA_API_KEY
 
+        # 디버그: API 키 확인
+        print(f"[KMA OOTD DEBUG] API Key exists: {bool(api_key)}, Key length: {len(api_key) if api_key else 0}")
+        print(f"[KMA OOTD DEBUG] lat={lat}, lon={lon}")
+
         # 위경도 -> 격자 좌표 변환
         nx, ny = latlon_to_grid(lat, lon)
+        print(f"[KMA OOTD DEBUG] Grid coords: nx={nx}, ny={ny}")
 
         # 기상청 API용 시간 계산 (base_time: 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300)
-        now = datetime.now()
+        # 한국 시간(KST = UTC+9) 사용
+        import pytz
+        kst = pytz.timezone('Asia/Seoul')
+        now = datetime.now(kst)
         base_times = ['0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300']
         current_hour = now.hour * 100 + now.minute
 
-        # 현재 시간보다 이전의 가장 가까운 base_time 찾기
+        print(f"[KMA OOTD DEBUG] Current KST time: {now.strftime('%Y-%m-%d %H:%M:%S')}")
+
+        # 현재 시간보다 이전의 가장 가까운 base_time 찾기 (API는 발표시간+10분 후 제공)
         base_time = '2300'
         base_date = now - timedelta(days=1)
         for bt in base_times:
-            if int(bt) <= current_hour - 10:  # 10분 여유
+            # 발표시간 + 10분 이후에 데이터 사용 가능
+            available_time = int(bt) + 10
+            if current_hour >= available_time:
                 base_time = bt
                 base_date = now
 
         base_date_str = base_date.strftime('%Y%m%d')
+        print(f"[KMA OOTD DEBUG] base_date={base_date_str}, base_time={base_time}")
 
         try:
             # 단기예보 API 호출
@@ -182,8 +195,24 @@ class OOTDRecommendationAPIView(APIView):
                 'ny': ny
             }
 
+            print(f"[KMA OOTD DEBUG] Calling API...")
+            print(f"[KMA OOTD DEBUG] Request URL: {url}")
+            print(f"[KMA OOTD DEBUG] Request params (without key): base_date={base_date_str}, base_time={base_time}, nx={nx}, ny={ny}")
             response = requests.get(url, params=params, timeout=10)
-            data = response.json()
+            print(f"[KMA OOTD DEBUG] Response status: {response.status_code}")
+            print(f"[KMA OOTD DEBUG] Response content (first 500 chars): {response.text[:500]}")
+
+            try:
+                data = response.json()
+            except Exception as json_err:
+                print(f"[KMA OOTD DEBUG] JSON parse error: {json_err}")
+                print(f"[KMA OOTD DEBUG] Full response: {response.text}")
+                raise Exception(f"JSON parse error: {json_err}")
+
+            # 디버그: API 응답 구조 확인
+            result_code = data.get('response', {}).get('header', {}).get('resultCode', 'N/A')
+            result_msg = data.get('response', {}).get('header', {}).get('resultMsg', 'N/A')
+            print(f"[KMA OOTD DEBUG] API Result: code={result_code}, msg={result_msg}")
 
             # 주소 가져오기
             korean_address = get_korean_address(lat, lon)
@@ -598,22 +627,33 @@ class WeatherAPIView(APIView):
         lon = float(request.query_params.get('lon', 127.3565))
         api_key = settings.KMA_API_KEY
 
+        # 디버그: API 키 확인
+        print(f"[KMA DEBUG] API Key exists: {bool(api_key)}, Key length: {len(api_key) if api_key else 0}")
+        print(f"[KMA DEBUG] lat={lat}, lon={lon}")
+
         # 위경도 -> 격자 좌표 변환
         nx, ny = latlon_to_grid(lat, lon)
+        print(f"[KMA DEBUG] Grid coords: nx={nx}, ny={ny}")
 
-        # 기상청 API용 시간 계산
-        now = datetime.now()
+        # 기상청 API용 시간 계산 (한국 시간 사용)
+        import pytz
+        kst = pytz.timezone('Asia/Seoul')
+        now = datetime.now(kst)
         base_times = ['0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300']
         current_hour = now.hour * 100 + now.minute
+
+        print(f"[KMA DEBUG] Current KST time: {now.strftime('%Y-%m-%d %H:%M:%S')}")
 
         base_time = '2300'
         base_date = now - timedelta(days=1)
         for bt in base_times:
-            if int(bt) <= current_hour - 10:
+            available_time = int(bt) + 10
+            if current_hour >= available_time:
                 base_time = bt
                 base_date = now
 
         base_date_str = base_date.strftime('%Y%m%d')
+        print(f"[KMA DEBUG] base_date={base_date_str}, base_time={base_time}")
 
         try:
             # 단기예보 API 호출
@@ -629,8 +669,24 @@ class WeatherAPIView(APIView):
                 'ny': ny
             }
 
+            print(f"[KMA DEBUG] Calling API...")
+            print(f"[KMA DEBUG] Request URL: {url}")
+            print(f"[KMA DEBUG] Request params (without key): base_date={base_date_str}, base_time={base_time}, nx={nx}, ny={ny}")
             response = requests.get(url, params=params, timeout=10)
-            data = response.json()
+            print(f"[KMA DEBUG] Response status: {response.status_code}")
+            print(f"[KMA DEBUG] Response content (first 500 chars): {response.text[:500]}")
+
+            try:
+                data = response.json()
+            except Exception as json_err:
+                print(f"[KMA DEBUG] JSON parse error: {json_err}")
+                print(f"[KMA DEBUG] Full response: {response.text}")
+                raise Exception(f"JSON parse error: {json_err}")
+
+            # 디버그: API 응답 구조 확인
+            result_code = data.get('response', {}).get('header', {}).get('resultCode', 'N/A')
+            result_msg = data.get('response', {}).get('header', {}).get('resultMsg', 'N/A')
+            print(f"[KMA DEBUG] API Result: code={result_code}, msg={result_msg}")
 
             # 주소 가져오기
             korean_address = get_korean_address(lat, lon)

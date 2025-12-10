@@ -54,22 +54,23 @@
             </div>
 
             <!-- Hourly Forecast Chart -->
-            <div style="padding-bottom: 10px;">
-              <div class="chart-scroll-wrapper">
-                <canvas ref="weatherChart"></canvas>
+            <div class="hourly-forecast-section">
+              <!-- 좌측 레이블 -->
+              <div class="chart-row-labels">
+                <div class="label-item label-time">시간</div>
+                <div class="label-item label-rain-prob">
+                  <Droplets class="me-1" :size="12" />강수확률
+                </div>
+                <div class="label-item label-rain-amount">
+                  <Umbrella class="me-1" :size="12" />예상강수량
+                </div>
               </div>
-              <div class="rain-info-container" ref="rainInfoContainer"></div>
-            </div>
-
-            <div class="row mt-3 text-center small border-top pt-3 text-nowrap" style="border-color: rgba(255,255,255,0.1) !important;">
-              <div class="col px-1 d-flex align-items-center justify-content-center">
-                <Droplets class="text-primary me-1" :size="14" /> 강수확률 <span>{{ weather.rain_prob || 0 }}%</span>
-              </div>
-              <div class="col px-1 d-flex align-items-center justify-content-center">
-                <Wind class="text-primary me-1" :size="14" /> 풍속 <span>{{ weather.wind_speed || 0 }}m/s</span>
-              </div>
-              <div class="col px-1 d-flex align-items-center justify-content-center">
-                <Umbrella class="text-primary me-1" :size="14" /> 강수량 <span>{{ weather.rain_amount || 0 }}mm</span>
+              <!-- 차트 영역 -->
+              <div class="chart-content-area">
+                <div class="chart-scroll-wrapper">
+                  <canvas ref="weatherChart"></canvas>
+                </div>
+                <div class="rain-info-container" ref="rainInfoContainer"></div>
               </div>
             </div>
           </div>
@@ -196,11 +197,10 @@ import api from '@/services/api'
 import { colorMap } from '@/utils/colors'
 import { Chart, registerables } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
-import { 
-  Star, MapPin, RefreshCw, Droplets, Wind, Umbrella, 
+import {
+  Star, MapPin, RefreshCw, Droplets, Umbrella,
   AlertCircle,
-  Sun, Cloud, CloudRain, CloudSnow, Snowflake, ThermometerSnowflake,
-  Hand, Smile
+  Sun, Cloud, CloudRain, CloudSnow, ThermometerSnowflake
 } from 'lucide-vue-next'
 
 // 상의 이미지
@@ -530,14 +530,17 @@ const renderChart = (hourlyData) => {
 
   const labels = hourlyData.map(item => item.time)
   const temps = hourlyData.map(item => item.temp)
-  const rainProbs = hourlyData.map(item => item.rain_probability)
 
   // 강수 정보 컨테이너 비우기 (차트 afterDraw에서 위치 맞춰서 다시 채움)
   if (rainInfoContainer.value) {
     rainInfoContainer.value.innerHTML = ''
   }
 
-  // 커스텀 플러그인: 차트 아래에 강수확률 표시
+  // 화면 크기에 따른 틱 간격 결정
+  const isMobile = window.innerWidth < 768
+  const tickInterval = isMobile ? 2 : 1  // 모바일: 2시간, 웹: 1시간
+
+  // 커스텀 플러그인: 차트 아래에 강수확률과 강수량 표시
   const rainPlugin = {
     id: 'rainInfo',
     afterDraw: (chart) => {
@@ -545,9 +548,11 @@ const renderChart = (hourlyData) => {
       rainInfoContainer.value.innerHTML = ''
 
       const xAxis = chart.scales.x
-      const chartArea = chart.chartArea
 
       hourlyData.forEach((item, index) => {
+        // 틱 간격에 맞춰서만 표시
+        if (index % tickInterval !== 0) return
+
         const x = xAxis.getPixelForValue(index)
         const div = document.createElement('div')
         div.className = 'rain-info-item'
@@ -555,11 +560,18 @@ const renderChart = (hourlyData) => {
         div.style.left = `${x}px`
         div.style.transform = 'translateX(-50%)'
 
-        let html = `<div style="color: white;">${item.rain_probability}%</div>`
-        if (item.rain_amount > 0) {
-          html += `<div style="color: #81d4fa;">${item.rain_amount}mm</div>`
-        }
-        div.innerHTML = html
+        // 강수확률 행
+        const probRow = document.createElement('div')
+        probRow.className = 'rain-prob-row'
+        probRow.textContent = `${item.rain_probability}%`
+
+        // 강수량 행
+        const amountRow = document.createElement('div')
+        amountRow.className = 'rain-amount-row'
+        amountRow.textContent = item.rain_amount > 0 ? `${item.rain_amount}mm` : '-'
+
+        div.appendChild(probRow)
+        div.appendChild(amountRow)
         rainInfoContainer.value.appendChild(div)
       })
     }
@@ -589,6 +601,10 @@ const renderChart = (hourlyData) => {
           },
           formatter: function(value) {
             return Math.round(value) + '°'
+          },
+          // 틱 간격에 맞춰서만 라벨 표시
+          display: function(context) {
+            return context.dataIndex % tickInterval === 0
           }
         }
       }]
@@ -609,9 +625,15 @@ const renderChart = (hourlyData) => {
             color: 'rgba(255, 255, 255, 0.8)',
             maxRotation: 0,
             minRotation: 0,
-            autoSkip: true,
-            maxTicksLimit: 8,
-            font: { size: 11 }
+            autoSkip: false,
+            font: { size: 11 },
+            // 틱 간격에 맞춰서만 표시
+            callback: function(_value, index) {
+              if (index % tickInterval === 0) {
+                return labels[index]
+              }
+              return ''
+            }
           }
         },
         y: {
@@ -621,7 +643,7 @@ const renderChart = (hourlyData) => {
         }
       },
       layout: {
-        padding: { left: 25, right: 25, top: 20, bottom: 10 }
+        padding: { left: 10, right: 10, top: 20, bottom: 10 }
       }
     }
   })
@@ -731,24 +753,79 @@ onMounted(() => {
   opacity: 0.7;
 }
 
+/* 시간별 예보 섹션 */
+.hourly-forecast-section {
+  display: flex;
+  margin-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 15px;
+}
+
+/* 좌측 레이블 영역 */
+.chart-row-labels {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+  min-width: 70px;
+  flex-shrink: 0;
+}
+
+.label-item {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.label-time {
+  height: 25px;
+  margin-bottom: 0;
+}
+
+.label-rain-prob {
+  height: 18px;
+}
+
+.label-rain-amount {
+  height: 18px;
+}
+
+/* 차트 컨텐츠 영역 */
+.chart-content-area {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+}
+
 .chart-scroll-wrapper {
   width: 100%;
-  height: 180px;
-  margin-top: 20px;
+  height: 160px;
   padding: 10px 0;
 }
 
 .rain-info-container {
   position: relative;
-  height: 35px;
-  margin-top: 5px;
+  height: 40px;
   font-size: 11px;
-  opacity: 0.7;
   width: 100%;
 }
 
 .rain-info-item {
   text-align: center;
+}
+
+.rain-prob-row {
+  color: rgba(255, 255, 255, 0.9);
+  height: 18px;
+  line-height: 18px;
+}
+
+.rain-amount-row {
+  color: #81d4fa;
+  height: 18px;
+  line-height: 18px;
 }
 
 .outfit-card {
@@ -825,14 +902,32 @@ onMounted(() => {
     padding-left: 3% !important;
     padding-right: 3% !important;
   }
-  
+
   /* Apply to weather card specifically if it uses fixed padding */
   .weather-card {
-    padding: 1.5rem !important; /* Reduce from whatever it was */
+    padding: 1.5rem !important;
   }
-  
+
   .glass-card {
     border-radius: 12px;
+  }
+
+  /* 모바일에서 좌측 레이블 축소 */
+  .chart-row-labels {
+    min-width: 55px;
+    font-size: 9px;
+  }
+
+  .label-item {
+    font-size: 9px;
+  }
+
+  .chart-scroll-wrapper {
+    height: 140px;
+  }
+
+  .rain-info-container {
+    font-size: 10px;
   }
 }
 </style>
