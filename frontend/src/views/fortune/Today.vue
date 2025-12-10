@@ -361,10 +361,15 @@ const formatDescription = (text, itemName) => {
   return result.replace(/([.!?])(\s+)/g, '$1<br>')
 }
 
-// 운세 텍스트 문장 단위 줄바꿈
+// 운세 텍스트 문장 단위로 리스트 형태로 변환
 const formatFortuneText = (text) => {
   if (!text) return ''
-  return text.replace(/([.!?])(\s+)/g, '$1<br>')
+  // 문장 단위로 분리 (마침표, 느낌표, 물음표 기준)
+  const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim())
+  if (sentences.length <= 1) return text
+  // ul 리스트로 변환
+  const listItems = sentences.map(s => `<li>${s.trim()}</li>`).join('')
+  return `<ul class="fortune-list">${listItems}</ul>`
 }
 
 // Django today.html의 색상 매핑과 동일
@@ -646,6 +651,32 @@ onMounted(async () => {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 15px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.fortune-text :deep(.fortune-list) {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fortune-text :deep(.fortune-list li) {
+  position: relative;
+  padding-left: 1.5rem;
+  margin-bottom: 0.8rem;
+  text-align: left;
+}
+
+.fortune-text :deep(.fortune-list li):last-child {
+  margin-bottom: 0;
+}
+
+.fortune-text :deep(.fortune-list li)::before {
+  content: '•';
+  position: absolute;
+  left: 0;
+  color: #a78bfa;
+  font-size: 1.2rem;
+  line-height: 1.6;
 }
 
 .lotto-numbers {
