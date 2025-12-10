@@ -23,7 +23,25 @@
 
           <!-- Fortune Info -->
           <div v-if="!isLoading && fortuneData" class="card-base card-md section-spacing">
-              <div class="badge-row">
+              <!-- 운세 요약 -->
+              <p v-if="fortuneData.fortune_summary" class="text-white text-center mb-3" style="font-size: 0.95rem;">
+                <i class="fas fa-star-half-alt text-warning me-1"></i>
+                {{ fortuneData.fortune_summary }}
+              </p>
+              <!-- 오늘의 행운색 -->
+              <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="text-center mb-3">
+                <h6 class="text-white opacity-75 mb-2">
+                  <i class="fas fa-palette text-primary me-1"></i>
+                  오늘의 행운색
+                </h6>
+                <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+                  <span v-for="color in fortuneData.lucky_colors" :key="color" class="badge rounded-pill px-3 py-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}; color: ${getTextColor(colorMap[color])};`">
+                    {{ color }}
+                  </span>
+                </div>
+              </div>
+              <!-- 운세 정보 배지 -->
+              <div class="badge-row justify-content-center">
                 <div class="text-center px-4">
                   <h6 class="text-white opacity-75 mb-2">오늘의 운세 점수</h6>
                   <h3 class="text-primary-light mb-0">{{ fortuneData.fortune_score || 0 }}점</h3>

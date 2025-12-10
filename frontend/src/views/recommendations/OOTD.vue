@@ -14,13 +14,17 @@
         <!-- 운세 요약 카드 -->
         <div v-if="fortuneSummary || (luckyColors && luckyColors.length)" class="card-base card-md text-center mb-4">
             <!-- 운세 요약 한줄 -->
-            <p v-if="fortuneSummary" class="text-white mb-2" style="font-size: 0.95rem;">
+            <p v-if="fortuneSummary" class="text-white mb-3" style="font-size: 0.95rem;">
               <i class="fas fa-star-half-alt text-warning me-1"></i>
               {{ fortuneSummary }}
             </p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-2">
+            <!-- 오늘의 행운색 -->
+            <div v-if="luckyColors && luckyColors.length">
+              <h6 class="text-white opacity-75 mb-2">
+                <i class="fas fa-palette text-primary me-1"></i>
+                오늘의 행운색
+              </h6>
               <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-                <Star class="text-warning" :size="16" />
                 <span v-for="color in luckyColors" :key="color" class="badge dynamic-color-badge">
                   {{ color }}
                 </span>
@@ -180,7 +184,7 @@ import { colorMap } from '@/utils/colors'
 import { Chart, registerables } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import {
-  Star, MapPin, RefreshCw, AlertCircle,
+  MapPin, RefreshCw, AlertCircle,
   Sun, Cloud, CloudRain, CloudSnow, ThermometerSnowflake
 } from 'lucide-vue-next'
 

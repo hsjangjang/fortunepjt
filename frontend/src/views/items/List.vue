@@ -20,6 +20,33 @@
         </div>
 
         <template v-else>
+          <!-- 운세 카테고리 선택 -->
+          <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
+              <span class="text-white-50 me-2 d-none d-md-inline"><i class="fas fa-magic"></i> 운세별 행운 아이템:</span>
+              <button
+                v-for="cat in fortuneCategories"
+                :key="cat.key"
+                class="btn btn-sm rounded-pill fortune-cat-btn"
+                :class="{ active: selectedCategory === cat.key }"
+                @click="selectedCategory = cat.key"
+              >
+                <i :class="'fas ' + cat.icon" class="me-1"></i>
+                <span class="d-none d-sm-inline">{{ cat.label }}</span>
+                <span class="d-sm-none">{{ cat.label.slice(0, 2) }}</span>
+              </button>
+            </div>
+            <div class="text-center">
+              <small class="text-white-50">
+                <i class="fas fa-palette text-primary me-1"></i>
+                오늘의 행운색:
+                <span v-for="(color, idx) in luckyColors" :key="color" class="ms-1">
+                  <span class="badge rounded-pill px-2" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: '#fff' }">{{ color }}</span>
+                </span>
+              </small>
+            </div>
+          </div>
+
           <div class="d-flex justify-content-between align-items-center mb-4">
             <h5>총 {{ items.length }}개 아이템</h5>
             <router-link to="/items/upload" class="btn btn-primary">
@@ -28,11 +55,11 @@
           </div>
 
           <div v-if="items.length > 0" class="row g-2 g-md-4">
-            <div v-for="item in items" :key="item.id" class="col-4 col-md-4 mb-2 mb-md-4">
+            <div v-for="item in items" :key="item.id" class="col-6 col-md-4 mb-2 mb-md-4">
               <div class="card h-100 item-card border-0" :class="{ 'top-luck-item': item.id === topLuckItemId }">
                 <!-- 최고 행운 배지 -->
                 <div v-if="item.id === topLuckItemId" class="top-luck-badge">
-                  <i class="fas fa-crown"></i> <span class="d-none d-md-inline">오늘의 행운</span>
+                  <i class="fas fa-crown"></i> <span class="d-none d-md-inline">{{ fortuneCategories.find(c => c.key === selectedCategory)?.label }} 최고</span>
                 </div>
                 <div class="position-relative">
                   <router-link :to="`/items/${item.id}`">
@@ -86,7 +113,15 @@
                       </span>
                     </div>
 
-                    <!-- 게임 스탯 스타일 운세 영향도 - 모바일에서 숨김 -->
+                    <!-- 모바일 행운 점수 (간략) -->
+                    <div class="mt-auto d-md-none">
+                      <div class="mobile-luck-score">
+                        <i class="fas fa-star text-warning me-1"></i>
+                        <span>{{ getFortuneBoost(item, selectedCategory) }}</span>
+                      </div>
+                    </div>
+
+                    <!-- 게임 스탯 스타일 운세 영향도 - 데스크탑 -->
                     <div class="mt-auto stat-section d-none d-md-block">
                       <div class="stat-row">
                         <span class="stat-label"><i class="fas fa-palette"></i> 색상</span>
@@ -96,11 +131,11 @@
                         <span class="stat-value">{{ getColorStat(item) }}</span>
                       </div>
                       <div class="stat-row">
-                        <span class="stat-label"><i class="fas fa-star"></i> 행운</span>
+                        <span class="stat-label"><i :class="'fas ' + fortuneCategories.find(c => c.key === selectedCategory)?.icon"></i> {{ fortuneCategories.find(c => c.key === selectedCategory)?.label.slice(0, 2) }}</span>
                         <div class="stat-bar-container">
-                          <div class="stat-bar" :style="{ width: getLuckStat(item) + '%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)' }"></div>
+                          <div class="stat-bar" :style="{ width: getFortuneBoost(item, selectedCategory) + '%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)' }"></div>
                         </div>
-                        <span class="stat-value">{{ getLuckStat(item) }}</span>
+                        <span class="stat-value">{{ getFortuneBoost(item, selectedCategory) }}</span>
                       </div>
                     </div>
                   </div>
@@ -132,17 +167,59 @@ import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
+import { colorMap } from '@/utils/colors'
 
 const authStore = useAuthStore()
 const items = ref([])
+const fortuneData = ref(null)
+const luckyColors = ref([])
 
-// 최고 행운 아이템 ID 계산
+// 세부 운세 카테고리
+const fortuneCategories = [
+  { key: 'overall', label: '종합운', icon: 'fa-star' },
+  { key: 'love', label: '애정운', icon: 'fa-heart' },
+  { key: 'money', label: '금전운', icon: 'fa-coins' },
+  { key: 'work', label: '직장운', icon: 'fa-briefcase' },
+  { key: 'health', label: '건강운', icon: 'fa-heartbeat' }
+]
+const selectedCategory = ref('overall')
+
+// 아이템별 세부 운세 스탯 계산
+const getFortuneBoost = (item, category) => {
+  if (!item.dominant_colors || item.dominant_colors.length === 0) return 30
+
+  // 행운색과 아이템 색상 매칭 점수 계산
+  let matchScore = 0
+  const itemColors = item.dominant_colors.map(c => c.korean_name || c.name)
+
+  luckyColors.value.forEach(luckyColor => {
+    if (itemColors.some(ic => ic === luckyColor || ic.includes(luckyColor) || luckyColor.includes(ic))) {
+      matchScore += 25
+    }
+  })
+
+  // 카테고리별 가중치 (아이템 ID 기반으로 일관된 값)
+  const categoryWeights = {
+    overall: 1.0,
+    love: 0.8 + (item.id % 5) * 0.1,
+    money: 0.7 + (item.id % 7) * 0.08,
+    work: 0.75 + (item.id % 6) * 0.09,
+    health: 0.85 + (item.id % 4) * 0.07
+  }
+
+  const baseScore = 40 + matchScore
+  const finalScore = Math.round(baseScore * (categoryWeights[category] || 1))
+
+  return Math.max(20, Math.min(100, finalScore))
+}
+
+// 선택된 카테고리 기준 최고 행운 아이템 ID 계산
 const topLuckItemId = computed(() => {
   if (items.value.length === 0) return null
   let maxLuck = -1
   let topId = null
   items.value.forEach(item => {
-    const luck = getLuckStat(item)
+    const luck = getFortuneBoost(item, selectedCategory.value)
     if (luck > maxLuck) {
       maxLuck = luck
       topId = item.id
@@ -150,6 +227,19 @@ const topLuckItemId = computed(() => {
   })
   return topId
 })
+
+// 운세 데이터 가져오기
+const fetchFortuneData = async () => {
+  try {
+    const response = await api.get('/api/fortune/today/')
+    if (response.data.success && response.data.fortune) {
+      fortuneData.value = response.data.fortune
+      luckyColors.value = response.data.fortune.lucky_colors || []
+    }
+  } catch (error) {
+    console.error('운세 데이터 가져오기 실패:', error)
+  }
+}
 
 // 이미지 URL에 base URL 추가
 const getImageUrl = (url) => {
@@ -178,21 +268,6 @@ const getColorStat = (item) => {
   return Math.max(30, Math.min(100, baseStat + variation))
 }
 
-// 행운 스탯 계산 (AI 분석 결과 기준)
-const getLuckStat = (item) => {
-  let stat = 50
-  if (item.ai_analysis) {
-    if (item.ai_analysis.tags && item.ai_analysis.tags.length > 0) {
-      stat += item.ai_analysis.tags.length * 8
-    }
-    if (item.ai_analysis.matching_colors && item.ai_analysis.matching_colors.length > 0) {
-      stat += item.ai_analysis.matching_colors.length * 5
-    }
-  }
-  // 아이템 ID 기반 변동
-  const variation = ((item.id * 7) % 20) - 10
-  return Math.max(30, Math.min(100, stat + variation))
-}
 
 const deleteItem = async (itemId) => {
   if (!confirm('정말 이 아이템을 삭제하시겠습니까?')) {
@@ -217,6 +292,7 @@ const deleteItem = async (itemId) => {
 onMounted(() => {
   if (authStore.isAuthenticated) {
     fetchItems()
+    fetchFortuneData()
   }
 })
 </script>
@@ -395,5 +471,48 @@ onMounted(() => {
   width: 24px;
   text-align: right;
   flex-shrink: 0;
+}
+
+/* 운세 카테고리 버튼 */
+.fortune-cat-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  padding: 0.35rem 0.75rem;
+  transition: all 0.2s;
+}
+
+.fortune-cat-btn:hover {
+  background: rgba(124, 58, 237, 0.3);
+  border-color: rgba(124, 58, 237, 0.5);
+  color: #fff;
+}
+
+.fortune-cat-btn.active {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-color: #7c3aed;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+}
+
+/* 모바일 행운 점수 */
+.mobile-luck-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(251, 191, 36, 0.15);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fbbf24;
+}
+
+@media (max-width: 767.98px) {
+  .fortune-cat-btn {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
 }
 </style>
