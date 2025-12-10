@@ -2,35 +2,44 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
 
+// 동적 import 실패 시 페이지 새로고침 (배포 후 캐시 문제 해결)
+const lazyLoad = (importFn) => {
+  return () => importFn().catch(() => {
+    // 새로 배포된 경우 청크 파일이 변경되어 로드 실패할 수 있음
+    // 이 경우 페이지를 새로고침하여 최신 버전을 로드
+    window.location.reload()
+  })
+}
+
 // Lazy load components
-const Home = () => import('@/views/Home.vue')
+const Home = lazyLoad(() => import('@/views/Home.vue'))
 
 // Auth
-const Login = () => import('@/views/auth/Login.vue')
-const Register = () => import('@/views/auth/Register.vue')
-const Profile = () => import('@/views/auth/Profile.vue')
-const PasswordReset = () => import('@/views/auth/PasswordReset.vue')
-const PasswordResetConfirm = () => import('@/views/auth/PasswordResetConfirm.vue')
-const FindUsername = () => import('@/views/auth/FindUsername.vue')
-const FindPassword = () => import('@/views/auth/FindPassword.vue')
-const ChangePassword = () => import('@/views/auth/ChangePassword.vue')
-const DeleteAccount = () => import('@/views/auth/DeleteAccount.vue')
+const Login = lazyLoad(() => import('@/views/auth/Login.vue'))
+const Register = lazyLoad(() => import('@/views/auth/Register.vue'))
+const Profile = lazyLoad(() => import('@/views/auth/Profile.vue'))
+const PasswordReset = lazyLoad(() => import('@/views/auth/PasswordReset.vue'))
+const PasswordResetConfirm = lazyLoad(() => import('@/views/auth/PasswordResetConfirm.vue'))
+const FindUsername = lazyLoad(() => import('@/views/auth/FindUsername.vue'))
+const FindPassword = lazyLoad(() => import('@/views/auth/FindPassword.vue'))
+const ChangePassword = lazyLoad(() => import('@/views/auth/ChangePassword.vue'))
+const DeleteAccount = lazyLoad(() => import('@/views/auth/DeleteAccount.vue'))
 
 // Fortune
-const FortuneCalculate = () => import('@/views/fortune/Calculate.vue')
-const FortuneLoading = () => import('@/views/fortune/Loading.vue')
-const TodayFortune = () => import('@/views/fortune/Today.vue')
-const FortuneDetail = () => import('@/views/fortune/Detail.vue')
-const ItemCheck = () => import('@/views/fortune/ItemCheck.vue')
+const FortuneCalculate = lazyLoad(() => import('@/views/fortune/Calculate.vue'))
+const FortuneLoading = lazyLoad(() => import('@/views/fortune/Loading.vue'))
+const TodayFortune = lazyLoad(() => import('@/views/fortune/Today.vue'))
+const FortuneDetail = lazyLoad(() => import('@/views/fortune/Detail.vue'))
+const ItemCheck = lazyLoad(() => import('@/views/fortune/ItemCheck.vue'))
 
 // Items
-const ItemList = () => import('@/views/items/List.vue')
-const ItemUpload = () => import('@/views/items/Upload.vue')
-const ItemDetail = () => import('@/views/items/Detail.vue')
+const ItemList = lazyLoad(() => import('@/views/items/List.vue'))
+const ItemUpload = lazyLoad(() => import('@/views/items/Upload.vue'))
+const ItemDetail = lazyLoad(() => import('@/views/items/Detail.vue'))
 
 // Recommendations
-const OOTDRecommendation = () => import('@/views/recommendations/OOTD.vue')
-const MenuRecommendation = () => import('@/views/recommendations/Menu.vue')
+const OOTDRecommendation = lazyLoad(() => import('@/views/recommendations/OOTD.vue'))
+const MenuRecommendation = lazyLoad(() => import('@/views/recommendations/Menu.vue'))
 
 const router = createRouter({
   history: createWebHistory(),
@@ -178,7 +187,7 @@ const router = createRouter({
     {
       path: '/:pathMatch(.*)*',
       name: 'not-found',
-      component: () => import('@/views/NotFound.vue'),
+      component: lazyLoad(() => import('@/views/NotFound.vue')),
       meta: { title: '페이지를 찾을 수 없습니다' }
     }
   ],
