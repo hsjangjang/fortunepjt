@@ -62,6 +62,10 @@
                   <!-- 동적으로 생성됨 -->
                 </div>
               </div>
+              <!-- 온도 라인 그래프 -->
+              <div class="chart-container">
+                <canvas ref="tempChart"></canvas>
+              </div>
             </div>
           </div>
 
@@ -341,6 +345,8 @@ Chart.register(...registerables, ChartDataLabels)
 const authStore = useAuthStore()
 const { showToast } = useToast()
 const hourlyContent = ref(null)
+const tempChart = ref(null)
+let chartInstance = null
 
 const isLoading = ref(true)
 const luckyColors = ref([])
@@ -583,6 +589,76 @@ const renderHourlyForecast = (hourlyData) => {
 
     hourlyContent.value.appendChild(itemDiv)
   })
+
+  // 온도 라인 차트 렌더링
+  renderTempChart(hourlyData)
+}
+
+// 온도 라인 차트 렌더링
+const renderTempChart = (hourlyData) => {
+  if (!tempChart.value) return
+
+  // 기존 차트 제거
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
+
+  const ctx = tempChart.value.getContext('2d')
+  const temps = hourlyData.map(item => Math.round(item.temp))
+  const labels = hourlyData.map(item => item.time)
+
+  // 그라데이션 생성
+  const gradient = ctx.createLinearGradient(0, 0, 0, 100)
+  gradient.addColorStop(0, 'rgba(167, 139, 250, 0.4)')
+  gradient.addColorStop(1, 'rgba(167, 139, 250, 0)')
+
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: temps,
+        borderColor: '#a78bfa',
+        borderWidth: 2,
+        backgroundColor: gradient,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: '#a78bfa'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        datalabels: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          displayColors: false,
+          callbacks: {
+            label: (context) => `${context.raw}°C`
+          }
+        }
+      },
+      scales: {
+        x: { display: false },
+        y: {
+          display: false,
+          min: Math.min(...temps) - 2,
+          max: Math.max(...temps) + 2
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
+      }
+    }
+  })
 }
 
 const fetchOOTD = async (lat = null, lon = null) => {
@@ -710,6 +786,12 @@ onMounted(() => {
 .hourly-content {
   display: flex;
   gap: 0;
+}
+
+.chart-container {
+  height: 60px;
+  margin-top: -10px;
+  padding: 0 4px;
 }
 
 .hourly-item {
