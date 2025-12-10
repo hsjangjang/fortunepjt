@@ -133,6 +133,35 @@
                   </div>
                 </div>
 
+                <!-- 운세별 보완력 -->
+                <div class="fortune-boost-section mb-4">
+                  <h5 class="fw-bold mb-3"><i class="fas fa-chart-bar text-info"></i> 운세별 보완력</h5>
+                  <p class="text-muted small mb-3">이 아이템이 각 운세에 얼마나 도움을 줄 수 있는지 나타냅니다</p>
+                  <div class="fortune-stats">
+                    <div v-for="cat in fortuneCategories" :key="cat.key" class="stat-row">
+                      <span class="stat-label">
+                        <i :class="'fas ' + cat.icon" :style="{ color: cat.color }"></i>
+                        {{ cat.label }}
+                      </span>
+                      <div class="stat-bar-container">
+                        <div 
+                          class="stat-bar" 
+                          :style="{ 
+                            width: getFortuneBoost(cat.key) + '%', 
+                            background: `linear-gradient(90deg, ${cat.color}, ${cat.color}dd)` 
+                          }"
+                        ></div>
+                      </div>
+                      <span class="stat-value" :style="{ color: cat.color }">{{ getFortuneBoost(cat.key) }}</span>
+                    </div>
+                  </div>
+                  <div v-if="primaryFortuneTag" class="mt-3 text-center">
+                    <span class="badge rounded-pill px-3 py-2" :style="{ background: getPrimaryFortuneColor(), color: '#fff' }">
+                      <i class="fas fa-star me-1"></i> {{ primaryFortuneTag }} 보완에 최적화된 아이템
+                    </span>
+                  </div>
+                </div>
+
                 <div class="d-grid gap-3 mt-4">
                   <router-link to="/items" class="btn btn-outline-light rounded-pill py-2">
                     <i class="fas fa-list me-2"></i> 목록으로 돌아가기
@@ -166,9 +195,11 @@ import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { colorMap, getTextColor } from '@/utils/colors'
+import { useFortuneStore } from '@/stores/fortune'
 
 const route = useRoute()
 const router = useRouter()
+const fortuneStore = useFortuneStore()
 const item = ref(null)
 const isEditing = ref(false)
 const isSaving = ref(false)
@@ -191,6 +222,263 @@ const aiAnalysis = computed(() => {
   if (!item.value) return {}
   return item.value.ai_analysis_result || item.value.ai_analysis || {}
 })
+
+// 운세 카테고리 정의
+const fortuneCategories = [
+  { key: 'overall', label: '종합운', icon: 'fa-star', color: '#a78bfa' },
+  { key: 'love', label: '애정운', icon: 'fa-heart', color: '#f472b6' },
+  { key: 'money', label: '금전운', icon: 'fa-coins', color: '#facc15' },
+  { key: 'work', label: '직장운', icon: 'fa-briefcase', color: '#60a5fa' },
+  { key: 'health', label: '건강운', icon: 'fa-heartbeat', color: '#4ade80' },
+  { key: 'study', label: '학업운', icon: 'fa-book', color: '#38bdf8' }
+]
+
+// 운세 태그 매핑 (태그에 포함된 키워드로 점수 부여)
+const fortuneTagMap = {
+  'overall': ['종합운', '행운', '대박', '럭키'],
+  'love': ['애정운', '연애운', '사랑', '로맨스', '인연'],
+  'money': ['금전운', '재물운', '돈', '부자', '재운', '재물'],
+  'work': ['직장운', '사업운', '업무', '승진', '취업', '커리어'],
+  'health': ['건강운', '건강', '체력', '활력'],
+  'study': ['학업운', '시험운', '공부', '합격', '수험']
+}
+
+// HEX 색상을 RGB로 변환
+const hexToRgb = (hex) => {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 128, g: 128, b: 128 }
+}
+
+// 두 색상 간의 RGB 절댓값 차이 계산 (0~765 범위, 각 채널 최대 255 * 3)
+const colorDistance = (hex1, hex2) => {
+  const rgb1 = hexToRgb(hex1)
+  const rgb2 = hexToRgb(hex2)
+  // R, G, B 각각의 절댓값 차이의 합
+  return Math.abs(rgb1.r - rgb2.r) + Math.abs(rgb1.g - rgb2.g) + Math.abs(rgb1.b - rgb2.b)
+}
+
+// 오늘의 행운색과 아이템 색상의 유사도 점수 (0~100)
+const getColorMatchScore = () => {
+  if (!item.value?.dominant_colors || item.value.dominant_colors.length === 0) return 0
+
+  const luckyColors = fortuneStore.luckyColors || []
+  if (luckyColors.length === 0) return 0
+
+  // 행운색의 hex 값 가져오기
+  const luckyColorHexes = luckyColors.map(colorName => colorMap[colorName] || '#808080')
+
+  // 아이템의 각 색상과 행운색들 간의 최소 거리 계산
+  let minDistance = 765  // 최대 거리 (255 * 3)
+  for (const itemColor of item.value.dominant_colors) {
+    const itemHex = itemColor.hex || '#808080'
+    for (const luckyHex of luckyColorHexes) {
+      const distance = colorDistance(itemHex, luckyHex)
+      if (distance < minDistance) {
+        minDistance = distance
+      }
+    }
+  }
+
+  // 거리를 점수로 변환: 가장 가까운 경우(0) = 100점, 가장 먼 경우(765) = 0점
+  const score = Math.round(100 - (minDistance / 765) * 100)
+  return Math.max(0, score)
+}
+
+// 아이템 특성을 벡터로 변환하기 위한 키워드 목록
+const itemFeatureKeywords = [
+  // 운세 관련
+  '애정운', '연애운', '사랑', '로맨스', '인연',
+  '금전운', '재물운', '돈', '부자', '재물',
+  '직장운', '사업운', '업무', '승진', '취업', '커리어',
+  '건강운', '건강', '체력', '활력',
+  '학업운', '시험운', '공부', '합격', '수험',
+  '행운', '대박', '럭키',
+  // 아이템 카테고리
+  '액세서리', '악세서리', '장신구', '귀걸이', '반지', '목걸이', '팔찌',
+  '가방', '파우치', '지갑', '케이스',
+  '패션', '의류', '옷', '스카프', '머플러',
+  '문구', '펜', '노트', '다이어리', '메모',
+  '화장품', '향수', '립밤', '뷰티',
+  '시계', '키링', '키홀더', '거울'
+]
+
+// 텍스트를 특성 벡터로 변환 (키워드 매칭 기반)
+const textToFeatureVector = (texts) => {
+  const vector = new Array(itemFeatureKeywords.length).fill(0)
+  const textArray = Array.isArray(texts) ? texts : [texts]
+
+  for (let i = 0; i < itemFeatureKeywords.length; i++) {
+    const keyword = itemFeatureKeywords[i]
+    for (const text of textArray) {
+      if (text && text.includes(keyword)) {
+        vector[i] = 1
+        break
+      }
+    }
+  }
+  return vector
+}
+
+// 코사인 유사도 계산
+const cosineSimilarity = (vecA, vecB) => {
+  let dotProduct = 0
+  let normA = 0
+  let normB = 0
+
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i]
+    normA += vecA[i] * vecA[i]
+    normB += vecB[i] * vecB[i]
+  }
+
+  normA = Math.sqrt(normA)
+  normB = Math.sqrt(normB)
+
+  if (normA === 0 || normB === 0) return 0
+  return dotProduct / (normA * normB)
+}
+
+// 오늘의 행운 아이템과 현재 아이템의 코사인 유사도 점수 (0~100)
+const getLuckyItemCosineSimilarity = () => {
+  const luckyItem = fortuneStore.luckyItem || {}
+  const itemTags = aiAnalysis.value?.tags || []
+
+  if (!luckyItem.main || itemTags.length === 0) return 0
+
+  // 행운 아이템의 특성 벡터 (이름 + 설명 + 보완 운세)
+  const luckyItemTexts = [
+    luckyItem.main || '',
+    luckyItem.description || '',
+    luckyItem.weak_fortunes || '',
+    luckyItem.zodiac || '',
+    luckyItem.zodiac_description || ''
+  ]
+  const luckyVector = textToFeatureVector(luckyItemTexts)
+
+  // 현재 아이템의 특성 벡터 (태그 + 이름)
+  const itemTexts = [...itemTags]
+  if (item.value?.item_name) {
+    itemTexts.push(item.value.item_name)
+  }
+  const itemVector = textToFeatureVector(itemTexts)
+
+  // 코사인 유사도 계산 (0~1) -> 점수로 변환 (0~100)
+  const similarity = cosineSimilarity(luckyVector, itemVector)
+  return Math.round(similarity * 100)
+}
+
+// 오늘의 행운 아이템과 현재 아이템의 유사성 점수 (카테고리별 가중치 포함)
+const getLuckyItemSimilarityScore = (category) => {
+  const luckyItem = fortuneStore.luckyItem || {}
+
+  if (!luckyItem.main) return 0
+
+  // 코사인 유사도 기반 점수
+  const cosineSimilarityScore = getLuckyItemCosineSimilarity()
+
+  // 행운 아이템이 보완하는 운세와 현재 카테고리 매칭 확인
+  const weakFortunes = luckyItem.weak_fortunes || ''
+  const fortuneNameToKey = {
+    '재물운': 'money',
+    '애정운': 'love',
+    '학업운': 'study',
+    '직장운': 'work',
+    '건강운': 'health'
+  }
+
+  // weak_fortunes에서 카테고리 추출 (예: "재물운, 애정운")
+  let categoryBonus = 0
+  for (const [name, key] of Object.entries(fortuneNameToKey)) {
+    if (weakFortunes.includes(name) && category === key) {
+      categoryBonus = 20  // 행운 아이템이 보완하는 운세와 현재 카테고리가 일치
+      break
+    }
+  }
+
+  // 최종 점수: 코사인 유사도(80%) + 카테고리 보너스(20%)
+  return Math.min(100, Math.round(cosineSimilarityScore * 0.8 + categoryBonus))
+}
+
+// 아이템의 운세별 보완 점수 계산 (실제 데이터 기반)
+const getFortuneBoost = (category) => {
+  if (!item.value) return 30
+
+  // 1. 태그 기반 점수 (아이템이 특정 운세 보완에 적합한지)
+  const itemTags = aiAnalysis.value?.tags || []
+  const targetKeywords = fortuneTagMap[category] || []
+
+  let tagScore = 30  // 기본 점수
+  for (const keyword of targetKeywords) {
+    if (itemTags.some(tag => tag.includes(keyword) || keyword.includes(tag))) {
+      tagScore = 70  // 태그 매칭 시 높은 기본 점수
+      break
+    }
+  }
+
+  // 2. 오늘의 행운색과의 색상 유사도 (0~100)
+  const colorScore = getColorMatchScore()
+
+  // 3. 오늘의 행운 아이템과의 유사성 (0~60)
+  const similarityScore = getLuckyItemSimilarityScore(category)
+
+  // 최종 점수 계산: 태그 매칭(40%) + 색상 유사도(35%) + 행운아이템 유사성(25%)
+  let finalScore
+  if (tagScore >= 70) {
+    // 태그가 매칭된 경우: 해당 운세에 최적화된 아이템
+    finalScore = Math.round(tagScore * 0.4 + colorScore * 0.35 + similarityScore * 0.25)
+  } else {
+    // 태그 미매칭: 색상과 행운아이템 유사성으로만 점수 계산
+    finalScore = Math.round(tagScore * 0.3 + colorScore * 0.4 + similarityScore * 0.3)
+  }
+
+  // 종합운은 모든 운세 점수의 평균 반영
+  if (category === 'overall') {
+    const allFortuneKeywords = Object.values(fortuneTagMap).flat()
+    let hasAnyFortuneTag = false
+    for (const keyword of allFortuneKeywords) {
+      if (itemTags.some(tag => tag.includes(keyword) || keyword.includes(tag))) {
+        hasAnyFortuneTag = true
+        break
+      }
+    }
+    if (hasAnyFortuneTag) {
+      finalScore = Math.max(finalScore, 55)
+    }
+    // 색상 매칭이 좋으면 종합운 보너스
+    if (colorScore >= 70) {
+      finalScore = Math.max(finalScore, 60)
+    }
+  }
+
+  // 최소 25, 최대 95로 제한
+  return Math.max(25, Math.min(95, finalScore))
+}
+
+// 주요 운세 태그 찾기 (가장 높은 점수의 운세)
+const primaryFortuneTag = computed(() => {
+  const itemTags = aiAnalysis.value?.tags || []
+  
+  for (const [key, keywords] of Object.entries(fortuneTagMap)) {
+    if (key === 'overall') continue
+    for (const keyword of keywords) {
+      if (itemTags.some(tag => tag.includes(keyword) || keyword.includes(tag))) {
+        return fortuneCategories.find(c => c.key === key)?.label || null
+      }
+    }
+  }
+  return null
+})
+
+// 주요 운세의 색상 가져오기
+const getPrimaryFortuneColor = () => {
+  if (!primaryFortuneTag.value) return '#a78bfa'
+  const cat = fortuneCategories.find(c => c.label === primaryFortuneTag.value)
+  return cat?.color || '#a78bfa'
+}
 
 // 색상 hex 값 가져오기
 const getColorHex = (colorName) => {
@@ -318,3 +606,83 @@ onMounted(() => {
   fetchItemDetail()
 })
 </script>
+
+<style scoped>
+/* 운세별 보완력 섹션 */
+.fortune-boost-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  padding: 1.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.fortune-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  width: 75px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.stat-label i {
+  width: 16px;
+  text-align: center;
+}
+
+.stat-bar-container {
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.stat-bar {
+  height: 100%;
+  border-radius: 5px;
+  transition: width 0.6s ease-out;
+}
+
+.stat-value {
+  font-size: 0.9rem;
+  font-weight: 700;
+  width: 32px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* 모바일 반응형 */
+@media (max-width: 767.98px) {
+  .fortune-boost-section {
+    padding: 1rem;
+  }
+
+  .stat-label {
+    font-size: 0.8rem;
+    width: 65px;
+  }
+
+  .stat-bar-container {
+    height: 8px;
+  }
+
+  .stat-value {
+    font-size: 0.85rem;
+    width: 28px;
+  }
+}
+</style>
