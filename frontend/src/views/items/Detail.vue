@@ -194,7 +194,8 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { getColorMatchScore as getColorMatchScoreUtil } from '@/utils/colors'
+import { getColorMatchScore } from '@/utils/colors'
+import { getFortuneBoostScore, fortuneKeywords } from '@/utils/similarity'
 import { useFortuneStore } from '@/stores/fortune'
 
 const route = useRoute()
@@ -233,222 +234,16 @@ const fortuneCategories = [
   { key: 'study', label: '학업운', icon: 'fa-book', color: '#38bdf8' }
 ]
 
-// 운세 태그 매핑 (태그에 포함된 키워드로 점수 부여)
-const fortuneTagMap = {
-  'overall': ['종합운', '행운', '대박', '럭키'],
-  'love': ['애정운', '연애운', '사랑', '로맨스', '인연'],
-  'money': ['금전운', '재물운', '돈', '부자', '재운', '재물'],
-  'work': ['직장운', '사업운', '업무', '승진', '취업', '커리어'],
-  'health': ['건강운', '건강', '체력', '활력'],
-  'study': ['학업운', '시험운', '공부', '합격', '수험']
-}
-
-// 오늘의 행운색과 아이템 색상의 유사도 점수 (0~100) - colors.js 유틸 사용
-const getColorMatchScore = () => {
-  return getColorMatchScoreUtil(item.value?.dominant_colors, fortuneStore.luckyColors)
-}
-
-// 아이템 특성을 벡터로 변환하기 위한 키워드 목록
-const itemFeatureKeywords = [
-  // 운세 관련
-  '애정운', '연애운', '사랑', '로맨스', '인연',
-  '금전운', '재물운', '돈', '부자', '재물',
-  '직장운', '사업운', '업무', '승진', '취업', '커리어',
-  '건강운', '건강', '체력', '활력',
-  '학업운', '시험운', '공부', '합격', '수험',
-  '행운', '대박', '럭키',
-  // 아이템 카테고리
-  '액세서리', '악세서리', '장신구', '귀걸이', '반지', '목걸이', '팔찌',
-  '가방', '파우치', '지갑', '케이스',
-  '패션', '의류', '옷', '스카프', '머플러',
-  '문구', '펜', '노트', '다이어리', '메모',
-  '화장품', '향수', '립밤', '뷰티',
-  '시계', '키링', '키홀더', '거울'
-]
-
-// 텍스트를 특성 벡터로 변환 (키워드 매칭 기반)
-const textToFeatureVector = (texts) => {
-  const vector = new Array(itemFeatureKeywords.length).fill(0)
-  const textArray = Array.isArray(texts) ? texts : [texts]
-
-  for (let i = 0; i < itemFeatureKeywords.length; i++) {
-    const keyword = itemFeatureKeywords[i]
-    for (const text of textArray) {
-      if (text && text.includes(keyword)) {
-        vector[i] = 1
-        break
-      }
-    }
-  }
-  return vector
-}
-
-// 코사인 유사도 계산
-const cosineSimilarity = (vecA, vecB) => {
-  let dotProduct = 0
-  let normA = 0
-  let normB = 0
-
-  for (let i = 0; i < vecA.length; i++) {
-    dotProduct += vecA[i] * vecB[i]
-    normA += vecA[i] * vecA[i]
-    normB += vecB[i] * vecB[i]
-  }
-
-  normA = Math.sqrt(normA)
-  normB = Math.sqrt(normB)
-
-  if (normA === 0 || normB === 0) return 0
-  return dotProduct / (normA * normB)
-}
-
-// 카테고리별 키워드 (코사인 유사도 계산용)
-const categoryKeywordsMap = {
-  'overall': ['행운', '운세', '럭키', '대박', '길운'],
-  'love': ['애정', '사랑', '연애', '로맨스', '인연', '매력', '이성', '커플'],
-  'money': ['재물', '금전', '돈', '부자', '재운', '경제', '수익', '투자'],
-  'work': ['직장', '사업', '업무', '승진', '취업', '커리어', '회사', '일'],
-  'health': ['건강', '체력', '활력', '힐링', '운동', '에너지'],
-  'study': ['학업', '시험', '공부', '합격', '수험', '학습', '교육', '지식']
-}
-
-// 텍스트에서 특정 카테고리와의 연관성 점수 계산 (0~100)
-const getCategoryRelevanceScore = (texts, category) => {
-  const keywords = categoryKeywordsMap[category] || []
-  if (keywords.length === 0) return 0
-
-  const textArray = Array.isArray(texts) ? texts : [texts]
-  const textJoined = textArray.join(' ').toLowerCase()
-
-  let matchCount = 0
-  for (const keyword of keywords) {
-    if (textJoined.includes(keyword)) {
-      matchCount++
-    }
-  }
-
-  // 매칭된 키워드 비율로 점수 계산 (최대 100)
-  return Math.min(100, Math.round((matchCount / keywords.length) * 150))
-}
-
-// 오늘의 행운 아이템과 현재 아이템의 유사성 점수 (카테고리별로 다르게 계산)
-const getLuckyItemSimilarityScore = (category) => {
-  const luckyItem = fortuneStore.luckyItem || {}
-  const itemTags = aiAnalysis.value?.tags || []
-
-  if (!luckyItem.main) return 0
-
-  // 1. 행운 아이템의 텍스트
-  const luckyItemTexts = [
-    luckyItem.main || '',
-    luckyItem.description || '',
-    luckyItem.weak_fortunes || '',
-    luckyItem.zodiac || '',
-    luckyItem.zodiac_description || ''
-  ]
-
-  // 2. 현재 아이템의 텍스트
-  const itemTexts = [...itemTags]
-  if (item.value?.item_name) {
-    itemTexts.push(item.value.item_name)
-  }
-
-  // 3. 코사인 유사도 계산 (아이템 간 전체 유사도)
-  const luckyVector = textToFeatureVector(luckyItemTexts)
-  const itemVector = textToFeatureVector(itemTexts)
-  const baseSimilarity = cosineSimilarity(luckyVector, itemVector) * 100
-
-  // 4. 현재 아이템이 해당 카테고리와 얼마나 관련있는지 (태그 기반)
-  const itemCategoryRelevance = getCategoryRelevanceScore(itemTexts, category)
-
-  // 5. 행운 아이템이 해당 카테고리를 보완하는지 확인
-  const weakFortunes = luckyItem.weak_fortunes || ''
-  const fortuneNameToKey = {
-    '재물운': 'money',
-    '애정운': 'love',
-    '학업운': 'study',
-    '직장운': 'work',
-    '건강운': 'health'
-  }
-
-  let luckyItemCategoryBonus = 0
-  for (const [name, key] of Object.entries(fortuneNameToKey)) {
-    if (weakFortunes.includes(name) && category === key) {
-      luckyItemCategoryBonus = 30  // 행운 아이템이 이 카테고리를 보완함
-      break
-    }
-  }
-
-  // 6. 최종 점수: 기본 유사도(40%) + 아이템-카테고리 연관성(40%) + 행운아이템 보완 보너스(20%)
-  const finalScore = Math.round(
-    baseSimilarity * 0.4 +
-    itemCategoryRelevance * 0.4 +
-    luckyItemCategoryBonus
-  )
-
-  return Math.min(100, finalScore)
-}
-
-// 아이템의 운세별 보완 점수 계산 (실제 데이터 기반)
+// 아이템의 운세별 보완 점수 계산 (유틸리티 사용)
 const getFortuneBoost = (category) => {
-  if (!item.value) return 30
-
-  // 1. 태그 기반 점수 (아이템이 특정 운세 보완에 적합한지)
-  const itemTags = aiAnalysis.value?.tags || []
-  const targetKeywords = fortuneTagMap[category] || []
-
-  let tagScore = 30  // 기본 점수
-  for (const keyword of targetKeywords) {
-    if (itemTags.some(tag => tag.includes(keyword) || keyword.includes(tag))) {
-      tagScore = 70  // 태그 매칭 시 높은 기본 점수
-      break
-    }
-  }
-
-  // 2. 오늘의 행운색과의 색상 유사도 (0~100)
-  const colorScore = getColorMatchScore()
-
-  // 3. 오늘의 행운 아이템과의 유사성 (0~60)
-  const similarityScore = getLuckyItemSimilarityScore(category)
-
-  // 최종 점수 계산: 태그 매칭(40%) + 색상 유사도(35%) + 행운아이템 유사성(25%)
-  let finalScore
-  if (tagScore >= 70) {
-    // 태그가 매칭된 경우: 해당 운세에 최적화된 아이템
-    finalScore = Math.round(tagScore * 0.4 + colorScore * 0.35 + similarityScore * 0.25)
-  } else {
-    // 태그 미매칭: 색상과 행운아이템 유사성으로만 점수 계산
-    finalScore = Math.round(tagScore * 0.3 + colorScore * 0.4 + similarityScore * 0.3)
-  }
-
-  // 종합운은 모든 운세 점수의 평균 반영
-  if (category === 'overall') {
-    const allFortuneKeywords = Object.values(fortuneTagMap).flat()
-    let hasAnyFortuneTag = false
-    for (const keyword of allFortuneKeywords) {
-      if (itemTags.some(tag => tag.includes(keyword) || keyword.includes(tag))) {
-        hasAnyFortuneTag = true
-        break
-      }
-    }
-    if (hasAnyFortuneTag) {
-      finalScore = Math.max(finalScore, 55)
-    }
-    // 색상 매칭이 좋으면 종합운 보너스
-    if (colorScore >= 70) {
-      finalScore = Math.max(finalScore, 60)
-    }
-  }
-
-  // 최소 25, 최대 95로 제한
-  return Math.max(25, Math.min(95, finalScore))
+  return getFortuneBoostScore(item.value, fortuneStore.luckyColors, category, getColorMatchScore)
 }
 
 // 주요 운세 태그 찾기 (가장 높은 점수의 운세)
 const primaryFortuneTag = computed(() => {
   const itemTags = aiAnalysis.value?.tags || []
-  
-  for (const [key, keywords] of Object.entries(fortuneTagMap)) {
+
+  for (const [key, keywords] of Object.entries(fortuneKeywords)) {
     if (key === 'overall') continue
     for (const keyword of keywords) {
       if (itemTags.some(tag => tag.includes(keyword) || keyword.includes(tag))) {

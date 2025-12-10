@@ -162,7 +162,8 @@ import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
-import { getTextColor } from '@/utils/colors'
+import { getTextColor, getColorMatchScore } from '@/utils/colors'
+import { getFortuneBoostScore } from '@/utils/similarity'
 
 const authStore = useAuthStore()
 const items = ref([])
@@ -178,6 +179,7 @@ const fortuneCategories = [
   { key: 'health', label: '건강운', icon: 'fa-heartbeat', color: '#4ade80' },
   { key: 'study', label: '학업운', icon: 'fa-book', color: '#38bdf8' }
 ]
+
 const selectedCategory = ref('overall')
 
 // 선택된 카테고리의 색상
@@ -185,41 +187,9 @@ const selectedCategoryColor = computed(() => {
   return fortuneCategories.find(c => c.key === selectedCategory.value)?.color || '#a78bfa'
 })
 
-// 아이템별 세부 운세 스탯 계산 (실제 운세 점수 기반)
+// 아이템별 운세 점수 계산 (유틸리티 사용)
 const getFortuneBoost = (item, category) => {
-  if (!item.dominant_colors || item.dominant_colors.length === 0) return 30
-
-  // 행운색과 아이템 색상 매칭 점수 계산
-  let colorMatchScore = 0
-  const itemColors = item.dominant_colors.map(c => c.korean_name || c.name)
-
-  luckyColors.value.forEach(luckyColor => {
-    if (itemColors.some(ic => ic === luckyColor || ic.includes(luckyColor) || luckyColor.includes(ic))) {
-      colorMatchScore += 20
-    }
-  })
-
-  // 실제 운세 점수 가져오기 (fortuneData.fortune_scores)
-  const fortuneScores = fortuneData.value?.fortune_scores || {}
-
-  // 카테고리별 실제 운세 점수 (0-100)
-  const categoryScoreMap = {
-    overall: fortuneData.value?.fortune_score || 50,
-    love: fortuneScores.love || 50,
-    money: fortuneScores.money || 50,
-    work: fortuneScores.work || 50,
-    health: fortuneScores.health || 50,
-    study: fortuneScores.study || 50
-  }
-
-  // 해당 카테고리의 실제 운세 점수
-  const categoryScore = categoryScoreMap[category] || 50
-
-  // 최종 점수: 색상 매칭 보너스 + 실제 운세 점수 기반 계산
-  // 색상 매칭이 있으면 운세 점수에 보너스 추가
-  const baseScore = Math.round(categoryScore * 0.7 + colorMatchScore)
-
-  return Math.max(20, Math.min(100, baseScore))
+  return getFortuneBoostScore(item, luckyColors.value, category, getColorMatchScore)
 }
 
 // 선택된 카테고리 기준 최고 행운 아이템 ID 계산
