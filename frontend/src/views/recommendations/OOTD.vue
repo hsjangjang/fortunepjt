@@ -1,19 +1,24 @@
 <template>
   <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-8 col-12 mx-auto px-1 px-md-3">
-        <!-- Header -->
-        <div class="glass-card mb-4 responsive-padding text-center py-4">
-            <h1 class="display-5 fw-bold text-white">
-              <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
-            </h1>
-            <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
+    <div class="page-container">
+      <div class="content-wrapper">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-tshirt text-primary"></i>
+            OOTD 추천
+          </h1>
+          <p class="page-subtitle">날씨와 행운색 기반 오늘의 코디</p>
+        </div>
+
+        <!-- 운세 요약 카드 -->
+        <div v-if="fortuneSummary || (luckyColors && luckyColors.length)" class="card-base card-md text-center mb-4">
             <!-- 운세 요약 한줄 -->
-            <p v-if="fortuneSummary" class="text-white mt-2 mb-2" style="font-size: 0.95rem;">
+            <p v-if="fortuneSummary" class="text-white mb-2" style="font-size: 0.95rem;">
               <i class="fas fa-star-half-alt text-warning me-1"></i>
               {{ fortuneSummary }}
             </p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-3">
+            <div v-if="luckyColors && luckyColors.length" class="mt-2">
               <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
                 <Star class="text-warning" :size="16" />
                 <span v-for="color in luckyColors" :key="color" class="badge dynamic-color-badge">

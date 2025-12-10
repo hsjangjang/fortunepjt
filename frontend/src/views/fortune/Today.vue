@@ -33,14 +33,14 @@
             <div class="badge-row mt-5">
               <div class="text-center">
                 <h6 class="text-primary-light mb-2">별자리</h6>
-                <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2 d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
+                <span class="badge zodiac-badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2 d-inline-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
                   <img v-if="getZodiacIcon(fortune.zodiac_sign)" :src="getZodiacIcon(fortune.zodiac_sign)" alt="" class="zodiac-icon">
                   {{ fortune.zodiac_sign || '-' }}
                 </span>
               </div>
               <div class="text-center">
                 <h6 class="text-primary-light mb-2">띠</h6>
-                <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
+                <span class="badge zodiac-badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2 d-inline-flex align-items-center justify-content-center gap-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
                   {{ getChineseZodiacEmoji(fortune.chinese_zodiac) }} {{ fortune.chinese_zodiac || '-' }}
                 </span>
               </div>
@@ -563,6 +563,12 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* 별자리/띠 배지 동일 높이 */
+.zodiac-badge {
+  min-height: 48px;
+  min-width: 140px;
+}
+
 .zodiac-icon {
   width: 28px;
   height: 28px;

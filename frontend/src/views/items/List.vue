@@ -1,28 +1,22 @@
 <template>
   <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-10 mx-auto">
-        <div class="card mb-4">
-          <div class="card-body text-center py-4">
-            <h1 class="display-5">
-              <i class="fas fa-closet text-primary"></i> 내 아이템
-            </h1>
-            <p class="lead text-muted">업로드한 아이템과 행운색 매칭도를 확인하세요</p>
-          </div>
+    <div class="page-container">
+      <div class="content-wrapper wide">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-box-open text-primary"></i>
+            내 아이템
+          </h1>
+          <p class="page-subtitle">업로드한 아이템과 행운색 매칭도를 확인하세요</p>
         </div>
 
-        <div v-if="!authStore.isAuthenticated" class="alert alert-warning text-center p-4" role="alert">
-          <div class="mb-3">
-            <i class="fas fa-lock fa-3x text-warning"></i>
+        <div v-if="!authStore.isAuthenticated" class="card-base card-lg text-center">
+          <div class="empty-state">
+            <i class="fas fa-lock empty-icon" style="color: #fbbf24;"></i>
+            <h3 class="empty-title">로그인 후 이용해주세요</h3>
+            <p class="empty-text">내 아이템 서비스는 회원 전용 기능입니다.<br>상단 메뉴에서 로그인 또는 회원가입을 해주세요.</p>
           </div>
-          <h5 class="mb-3">
-            <i class="fas fa-lock"></i> 로그인 후 이용해주세요
-          </h5>
-          <p class="mb-3">내 아이템 서비스는 회원 전용 기능입니다.</p>
-          <hr>
-          <p class="mb-0 text-muted">
-            상단 메뉴에서 <strong>로그인</strong> 또는 <strong>회원가입</strong>을 해주세요.
-          </p>
         </div>
 
         <template v-else>
@@ -33,20 +27,19 @@
             </router-link>
           </div>
 
-          <div v-if="items.length > 0" class="row">
-            <div v-for="item in items" :key="item.id" class="col-md-4 mb-4">
+          <div v-if="items.length > 0" class="row g-2 g-md-4">
+            <div v-for="item in items" :key="item.id" class="col-4 col-md-4 mb-2 mb-md-4">
               <div class="card h-100 item-card border-0" :class="{ 'top-luck-item': item.id === topLuckItemId }">
                 <!-- 최고 행운 배지 -->
                 <div v-if="item.id === topLuckItemId" class="top-luck-badge">
-                  <i class="fas fa-crown"></i> 오늘의 행운
+                  <i class="fas fa-crown"></i> <span class="d-none d-md-inline">오늘의 행운</span>
                 </div>
                 <div class="position-relative">
                   <router-link :to="`/items/${item.id}`">
                     <img
                       :src="getImageUrl(item.image)"
-                      class="card-img-top"
+                      class="card-img-top item-image"
                       :alt="item.item_name"
-                      style="height: 200px; object-fit: cover; border-radius: 12px 12px 0 0;"
                     >
                   </router-link>
                   <!-- 삭제 버튼 - 이미지 우상단 -->
@@ -62,11 +55,11 @@
                   :to="`/items/${item.id}`"
                   class="text-decoration-none h-100 d-flex flex-column"
                 >
-                  <div class="card-body flex-grow-1 d-flex flex-column">
-                    <h5 class="card-title text-white mb-2">{{ item.item_name }}</h5>
+                  <div class="card-body flex-grow-1 d-flex flex-column item-body">
+                    <h5 class="card-title text-white mb-1 mb-md-2 item-name">{{ item.item_name }}</h5>
 
-                    <!-- 색상 태그 -->
-                    <div v-if="item.dominant_colors && item.dominant_colors.length > 0" class="mb-2">
+                    <!-- 색상 태그 - 모바일에서 숨김 -->
+                    <div v-if="item.dominant_colors && item.dominant_colors.length > 0" class="mb-1 mb-md-2 d-none d-md-block">
                       <span
                         v-for="(color, index) in item.dominant_colors.slice(0, 1)"
                         :key="index"
@@ -81,8 +74,8 @@
                       </span>
                     </div>
 
-                    <!-- AI 분석 태그 -->
-                    <div v-if="item.ai_analysis && item.ai_analysis.tags && item.ai_analysis.tags.length > 0" class="mb-3">
+                    <!-- AI 분석 태그 - 모바일에서 숨김 -->
+                    <div v-if="item.ai_analysis && item.ai_analysis.tags && item.ai_analysis.tags.length > 0" class="mb-3 d-none d-md-block">
                       <span
                         v-for="(tag, index) in item.ai_analysis.tags.slice(0, 3)"
                         :key="'tag-' + index"
@@ -93,8 +86,8 @@
                       </span>
                     </div>
 
-                    <!-- 게임 스탯 스타일 운세 영향도 -->
-                    <div class="mt-auto stat-section">
+                    <!-- 게임 스탯 스타일 운세 영향도 - 모바일에서 숨김 -->
+                    <div class="mt-auto stat-section d-none d-md-block">
                       <div class="stat-row">
                         <span class="stat-label"><i class="fas fa-palette"></i> 색상</span>
                         <div class="stat-bar-container">
@@ -117,13 +110,13 @@
           </div>
 
           <!-- 아이템이 없을 때 -->
-          <div v-else class="card">
-            <div class="card-body text-center py-5">
-              <i class="fas fa-camera fa-5x text-muted mb-3"></i>
-              <h4>아직 업로드한 아이템이 없습니다</h4>
-              <p class="text-muted">첫 번째 아이템을 업로드하고 행운색 매칭도를 확인해보세요!</p>
-              <router-link to="/items/upload" class="btn btn-primary">
-                <i class="fas fa-upload"></i> 첫 아이템 업로드하기
+          <div v-else class="card-base card-lg">
+            <div class="empty-state">
+              <i class="fas fa-camera empty-icon"></i>
+              <h3 class="empty-title">아직 업로드한 아이템이 없습니다</h3>
+              <p class="empty-text">첫 번째 아이템을 업로드하고 행운색 매칭도를 확인해보세요!</p>
+              <router-link to="/items/upload" class="btn btn-primary btn-lg rounded-pill px-5">
+                <i class="fas fa-upload me-2"></i> 첫 아이템 업로드하기
               </router-link>
             </div>
           </div>
@@ -229,6 +222,51 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 이미지 크기 - 데스크탑 */
+.item-image {
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+}
+
+/* 모바일용 이미지 & 카드 축소 */
+@media (max-width: 767.98px) {
+  .item-image {
+    height: 100px;
+    border-radius: 8px 8px 0 0;
+  }
+
+  .item-card {
+    border-radius: 8px;
+  }
+
+  .item-body {
+    padding: 0.5rem !important;
+  }
+
+  .item-name {
+    font-size: 0.75rem;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .btn-delete {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+    top: 4px;
+    right: 4px;
+  }
+
+  .top-luck-badge {
+    padding: 2px 6px;
+    font-size: 9px;
+    border-radius: 0 0 6px 6px;
+  }
+}
+
 .item-card {
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;

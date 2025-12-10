@@ -1,17 +1,17 @@
 <template>
   <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-10 mx-auto">
-        <div class="card mb-4">
-          <div class="card-body text-center py-4">
-            <h1 class="display-5 mb-3">
-              <i class="fas fa-search text-primary"></i> 아이템 상세 분석
-            </h1>
-            <p class="lead text-muted">AI가 분석한 아이템의 상세 정보입니다</p>
-          </div>
+    <div class="page-container">
+      <div class="content-wrapper">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-search text-primary"></i>
+            아이템 상세 분석
+          </h1>
+          <p class="page-subtitle">AI가 분석한 아이템의 상세 정보입니다</p>
         </div>
 
-        <div v-if="item" class="card shadow-sm">
+        <div v-if="item" class="card-base card-lg">
           <div class="row g-0">
             <div class="col-md-5">
               <img
@@ -147,11 +147,13 @@
         </div>
 
         <!-- Loading State -->
-        <div v-else class="text-center py-5">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
+        <div v-else class="card-base card-lg">
+          <div class="empty-state">
+            <div class="spinner-border text-primary mb-3" role="status" style="width: 3rem; height: 3rem;">
+              <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="empty-text">아이템 정보를 불러오는 중...</p>
           </div>
-          <p class="mt-3 text-muted">아이템 정보를 불러오는 중...</p>
         </div>
       </div>
     </div>
