@@ -643,6 +643,21 @@ onMounted(() => {
   if (authStore.isAuthenticated) {
     fetchUserItems()
   }
+
+  // 아이템 상세 페이지에서 넘어온 경우 자동으로 행운 체크
+  const savedItem = sessionStorage.getItem('checkLuckItem')
+  if (savedItem) {
+    try {
+      const itemData = JSON.parse(savedItem)
+      sessionStorage.removeItem('checkLuckItem') // 사용 후 삭제
+      // 약간의 딜레이 후 자동 분석 (운세 데이터 로드 후)
+      setTimeout(() => {
+        selectExistingItem(itemData)
+      }, 500)
+    } catch (e) {
+      console.error('저장된 아이템 파싱 실패:', e)
+    }
+  }
 })
 </script>
 
