@@ -22,8 +22,8 @@
         <template v-else>
           <!-- 운세 카테고리 선택 -->
           <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
-            <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-2">
-              <span class="text-white-50 me-2 d-none d-md-inline"><i class="fas fa-magic"></i> 운세별 행운 아이템:</span>
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
+              <span class="text-white-50 me-2 d-none d-md-inline fortune-label"><i class="fas fa-magic me-1"></i>운세별 행운 아이템:</span>
               <button
                 v-for="cat in fortuneCategories"
                 :key="cat.key"
@@ -37,14 +37,11 @@
                 <span class="d-sm-none">{{ cat.label.slice(0, 2) }}</span>
               </button>
             </div>
-            <div class="text-center mt-3">
-              <small class="text-white-50">
-                <i class="fas fa-palette text-primary me-1"></i>
-                오늘의 행운색:
-                <span v-for="color in luckyColors" :key="color" class="ms-1">
-                  <span class="badge rounded-pill px-2" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: '#fff' }">{{ color }}</span>
-                </span>
-              </small>
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+              <span class="text-white-50 me-2 fortune-label"><i class="fas fa-palette text-primary me-1"></i>오늘의 행운색:</span>
+              <span v-for="color in luckyColors" :key="color">
+                <span class="badge rounded-pill px-2 py-1" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: '#fff' }">{{ color }}</span>
+              </span>
             </div>
           </div>
 
@@ -191,34 +188,41 @@ const selectedCategoryColor = computed(() => {
   return fortuneCategories.find(c => c.key === selectedCategory.value)?.color || '#a78bfa'
 })
 
-// 아이템별 세부 운세 스탯 계산
+// 아이템별 세부 운세 스탯 계산 (실제 운세 점수 기반)
 const getFortuneBoost = (item, category) => {
   if (!item.dominant_colors || item.dominant_colors.length === 0) return 30
 
   // 행운색과 아이템 색상 매칭 점수 계산
-  let matchScore = 0
+  let colorMatchScore = 0
   const itemColors = item.dominant_colors.map(c => c.korean_name || c.name)
 
   luckyColors.value.forEach(luckyColor => {
     if (itemColors.some(ic => ic === luckyColor || ic.includes(luckyColor) || luckyColor.includes(ic))) {
-      matchScore += 25
+      colorMatchScore += 20
     }
   })
 
-  // 카테고리별 가중치 (아이템 ID 기반으로 일관된 값)
-  const categoryWeights = {
-    overall: 1.0,
-    love: 0.8 + (item.id % 5) * 0.1,
-    money: 0.7 + (item.id % 7) * 0.08,
-    work: 0.75 + (item.id % 6) * 0.09,
-    health: 0.85 + (item.id % 4) * 0.07,
-    study: 0.78 + (item.id % 5) * 0.08
+  // 실제 운세 점수 가져오기 (fortuneData.fortune_scores)
+  const fortuneScores = fortuneData.value?.fortune_scores || {}
+
+  // 카테고리별 실제 운세 점수 (0-100)
+  const categoryScoreMap = {
+    overall: fortuneData.value?.fortune_score || 50,
+    love: fortuneScores.love || 50,
+    money: fortuneScores.money || 50,
+    work: fortuneScores.work || 50,
+    health: fortuneScores.health || 50,
+    study: fortuneScores.study || 50
   }
 
-  const baseScore = 40 + matchScore
-  const finalScore = Math.round(baseScore * (categoryWeights[category] || 1))
+  // 해당 카테고리의 실제 운세 점수
+  const categoryScore = categoryScoreMap[category] || 50
 
-  return Math.max(20, Math.min(100, finalScore))
+  // 최종 점수: 색상 매칭 보너스 + 실제 운세 점수 기반 계산
+  // 색상 매칭이 있으면 운세 점수에 보너스 추가
+  const baseScore = Math.round(categoryScore * 0.7 + colorMatchScore)
+
+  return Math.max(20, Math.min(100, baseScore))
 }
 
 // 선택된 카테고리 기준 최고 행운 아이템 ID 계산
@@ -519,10 +523,19 @@ onMounted(() => {
   color: #fbbf24;
 }
 
+/* 운세별/행운색 라벨 동일 스타일 */
+.fortune-label {
+  font-size: 0.9rem;
+}
+
 @media (max-width: 767.98px) {
   .fortune-cat-btn {
     font-size: 0.7rem;
     padding: 0.25rem 0.5rem;
+  }
+
+  .fortune-label {
+    font-size: 0.8rem;
   }
 }
 </style>

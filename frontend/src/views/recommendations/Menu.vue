@@ -58,37 +58,34 @@
           </div>
 
           <!-- Main Menu Recommendations -->
-          <div v-if="!isLoading" class="card-grid cols-2 section-spacing">
-            <div v-for="rec in recommendations" :key="rec.rank" class="card-base card-md card-interactive position-relative overflow-hidden">
+          <div v-if="!isLoading" class="section-spacing">
+            <div v-for="rec in recommendations" :key="rec.rank" class="card-base card-md card-interactive position-relative overflow-hidden mb-4">
                 <!-- Subtle Gradient Background Glow -->
-                <div class="position-absolute top-0 start-50 translate-middle-x mt-n4"
-                     :style="`width: 150px; height: 150px; background: ${rec.bg_gradient}; filter: blur(60px); opacity: 0.2;`"></div>
+                <div class="position-absolute top-0 start-0"
+                     :style="`width: 200px; height: 200px; background: ${rec.bg_gradient}; filter: blur(80px); opacity: 0.15;`"></div>
 
-                  <div class="mb-3 position-relative text-center">
-                    <span class="badge rounded-pill px-3 py-2 text-white"
-                          style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); font-size: 1.1rem;">
-                      {{ rec.rank === 1 ? '🥇 1순위 추천' : '🥈 2순위 추천' }}
-                    </span>
-                  </div>
-
-                  <!-- 좌측 이미지 / 우측 텍스트 레이아웃 -->
-                  <div class="d-flex align-items-center gap-3">
-                    <div class="menu-icon animate-float flex-shrink-0">
-                      <div class="rounded-circle overflow-hidden shadow-lg border border-2 border-white border-opacity-25 main-menu-img">
-                        <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
+                  <!-- 좌측 이미지 / 우측 텍스트 - 전체 너비 활용 -->
+                  <div class="row g-0 align-items-center">
+                    <div class="col-5 col-md-4 text-center position-relative">
+                      <div class="rank-badge-top">
+                        {{ rec.rank === 1 ? '🥇 1순위' : '🥈 2순위' }}
+                      </div>
+                      <div class="menu-icon animate-float">
+                        <div class="rounded-circle overflow-hidden shadow-lg border border-3 border-white border-opacity-25 main-menu-img mx-auto">
+                          <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
+                        </div>
                       </div>
                     </div>
-                    <div class="flex-grow-1">
-                      <h3 class="fw-bold mb-1 text-white">{{ rec.menu.name }}</h3>
-                      <p class="text-white-50 mb-2 small">{{ rec.menu.category }}</p>
-                      <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center" :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
+                    <div class="col-7 col-md-8 ps-3 ps-md-4">
+                      <h2 class="fw-bold mb-2 text-white main-menu-name">{{ rec.menu.name }}</h2>
+                      <p class="text-white-50 mb-3">{{ rec.menu.category }}</p>
+                      <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center mb-3" :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); font-size: 0.9rem;`">
                         <i class="fas fa-palette me-1"></i> {{ rec.color }}
                       </span>
+                      <div class="info-box">
+                        <p class="mb-0 text-white" style="font-size: 0.95rem;">{{ rec.menu.desc }}</p>
+                      </div>
                     </div>
-                  </div>
-
-                  <div class="info-box position-relative mt-3">
-                    <p class="small mb-0 text-white">{{ rec.menu.desc }}</p>
                   </div>
             </div>
 
@@ -360,27 +357,46 @@ onMounted(() => {
     transform: translateY(-10px);
   }
 }
-/* 메인 추천 메뉴 이미지 */
+/* 메인 추천 메뉴 이미지 - 크게 */
 .main-menu-img {
-  width: 120px;
-  height: 120px;
+  width: 180px;
+  height: 180px;
+}
+
+.main-menu-name {
+  font-size: 2rem;
+}
+
+.rank-badge-top {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(5px);
+  padding: 0.4rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #fff;
+  white-space: nowrap;
+  z-index: 5;
 }
 
 /* 그 외 추천 메뉴 카드 스타일 */
 .other-menu-card {
-  min-height: 70px;
+  min-height: 80px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 0.75rem;
+  padding: 1rem;
 }
 
 .other-menu-img {
-  width: 50px;
-  height: 50px;
+  width: 60px;
+  height: 60px;
   object-fit: cover;
 }
 
 .menu-name-lg {
-  font-size: 0.95rem;
+  font-size: 1rem;
   font-weight: 500;
   line-height: 1.3;
   word-break: keep-all;
@@ -392,8 +408,17 @@ onMounted(() => {
   }
 
   .main-menu-img {
-    width: 90px;
-    height: 90px;
+    width: 120px;
+    height: 120px;
+  }
+
+  .main-menu-name {
+    font-size: 1.4rem;
+  }
+
+  .rank-badge-top {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.7rem;
   }
 
   .other-menu-card {
@@ -402,12 +427,12 @@ onMounted(() => {
   }
 
   .other-menu-img {
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
   }
 
   .menu-name-lg {
-    font-size: 0.8rem !important;
+    font-size: 0.85rem !important;
   }
 }
 </style>
