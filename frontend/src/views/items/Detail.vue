@@ -122,67 +122,27 @@
                 </div>
                 <p v-else class="text-muted mb-4">분석된 색상 정보가 없습니다.</p>
 
-                <!-- AI 분석 결과 상세 -->
-                <div v-if="item.ai_analysis_result || item.ai_analysis" class="mb-4">
+                <!-- AI 분석 결과 - 해시태그만 표시 -->
+                <div v-if="aiAnalysis.tags && aiAnalysis.tags.length > 0" class="mb-4">
                   <h5 class="fw-bold mb-3"><i class="fas fa-robot text-success"></i> AI 분석 결과</h5>
-
-                  <!-- 아이템 설명 -->
-                  <div v-if="aiAnalysis.description" class="mb-3">
-                    <p class="text-muted mb-0">{{ aiAnalysis.description }}</p>
-                  </div>
-
-                  <!-- 태그 -->
-                  <div v-if="aiAnalysis.tags && aiAnalysis.tags.length > 0" class="mb-3">
-                    <small class="text-muted d-block mb-2">분석 태그</small>
-                    <div>
-                      <span
-                        v-for="(tag, index) in aiAnalysis.tags"
-                        :key="index"
-                        class="badge bg-light text-dark border me-1 mb-1"
-                      >
-                        #{{ tag }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- 스타일 추천 -->
-                  <div v-if="aiAnalysis.style_recommendations && aiAnalysis.style_recommendations.length > 0" class="mb-3">
-                    <small class="text-muted d-block mb-2">스타일 추천</small>
-                    <ul class="list-unstyled mb-0">
-                      <li v-for="(rec, index) in aiAnalysis.style_recommendations" :key="index" class="mb-1">
-                        <i class="fas fa-check-circle text-success me-2"></i>{{ rec }}
-                      </li>
-                    </ul>
-                  </div>
-
-                  <!-- 어울리는 색상 -->
-                  <div v-if="aiAnalysis.matching_colors && aiAnalysis.matching_colors.length > 0" class="mb-3">
-                    <small class="text-muted d-block mb-2">어울리는 색상</small>
-                    <div class="d-flex flex-wrap gap-1">
-                      <span
-                        v-for="(color, index) in aiAnalysis.matching_colors"
-                        :key="index"
-                        class="badge rounded-pill"
-                        :style="{ backgroundColor: getColorHex(color), color: getTextColorForBg(color) }"
-                      >
-                        {{ color }}
-                      </span>
-                    </div>
-                  </div>
-
-                  <!-- 계절 -->
-                  <div v-if="aiAnalysis.season" class="mb-3">
-                    <small class="text-muted d-block mb-2">추천 계절</small>
-                    <span class="badge bg-info">{{ aiAnalysis.season }}</span>
+                  <div class="d-flex flex-wrap gap-2">
+                    <span
+                      v-for="(tag, index) in aiAnalysis.tags.slice(0, 4)"
+                      :key="index"
+                      class="badge rounded-pill"
+                      style="background: rgba(124, 58, 237, 0.3); color: #c4b5fd; font-size: 0.9rem; padding: 10px 16px;"
+                    >
+                      #{{ tag }}
+                    </span>
                   </div>
                 </div>
 
-                <div class="d-grid gap-2 mt-4">
-                  <router-link to="/items" class="btn btn-outline-primary">
-                    <i class="fas fa-list"></i> 목록으로 돌아가기
+                <div class="d-grid gap-3 mt-4">
+                  <router-link to="/items" class="btn btn-outline-light rounded-pill py-2">
+                    <i class="fas fa-list me-2"></i> 목록으로 돌아가기
                   </router-link>
-                  <button class="btn btn-outline-danger" @click="handleDelete">
-                    <i class="fas fa-trash"></i> 삭제하기
+                  <button class="btn btn-outline-danger rounded-pill py-2" @click="handleDelete">
+                    <i class="fas fa-trash me-2"></i> 삭제하기
                   </button>
                 </div>
               </div>
