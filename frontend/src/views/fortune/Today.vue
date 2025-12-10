@@ -88,7 +88,7 @@
                     <span class="score-text">{{ fortune.fortune_score || 0 }}%</span>
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_score || 0}%; background: linear-gradient(90deg, #7c3aed, #a78bfa);`" :data-target="fortune.fortune_score || 0"></div>
                   </div>
-                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.total || '오늘의 운세 내용')"></p>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.total || '오늘의 운세 내용', 'color-purple')"></p>
                 </div>
 
                 <!-- 재물운 -->
@@ -101,7 +101,7 @@
                     <span class="score-text">{{ fortune.fortune_scores?.money || 70 }}%</span>
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.money || 70}%; background: linear-gradient(90deg, #f59e0b, #fbbf24);`" :data-target="fortune.fortune_scores?.money || 70"></div>
                   </div>
-                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.money || '재물운 내용')"></p>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.money || '재물운 내용', 'color-yellow')"></p>
                 </div>
 
                 <!-- 연애운 -->
@@ -114,7 +114,7 @@
                     <span class="score-text">{{ fortune.fortune_scores?.love || 65 }}%</span>
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.love || 65}%; background: linear-gradient(90deg, #ef4444, #f87171);`" :data-target="fortune.fortune_scores?.love || 65"></div>
                   </div>
-                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.love || '연애운 내용')"></p>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.love || '연애운 내용', 'color-red')"></p>
                 </div>
 
                 <!-- 학업운 -->
@@ -127,7 +127,7 @@
                     <span class="score-text">{{ fortune.fortune_scores?.study || 75 }}%</span>
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.study || 75}%; background: linear-gradient(90deg, #3b82f6, #60a5fa);`" :data-target="fortune.fortune_scores?.study || 75"></div>
                   </div>
-                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.study || '학업운 내용')"></p>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.study || '학업운 내용', 'color-blue')"></p>
                 </div>
 
                 <!-- 직장운 -->
@@ -140,7 +140,7 @@
                     <span class="score-text">{{ fortune.fortune_scores?.work || 80 }}%</span>
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.work || 80}%; background: linear-gradient(90deg, #10b981, #34d399);`" :data-target="fortune.fortune_scores?.work || 80"></div>
                   </div>
-                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.work || '직장운 내용')"></p>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.work || '직장운 내용', 'color-green')"></p>
                 </div>
 
                 <!-- 건강운 -->
@@ -153,7 +153,7 @@
                     <span class="score-text">{{ fortune.fortune_scores?.health || 70 }}%</span>
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.health || 70}%; background: linear-gradient(90deg, #2dd4bf, #99f6e4);`" :data-target="fortune.fortune_scores?.health || 70"></div>
                   </div>
-                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.health || '건강운 내용')"></p>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.health || '건강운 내용', 'color-teal')"></p>
                 </div>
               </div>
             </div>
@@ -337,6 +337,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import apiClient from '@/config/api'
+import { getColorHex } from '@/utils/colors'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -361,42 +362,17 @@ const formatDescription = (text, itemName) => {
   return result.replace(/([.!?])(\s+)/g, '$1<br>')
 }
 
-// 운세 텍스트 문장 단위로 리스트 형태로 변환
-const formatFortuneText = (text) => {
+// 운세 텍스트 문장 단위로 리스트 형태로 변환 (색상 클래스 지원)
+const formatFortuneText = (text, colorClass = '') => {
   if (!text) return ''
   // 문장 단위로 분리 (마침표, 느낌표, 물음표 기준)
   const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim())
   if (sentences.length <= 1) return text
   // ul 리스트로 변환
   const listItems = sentences.map(s => `<li>${s.trim()}</li>`).join('')
-  return `<ul class="fortune-list">${listItems}</ul>`
+  return `<ul class="fortune-list ${colorClass}">${listItems}</ul>`
 }
 
-// Django today.html의 색상 매핑과 동일
-const getColorHex = (colorName) => {
-  const colorMap = {
-    '빨간색': '#FF0000',
-    '진한 빨간색': '#8B0000',
-    '주황색': '#FFA500',
-    '노란색': '#FFFF00',
-    '초록색': '#00FF00',
-    '연두색': '#90EE90',
-    '하늘색': '#87CEEB',
-    '파란색': '#0000FF',
-    '남색': '#000080',
-    '보라색': '#800080',
-    '연보라색': '#DA70D6',
-    '분홍색': '#FFC0CB',
-    '갈색': '#8B4513',
-    '베이지색': '#F5DEB3',
-    '검은색': '#000000',
-    '흰색': '#FFFFFF',
-    '회색': '#808080',
-    '은색': '#C0C0C0',
-    '금색': '#FFD700'
-  }
-  return colorMap[colorName] || '#7c3aed'
-}
 
 // Django today.html의 로또볼 스타일과 동일
 const getLottoBallStyle = (number) => {
@@ -677,6 +653,26 @@ onMounted(async () => {
   color: #a78bfa;
   font-size: 1.2rem;
   line-height: 1.6;
+}
+
+/* 운세별 점 색상 */
+.fortune-text :deep(.fortune-list.color-purple li)::before {
+  color: #a78bfa;
+}
+.fortune-text :deep(.fortune-list.color-yellow li)::before {
+  color: #fbbf24;
+}
+.fortune-text :deep(.fortune-list.color-red li)::before {
+  color: #f87171;
+}
+.fortune-text :deep(.fortune-list.color-blue li)::before {
+  color: #60a5fa;
+}
+.fortune-text :deep(.fortune-list.color-green li)::before {
+  color: #34d399;
+}
+.fortune-text :deep(.fortune-list.color-teal li)::before {
+  color: #2dd4bf;
 }
 
 .lotto-numbers {

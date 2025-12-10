@@ -193,6 +193,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
+import { colorMap } from '@/utils/colors'
 import { Chart, registerables } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import { 
@@ -418,34 +419,6 @@ const getAccessoryImage = (name) => {
   return accImageMap[name] || accScarf
 }
 
-const colorMap = {
-  '블랙': '#000000', '검은색': '#000000', '검정': '#000000', '검정색': '#000000',
-  '화이트': '#FFFFFF', '흰색': '#FFFFFF', '하양': '#FFFFFF', '하얀색': '#FFFFFF',
-  '그레이': '#808080', '회색': '#808080', '그래이': '#808080',
-  '차콜': '#36454F',
-  '네이비': '#000080', '남색': '#000080',
-  '블루': '#0000FF', '파란색': '#0000FF', '파랑': '#0000FF',
-  '스카이블루': '#87CEEB', '하늘색': '#87CEEB',
-  '레드': '#FF0000', '빨간색': '#FF0000', '빨강': '#FF0000',
-  '진한 빨간색': '#8B0000', '다크레드': '#8B0000',
-  '핑크': '#FFC0CB', '분홍색': '#FFC0CB', '분홍': '#FFC0CB',
-  '오렌지': '#FFA500', '주황색': '#FFA500', '주황': '#FFA500',
-  '옐로우': '#FFD700', '노란색': '#FFD700', '노랑': '#FFD700',
-  '골드': '#FFD700', '금색': '#FFD700', '금': '#FFD700', '황금색': '#FFD700',
-  '실버': '#C0C0C0', '은색': '#C0C0C0', '은': '#C0C0C0',
-  '그린': '#008000', '초록색': '#008000', '초록': '#008000', '녹색': '#008000',
-  '연두색': '#9ACD32', '연두': '#9ACD32',
-  '베이지': '#F5F5DC',
-  '브라운': '#8B4513', '갈색': '#8B4513',
-  '퍼플': '#800080', '보라색': '#800080', '보라': '#800080',
-  '라벤더': '#E6E6FA', '연보라': '#E6E6FA',
-  '와인': '#722F37', '버건디': '#800020', '마룬': '#800000',
-  '카키': '#8B8B00', '올리브': '#808000',
-  '민트': '#98FF98', '민트색': '#98FF98',
-  '아이보리': '#FFFFF0', '크림': '#FFFDD0',
-  '코랄': '#FF7F50', '살몬': '#FA8072',
-  '터콰이즈': '#40E0D0', '청록': '#008B8B', '청록색': '#008B8B'
-}
 
 const applyDynamicColors = () => {
   nextTick(() => {

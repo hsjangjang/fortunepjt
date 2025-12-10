@@ -89,14 +89,14 @@
               <h5 class="mb-0 text-white">그 외 추천 메뉴</h5>
             </div>
 
-            <div class="row text-center g-4">
+            <div class="row text-center g-3">
               <div v-for="item in otherRecommendations" :key="item.menu.name" class="col-4 col-md-2">
-                <div class="p-3 rounded-3 hover-lift transition" style="background: rgba(255,255,255,0.02);">
-                  <div class="mb-2">
-                    <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" width="50" class="img-fluid rounded-circle" />
+                <div class="other-menu-card p-3 rounded-3 hover-lift transition h-100 d-flex flex-column align-items-center" style="background: rgba(255,255,255,0.02);">
+                  <div class="mb-2 flex-shrink-0">
+                    <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" class="other-menu-img rounded-circle" />
                   </div>
-                  <h6 class="small mb-1 text-white">{{ item.menu.name }}</h6>
-                  <span class="badge bg-secondary bg-opacity-50 text-white" style="font-size: 0.7rem;">{{ item.color }}</span>
+                  <h6 class="small mb-2 text-white menu-name">{{ item.menu.name }}</h6>
+                  <span class="badge rounded-pill mt-auto" :style="`background-color: ${colorMap[item.color] || '#6B7280'}; color: ${getTextColor(colorMap[item.color])}; font-size: 0.7rem;`">{{ item.color }}</span>
                 </div>
               </div>
 
@@ -116,6 +116,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
+import { colorMap, getTextColor } from '@/utils/colors'
 
 // 75개 음식 개별 이미지 imports
 import kimchiJjigae from '@/assets/images/food/kimchi_jjigae.png'
@@ -319,13 +320,6 @@ onMounted(() => {
   }
 })
 
-const colorMap = {
-  '빨간색': '#EF4444', '진한 빨간색': '#B91C1C', '주황색': '#F59E0B', '노란색': '#FCD34D',
-  '초록색': '#10B981', '연두색': '#84CC16', '하늘색': '#38BDF8',
-  '파란색': '#3B82F6', '남색': '#1E3A8A', '보라색': '#8B5CF6',
-  '분홍색': '#F472B6', '갈색': '#92400E', '베이지': '#E7E5E4',
-  '검은색': '#000000', '흰색': '#FFFFFF', '회색': '#6B7280', '금색': '#FBBF24'
-}
 </script>
 
 <style scoped>
@@ -349,9 +343,43 @@ const colorMap = {
     transform: translateY(-10px);
   }
 }
+/* 그 외 추천 메뉴 카드 스타일 */
+.other-menu-card {
+  min-height: 140px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.other-menu-img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+}
+
+.menu-name {
+  line-height: 1.3;
+  word-break: keep-all;
+  min-height: 2.6em;
+  display: flex;
+  align-items: center;
+}
+
 @media (max-width: 768px) {
   .responsive-padding {
     padding: 3% !important;
+  }
+
+  .other-menu-card {
+    min-height: 120px;
+    padding: 0.75rem !important;
+  }
+
+  .other-menu-img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .menu-name {
+    font-size: 0.75rem !important;
   }
 }
 </style>

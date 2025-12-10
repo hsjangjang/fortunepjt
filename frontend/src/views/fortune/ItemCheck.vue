@@ -202,6 +202,7 @@ import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
+import { colorMap, getTextColor } from '@/utils/colors'
 
 const authStore = useAuthStore()
 
@@ -238,21 +239,6 @@ const luckProgressOffset = computed(() => {
   return circumference - (displayLuckScore.value / 100 * circumference)
 })
 
-const colorMap = {
-  '빨간색': '#FF0000', '진한 빨간색': '#8B0000', '주황색': '#FFA500', '노란색': '#FFFF00',
-  '초록색': '#00FF00', '연두색': '#90EE90', '하늘색': '#87CEEB',
-  '파란색': '#0000FF', '남색': '#000080', '보라색': '#800080',
-  '분홍색': '#FFC0CB', '갈색': '#8B4513', '베이지색': '#F5DEB3',
-  '검은색': '#000000', '흰색': '#FFFFFF', '회색': '#808080', '금색': '#FFD700'
-}
-
-const getTextColor = (hex) => {
-  const r = parseInt(hex.substr(1, 2), 16)
-  const g = parseInt(hex.substr(3, 2), 16)
-  const b = parseInt(hex.substr(5, 2), 16)
-  const yiq = ((r * 299) + (g * 587) + (b * 114)) / 1000
-  return (yiq >= 128) ? '#000' : '#fff'
-}
 
 const formatDate = (dateString) => {
   const date = new Date(dateString)
