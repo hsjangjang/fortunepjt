@@ -2,13 +2,14 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
-from datetime import date
+from datetime import date, datetime, timedelta
 from django.conf import settings
 import requests
 import random
 import json
 import os
 from .utils import get_korean_address
+from config.weather_config import latlon_to_grid, get_weather_description, SKY_CODE, PTY_CODE
 
 
 def load_ootd_data():
@@ -144,108 +145,197 @@ class OOTDRecommendationAPIView(APIView):
         })
 
     def _get_weather_info(self, request):
-        """날씨 정보 조회 (시간별 예보 포함)"""
-        from datetime import datetime
-        lat = request.query_params.get('lat', 36.3621)
-        lon = request.query_params.get('lon', 127.3565)
-        api_key = settings.WEATHER_API_KEY
+        """날씨 정보 조회 - 기상청 API 사용"""
+        lat = float(request.query_params.get('lat', 36.3621))
+        lon = float(request.query_params.get('lon', 127.3565))
+        api_key = settings.KMA_API_KEY
+
+        # 위경도 -> 격자 좌표 변환
+        nx, ny = latlon_to_grid(lat, lon)
+
+        # 기상청 API용 시간 계산 (base_time: 0200, 0500, 0800, 1100, 1400, 1700, 2000, 2300)
+        now = datetime.now()
+        base_times = ['0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300']
+        current_hour = now.hour * 100 + now.minute
+
+        # 현재 시간보다 이전의 가장 가까운 base_time 찾기
+        base_time = '2300'
+        base_date = now - timedelta(days=1)
+        for bt in base_times:
+            if int(bt) <= current_hour - 10:  # 10분 여유
+                base_time = bt
+                base_date = now
+
+        base_date_str = base_date.strftime('%Y%m%d')
 
         try:
-            # 현재 날씨
-            url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
-            response = requests.get(url, timeout=5)
-            data = response.json()
-            korean_address = get_korean_address(lat, lon)
-            city_name = korean_address if korean_address else data.get('name', '대전 유성구')
+            # 단기예보 API 호출
+            url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
+            params = {
+                'serviceKey': api_key,
+                'numOfRows': 300,
+                'pageNo': 1,
+                'dataType': 'JSON',
+                'base_date': base_date_str,
+                'base_time': base_time,
+                'nx': nx,
+                'ny': ny
+            }
 
-            # 강수량: rain 또는 snow (눈)
-            rain_1h = data.get('rain', {}).get('1h', 0)
-            snow_1h = data.get('snow', {}).get('1h', 0)
-            precipitation = rain_1h + snow_1h
+            response = requests.get(url, params=params, timeout=10)
+            data = response.json()
+
+            # 주소 가져오기
+            korean_address = get_korean_address(lat, lon)
+            city_name = korean_address if korean_address else '대전 유성구'
+
+            # 응답 파싱
+            items = data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
+
+            if not items:
+                raise Exception("No weather data")
+
+            # 데이터 정리 (시간별로 그룹화)
+            weather_by_time = {}
+            for item in items:
+                fcst_date = item['fcstDate']
+                fcst_time = item['fcstTime']
+                category = item['category']
+                value = item['fcstValue']
+                key = f"{fcst_date}_{fcst_time}"
+
+                if key not in weather_by_time:
+                    weather_by_time[key] = {}
+                weather_by_time[key][category] = value
+
+            # 현재 시간에 가장 가까운 데이터 찾기
+            current_key = None
+            current_time_str = now.strftime('%Y%m%d_%H00')
+            for key in sorted(weather_by_time.keys()):
+                if key >= current_time_str:
+                    current_key = key
+                    break
+            if not current_key and weather_by_time:
+                current_key = sorted(weather_by_time.keys())[0]
+
+            current_data = weather_by_time.get(current_key, {})
+
+            # 오늘 최고/최저 기온 계산
+            today_str = now.strftime('%Y%m%d')
+            today_temps = []
+            for key, values in weather_by_time.items():
+                if key.startswith(today_str) and 'TMP' in values:
+                    try:
+                        today_temps.append(float(values['TMP']))
+                    except:
+                        pass
+
+            temp = float(current_data.get('TMP', 15))
+            temp_max = max(today_temps) if today_temps else temp + 3
+            temp_min = min(today_temps) if today_temps else temp - 3
+
+            # 날씨 설명 생성
+            sky = current_data.get('SKY', '1')
+            pty = current_data.get('PTY', '0')
+            description = get_weather_description(sky, pty)
+
+            # 습도
+            humidity = int(current_data.get('REH', 50))
+
+            # 강수확률과 강수량
+            rain_probability = int(current_data.get('POP', 0))
+            rain_amount_str = current_data.get('PCP', '강수없음')
+            if rain_amount_str == '강수없음':
+                rain_amount = 0
+            elif rain_amount_str == '1mm 미만':
+                rain_amount = 0.5
+            else:
+                try:
+                    rain_amount = float(rain_amount_str.replace('mm', ''))
+                except:
+                    rain_amount = 0
+
+            # 풍속
+            wind_speed = float(current_data.get('WSD', 0))
 
             weather_data = {
-                'temp': round(data['main']['temp'], 1),
-                'temp_max': round(data['main']['temp_max']),
-                'temp_min': round(data['main']['temp_min']),
-                'description': data['weather'][0]['description'],
-                'humidity': data['main']['humidity'],
+                'temp': round(temp, 1),
+                'temp_max': round(temp_max),
+                'temp_min': round(temp_min),
+                'description': description,
+                'humidity': humidity,
                 'city': city_name,
                 'current': {
-                    'rain_probability': 0,
-                    'wind_speed': data.get('wind', {}).get('speed', 0),
-                    'rain_amount': precipitation
+                    'rain_probability': rain_probability,
+                    'wind_speed': wind_speed,
+                    'rain_amount': rain_amount
                 }
             }
 
-            # 시간별 예보 (12시간, 1시간 간격으로 보간)
-            forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
-            forecast_response = requests.get(forecast_url, timeout=5)
+            # 시간별 예보 (12시간)
             hourly_forecast = []
+            sorted_keys = sorted(weather_by_time.keys())
+            start_idx = 0
+            for i, key in enumerate(sorted_keys):
+                if key >= current_time_str:
+                    start_idx = i
+                    break
 
-            if forecast_response.status_code == 200:
-                forecast_data = forecast_response.json()
-                # 오늘 날짜의 데이터만 필터링해서 최고/최저 계산
-                from datetime import timedelta
-                today = datetime.now().date()
-                today_temps = []
+            for key in sorted_keys[start_idx:start_idx + 12]:
+                data = weather_by_time[key]
+                fcst_time = key.split('_')[1]
+                hour_str = f"{fcst_time[:2]}시"
 
-                for item in forecast_data['list']:
-                    item_date = datetime.fromtimestamp(item['dt']).date()
-                    if item_date == today:
-                        today_temps.append(item['main']['temp'])
+                sky_val = data.get('SKY', '1')
+                pty_val = data.get('PTY', '0')
+                weather_desc = get_weather_description(sky_val, pty_val)
 
-                # 오늘 예보 데이터가 있으면 최고/최저 업데이트
-                if today_temps:
-                    weather_data['temp_max'] = round(max(today_temps))
-                    weather_data['temp_min'] = round(min(today_temps))
+                # 아이콘 매핑 (기상청 코드 -> 간단한 아이콘)
+                if pty_val in ['1', '2', '4', '5', '6']:
+                    icon = '🌧️'
+                elif pty_val in ['3', '7']:
+                    icon = '🌨️'
+                elif sky_val == '1':
+                    icon = '☀️'
+                elif sky_val == '3':
+                    icon = '⛅'
+                else:
+                    icon = '☁️'
 
-                # 3시간 간격 데이터 5개를 가져와서 1시간 간격으로 보간
-                raw_data = forecast_data['list'][:5]
+                pop = int(data.get('POP', 0))
+                pcp_str = data.get('PCP', '강수없음')
+                if pcp_str == '강수없음':
+                    pcp = 0
+                elif pcp_str == '1mm 미만':
+                    pcp = 0.5
+                else:
+                    try:
+                        pcp = float(pcp_str.replace('mm', ''))
+                    except:
+                        pcp = 0
 
-                for i in range(len(raw_data) - 1):
-                    current = raw_data[i]
-                    next_item = raw_data[i + 1]
-
-                    current_dt = datetime.fromtimestamp(current['dt'])
-                    current_temp = current['main']['temp']
-                    next_temp = next_item['main']['temp']
-                    current_pop = current.get('pop', 0)
-                    next_pop = next_item.get('pop', 0)
-                    # rain + snow (눈) 합산
-                    current_rain = current.get('rain', {}).get('3h', 0) + current.get('snow', {}).get('3h', 0)
-                    next_rain = next_item.get('rain', {}).get('3h', 0) + next_item.get('snow', {}).get('3h', 0)
-
-                    # 3시간을 1시간 간격으로 보간 (0, 1, 2시간)
-                    for h in range(3):
-                        if len(hourly_forecast) >= 12:
-                            break
-                        ratio = h / 3.0
-                        interp_temp = current_temp + (next_temp - current_temp) * ratio
-                        interp_pop = current_pop + (next_pop - current_pop) * ratio
-                        interp_rain = (current_rain + (next_rain - current_rain) * ratio) / 3  # 3시간 강수량을 1시간으로
-
-                        interp_dt = current_dt + timedelta(hours=h)
-
-                        hourly_forecast.append({
-                            'time': interp_dt.strftime('%H시'),
-                            'temp': round(interp_temp, 1),
-                            'weather': current['weather'][0]['description'],
-                            'icon': current['weather'][0]['icon'],
-                            'rain_probability': int(interp_pop * 100),
-                            'rain_amount': round(interp_rain, 1)
-                        })
+                hourly_forecast.append({
+                    'time': hour_str,
+                    'temp': round(float(data.get('TMP', temp)), 1),
+                    'weather': weather_desc,
+                    'icon': icon,
+                    'rain_probability': pop,
+                    'rain_amount': round(pcp, 1),
+                    'humidity': int(data.get('REH', humidity))
+                })
 
             weather_data['hourly'] = hourly_forecast
             return weather_data
 
-        except Exception:
+        except Exception as e:
+            print(f"[KMA API Error] {e}")
             return {
                 'temp': 15,
                 'temp_max': 18,
                 'temp_min': 10,
                 'description': '날씨 정보 없음',
                 'humidity': 50,
-                'city': '대전 유성구',
+                'city': city_name if 'city_name' in locals() else '대전 유성구',
                 'current': {
                     'rain_probability': 0,
                     'wind_speed': 0,
@@ -500,50 +590,163 @@ class MenuRecommendationAPIView(APIView):
 
 
 class WeatherAPIView(APIView):
-    """날씨 정보 API"""
+    """날씨 정보 API - 기상청 API 사용"""
     permission_classes = [AllowAny]
 
     def get(self, request):
-        lat = request.query_params.get('lat', 36.3621)
-        lon = request.query_params.get('lon', 127.3565)
-        api_key = settings.WEATHER_API_KEY
+        lat = float(request.query_params.get('lat', 36.3621))
+        lon = float(request.query_params.get('lon', 127.3565))
+        api_key = settings.KMA_API_KEY
+
+        # 위경도 -> 격자 좌표 변환
+        nx, ny = latlon_to_grid(lat, lon)
+
+        # 기상청 API용 시간 계산
+        now = datetime.now()
+        base_times = ['0200', '0500', '0800', '1100', '1400', '1700', '2000', '2300']
+        current_hour = now.hour * 100 + now.minute
+
+        base_time = '2300'
+        base_date = now - timedelta(days=1)
+        for bt in base_times:
+            if int(bt) <= current_hour - 10:
+                base_time = bt
+                base_date = now
+
+        base_date_str = base_date.strftime('%Y%m%d')
 
         try:
-            # 현재 날씨
-            url = f"http://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
-            response = requests.get(url, timeout=5)
+            # 단기예보 API 호출
+            url = "http://apis.data.go.kr/1360000/VilageFcstInfoService_2.0/getVilageFcst"
+            params = {
+                'serviceKey': api_key,
+                'numOfRows': 300,
+                'pageNo': 1,
+                'dataType': 'JSON',
+                'base_date': base_date_str,
+                'base_time': base_time,
+                'nx': nx,
+                'ny': ny
+            }
+
+            response = requests.get(url, params=params, timeout=10)
             data = response.json()
 
+            # 주소 가져오기
+            korean_address = get_korean_address(lat, lon)
+            city_name = korean_address if korean_address else '대전 유성구'
+
+            # 응답 파싱
+            items = data.get('response', {}).get('body', {}).get('items', {}).get('item', [])
+
+            if not items:
+                raise Exception("No weather data")
+
+            # 데이터 정리
+            weather_by_time = {}
+            for item in items:
+                fcst_date = item['fcstDate']
+                fcst_time = item['fcstTime']
+                category = item['category']
+                value = item['fcstValue']
+                key = f"{fcst_date}_{fcst_time}"
+
+                if key not in weather_by_time:
+                    weather_by_time[key] = {}
+                weather_by_time[key][category] = value
+
+            # 현재 시간에 가장 가까운 데이터
+            current_key = None
+            current_time_str = now.strftime('%Y%m%d_%H00')
+            for key in sorted(weather_by_time.keys()):
+                if key >= current_time_str:
+                    current_key = key
+                    break
+            if not current_key and weather_by_time:
+                current_key = sorted(weather_by_time.keys())[0]
+
+            current_data = weather_by_time.get(current_key, {})
+
+            # 오늘 최고/최저 기온
+            today_str = now.strftime('%Y%m%d')
+            today_temps = []
+            for key, values in weather_by_time.items():
+                if key.startswith(today_str) and 'TMP' in values:
+                    try:
+                        today_temps.append(float(values['TMP']))
+                    except:
+                        pass
+
+            temp = float(current_data.get('TMP', 15))
+            temp_max = max(today_temps) if today_temps else temp + 3
+            temp_min = min(today_temps) if today_temps else temp - 3
+
+            sky = current_data.get('SKY', '1')
+            pty = current_data.get('PTY', '0')
+            description = get_weather_description(sky, pty)
+
+            # 아이콘 매핑
+            if pty in ['1', '2', '4', '5', '6']:
+                icon = '🌧️'
+            elif pty in ['3', '7']:
+                icon = '🌨️'
+            elif sky == '1':
+                icon = '☀️'
+            elif sky == '3':
+                icon = '⛅'
+            else:
+                icon = '☁️'
+
             current_weather = {
-                'temp': round(data['main']['temp'], 1),
-                'temp_max': round(data['main']['temp_max']),
-                'temp_min': round(data['main']['temp_min']),
-                'description': data['weather'][0]['description'],
-                'humidity': data['main']['humidity'],
-                'wind_speed': data['wind']['speed'],
-                'icon': data['weather'][0]['icon'],
+                'temp': round(temp, 1),
+                'temp_max': round(temp_max),
+                'temp_min': round(temp_min),
+                'description': description,
+                'humidity': int(current_data.get('REH', 50)),
+                'wind_speed': float(current_data.get('WSD', 0)),
+                'icon': icon,
+                'rain_probability': int(current_data.get('POP', 0)),
+                'rain_amount': self._parse_rain_amount(current_data.get('PCP', '강수없음'))
             }
 
             # 시간별 예보
-            forecast_url = f"http://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={api_key}&units=metric&lang=kr"
-            forecast_response = requests.get(forecast_url, timeout=5)
             hourly_forecast = []
+            sorted_keys = sorted(weather_by_time.keys())
+            start_idx = 0
+            for i, key in enumerate(sorted_keys):
+                if key >= current_time_str:
+                    start_idx = i
+                    break
 
-            if forecast_response.status_code == 200:
-                forecast_data = forecast_response.json()
-                for item in forecast_data['list'][:8]:  # 24시간 (3시간 간격)
-                    from datetime import datetime
-                    dt = datetime.fromtimestamp(item['dt'])
-                    hourly_forecast.append({
-                        'time': dt.strftime('%H:%M'),
-                        'temp': round(item['main']['temp'], 1),
-                        'weather': item['weather'][0]['description'],
-                        'icon': item['weather'][0]['icon'],
-                        'rain_probability': int(item.get('pop', 0) * 100),
-                    })
+            for key in sorted_keys[start_idx:start_idx + 12]:
+                wdata = weather_by_time[key]
+                fcst_time = key.split('_')[1]
+                hour_str = f"{fcst_time[:2]}시"
 
-            korean_address = get_korean_address(lat, lon)
-            city_name = korean_address if korean_address else data.get('name', 'Unknown')
+                sky_val = wdata.get('SKY', '1')
+                pty_val = wdata.get('PTY', '0')
+                weather_desc = get_weather_description(sky_val, pty_val)
+
+                if pty_val in ['1', '2', '4', '5', '6']:
+                    h_icon = '🌧️'
+                elif pty_val in ['3', '7']:
+                    h_icon = '🌨️'
+                elif sky_val == '1':
+                    h_icon = '☀️'
+                elif sky_val == '3':
+                    h_icon = '⛅'
+                else:
+                    h_icon = '☁️'
+
+                hourly_forecast.append({
+                    'time': hour_str,
+                    'temp': round(float(wdata.get('TMP', temp)), 1),
+                    'weather': weather_desc,
+                    'icon': h_icon,
+                    'rain_probability': int(wdata.get('POP', 0)),
+                    'rain_amount': self._parse_rain_amount(wdata.get('PCP', '강수없음')),
+                    'humidity': int(wdata.get('REH', 50))
+                })
 
             return Response({
                 'success': True,
@@ -553,10 +756,23 @@ class WeatherAPIView(APIView):
             })
 
         except Exception as e:
+            print(f"[KMA Weather API Error] {e}")
             return Response({
                 'success': False,
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def _parse_rain_amount(self, pcp_str):
+        """강수량 문자열 파싱"""
+        if pcp_str == '강수없음':
+            return 0
+        elif pcp_str == '1mm 미만':
+            return 0.5
+        else:
+            try:
+                return float(pcp_str.replace('mm', ''))
+            except:
+                return 0
 
     def post(self, request):
         """위치 기반 날씨 (POST로 좌표 전송)"""

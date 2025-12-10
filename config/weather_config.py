@@ -1,7 +1,5 @@
 # 날씨 API 설정 파일
-
-# OpenWeatherMap API 키
-WEATHER_API_KEY = "your-api-key-here"
+import math
 
 # 기본 위치 설정 (대전광역시 유성구)
 DEFAULT_LOCATION = {
@@ -9,39 +7,85 @@ DEFAULT_LOCATION = {
     'city_en': 'Daejeon, Yuseong-gu',
     'lat': 36.3621,  # 위도
     'lon': 127.3565,  # 경도
+    'nx': 67,  # 기상청 격자 X
+    'ny': 100,  # 기상청 격자 Y
     'country': 'KR'
-}
-
-# 대전 유성구 주요 지점 좌표
-YUSEONG_LOCATIONS = {
-    'kaist': {
-        'name': 'KAIST',
-        'lat': 36.3721,
-        'lon': 127.3604
-    },
-    'chungnam_univ': {
-        'name': '충남대학교',
-        'lat': 36.3698,
-        'lon': 127.3466
-    },
-    'yuseong_hot_spring': {
-        'name': '유성온천',
-        'lat': 36.3553,
-        'lon': 127.3429
-    },
-    'daedeok_innopolis': {
-        'name': '대덕특구',
-        'lat': 36.3784,
-        'lon': 127.3877
-    }
 }
 
 # API 호출 설정
 API_CONFIG = {
-    'units': 'metric',  # 섭씨 온도 사용
-    'lang': 'kr',       # 한국어 응답
-    'timeout': 5        # 타임아웃 5초
+    'timeout': 5  # 타임아웃 5초
 }
+
+
+def latlon_to_grid(lat, lon):
+    """
+    위경도 -> 기상청 격자 좌표(nx, ny) 변환
+    기상청 격자 변환 공식 사용
+    """
+    RE = 6371.00877  # 지구 반경(km)
+    GRID = 5.0  # 격자 간격(km)
+    SLAT1 = 30.0  # 투영 위도1(degree)
+    SLAT2 = 60.0  # 투영 위도2(degree)
+    OLON = 126.0  # 기준점 경도(degree)
+    OLAT = 38.0  # 기준점 위도(degree)
+    XO = 43  # 기준점 X좌표(GRID)
+    YO = 136  # 기준점 Y좌표(GRID)
+
+    DEGRAD = math.pi / 180.0
+
+    re = RE / GRID
+    slat1 = SLAT1 * DEGRAD
+    slat2 = SLAT2 * DEGRAD
+    olon = OLON * DEGRAD
+    olat = OLAT * DEGRAD
+
+    sn = math.tan(math.pi * 0.25 + slat2 * 0.5) / math.tan(math.pi * 0.25 + slat1 * 0.5)
+    sn = math.log(math.cos(slat1) / math.cos(slat2)) / math.log(sn)
+    sf = math.tan(math.pi * 0.25 + slat1 * 0.5)
+    sf = math.pow(sf, sn) * math.cos(slat1) / sn
+    ro = math.tan(math.pi * 0.25 + olat * 0.5)
+    ro = re * sf / math.pow(ro, sn)
+
+    ra = math.tan(math.pi * 0.25 + lat * DEGRAD * 0.5)
+    ra = re * sf / math.pow(ra, sn)
+    theta = lon * DEGRAD - olon
+    if theta > math.pi:
+        theta -= 2.0 * math.pi
+    if theta < -math.pi:
+        theta += 2.0 * math.pi
+    theta *= sn
+
+    nx = int(ra * math.sin(theta) + XO + 0.5)
+    ny = int(ro - ra * math.cos(theta) + YO + 0.5)
+
+    return nx, ny
+
+
+# 기상청 날씨 코드 매핑
+SKY_CODE = {
+    '1': '맑음',
+    '3': '구름많음',
+    '4': '흐림'
+}
+
+PTY_CODE = {
+    '0': '',  # 없음
+    '1': '비',
+    '2': '비/눈',
+    '3': '눈',
+    '4': '소나기',
+    '5': '빗방울',
+    '6': '빗방울눈날림',
+    '7': '눈날림'
+}
+
+
+def get_weather_description(sky, pty):
+    """SKY와 PTY 코드로 날씨 설명 생성"""
+    if pty and pty != '0':
+        return PTY_CODE.get(pty, '비')
+    return SKY_CODE.get(sky, '맑음')
 
 # 날씨 상태별 옷차림 추천
 WEATHER_OUTFIT = {

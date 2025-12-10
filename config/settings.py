@@ -154,11 +154,17 @@ USE_I18N = True
 USE_TZ = True
 
 # Weather API Configuration
+# 기상청 API (공공데이터포털)
+KMA_API_KEY = config('KMA_API_KEY', default='')
+# OpenWeatherMap API (백업용)
 WEATHER_API_KEY = config('WEATHER_API_KEY', default='')
 DEFAULT_LOCATION = {
     'latitude': 36.3621,
     'longitude': 127.3565,
-    'city': '대전 유성구'
+    'city': '대전 유성구',
+    # 기상청 격자 좌표 (대전 유성구)
+    'nx': 67,
+    'ny': 100
 }
 
 # Gemini AI Configuration
