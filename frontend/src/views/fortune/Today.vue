@@ -166,11 +166,11 @@
         <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="glass-card">
             <div class="card-body responsive-padding">
-              <h4 class="text-white text-center mb-4">
+              <h4 class="text-white text-center mb-2">
                 <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
               </h4>
-              <h5 class="text-center text-white opacity-90 mb-4">오늘 당신에게 행운을 가져다 줄 색상</h5>
+              <p class="text-center text-white opacity-75 mb-5">오늘 당신에게 행운을 가져다 줄 색상</p>
 
               <div v-if="fortune.lucky_colors && fortune.lucky_colors.length > 0" class="d-flex justify-content-center align-items-center gap-3 gap-md-5">
                 <div v-for="color in fortune.lucky_colors" :key="color" class="text-center">
@@ -206,11 +206,11 @@
         <div class="col-lg-8 col-12 px-1 px-md-3">
           <div class="glass-card">
             <div class="card-body responsive-padding">
-              <h4 class="text-white text-center mb-4">
+              <h4 class="text-white text-center mb-2">
                 <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
               </h4>
-              <p class="text-center text-white opacity-75 mb-4">오늘 당신에게 행운을 가져다 줄 아이템들</p>
+              <p class="text-center text-white opacity-75 mb-5">오늘 당신에게 행운을 가져다 줄 아이템들</p>
 
               <div v-if="fortune.lucky_item" class="d-flex flex-column gap-4">
                 <div class="lucky-item-card text-center p-4"
