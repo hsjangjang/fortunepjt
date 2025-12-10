@@ -40,7 +40,7 @@
             <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
               <span class="text-white-50 me-2 fortune-label"><i class="fas fa-palette text-primary me-1"></i>오늘의 행운색:</span>
               <span v-for="color in luckyColors" :key="color">
-                <span class="badge rounded-pill px-3 py-2" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: '#fff' }">{{ color }}</span>
+                <span class="btn btn-sm rounded-pill fortune-cat-btn" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: '#fff', border: 'none', cursor: 'default' }">{{ color }}</span>
               </span>
             </div>
           </div>
