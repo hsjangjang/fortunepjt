@@ -1,14 +1,14 @@
 <template>
   <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-12 col-12 mx-auto px-1 px-md-3">
-        <!-- Menu Header -->
-        <!-- Menu Header -->
-        <div class="glass-card mb-4 text-center py-4">
-            <h1 class="display-5 fw-bold text-white">
-              <i class="fas fa-utensils me-2" style="color: #a78bfa !important;"></i> 오늘의 메뉴 추천
-            </h1>
-            <p class="lead text-white-50">운세와 행운색을 기반으로 한 맞춤 메뉴</p>
+    <div class="page-container">
+      <div class="content-wrapper wide">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-utensils" style="color: #a78bfa !important;"></i>
+            오늘의 메뉴 추천
+          </h1>
+          <p class="page-subtitle">운세와 행운색을 기반으로 한 맞춤 메뉴</p>
         </div>
 
         <!-- 라우터 가드에서 인증/운세 체크 완료 후 진입 -->
@@ -22,27 +22,26 @@
           </div>
 
           <!-- Fortune Info -->
-          <div v-if="!isLoading && fortuneData" class="glass-card mb-4 responsive-padding">
-              <div class="row text-center">
-                <div class="col-md-4">
-                  <h6 class="text-white-50">오늘의 운세 점수</h6>
-                  <h3 class="text-primary-light">{{ fortuneData.fortune_score || 0 }}점</h3>
+          <div v-if="!isLoading && fortuneData" class="card-base card-md section-spacing">
+              <div class="badge-row">
+                <div class="text-center px-4">
+                  <h6 class="text-white opacity-75 mb-2">오늘의 운세 점수</h6>
+                  <h3 class="text-primary-light mb-0">{{ fortuneData.fortune_score || 0 }}점</h3>
                 </div>
-                <div class="col-md-4">
-                  <h6 class="text-white-50">별자리</h6>
-                  <h4 class="text-white">{{ fortuneData.zodiac_sign || '-' }}</h4>
+                <div class="text-center px-4">
+                  <h6 class="text-white opacity-75 mb-2">별자리</h6>
+                  <h4 class="text-white mb-0">{{ fortuneData.zodiac_sign || '-' }}</h4>
                 </div>
-                <div class="col-md-4">
-                  <h6 class="text-white-50">띠</h6>
-                  <h4 class="text-white">{{ fortuneData.chinese_zodiac || '-' }}</h4>
+                <div class="text-center px-4">
+                  <h6 class="text-white opacity-75 mb-2">띠</h6>
+                  <h4 class="text-white mb-0">{{ fortuneData.chinese_zodiac || '-' }}</h4>
                 </div>
               </div>
           </div>
 
           <!-- Main Menu Recommendations -->
-          <div v-if="!isLoading" class="row">
-            <div v-for="rec in recommendations" :key="rec.rank" class="col-md-6 mb-4">
-              <div class="glass-card h-100 position-relative overflow-hidden hover-lift text-center p-4 responsive-padding">
+          <div v-if="!isLoading" class="card-grid cols-2 section-spacing">
+            <div v-for="rec in recommendations" :key="rec.rank" class="card-base card-md card-interactive position-relative overflow-hidden text-center">
                 <!-- Subtle Gradient Background Glow -->
                 <div class="position-absolute top-0 start-50 translate-middle-x mt-n4"
                      :style="`width: 150px; height: 150px; background: ${rec.bg_gradient}; filter: blur(60px); opacity: 0.2;`"></div>
@@ -69,19 +68,18 @@
                     </span>
                   </div>
 
-                  <div class="p-3 rounded-3 position-relative" style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);">
+                  <div class="info-box position-relative">
                     <p class="small mb-0 text-white">{{ rec.menu.desc }}</p>
                   </div>
-              </div>
             </div>
 
-            <div v-if="!recommendations.length" class="col-12 text-center">
+            <div v-if="!recommendations.length" class="text-center">
               <p class="text-white">추천할 메뉴가 없습니다.</p>
             </div>
           </div>
 
           <!-- Additional Recommendations -->
-          <div v-if="!isLoading" class="glass-card p-4 responsive-padding">
+          <div v-if="!isLoading" class="card-base card-lg">
             <div class="d-flex justify-content-center align-items-center mb-4 border-bottom border-white border-opacity-10 pb-3">
               <div class="bg-primary bg-opacity-10 p-2 rounded-circle me-3">
                 <i class="fas fa-utensils text-primary"></i>
@@ -89,19 +87,17 @@
               <h5 class="mb-0 text-white">그 외 추천 메뉴</h5>
             </div>
 
-            <div class="row text-center g-3">
-              <div v-for="item in otherRecommendations" :key="item.menu.name" class="col-4 col-md-2">
-                <div class="other-menu-card p-3 rounded-3 hover-lift transition h-100 d-flex flex-column align-items-center" style="background: rgba(255,255,255,0.02);">
+            <div class="card-grid cols-3">
+              <div v-for="item in otherRecommendations" :key="item.menu.name" class="info-box text-center hover-lift">
                   <div class="mb-2 flex-shrink-0">
                     <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" class="other-menu-img rounded-circle" />
                   </div>
                   <h6 class="small mb-2 text-white menu-name">{{ item.menu.name }}</h6>
                   <span class="badge rounded-pill mt-auto" :style="`background-color: ${colorMap[item.color] || '#6B7280'}; color: ${getTextColor(colorMap[item.color])}; font-size: 0.7rem;`">{{ item.color }}</span>
-                </div>
               </div>
 
-              <div v-if="!otherRecommendations.length" class="col-12">
-                <p class="text-muted">추가 추천 메뉴가 없습니다.</p>
+              <div v-if="!otherRecommendations.length" class="text-center">
+                <p class="text-white opacity-50">추가 추천 메뉴가 없습니다.</p>
               </div>
             </div>
           </div>

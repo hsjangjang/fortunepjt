@@ -1,12 +1,16 @@
 <template>
   <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-6 col-12 mx-auto px-1 px-md-3">
-          <div class="glass-card responsive-padding">
-            <h2 class="text-center mb-4 text-white">
-              <i class="fas fa-calculator text-primary-light me-2"></i> 운세 계산
-            </h2>
+    <div class="page-container">
+      <div class="content-wrapper narrow">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-calculator text-primary-light"></i>
+            운세 계산
+          </h1>
+        </div>
 
+        <div class="card-base card-lg">
             <div v-if="!authStore.isAuthenticated" class="text-center mb-4">
               <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" @click="resetFortune">
                 <i class="fas fa-redo me-1"></i> 다시 계산하기
@@ -145,7 +149,7 @@
                 회원가입하기
               </router-link>
             </div>
-          </div>
+        </div>
       </div>
     </div>
   </DefaultLayout>
@@ -333,14 +337,5 @@ option {
   filter: invert(1);
   opacity: 0.8;
   cursor: pointer;
-}
-@media (max-width: 768px) {
-  .responsive-padding {
-    padding: 3% !important;
-  }
-  
-  .glass-card {
-    border-radius: 12px;
-  }
 }
 </style>

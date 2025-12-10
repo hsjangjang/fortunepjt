@@ -46,15 +46,12 @@
 {% endblock %}
 
 {% block content %}
+<div class="page-container">
+    <div class="content-wrapper narrow">
+        {# 페이지 헤더 #}
+        {% include 'includes/page_header.html' with title="운세 계산" icon="fas fa-calculator" %}
 
-<div class="row">
-    <div class="col-lg-6 mx-auto">
-        <div class="glass-card p-4 p-md-5">
-            <div class="card-body p-0">
-                <!-- 운세 계산 입력 폼 -->
-                <h2 class="text-center mb-4 text-white">
-                    <i class="fas fa-calculator text-primary-light me-2"></i> 운세 계산
-                </h2>
+        <div class="card-base card-lg">
                 {% if not user.is_authenticated %}
                 <div class="text-center mb-4">
                     <button type="button" class="btn btn-outline-light btn-sm rounded-pill px-3" id="resetFortuneBtn">
@@ -243,7 +240,6 @@
                     </a>
                 </div>
                 {% endif %}
-            </div>
         </div>
     </div>
 </div>

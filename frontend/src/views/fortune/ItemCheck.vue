@@ -1,15 +1,20 @@
 <template>
   <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-10 col-12 mx-auto px-1 px-md-3">
-        <div class="glass-card responsive-padding">
-            <h2 class="text-center text-white mb-4">
-              <i class="fas fa-search text-primary" style="color: #a78bfa !important;"></i> 아이템 행운도 측정
-            </h2>
-            <p class="text-center text-white opacity-75 mb-5">
-              가지고 있는 아이템을 촬영하거나 업로드하여<br>
-              오늘의 행운 아이템과 얼마나 일치하는지 확인해보세요!
-            </p>
+    <div class="page-container">
+      <div class="content-wrapper wide">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-search" style="color: #a78bfa !important;"></i>
+            아이템 행운도 측정
+          </h1>
+          <p class="page-subtitle">
+            가지고 있는 아이템을 촬영하거나 업로드하여<br>
+            오늘의 행운 아이템과 얼마나 일치하는지 확인해보세요!
+          </p>
+        </div>
+
+        <div class="card-base card-lg">
 
             <!-- Upload Area -->
             <div v-if="!showResult"
@@ -56,7 +61,7 @@
             </div>
             
              <!-- Analysis Result -->
-            <div v-if="showResult" class="result-card glass-card mt-4 border-0" style="background: rgba(255, 255, 255, 0.05);">
+            <div v-if="showResult" class="result-card card-base card-md mt-4">
               <div class="card-body">
                 <h4 class="text-center text-white mb-4">분석 결과</h4>
 
@@ -121,7 +126,7 @@
                 </div>
 
                 <!-- Today's Lucky Item Reference -->
-                <div class="glass-card mt-4 p-4" style="background: rgba(0,0,0,0.2);">
+                <div class="info-box info-primary mt-4">
                   <h6 class="text-white mb-3"><i class="fas fa-star text-warning me-2"></i> 오늘의 행운 아이템</h6>
                   <div class="reference-grid">
                     <div class="reference-item">

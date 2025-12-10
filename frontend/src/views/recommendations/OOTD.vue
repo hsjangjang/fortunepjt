@@ -1,23 +1,26 @@
 <template>
   <DefaultLayout>
-    <div class="row">
-      <div class="col-lg-8 col-12 mx-auto px-1 px-md-3">
-        <!-- Header -->
-        <div class="glass-card mb-4 responsive-padding text-center py-4">
-            <h1 class="display-5 fw-bold text-white">
-              <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
-            </h1>
-            <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-3">
-              <div class="text-white-50 d-flex align-items-center justify-content-center mb-2">
-                <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
-              </div>
-              <div class="d-flex flex-wrap align-items-center justify-content-center gap-3">
-                <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white">
-                  <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
-                  {{ color }}
-                </span>
-              </div>
+    <div class="page-container">
+      <div class="content-wrapper">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-tshirt" style="color: #a78bfa !important;"></i>
+            OOTD 추천
+          </h1>
+          <p class="page-subtitle">날씨와 행운색 기반 오늘의 코디</p>
+        </div>
+
+        <!-- Lucky Colors Badge -->
+        <div v-if="luckyColors && luckyColors.length" class="card-base card-sm section-spacing text-center">
+            <div class="text-white opacity-75 d-flex align-items-center justify-content-center mb-2">
+              <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
+            </div>
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-3">
+              <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white">
+                <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
+                {{ color }}
+              </span>
             </div>
         </div>
 
@@ -70,9 +73,8 @@
           </div>
 
           <!-- Main OOTD Recommendation -->
-          <div class="row">
-            <div class="col-md-6 mb-4">
-              <div class="card glass-card outfit-card h-100 py-3">
+          <div class="card-grid cols-2 section-spacing">
+            <div class="card-base card-md card-interactive outfit-card">
                 <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
                   <h5 class="mb-0 text-white">오늘의 상의</h5>
                 </div>
@@ -87,11 +89,9 @@
                     <span v-for="color in outfit.top_alt_colors" :key="color" class="badge dynamic-color-badge">{{ color }}</span>
                   </div>
                 </div>
-              </div>
             </div>
 
-            <div class="col-md-6 mb-4">
-              <div class="card glass-card outfit-card h-100 py-3">
+            <div class="card-base card-md card-interactive outfit-card">
                 <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
                   <h5 class="mb-0 text-white">오늘의 하의</h5>
                 </div>
@@ -106,12 +106,11 @@
                     <span v-for="color in outfit.bottom_alt_colors" :key="color" class="badge dynamic-color-badge">{{ color }}</span>
                   </div>
                 </div>
-              </div>
             </div>
           </div>
 
           <!-- Outer Recommendation -->
-          <div v-if="outfit.outer_required" class="card glass-card mb-4 outfit-card py-3">
+          <div v-if="outfit.outer_required" class="card-base card-md section-spacing outfit-card">
             <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
               <h5 class="mb-0 text-white d-flex align-items-center justify-content-center">
                 <AlertCircle class="text-warning me-2" :size="20" />필수 아우터
@@ -132,7 +131,7 @@
           </div>
 
           <!-- Accessories Recommendation -->
-          <div v-if="outfit.accessories && outfit.accessories.length" class="card glass-card mb-4 outfit-card py-3">
+          <div v-if="outfit.accessories && outfit.accessories.length" class="card-base card-md section-spacing outfit-card">
             <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
               <h5 class="mb-0 text-white d-flex align-items-center justify-content-center">
                 <Gem class="text-info me-2" :size="20" />추천 액세서리
