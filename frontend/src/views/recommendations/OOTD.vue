@@ -57,12 +57,14 @@
             <div class="hourly-forecast-section">
               <!-- 좌측 레이블 -->
               <div class="chart-row-labels">
-                <div class="label-item label-time">시간</div>
-                <div class="label-item label-rain-prob">
-                  <Droplets class="me-1" :size="12" />강수확률
-                </div>
-                <div class="label-item label-rain-amount">
-                  <Umbrella class="me-1" :size="12" />예상강수량
+                <div class="label-spacer"></div>
+                <div class="labels-bottom">
+                  <div class="label-item">
+                    <Droplets class="me-1" :size="10" />강수확률
+                  </div>
+                  <div class="label-item">
+                    <Umbrella class="me-1" :size="10" />예상강수량
+                  </div>
                 </div>
               </div>
               <!-- 차트 영역 -->
@@ -626,7 +628,8 @@ const renderChart = (hourlyData) => {
             maxRotation: 0,
             minRotation: 0,
             autoSkip: false,
-            font: { size: 11 },
+            font: { size: 10 },
+            padding: 2,
             // 틱 간격에 맞춰서만 표시
             callback: function(_value, index) {
               if (index % tickInterval === 0) {
@@ -643,7 +646,7 @@ const renderChart = (hourlyData) => {
         }
       },
       layout: {
-        padding: { left: 10, right: 10, top: 20, bottom: 10 }
+        padding: { left: 5, right: 5, top: 15, bottom: 5 }
       }
     }
   })
@@ -765,31 +768,29 @@ onMounted(() => {
 .chart-row-labels {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding-bottom: 10px;
-  min-width: 70px;
+  min-width: 75px;
   flex-shrink: 0;
 }
 
+/* 차트 영역과 높이를 맞추기 위한 빈 공간 */
+.chart-row-labels .label-spacer {
+  flex: 1;
+}
+
+/* 하단 레이블 컨테이너 */
+.chart-row-labels .labels-bottom {
+  display: flex;
+  flex-direction: column;
+}
+
 .label-item {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.6);
   display: flex;
   align-items: center;
   white-space: nowrap;
-}
-
-.label-time {
-  height: 25px;
-  margin-bottom: 0;
-}
-
-.label-rain-prob {
-  height: 18px;
-}
-
-.label-rain-amount {
-  height: 18px;
+  height: 16px;
+  line-height: 16px;
 }
 
 /* 차트 컨텐츠 영역 */
@@ -797,19 +798,23 @@ onMounted(() => {
   flex: 1;
   min-width: 0;
   overflow-x: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-scroll-wrapper {
   width: 100%;
   height: 160px;
   padding: 10px 0;
+  flex-shrink: 0;
 }
 
 .rain-info-container {
   position: relative;
-  height: 40px;
-  font-size: 11px;
+  height: 32px;
+  font-size: 10px;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .rain-info-item {
@@ -817,15 +822,15 @@ onMounted(() => {
 }
 
 .rain-prob-row {
-  color: rgba(255, 255, 255, 0.9);
-  height: 18px;
-  line-height: 18px;
+  color: rgba(255, 255, 255, 0.8);
+  height: 16px;
+  line-height: 16px;
 }
 
 .rain-amount-row {
   color: #81d4fa;
-  height: 18px;
-  line-height: 18px;
+  height: 16px;
+  line-height: 16px;
 }
 
 .outfit-card {
@@ -914,12 +919,13 @@ onMounted(() => {
 
   /* 모바일에서 좌측 레이블 축소 */
   .chart-row-labels {
-    min-width: 55px;
-    font-size: 9px;
+    min-width: 60px;
   }
 
   .label-item {
     font-size: 9px;
+    height: 14px;
+    line-height: 14px;
   }
 
   .chart-scroll-wrapper {
@@ -927,7 +933,14 @@ onMounted(() => {
   }
 
   .rain-info-container {
-    font-size: 10px;
+    height: 28px;
+    font-size: 9px;
+  }
+
+  .rain-prob-row,
+  .rain-amount-row {
+    height: 14px;
+    line-height: 14px;
   }
 }
 </style>
