@@ -133,6 +133,9 @@ class OOTDRecommendationAPIView(APIView):
         # 행운색
         lucky_colors = fortune_data.get('lucky_colors', [])[:3]
 
+        # 운세 요약 (한줄)
+        fortune_summary = fortune_data.get('overall_fortune', {}).get('summary', '')
+
         # OOTD 추천 생성
         outfit = self._generate_ootd(weather_data, lucky_colors)
 
@@ -140,6 +143,7 @@ class OOTDRecommendationAPIView(APIView):
             'success': True,
             'weather': weather_data,
             'lucky_colors': lucky_colors,
+            'fortune_summary': fortune_summary,
             'outfit': outfit,
             'date': str(date.today())
         })

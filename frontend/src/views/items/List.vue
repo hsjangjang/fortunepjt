@@ -35,7 +35,11 @@
 
           <div v-if="items.length > 0" class="row">
             <div v-for="item in items" :key="item.id" class="col-md-4 mb-4">
-              <div class="card h-100 item-card border-0">
+              <div class="card h-100 item-card border-0" :class="{ 'top-luck-item': item.id === topLuckItemId }">
+                <!-- 최고 행운 배지 -->
+                <div v-if="item.id === topLuckItemId" class="top-luck-badge">
+                  <i class="fas fa-crown"></i> 오늘의 행운
+                </div>
                 <div class="position-relative">
                   <router-link :to="`/items/${item.id}`">
                     <img
@@ -130,7 +134,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
@@ -138,6 +142,21 @@ import { API_BASE_URL } from '@/config/api'
 
 const authStore = useAuthStore()
 const items = ref([])
+
+// 최고 행운 아이템 ID 계산
+const topLuckItemId = computed(() => {
+  if (items.value.length === 0) return null
+  let maxLuck = -1
+  let topId = null
+  items.value.forEach(item => {
+    const luck = getLuckStat(item)
+    if (luck > maxLuck) {
+      maxLuck = luck
+      topId = item.id
+    }
+  })
+  return topId
+})
 
 // 이미지 URL에 base URL 추가
 const getImageUrl = (url) => {
@@ -215,11 +234,50 @@ onMounted(() => {
   border-radius: 12px;
   transition: transform 0.2s, box-shadow 0.2s;
   overflow: hidden;
+  position: relative;
 }
 
 .item-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* 최고 행운 아이템 강조 */
+.top-luck-item {
+  box-shadow: 0 0 0 2px #fbbf24, 0 0 20px rgba(251, 191, 36, 0.4);
+  animation: luck-glow 2s ease-in-out infinite;
+}
+
+.top-luck-item:hover {
+  box-shadow: 0 0 0 2px #fbbf24, 0 8px 30px rgba(251, 191, 36, 0.5);
+}
+
+@keyframes luck-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 2px #fbbf24, 0 0 15px rgba(251, 191, 36, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 2px #fbbf24, 0 0 25px rgba(251, 191, 36, 0.6);
+  }
+}
+
+.top-luck-badge {
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: #1a1a2e;
+  padding: 4px 12px;
+  border-radius: 0 0 10px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  z-index: 10;
+  white-space: nowrap;
+}
+
+.top-luck-badge i {
+  margin-right: 4px;
 }
 
 .item-card .card-body {

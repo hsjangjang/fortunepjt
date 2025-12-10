@@ -35,7 +35,8 @@
             <div class="row text-center mt-5 g-3 justify-content-center">
               <div class="col-md-4">
                 <h6 class="text-primary-light mb-2">별자리</h6>
-                <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
+                <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2 d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
+                  <img v-if="getZodiacIcon(fortune.zodiac_sign)" :src="getZodiacIcon(fortune.zodiac_sign)" alt="" class="zodiac-icon">
                   {{ fortune.zodiac_sign || '-' }}
                 </span>
               </div>
@@ -349,6 +350,41 @@ const isLoading = ref(true)
 const showMainItemDesc = ref(false)
 const showZodiacItemDesc = ref(false)
 
+// 별자리 이미지 아이콘 매핑
+import ariesIcon from '@/assets/zodiac/aries.png'
+import taurusIcon from '@/assets/zodiac/taurus.png'
+import geminiIcon from '@/assets/zodiac/gemini.png'
+import cancerIcon from '@/assets/zodiac/cancer.png'
+import leoIcon from '@/assets/zodiac/leo.png'
+import virgoIcon from '@/assets/zodiac/virgo.png'
+import libraIcon from '@/assets/zodiac/libra.png'
+import scorpioIcon from '@/assets/zodiac/scorpio.png'
+import sagittariusIcon from '@/assets/zodiac/sagittarius.png'
+import capricornIcon from '@/assets/zodiac/capricorn.png'
+import aquariusIcon from '@/assets/zodiac/aquarius.png'
+import piscesIcon from '@/assets/zodiac/pisces.png'
+
+const zodiacIcons = {
+  '양자리': ariesIcon,
+  '황소자리': taurusIcon,
+  '쌍둥이자리': geminiIcon,
+  '게자리': cancerIcon,
+  '사자자리': leoIcon,
+  '처녀자리': virgoIcon,
+  '천칭자리': libraIcon,
+  '전갈자리': scorpioIcon,
+  '사수자리': sagittariusIcon,
+  '염소자리': capricornIcon,
+  '물병자리': aquariusIcon,
+  '물고기자리': piscesIcon
+}
+
+// 별자리 아이콘 가져오기
+const getZodiacIcon = (zodiac) => {
+  if (!zodiac) return null
+  return zodiacIcons[zodiac] || null
+}
+
 // 문장 단위 줄바꿈 포맷팅 + 아이템명 굵게/밑줄 표시
 const formatDescription = (text, itemName) => {
   if (!text) return ''
@@ -535,6 +571,13 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+.zodiac-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  filter: brightness(1.2);
+}
+
 .fortune-circle {
   position: relative;
   width: 220px;

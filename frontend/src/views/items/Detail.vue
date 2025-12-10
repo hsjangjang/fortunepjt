@@ -86,16 +86,12 @@
                 <hr class="my-4">
 
                 <!-- 행운도 측정 버튼 -->
-                <div class="alert mb-4" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.15)); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
-                  <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                    <div>
-                      <h6 class="mb-1"><i class="fas fa-magic text-primary me-2"></i>오늘의 행운도 측정</h6>
-                      <small class="text-muted">이 아이템이 오늘의 행운과 얼마나 맞는지 확인해보세요</small>
-                    </div>
-                    <button class="btn btn-primary rounded-pill px-4" @click="checkLuck">
-                      <i class="fas fa-star me-1"></i> 행운 체크
-                    </button>
-                  </div>
+                <div class="alert mb-4 text-center" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.15)); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
+                  <h6 class="mb-2"><i class="fas fa-magic text-primary me-2"></i>오늘의 행운도 측정</h6>
+                  <small class="text-muted d-block mb-3">오늘의 행운과 얼마나 맞는지 확인하세요</small>
+                  <button class="btn btn-primary rounded-pill px-4" @click="checkLuck">
+                    <i class="fas fa-star me-1"></i> 행운 체크
+                  </button>
                 </div>
 
                 <!-- 주요 색상 -->

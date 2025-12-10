@@ -8,11 +8,14 @@
               <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
             </h1>
             <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
+            <!-- 운세 요약 한줄 -->
+            <p v-if="fortuneSummary" class="text-white mt-2 mb-2" style="font-size: 0.95rem;">
+              <i class="fas fa-star-half-alt text-warning me-1"></i>
+              {{ fortuneSummary }}
+            </p>
             <div v-if="luckyColors && luckyColors.length" class="mt-3">
-              <div class="text-white-50 d-flex align-items-center justify-content-center mb-2">
-                <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
-              </div>
               <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+                <Star class="text-warning" :size="16" />
                 <span v-for="color in luckyColors" :key="color" class="badge dynamic-color-badge">
                   {{ color }}
                 </span>
@@ -331,6 +334,7 @@ let chartInstance = null
 
 const isLoading = ref(true)
 const luckyColors = ref([])
+const fortuneSummary = ref('')
 const weather = ref({
   city: '대전 유성구',
   temp: 0,
@@ -435,6 +439,7 @@ const updateWeather = async () => {
           if (data.success) {
             if (data.weather) updateWeatherUI(data.weather)
             if (data.lucky_colors) luckyColors.value = data.lucky_colors
+            if (data.fortune_summary) fortuneSummary.value = data.fortune_summary
             if (data.outfit) outfit.value = { ...outfit.value, ...data.outfit }
             applyDynamicColors()
             showToast('날씨 정보가 업데이트되었습니다!', 'success')
@@ -458,6 +463,7 @@ const updateWeather = async () => {
           if (data.success) {
             if (data.weather) updateWeatherUI(data.weather)
             if (data.lucky_colors) luckyColors.value = data.lucky_colors
+            if (data.fortune_summary) fortuneSummary.value = data.fortune_summary
             if (data.outfit) outfit.value = { ...outfit.value, ...data.outfit }
             applyDynamicColors()
             showToast('대전 유성구 날씨 정보를 표시합니다.', 'success')
@@ -524,12 +530,19 @@ const renderHourlyForecast = (hourlyData) => {
   hourlyIcons.value.innerHTML = ''
   hourlyDetails.value.innerHTML = ''
 
-  // 컨테이너에 인라인 스타일 적용
-  hourlyIcons.value.style.cssText = 'display: flex; gap: 0;'
-  hourlyDetails.value.style.cssText = 'display: flex; gap: 0;'
-
   const isMobile = window.innerWidth <= 768
-  const itemWidth = isMobile ? 'calc(100% / 6)' : 'calc(100% / 12)'
+  const dataCount = hourlyData.length // 실제 데이터 개수 (보통 12개)
+
+  // 모바일: 6개가 화면에 보이고, 12개 데이터면 200% 너비로 스크롤
+  // 웹: 12개 모두 화면에 표시
+  const containerWidthPercent = isMobile ? (dataCount / 6) * 100 : 100
+
+  // 컨테이너에 인라인 스타일 적용 (모바일에서 스크롤을 위해 너비 확장)
+  hourlyIcons.value.style.cssText = `display: flex; gap: 0; width: ${containerWidthPercent}%;`
+  hourlyDetails.value.style.cssText = `display: flex; gap: 0; width: ${containerWidthPercent}%;`
+
+  // 각 아이템은 컨테이너의 1/dataCount 너비
+  const itemWidth = `${100 / dataCount}%`
 
   hourlyData.forEach((item) => {
     // 아이콘 행 아이템
@@ -584,12 +597,12 @@ const renderHourlyForecast = (hourlyData) => {
     hourlyDetails.value.appendChild(detailItem)
   })
 
-  // 온도 라인 차트 렌더링
-  renderTempChart(hourlyData)
+  // 온도 라인 차트 렌더링 (데이터 개수와 컨테이너 너비 전달)
+  renderTempChart(hourlyData, containerWidthPercent)
 }
 
 // 온도 라인 차트 렌더링
-const renderTempChart = (hourlyData) => {
+const renderTempChart = (hourlyData, containerWidthPercent = 100) => {
   if (!tempChart.value) return
 
   // 기존 차트 제거
@@ -597,17 +610,25 @@ const renderTempChart = (hourlyData) => {
     chartInstance.destroy()
   }
 
+  // 차트 컨테이너 너비 설정 (모바일에서 스크롤을 위해)
+  const chartContainer = tempChart.value.parentElement
+  if (chartContainer) {
+    chartContainer.style.width = `${containerWidthPercent}%`
+  }
+
   const ctx = tempChart.value.getContext('2d')
   const temps = hourlyData.map(item => Math.round(item.temp))
   const labels = hourlyData.map(item => item.time)
 
-  // 컨테이너 너비 기준으로 패딩 계산
-  const containerWidth = tempChart.value.parentElement?.clientWidth || 600
+  // 실제 렌더링될 차트 너비 기준으로 패딩 계산
+  const scrollContainer = chartContainer?.parentElement
+  const visibleWidth = scrollContainer?.clientWidth || 600
+  // 한 아이템의 보이는 너비 (모바일: 화면의 1/6, 웹: 화면의 1/12)
   const isMobile = window.innerWidth <= 768
-  const itemCount = isMobile ? 6 : 12
-  const itemWidth = containerWidth / itemCount
-  // 좌우 패딩 = 컬럼 너비의 절반 (점이 컬럼 중앙에 오도록)
-  const sidePadding = itemWidth / 2
+  const visibleItemCount = isMobile ? 6 : 12
+  const itemVisibleWidth = visibleWidth / visibleItemCount
+  // 좌우 패딩 = 아이템 너비의 절반 (점이 컬럼 중앙에 오도록)
+  const sidePadding = itemVisibleWidth / 2
 
   chartInstance = new Chart(ctx, {
     type: 'line',
@@ -680,6 +701,7 @@ const fetchOOTD = async (lat = null, lon = null) => {
     const data = response.data
 
     if (data.lucky_colors) luckyColors.value = data.lucky_colors
+    if (data.fortune_summary) fortuneSummary.value = data.fortune_summary
     if (data.weather) updateWeatherUI(data.weather)
     if (data.outfit) outfit.value = { ...outfit.value, ...data.outfit }
 
