@@ -60,10 +60,10 @@
                 <div class="label-spacer"></div>
                 <div class="labels-bottom">
                   <div class="label-item">
-                    <Droplets class="me-1" :size="10" />강수확률
+                    <Droplets class="me-1" :size="12" />강수확률
                   </div>
                   <div class="label-item">
-                    <Umbrella class="me-1" :size="10" />예상강수량
+                    <component :is="precipitationIcon" class="me-1" :size="12" />{{ precipitationLabel }}
                   </div>
                 </div>
               </div>
@@ -200,7 +200,7 @@ import { colorMap } from '@/utils/colors'
 import { Chart, registerables } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import {
-  Star, MapPin, RefreshCw, Droplets, Umbrella,
+  Star, MapPin, RefreshCw, Droplets, Snowflake,
   AlertCircle,
   Sun, Cloud, CloudRain, CloudSnow, ThermometerSnowflake
 } from 'lucide-vue-next'
@@ -358,6 +358,7 @@ const rainInfoContainer = ref(null)
 
 const isLoading = ref(true)
 const luckyColors = ref([])
+const isSnowDay = ref(false)  // 눈 오는 날 여부
 const weather = ref({
   city: '대전 유성구',
   temp: 0,
@@ -368,6 +369,10 @@ const weather = ref({
   wind_speed: 0,
   rain_amount: 0
 })
+
+// 눈/비에 따른 레이블과 아이콘
+const precipitationLabel = computed(() => isSnowDay.value ? '예상적설량' : '예상강수량')
+const precipitationIcon = computed(() => isSnowDay.value ? Snowflake : Droplets)
 
 const outfit = ref({
   top: '니트',
@@ -516,6 +521,10 @@ const updateWeatherUI = (data) => {
     rain_amount: data.current?.rain_amount || 0
   }
 
+  // 눈 오는 날인지 확인 (description에 '눈' 포함 여부)
+  const desc = data.description || ''
+  isSnowDay.value = desc.includes('눈')
+
   if (data.hourly && data.hourly.length > 0) {
     renderChart(data.hourly)
   }
@@ -567,10 +576,18 @@ const renderChart = (hourlyData) => {
         probRow.className = 'rain-prob-row'
         probRow.textContent = `${item.rain_probability}%`
 
-        // 강수량 행
+        // 강수량/적설량 행
         const amountRow = document.createElement('div')
         amountRow.className = 'rain-amount-row'
-        amountRow.textContent = item.rain_amount > 0 ? `${item.rain_amount}mm` : '-'
+        if (isSnowDay.value) {
+          // 눈: 적설량 cm 단위 (API에서 cm로 오거나 mm를 cm로 변환)
+          const snowAmount = item.snow_amount || item.rain_amount || 0
+          amountRow.textContent = `${snowAmount.toFixed(1)}cm`
+        } else {
+          // 비: 강수량 mm 단위
+          const rainAmount = item.rain_amount || 0
+          amountRow.textContent = `${rainAmount.toFixed(1)}mm`
+        }
 
         div.appendChild(probRow)
         div.appendChild(amountRow)
@@ -784,13 +801,13 @@ onMounted(() => {
 }
 
 .label-item {
-  font-size: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
   display: flex;
   align-items: center;
   white-space: nowrap;
-  height: 16px;
-  line-height: 16px;
+  height: 18px;
+  line-height: 18px;
 }
 
 /* 차트 컨텐츠 영역 */
@@ -811,8 +828,8 @@ onMounted(() => {
 
 .rain-info-container {
   position: relative;
-  height: 32px;
-  font-size: 10px;
+  height: 36px;
+  font-size: 11px;
   width: 100%;
   flex-shrink: 0;
 }
@@ -823,14 +840,14 @@ onMounted(() => {
 
 .rain-prob-row {
   color: rgba(255, 255, 255, 0.8);
-  height: 16px;
-  line-height: 16px;
+  height: 18px;
+  line-height: 18px;
 }
 
 .rain-amount-row {
   color: #81d4fa;
-  height: 16px;
-  line-height: 16px;
+  height: 18px;
+  line-height: 18px;
 }
 
 .outfit-card {
@@ -917,15 +934,15 @@ onMounted(() => {
     border-radius: 12px;
   }
 
-  /* 모바일에서 좌측 레이블 축소 */
+  /* 모바일에서 좌측 레이블 */
   .chart-row-labels {
-    min-width: 60px;
+    min-width: 65px;
   }
 
   .label-item {
-    font-size: 9px;
-    height: 14px;
-    line-height: 14px;
+    font-size: 10px;
+    height: 16px;
+    line-height: 16px;
   }
 
   .chart-scroll-wrapper {
@@ -933,14 +950,14 @@ onMounted(() => {
   }
 
   .rain-info-container {
-    height: 28px;
-    font-size: 9px;
+    height: 32px;
+    font-size: 10px;
   }
 
   .rain-prob-row,
   .rain-amount-row {
-    height: 14px;
-    line-height: 14px;
+    height: 16px;
+    line-height: 16px;
   }
 }
 </style>
