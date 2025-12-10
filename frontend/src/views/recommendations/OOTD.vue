@@ -55,25 +55,7 @@
 
             <!-- Hourly Forecast Chart -->
             <div class="hourly-forecast-section">
-              <!-- 좌측 레이블 -->
-              <div class="chart-row-labels">
-                <div class="label-spacer"></div>
-                <div class="labels-bottom">
-                  <div class="label-item">
-                    <Droplets class="me-1" :size="12" />강수확률
-                  </div>
-                  <div class="label-item">
-                    <component :is="precipitationIcon" class="me-1" :size="12" />{{ precipitationLabel }}
-                  </div>
-                </div>
-              </div>
-              <!-- 차트 영역 -->
-              <div class="chart-content-area">
-                <div class="chart-scroll-wrapper">
-                  <canvas ref="weatherChart"></canvas>
-                </div>
-                <div class="rain-info-container" ref="rainInfoContainer"></div>
-              </div>
+              <div class="hourly-items-container" ref="hourlyItemsContainer"></div>
             </div>
           </div>
 
@@ -200,8 +182,7 @@ import { colorMap } from '@/utils/colors'
 import { Chart, registerables } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import {
-  Star, MapPin, RefreshCw, Droplets, Snowflake,
-  AlertCircle,
+  Star, MapPin, RefreshCw, AlertCircle,
   Sun, Cloud, CloudRain, CloudSnow, ThermometerSnowflake
 } from 'lucide-vue-next'
 
@@ -353,12 +334,10 @@ Chart.register(...registerables, ChartDataLabels)
 
 const authStore = useAuthStore()
 const { showToast } = useToast()
-const weatherChart = ref(null)
-const rainInfoContainer = ref(null)
+const hourlyItemsContainer = ref(null)
 
 const isLoading = ref(true)
 const luckyColors = ref([])
-const isSnowDay = ref(false)  // 눈 오는 날 여부
 const weather = ref({
   city: '대전 유성구',
   temp: 0,
@@ -369,10 +348,6 @@ const weather = ref({
   wind_speed: 0,
   rain_amount: 0
 })
-
-// 눈/비에 따른 레이블과 아이콘
-const precipitationLabel = computed(() => isSnowDay.value ? '예상적설량' : '예상강수량')
-const precipitationIcon = computed(() => isSnowDay.value ? Snowflake : Droplets)
 
 const outfit = ref({
   top: '니트',
@@ -388,8 +363,6 @@ const outfit = ref({
   outer_desc: '',
   accessories: []
 })
-
-let chartInstance = null
 
 const weatherIcon = computed(() => {
   const temp = weather.value.temp
@@ -521,151 +494,77 @@ const updateWeatherUI = (data) => {
     rain_amount: data.current?.rain_amount || 0
   }
 
-  // 눈 오는 날인지 확인 (description에 '눈' 포함 여부)
-  const desc = data.description || ''
-  isSnowDay.value = desc.includes('눈')
-
   if (data.hourly && data.hourly.length > 0) {
-    renderChart(data.hourly)
+    renderHourlyForecast(data.hourly)
   }
 }
 
-const renderChart = (hourlyData) => {
-  if (!weatherChart.value) return
-
-  const ctx = weatherChart.value.getContext('2d')
-
-  if (chartInstance) {
-    chartInstance.destroy()
+// 날씨 아이콘 SVG 반환 (sky: 하늘상태, pty: 강수형태)
+const getWeatherIconSvg = (sky, pty) => {
+  // pty(강수형태): 0=없음, 1=비, 2=비/눈, 3=눈, 4=소나기
+  // sky(하늘상태): 1=맑음, 3=구름많음, 4=흐림
+  if (pty === 1 || pty === 4) {
+    // 비 또는 소나기
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#81d4fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>`
   }
-
-  const labels = hourlyData.map(item => item.time)
-  const temps = hourlyData.map(item => item.temp)
-
-  // 강수 정보 컨테이너 비우기 (차트 afterDraw에서 위치 맞춰서 다시 채움)
-  if (rainInfoContainer.value) {
-    rainInfoContainer.value.innerHTML = ''
+  if (pty === 2 || pty === 3) {
+    // 눈 또는 비/눈
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></svg>`
   }
+  if (sky === 1) {
+    // 맑음
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
+  }
+  if (sky === 3) {
+    // 구름많음
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><circle cx="12" cy="12" r="4"/><path d="M3 17h.01"/><path d="M5 15h.01"/><path d="M13 17h.01"/><path d="M15 15h.01"/><path d="M4.5 13A2.5 2.5 0 1 1 7 15.5h-2a3 3 0 0 1 0-6 3.5 3.5 0 0 1 6.5 1.5H9a2 2 0 1 0-4 2.5h-.5z"/></svg>`
+  }
+  // 흐림 (sky === 4 또는 기본)
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`
+}
 
-  // 화면 크기에 따른 틱 간격 결정
+// 시간별 예보 렌더링 (아이콘 + 온도 + 강수확률)
+const renderHourlyForecast = (hourlyData) => {
+  if (!hourlyItemsContainer.value) return
+
+  hourlyItemsContainer.value.innerHTML = ''
+
+  // 화면 크기에 따른 표시 간격
   const isMobile = window.innerWidth < 768
-  const tickInterval = isMobile ? 2 : 1  // 모바일: 2시간, 웹: 1시간
+  const interval = isMobile ? 2 : 1
 
-  // 커스텀 플러그인: 차트 아래에 강수확률과 강수량 표시
-  const rainPlugin = {
-    id: 'rainInfo',
-    afterDraw: (chart) => {
-      if (!rainInfoContainer.value) return
-      rainInfoContainer.value.innerHTML = ''
+  hourlyData.forEach((item, index) => {
+    if (index % interval !== 0) return
 
-      const xAxis = chart.scales.x
+    const itemDiv = document.createElement('div')
+    itemDiv.className = 'hourly-item'
 
-      hourlyData.forEach((item, index) => {
-        // 틱 간격에 맞춰서만 표시
-        if (index % tickInterval !== 0) return
+    // 시간
+    const timeDiv = document.createElement('div')
+    timeDiv.className = 'hourly-time'
+    timeDiv.textContent = item.time
 
-        const x = xAxis.getPixelForValue(index)
-        const div = document.createElement('div')
-        div.className = 'rain-info-item'
-        div.style.position = 'absolute'
-        div.style.left = `${x}px`
-        div.style.transform = 'translateX(-50%)'
+    // 날씨 아이콘
+    const iconDiv = document.createElement('div')
+    iconDiv.className = 'hourly-icon'
+    iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty)
 
-        // 강수확률 행
-        const probRow = document.createElement('div')
-        probRow.className = 'rain-prob-row'
-        probRow.textContent = `${item.rain_probability}%`
+    // 온도
+    const tempDiv = document.createElement('div')
+    tempDiv.className = 'hourly-temp'
+    tempDiv.textContent = `${Math.round(item.temp)}°`
 
-        // 강수량/적설량 행
-        const amountRow = document.createElement('div')
-        amountRow.className = 'rain-amount-row'
-        if (isSnowDay.value) {
-          // 눈: 적설량 cm 단위 (API에서 cm로 오거나 mm를 cm로 변환)
-          const snowAmount = item.snow_amount || item.rain_amount || 0
-          amountRow.textContent = `${snowAmount.toFixed(1)}cm`
-        } else {
-          // 비: 강수량 mm 단위
-          const rainAmount = item.rain_amount || 0
-          amountRow.textContent = `${rainAmount.toFixed(1)}mm`
-        }
+    // 강수확률
+    const probDiv = document.createElement('div')
+    probDiv.className = 'hourly-prob'
+    probDiv.textContent = `${item.rain_probability}%`
 
-        div.appendChild(probRow)
-        div.appendChild(amountRow)
-        rainInfoContainer.value.appendChild(div)
-      })
-    }
-  }
+    itemDiv.appendChild(timeDiv)
+    itemDiv.appendChild(iconDiv)
+    itemDiv.appendChild(tempDiv)
+    itemDiv.appendChild(probDiv)
 
-  chartInstance = new Chart(ctx, {
-    type: 'line',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: '기온 (°C)',
-        data: temps,
-        borderColor: 'rgba(255, 255, 255, 0.9)',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
-        borderWidth: 2,
-        pointBackgroundColor: 'rgba(255, 255, 255, 1)',
-        pointRadius: 4,
-        tension: 0.4,
-        fill: false,
-        datalabels: {
-          align: 'top',
-          anchor: 'end',
-          color: 'white',
-          font: {
-            weight: 'bold',
-            size: 12
-          },
-          formatter: function(value) {
-            return Math.round(value) + '°'
-          },
-          // 틱 간격에 맞춰서만 라벨 표시
-          display: function(context) {
-            return context.dataIndex % tickInterval === 0
-          }
-        }
-      }]
-    },
-    plugins: [rainPlugin],
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { display: false },
-        tooltip: { enabled: false },
-        datalabels: { display: true }
-      },
-      scales: {
-        x: {
-          grid: { display: false, drawBorder: false },
-          ticks: {
-            color: 'rgba(255, 255, 255, 0.8)',
-            maxRotation: 0,
-            minRotation: 0,
-            autoSkip: false,
-            font: { size: 10 },
-            padding: 2,
-            // 틱 간격에 맞춰서만 표시
-            callback: function(_value, index) {
-              if (index % tickInterval === 0) {
-                return labels[index]
-              }
-              return ''
-            }
-          }
-        },
-        y: {
-          display: false,
-          min: Math.min(...temps) - 5,
-          max: Math.max(...temps) + 5
-        }
-      },
-      layout: {
-        padding: { left: 5, right: 5, top: 15, bottom: 5 }
-      }
-    }
+    hourlyItemsContainer.value.appendChild(itemDiv)
   })
 }
 
@@ -775,79 +674,48 @@ onMounted(() => {
 
 /* 시간별 예보 섹션 */
 .hourly-forecast-section {
-  display: flex;
   margin-top: 20px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   padding-top: 15px;
 }
 
-/* 좌측 레이블 영역 */
-.chart-row-labels {
+.hourly-items-container {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.hourly-item {
   display: flex;
   flex-direction: column;
-  min-width: 75px;
-  flex-shrink: 0;
-}
-
-/* 차트 영역과 높이를 맞추기 위한 빈 공간 */
-.chart-row-labels .label-spacer {
-  flex: 1;
-}
-
-/* 하단 레이블 컨테이너 */
-.chart-row-labels .labels-bottom {
-  display: flex;
-  flex-direction: column;
-}
-
-.label-item {
-  font-size: 11px;
-  color: rgba(255, 255, 255, 0.7);
-  display: flex;
   align-items: center;
-  white-space: nowrap;
-  height: 18px;
-  line-height: 18px;
-}
-
-/* 차트 컨텐츠 영역 */
-.chart-content-area {
   flex: 1;
   min-width: 0;
-  overflow-x: auto;
+}
+
+.hourly-time {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 8px;
+}
+
+.hourly-icon {
+  margin-bottom: 6px;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
-.chart-scroll-wrapper {
-  width: 100%;
-  height: 160px;
-  padding: 10px 0;
-  flex-shrink: 0;
+.hourly-temp {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
 }
 
-.rain-info-container {
-  position: relative;
-  height: 36px;
+.hourly-prob {
   font-size: 11px;
-  width: 100%;
-  flex-shrink: 0;
-}
-
-.rain-info-item {
-  text-align: center;
-}
-
-.rain-prob-row {
-  color: rgba(255, 255, 255, 0.8);
-  height: 18px;
-  line-height: 18px;
-}
-
-.rain-amount-row {
   color: #81d4fa;
-  height: 18px;
-  line-height: 18px;
 }
 
 .outfit-card {
@@ -934,30 +802,27 @@ onMounted(() => {
     border-radius: 12px;
   }
 
-  /* 모바일에서 좌측 레이블 */
-  .chart-row-labels {
-    min-width: 65px;
+  /* 모바일에서 시간별 예보 */
+  .hourly-items-container {
+    gap: 4px;
   }
 
-  .label-item {
+  .hourly-time {
     font-size: 10px;
-    height: 16px;
-    line-height: 16px;
+    margin-bottom: 6px;
   }
 
-  .chart-scroll-wrapper {
-    height: 140px;
+  .hourly-icon svg {
+    width: 18px;
+    height: 18px;
   }
 
-  .rain-info-container {
-    height: 32px;
+  .hourly-temp {
+    font-size: 14px;
+  }
+
+  .hourly-prob {
     font-size: 10px;
-  }
-
-  .rain-prob-row,
-  .rain-amount-row {
-    height: 16px;
-    line-height: 16px;
   }
 }
 </style>

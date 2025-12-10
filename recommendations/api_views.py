@@ -348,6 +348,8 @@ class OOTDRecommendationAPIView(APIView):
                     'temp': round(float(data.get('TMP', temp)), 1),
                     'weather': weather_desc,
                     'icon': icon,
+                    'sky': int(sky_val),  # 하늘상태: 1=맑음, 3=구름많음, 4=흐림
+                    'pty': int(pty_val),  # 강수형태: 0=없음, 1=비, 2=비/눈, 3=눈, 4=소나기
                     'rain_probability': pop,
                     'rain_amount': round(pcp, 1),
                     'humidity': int(data.get('REH', humidity))
@@ -799,6 +801,8 @@ class WeatherAPIView(APIView):
                     'temp': round(float(wdata.get('TMP', temp)), 1),
                     'weather': weather_desc,
                     'icon': h_icon,
+                    'sky': int(sky_val),  # 하늘상태: 1=맑음, 3=구름많음, 4=흐림
+                    'pty': int(pty_val),  # 강수형태: 0=없음, 1=비, 2=비/눈, 3=눈, 4=소나기
                     'rain_probability': int(wdata.get('POP', 0)),
                     'rain_amount': self._parse_rain_amount(wdata.get('PCP', '강수없음')),
                     'humidity': int(wdata.get('REH', 50))
