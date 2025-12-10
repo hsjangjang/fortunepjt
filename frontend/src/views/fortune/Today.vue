@@ -41,7 +41,7 @@
               <div class="text-center">
                 <h6 class="text-primary-light mb-2">띠</h6>
                 <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
-                  {{ fortune.chinese_zodiac || '-' }}
+                  {{ getChineseZodiacEmoji(fortune.chinese_zodiac) }} {{ fortune.chinese_zodiac || '-' }}
                 </span>
               </div>
             </div>
@@ -353,6 +353,28 @@ const zodiacIcons = {
 const getZodiacIcon = (zodiac) => {
   if (!zodiac) return null
   return zodiacIcons[zodiac] || null
+}
+
+// 십이지(띠) 이모지 매핑
+const chineseZodiacEmojis = {
+  '쥐띠': '🐭',
+  '소띠': '🐮',
+  '호랑이띠': '🐯',
+  '토끼띠': '🐰',
+  '용띠': '🐲',
+  '뱀띠': '🐍',
+  '말띠': '🐴',
+  '양띠': '🐑',
+  '원숭이띠': '🐵',
+  '닭띠': '🐔',
+  '개띠': '🐶',
+  '돼지띠': '🐷'
+}
+
+// 십이지 이모지 가져오기
+const getChineseZodiacEmoji = (zodiac) => {
+  if (!zodiac) return ''
+  return chineseZodiacEmojis[zodiac] || ''
 }
 
 // 문장 단위 줄바꿈 포맷팅 + 아이템명 굵게/밑줄 표시
