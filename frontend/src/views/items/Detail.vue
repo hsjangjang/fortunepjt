@@ -194,7 +194,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { colorMap, getTextColor } from '@/utils/colors'
+import { getColorMatchScore as getColorMatchScoreUtil } from '@/utils/colors'
 import { useFortuneStore } from '@/stores/fortune'
 
 const route = useRoute()
@@ -243,49 +243,9 @@ const fortuneTagMap = {
   'study': ['학업운', '시험운', '공부', '합격', '수험']
 }
 
-// HEX 색상을 RGB로 변환
-const hexToRgb = (hex) => {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : { r: 128, g: 128, b: 128 }
-}
-
-// 두 색상 간의 RGB 절댓값 차이 계산 (0~765 범위, 각 채널 최대 255 * 3)
-const colorDistance = (hex1, hex2) => {
-  const rgb1 = hexToRgb(hex1)
-  const rgb2 = hexToRgb(hex2)
-  // R, G, B 각각의 절댓값 차이의 합
-  return Math.abs(rgb1.r - rgb2.r) + Math.abs(rgb1.g - rgb2.g) + Math.abs(rgb1.b - rgb2.b)
-}
-
-// 오늘의 행운색과 아이템 색상의 유사도 점수 (0~100)
+// 오늘의 행운색과 아이템 색상의 유사도 점수 (0~100) - colors.js 유틸 사용
 const getColorMatchScore = () => {
-  if (!item.value?.dominant_colors || item.value.dominant_colors.length === 0) return 0
-
-  const luckyColors = fortuneStore.luckyColors || []
-  if (luckyColors.length === 0) return 0
-
-  // 행운색의 hex 값 가져오기
-  const luckyColorHexes = luckyColors.map(colorName => colorMap[colorName] || '#808080')
-
-  // 아이템의 각 색상과 행운색들 간의 최소 거리 계산
-  let minDistance = 765  // 최대 거리 (255 * 3)
-  for (const itemColor of item.value.dominant_colors) {
-    const itemHex = itemColor.hex || '#808080'
-    for (const luckyHex of luckyColorHexes) {
-      const distance = colorDistance(itemHex, luckyHex)
-      if (distance < minDistance) {
-        minDistance = distance
-      }
-    }
-  }
-
-  // 거리를 점수로 변환: 가장 가까운 경우(0) = 100점, 가장 먼 경우(765) = 0점
-  const score = Math.round(100 - (minDistance / 765) * 100)
-  return Math.max(0, score)
+  return getColorMatchScoreUtil(item.value?.dominant_colors, fortuneStore.luckyColors)
 }
 
 // 아이템 특성을 벡터로 변환하기 위한 키워드 목록
@@ -342,14 +302,43 @@ const cosineSimilarity = (vecA, vecB) => {
   return dotProduct / (normA * normB)
 }
 
-// 오늘의 행운 아이템과 현재 아이템의 코사인 유사도 점수 (0~100)
-const getLuckyItemCosineSimilarity = () => {
+// 카테고리별 키워드 (코사인 유사도 계산용)
+const categoryKeywordsMap = {
+  'overall': ['행운', '운세', '럭키', '대박', '길운'],
+  'love': ['애정', '사랑', '연애', '로맨스', '인연', '매력', '이성', '커플'],
+  'money': ['재물', '금전', '돈', '부자', '재운', '경제', '수익', '투자'],
+  'work': ['직장', '사업', '업무', '승진', '취업', '커리어', '회사', '일'],
+  'health': ['건강', '체력', '활력', '힐링', '운동', '에너지'],
+  'study': ['학업', '시험', '공부', '합격', '수험', '학습', '교육', '지식']
+}
+
+// 텍스트에서 특정 카테고리와의 연관성 점수 계산 (0~100)
+const getCategoryRelevanceScore = (texts, category) => {
+  const keywords = categoryKeywordsMap[category] || []
+  if (keywords.length === 0) return 0
+
+  const textArray = Array.isArray(texts) ? texts : [texts]
+  const textJoined = textArray.join(' ').toLowerCase()
+
+  let matchCount = 0
+  for (const keyword of keywords) {
+    if (textJoined.includes(keyword)) {
+      matchCount++
+    }
+  }
+
+  // 매칭된 키워드 비율로 점수 계산 (최대 100)
+  return Math.min(100, Math.round((matchCount / keywords.length) * 150))
+}
+
+// 오늘의 행운 아이템과 현재 아이템의 유사성 점수 (카테고리별로 다르게 계산)
+const getLuckyItemSimilarityScore = (category) => {
   const luckyItem = fortuneStore.luckyItem || {}
   const itemTags = aiAnalysis.value?.tags || []
 
-  if (!luckyItem.main || itemTags.length === 0) return 0
+  if (!luckyItem.main) return 0
 
-  // 행운 아이템의 특성 벡터 (이름 + 설명 + 보완 운세)
+  // 1. 행운 아이템의 텍스트
   const luckyItemTexts = [
     luckyItem.main || '',
     luckyItem.description || '',
@@ -357,30 +346,22 @@ const getLuckyItemCosineSimilarity = () => {
     luckyItem.zodiac || '',
     luckyItem.zodiac_description || ''
   ]
-  const luckyVector = textToFeatureVector(luckyItemTexts)
 
-  // 현재 아이템의 특성 벡터 (태그 + 이름)
+  // 2. 현재 아이템의 텍스트
   const itemTexts = [...itemTags]
   if (item.value?.item_name) {
     itemTexts.push(item.value.item_name)
   }
+
+  // 3. 코사인 유사도 계산 (아이템 간 전체 유사도)
+  const luckyVector = textToFeatureVector(luckyItemTexts)
   const itemVector = textToFeatureVector(itemTexts)
+  const baseSimilarity = cosineSimilarity(luckyVector, itemVector) * 100
 
-  // 코사인 유사도 계산 (0~1) -> 점수로 변환 (0~100)
-  const similarity = cosineSimilarity(luckyVector, itemVector)
-  return Math.round(similarity * 100)
-}
+  // 4. 현재 아이템이 해당 카테고리와 얼마나 관련있는지 (태그 기반)
+  const itemCategoryRelevance = getCategoryRelevanceScore(itemTexts, category)
 
-// 오늘의 행운 아이템과 현재 아이템의 유사성 점수 (카테고리별 가중치 포함)
-const getLuckyItemSimilarityScore = (category) => {
-  const luckyItem = fortuneStore.luckyItem || {}
-
-  if (!luckyItem.main) return 0
-
-  // 코사인 유사도 기반 점수
-  const cosineSimilarityScore = getLuckyItemCosineSimilarity()
-
-  // 행운 아이템이 보완하는 운세와 현재 카테고리 매칭 확인
+  // 5. 행운 아이템이 해당 카테고리를 보완하는지 확인
   const weakFortunes = luckyItem.weak_fortunes || ''
   const fortuneNameToKey = {
     '재물운': 'money',
@@ -390,17 +371,22 @@ const getLuckyItemSimilarityScore = (category) => {
     '건강운': 'health'
   }
 
-  // weak_fortunes에서 카테고리 추출 (예: "재물운, 애정운")
-  let categoryBonus = 0
+  let luckyItemCategoryBonus = 0
   for (const [name, key] of Object.entries(fortuneNameToKey)) {
     if (weakFortunes.includes(name) && category === key) {
-      categoryBonus = 20  // 행운 아이템이 보완하는 운세와 현재 카테고리가 일치
+      luckyItemCategoryBonus = 30  // 행운 아이템이 이 카테고리를 보완함
       break
     }
   }
 
-  // 최종 점수: 코사인 유사도(80%) + 카테고리 보너스(20%)
-  return Math.min(100, Math.round(cosineSimilarityScore * 0.8 + categoryBonus))
+  // 6. 최종 점수: 기본 유사도(40%) + 아이템-카테고리 연관성(40%) + 행운아이템 보완 보너스(20%)
+  const finalScore = Math.round(
+    baseSimilarity * 0.4 +
+    itemCategoryRelevance * 0.4 +
+    luckyItemCategoryBonus
+  )
+
+  return Math.min(100, finalScore)
 }
 
 // 아이템의 운세별 보완 점수 계산 (실제 데이터 기반)
@@ -478,17 +464,6 @@ const getPrimaryFortuneColor = () => {
   if (!primaryFortuneTag.value) return '#a78bfa'
   const cat = fortuneCategories.find(c => c.label === primaryFortuneTag.value)
   return cat?.color || '#a78bfa'
-}
-
-// 색상 hex 값 가져오기
-const getColorHex = (colorName) => {
-  return colorMap[colorName] || '#6c757d'
-}
-
-// 배경색에 따른 텍스트 색상
-const getTextColorForBg = (colorName) => {
-  const hex = colorMap[colorName] || '#6c757d'
-  return getTextColor(hex)
 }
 
 const fetchItemDetail = async () => {

@@ -40,7 +40,7 @@
             <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
               <span class="text-white-50 me-2 fortune-label"><i class="fas fa-palette text-primary me-1"></i>오늘의 행운색:</span>
               <span v-for="color in luckyColors" :key="color">
-                <span class="btn btn-sm rounded-pill fortune-cat-btn" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: '#fff', border: 'none', cursor: 'default' }">{{ color }}</span>
+                <span class="btn btn-sm rounded-pill fortune-cat-btn" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: getTextColor(colorMap[color] || '#a78bfa'), border: 'none', cursor: 'default' }">{{ color }}</span>
               </span>
             </div>
           </div>
@@ -91,7 +91,7 @@
                         class="badge rounded-pill"
                         :style="{
                           backgroundColor: color.hex,
-                          color: (color.name === 'white' || color.name === 'yellow') ? '#000' : '#fff',
+                          color: getTextColor(color.hex),
                           border: '1px solid rgba(255,255,255,0.2)'
                         }"
                       >
@@ -165,7 +165,7 @@ import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
-import { colorMap } from '@/utils/colors'
+import { colorMap, getTextColor } from '@/utils/colors'
 
 const authStore = useAuthStore()
 const items = ref([])

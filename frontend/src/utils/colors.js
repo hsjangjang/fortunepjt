@@ -69,3 +69,51 @@ export const getTextColor = (bgColor) => {
   const brightness = (r * 299 + g * 587 + b * 114) / 1000
   return brightness > 128 ? '#1f2937' : '#fff'
 }
+
+// HEX 색상을 RGB 객체로 변환
+export const hexToRgb = (hex) => {
+  if (!hex) return { r: 128, g: 128, b: 128 }
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 128, g: 128, b: 128 }
+}
+
+// 두 색상 간의 RGB 절댓값 차이 계산 (0~765 범위)
+export const colorDistance = (hex1, hex2) => {
+  const rgb1 = hexToRgb(hex1)
+  const rgb2 = hexToRgb(hex2)
+  return Math.abs(rgb1.r - rgb2.r) + Math.abs(rgb1.g - rgb2.g) + Math.abs(rgb1.b - rgb2.b)
+}
+
+// 두 색상의 유사도 점수 계산 (0~100, 가까울수록 높은 점수)
+export const colorSimilarityScore = (hex1, hex2) => {
+  const distance = colorDistance(hex1, hex2)
+  return Math.max(0, Math.round(100 - (distance / 765) * 100))
+}
+
+// 아이템 색상과 행운색 배열 간의 최대 유사도 점수 계산
+export const getColorMatchScore = (itemColors, luckyColorNames) => {
+  if (!itemColors || itemColors.length === 0) return 0
+  if (!luckyColorNames || luckyColorNames.length === 0) return 0
+
+  // 행운색 이름을 HEX로 변환
+  const luckyColorHexes = luckyColorNames.map(name => colorMap[name] || '#808080')
+
+  // 아이템 각 색상과 행운색들 간의 최소 거리 계산
+  let minDistance = 765
+  for (const itemColor of itemColors) {
+    const itemHex = itemColor.hex || '#808080'
+    for (const luckyHex of luckyColorHexes) {
+      const distance = colorDistance(itemHex, luckyHex)
+      if (distance < minDistance) {
+        minDistance = distance
+      }
+    }
+  }
+
+  // 거리를 점수로 변환
+  return Math.max(0, Math.round(100 - (minDistance / 765) * 100))
+}
