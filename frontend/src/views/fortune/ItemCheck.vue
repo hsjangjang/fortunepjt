@@ -29,10 +29,10 @@
                 JPG, PNG 파일 (최대 10MB)
               </p>
               <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <button class="btn btn-primary rounded-pill px-4" @click="triggerCameraInput">
+                <button class="btn btn-primary rounded-pill upload-btn" @click="triggerCameraInput">
                   <i class="fas fa-camera me-2"></i> 카메라로 촬영
                 </button>
-                <button class="btn btn-outline-light rounded-pill px-4" @click="triggerGalleryInput">
+                <button class="btn btn-outline-light rounded-pill upload-btn" @click="triggerGalleryInput">
                   <i class="fas fa-images me-2"></i> 갤러리에서 선택
                 </button>
               </div>
@@ -840,6 +840,22 @@ onMounted(() => {
 @media (min-width: 768px) {
   .responsive-padding {
     padding: 2rem !important;
+  }
+}
+
+/* 업로드 버튼 크기 통일 */
+.upload-btn {
+  min-width: 140px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 400px) {
+  .upload-btn {
+    min-width: 120px;
+    padding: 0.45rem 0.8rem;
+    font-size: 0.85rem;
   }
 }
 </style>

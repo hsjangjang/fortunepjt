@@ -3,9 +3,9 @@
     <div class="page-container">
       <div class="content-wrapper wide">
         <!-- 페이지 헤더 -->
-        <div class="page-header">
+        <div class="page-header page-header-lg">
           <h1 class="page-title">
-            <i class="fas fa-box-open text-primary"></i>
+            <i class="fas fa-gem" style="color: #a78bfa !important;"></i>
             내 아이템
           </h1>
           <p class="page-subtitle">업로드한 아이템과 행운색 매칭도를 확인하세요</p>
@@ -22,25 +22,26 @@
         <template v-else>
           <!-- 운세 카테고리 선택 -->
           <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
-            <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
+            <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-2">
               <span class="text-white-50 me-2 d-none d-md-inline"><i class="fas fa-magic"></i> 운세별 행운 아이템:</span>
               <button
                 v-for="cat in fortuneCategories"
                 :key="cat.key"
                 class="btn btn-sm rounded-pill fortune-cat-btn"
                 :class="{ active: selectedCategory === cat.key }"
+                :style="selectedCategory === cat.key ? { background: cat.color, borderColor: cat.color } : {}"
                 @click="selectedCategory = cat.key"
               >
-                <i :class="'fas ' + cat.icon" class="me-1"></i>
+                <i :class="'fas ' + cat.icon" class="me-1" :style="selectedCategory === cat.key ? {} : { color: cat.color }"></i>
                 <span class="d-none d-sm-inline">{{ cat.label }}</span>
                 <span class="d-sm-none">{{ cat.label.slice(0, 2) }}</span>
               </button>
             </div>
-            <div class="text-center">
+            <div class="text-center mt-3">
               <small class="text-white-50">
                 <i class="fas fa-palette text-primary me-1"></i>
                 오늘의 행운색:
-                <span v-for="(color, idx) in luckyColors" :key="color" class="ms-1">
+                <span v-for="color in luckyColors" :key="color" class="ms-1">
                   <span class="badge rounded-pill px-2" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: '#fff' }">{{ color }}</span>
                 </span>
               </small>
@@ -131,9 +132,9 @@
                         <span class="stat-value">{{ getColorStat(item) }}</span>
                       </div>
                       <div class="stat-row">
-                        <span class="stat-label"><i :class="'fas ' + fortuneCategories.find(c => c.key === selectedCategory)?.icon"></i> {{ fortuneCategories.find(c => c.key === selectedCategory)?.label.slice(0, 2) }}</span>
+                        <span class="stat-label"><i :class="'fas ' + fortuneCategories.find(c => c.key === selectedCategory)?.icon" :style="{ color: fortuneCategories.find(c => c.key === selectedCategory)?.color }"></i> {{ fortuneCategories.find(c => c.key === selectedCategory)?.label.slice(0, 2) }}</span>
                         <div class="stat-bar-container">
-                          <div class="stat-bar" :style="{ width: getFortuneBoost(item, selectedCategory) + '%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)' }"></div>
+                          <div class="stat-bar" :style="{ width: getFortuneBoost(item, selectedCategory) + '%', background: `linear-gradient(90deg, ${fortuneCategories.find(c => c.key === selectedCategory)?.color}, ${fortuneCategories.find(c => c.key === selectedCategory)?.color}dd)` }"></div>
                         </div>
                         <span class="stat-value">{{ getFortuneBoost(item, selectedCategory) }}</span>
                       </div>
@@ -174,13 +175,13 @@ const items = ref([])
 const fortuneData = ref(null)
 const luckyColors = ref([])
 
-// 세부 운세 카테고리
+// 세부 운세 카테고리 (색상 매핑 포함)
 const fortuneCategories = [
-  { key: 'overall', label: '종합운', icon: 'fa-star' },
-  { key: 'love', label: '애정운', icon: 'fa-heart' },
-  { key: 'money', label: '금전운', icon: 'fa-coins' },
-  { key: 'work', label: '직장운', icon: 'fa-briefcase' },
-  { key: 'health', label: '건강운', icon: 'fa-heartbeat' }
+  { key: 'overall', label: '종합운', icon: 'fa-star', color: '#fbbf24' },
+  { key: 'love', label: '애정운', icon: 'fa-heart', color: '#f472b6' },
+  { key: 'money', label: '금전운', icon: 'fa-coins', color: '#facc15' },
+  { key: 'work', label: '직장운', icon: 'fa-briefcase', color: '#60a5fa' },
+  { key: 'health', label: '건강운', icon: 'fa-heartbeat', color: '#4ade80' }
 ]
 const selectedCategory = ref('overall')
 

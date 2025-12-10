@@ -12,23 +12,21 @@
         </div>
 
         <!-- 운세 요약 카드 -->
-        <div v-if="fortuneSummary || (luckyColors && luckyColors.length)" class="card-base card-md text-center mb-4">
+        <div v-if="fortuneSummary || (luckyColors && luckyColors.length)" class="card-base card-sm text-center mb-5">
             <!-- 운세 요약 한줄 -->
-            <p v-if="fortuneSummary" class="text-white mb-3" style="font-size: 0.95rem;">
+            <p v-if="fortuneSummary" class="text-white mb-2" style="font-size: 0.95rem;">
               <i class="fas fa-star-half-alt text-warning me-1"></i>
               {{ fortuneSummary }}
             </p>
-            <!-- 오늘의 행운색 -->
-            <div v-if="luckyColors && luckyColors.length">
-              <h6 class="text-white opacity-75 mb-2">
-                <i class="fas fa-palette text-primary me-1"></i>
-                오늘의 행운색
-              </h6>
-              <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-                <span v-for="color in luckyColors" :key="color" class="badge dynamic-color-badge">
-                  {{ color }}
-                </span>
-              </div>
+            <!-- 오늘의 행운색 - 가로 배치 -->
+            <div v-if="luckyColors && luckyColors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+              <span class="text-white opacity-75 me-1">
+                <i class="fas fa-star text-warning me-1"></i>
+                오늘의 행운색:
+              </span>
+              <span v-for="color in luckyColors" :key="color" class="badge dynamic-color-badge">
+                {{ color }}
+              </span>
             </div>
         </div>
 

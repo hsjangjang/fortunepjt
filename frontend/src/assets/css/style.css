@@ -625,6 +625,16 @@ h6 {
     margin: 0;
 }
 
+/* Page Header Large - 조금 더 큰 헤더 (메뉴추천, 내아이템 등) */
+.page-header.page-header-lg .page-title {
+    font-size: 2.8rem;
+}
+
+.page-header.page-header-lg .page-subtitle {
+    font-size: 1rem;
+    margin-top: 0.25rem;
+}
+
 /* Card Base - 기본 카드 스타일 (글래스모피즘) */
 .card-base {
     background: var(--glass-bg);

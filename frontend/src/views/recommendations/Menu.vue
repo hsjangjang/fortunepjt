@@ -3,7 +3,7 @@
     <div class="page-container">
       <div class="content-wrapper wide">
         <!-- 페이지 헤더 -->
-        <div class="page-header">
+        <div class="page-header page-header-lg">
           <h1 class="page-title">
             <i class="fas fa-utensils" style="color: #a78bfa !important;"></i>
             오늘의 메뉴 추천
@@ -106,11 +106,11 @@
             </div>
 
             <div class="card-grid cols-3">
-              <div v-for="item in otherRecommendations" :key="item.menu.name" class="info-box text-center hover-lift">
+              <div v-for="item in otherRecommendations" :key="item.menu.name" class="info-box text-center hover-lift d-flex flex-column align-items-center justify-content-center">
                   <div class="mb-2 flex-shrink-0">
                     <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" class="other-menu-img rounded-circle" />
                   </div>
-                  <h6 class="small mb-2 text-white menu-name">{{ item.menu.name }}</h6>
+                  <h6 class="small mb-2 text-white menu-name justify-content-center">{{ item.menu.name }}</h6>
                   <span class="badge rounded-pill mt-auto" :style="`background-color: ${colorMap[item.color] || '#6B7280'}; color: ${getTextColor(colorMap[item.color])}; font-size: 0.7rem;`">{{ item.color }}</span>
               </div>
 
