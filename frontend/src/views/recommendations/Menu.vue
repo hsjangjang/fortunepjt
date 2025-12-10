@@ -30,15 +30,11 @@
               </p>
               <!-- 오늘의 행운색 -->
               <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="text-center mb-3">
-                <h6 class="text-white opacity-75 mb-2">
-                  <i class="fas fa-palette text-primary me-1"></i>
-                  오늘의 행운색
-                </h6>
-                <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-                  <span v-for="color in fortuneData.lucky_colors" :key="color" class="badge rounded-pill px-3 py-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}; color: ${getTextColor(colorMap[color])};`">
-                    {{ color }}
-                  </span>
-                </div>
+                <span class="text-white opacity-75 me-2">
+                  <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
+                  오늘의 행운색:
+                </span>
+                <span class="text-white">{{ fortuneData.lucky_colors.join(', ') }}</span>
               </div>
               <!-- 운세 정보 배지 -->
               <div class="badge-row justify-content-center">
@@ -130,7 +126,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { colorMap, getTextColor } from '@/utils/colors'
+import { colorMap } from '@/utils/colors'
 
 // 75개 음식 개별 이미지 imports
 import kimchiJjigae from '@/assets/images/food/kimchi_jjigae.png'

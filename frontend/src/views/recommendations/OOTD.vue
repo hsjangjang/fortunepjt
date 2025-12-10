@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <i class="fas fa-tshirt text-primary"></i>
+            <i class="fas fa-tshirt" style="color: #a78bfa !important;"></i>
             OOTD 추천
           </h1>
           <p class="page-subtitle">날씨와 행운색 기반 오늘의 코디</p>
@@ -18,15 +18,13 @@
               <i class="fas fa-star-half-alt text-warning me-1"></i>
               {{ fortuneSummary }}
             </p>
-            <!-- 오늘의 행운색 - 가로 배치 -->
+            <!-- 오늘의 행운색 - 텍스트로 표시 -->
             <div v-if="luckyColors && luckyColors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
               <span class="text-white opacity-75 me-1">
-                <i class="fas fa-star text-warning me-1"></i>
+                <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
                 오늘의 행운색:
               </span>
-              <span v-for="color in luckyColors" :key="color" class="badge dynamic-color-badge">
-                {{ color }}
-              </span>
+              <span class="text-white">{{ luckyColors.join(', ') }}</span>
             </div>
         </div>
 
@@ -199,7 +197,6 @@ import topKnit from '@/assets/images/ootd/top_knit.png'
 import topThickKnit from '@/assets/images/ootd/top_thick_knit.png'
 import topTurtleneck from '@/assets/images/ootd/top_turtleneck.png'
 import topFleeceSweatshirt from '@/assets/images/ootd/top_fleece_sweatshirt.png'
-import topFleece from '@/assets/images/ootd/top_fleece.png'
 import topPolo from '@/assets/images/ootd/top_polo.png'
 import topCrop from '@/assets/images/ootd/top_crop.png'
 
@@ -261,7 +258,6 @@ const topImageMap = {
   '두꺼운 니트': topThickKnit,
   '터틀넥': topTurtleneck,
   '기모 맨투맨': topFleeceSweatshirt,
-  '플리스': topFleece,
   '카라 티셔츠': topPolo,
   '폴로': topPolo,
   '크롭티': topCrop,

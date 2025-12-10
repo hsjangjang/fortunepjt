@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <i class="fas fa-crystal-ball text-primary"></i>
+            <i class="fas fa-crystal-ball" style="color: #a78bfa !important;"></i>
             오늘의 운세
           </h1>
           <p class="page-subtitle">당신의 오늘을 빛낼 운세를 확인해보세요</p>

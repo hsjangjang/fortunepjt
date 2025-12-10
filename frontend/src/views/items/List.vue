@@ -32,16 +32,13 @@
                 :style="selectedCategory === cat.key ? { background: cat.color, borderColor: cat.color } : {}"
                 @click="selectedCategory = cat.key"
               >
-                <i :class="'fas ' + cat.icon" class="me-1" :style="selectedCategory === cat.key ? {} : { color: cat.color }"></i>
                 <span class="d-none d-sm-inline">{{ cat.label }}</span>
                 <span class="d-sm-none">{{ cat.label.slice(0, 2) }}</span>
               </button>
             </div>
             <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-              <span class="text-white-50 me-2 fortune-label"><i class="fas fa-palette text-primary me-1"></i>오늘의 행운색:</span>
-              <span v-for="color in luckyColors" :key="color">
-                <span class="btn btn-sm rounded-pill fortune-cat-btn" :style="{ backgroundColor: colorMap[color] || '#a78bfa', color: getTextColor(colorMap[color] || '#a78bfa'), border: 'none', cursor: 'default' }">{{ color }}</span>
-              </span>
+              <span class="text-white-50 me-2 fortune-label"><i class="fas fa-palette me-1" style="color: #a78bfa;"></i>오늘의 행운색:</span>
+              <span class="text-white">{{ luckyColors.join(', ') }}</span>
             </div>
           </div>
 
@@ -165,7 +162,7 @@ import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
-import { colorMap, getTextColor } from '@/utils/colors'
+import { getTextColor } from '@/utils/colors'
 
 const authStore = useAuthStore()
 const items = ref([])
