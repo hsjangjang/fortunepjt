@@ -55,7 +55,14 @@
 
             <!-- Hourly Forecast Chart -->
             <div class="hourly-forecast-section">
-              <div class="hourly-items-container" ref="hourlyItemsContainer"></div>
+              <!-- 아이콘 행 -->
+              <div class="hourly-icons-row" ref="hourlyIconsRow"></div>
+              <!-- 차트 영역 -->
+              <div class="chart-wrapper">
+                <canvas ref="weatherChart"></canvas>
+              </div>
+              <!-- 강수확률 행 -->
+              <div class="hourly-prob-row" ref="hourlyProbRow"></div>
             </div>
           </div>
 
@@ -334,7 +341,9 @@ Chart.register(...registerables, ChartDataLabels)
 
 const authStore = useAuthStore()
 const { showToast } = useToast()
-const hourlyItemsContainer = ref(null)
+const weatherChart = ref(null)
+const hourlyIconsRow = ref(null)
+const hourlyProbRow = ref(null)
 
 const isLoading = ref(true)
 const luckyColors = ref([])
@@ -363,6 +372,8 @@ const outfit = ref({
   outer_desc: '',
   accessories: []
 })
+
+let chartInstance = null
 
 const weatherIcon = computed(() => {
   const temp = weather.value.temp
@@ -523,48 +534,114 @@ const getWeatherIconSvg = (sky, pty) => {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`
 }
 
-// 시간별 예보 렌더링 (아이콘 + 온도 + 강수확률)
+// 시간별 예보 렌더링 (아이콘 + 차트 + 강수확률)
 const renderHourlyForecast = (hourlyData) => {
-  if (!hourlyItemsContainer.value) return
+  if (!weatherChart.value) return
 
-  hourlyItemsContainer.value.innerHTML = ''
+  const ctx = weatherChart.value.getContext('2d')
+
+  if (chartInstance) {
+    chartInstance.destroy()
+  }
 
   // 화면 크기에 따른 표시 간격
   const isMobile = window.innerWidth < 768
-  const interval = isMobile ? 2 : 1
+  const tickInterval = isMobile ? 2 : 1
 
-  hourlyData.forEach((item, index) => {
-    if (index % interval !== 0) return
+  const labels = hourlyData.map(item => item.time)
+  const temps = hourlyData.map(item => item.temp)
 
-    const itemDiv = document.createElement('div')
-    itemDiv.className = 'hourly-item'
+  // 아이콘 행 렌더링
+  if (hourlyIconsRow.value) {
+    hourlyIconsRow.value.innerHTML = ''
+    hourlyData.forEach((item, index) => {
+      if (index % tickInterval !== 0) return
+      const iconDiv = document.createElement('div')
+      iconDiv.className = 'hourly-icon-item'
+      iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty)
+      hourlyIconsRow.value.appendChild(iconDiv)
+    })
+  }
 
-    // 시간
-    const timeDiv = document.createElement('div')
-    timeDiv.className = 'hourly-time'
-    timeDiv.textContent = item.time
+  // 강수확률 행 렌더링
+  if (hourlyProbRow.value) {
+    hourlyProbRow.value.innerHTML = ''
+    hourlyData.forEach((item, index) => {
+      if (index % tickInterval !== 0) return
+      const probDiv = document.createElement('div')
+      probDiv.className = 'hourly-prob-item'
+      probDiv.textContent = `${item.rain_probability}%`
+      hourlyProbRow.value.appendChild(probDiv)
+    })
+  }
 
-    // 날씨 아이콘
-    const iconDiv = document.createElement('div')
-    iconDiv.className = 'hourly-icon'
-    iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty)
-
-    // 온도
-    const tempDiv = document.createElement('div')
-    tempDiv.className = 'hourly-temp'
-    tempDiv.textContent = `${Math.round(item.temp)}°`
-
-    // 강수확률
-    const probDiv = document.createElement('div')
-    probDiv.className = 'hourly-prob'
-    probDiv.textContent = `${item.rain_probability}%`
-
-    itemDiv.appendChild(timeDiv)
-    itemDiv.appendChild(iconDiv)
-    itemDiv.appendChild(tempDiv)
-    itemDiv.appendChild(probDiv)
-
-    hourlyItemsContainer.value.appendChild(itemDiv)
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: '기온 (°C)',
+        data: temps,
+        borderColor: 'rgba(255, 255, 255, 0.9)',
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 2,
+        pointBackgroundColor: 'rgba(255, 255, 255, 1)',
+        pointRadius: 4,
+        tension: 0.4,
+        fill: false,
+        datalabels: {
+          align: 'top',
+          anchor: 'end',
+          color: 'white',
+          font: {
+            weight: 'bold',
+            size: 12
+          },
+          formatter: function(value) {
+            return Math.round(value) + '°'
+          },
+          display: function(context) {
+            return context.dataIndex % tickInterval === 0
+          }
+        }
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { enabled: false },
+        datalabels: { display: true }
+      },
+      scales: {
+        x: {
+          grid: { display: false, drawBorder: false },
+          ticks: {
+            color: 'rgba(255, 255, 255, 0.8)',
+            maxRotation: 0,
+            minRotation: 0,
+            autoSkip: false,
+            font: { size: 11 },
+            padding: 2,
+            callback: function(_value, index) {
+              if (index % tickInterval === 0) {
+                return labels[index]
+              }
+              return ''
+            }
+          }
+        },
+        y: {
+          display: false,
+          min: Math.min(...temps) - 5,
+          max: Math.max(...temps) + 8
+        }
+      },
+      layout: {
+        padding: { left: 10, right: 10, top: 25, bottom: 5 }
+      }
+    }
   })
 }
 
@@ -679,41 +756,38 @@ onMounted(() => {
   padding-top: 15px;
 }
 
-.hourly-items-container {
+/* 아이콘 행 */
+.hourly-icons-row {
   display: flex;
   justify-content: space-between;
-  gap: 8px;
+  padding: 0 10px;
+  margin-bottom: 5px;
 }
 
-.hourly-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.hourly-icon-item {
   flex: 1;
-  min-width: 0;
-}
-
-.hourly-time {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.7);
-  margin-bottom: 8px;
-}
-
-.hourly-icon {
-  margin-bottom: 6px;
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
 }
 
-.hourly-temp {
-  font-size: 16px;
-  font-weight: 600;
-  color: white;
-  margin-bottom: 4px;
+/* 차트 영역 */
+.chart-wrapper {
+  width: 100%;
+  height: 120px;
 }
 
-.hourly-prob {
+/* 강수확률 행 */
+.hourly-prob-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 10px;
+  margin-top: 5px;
+}
+
+.hourly-prob-item {
+  flex: 1;
+  text-align: center;
   font-size: 11px;
   color: #81d4fa;
 }
@@ -803,25 +877,24 @@ onMounted(() => {
   }
 
   /* 모바일에서 시간별 예보 */
-  .hourly-items-container {
-    gap: 4px;
+  .hourly-icons-row {
+    padding: 0 5px;
   }
 
-  .hourly-time {
-    font-size: 10px;
-    margin-bottom: 6px;
-  }
-
-  .hourly-icon svg {
+  .hourly-icon-item svg {
     width: 18px;
     height: 18px;
   }
 
-  .hourly-temp {
-    font-size: 14px;
+  .chart-wrapper {
+    height: 100px;
   }
 
-  .hourly-prob {
+  .hourly-prob-row {
+    padding: 0 5px;
+  }
+
+  .hourly-prob-item {
     font-size: 10px;
   }
 }
