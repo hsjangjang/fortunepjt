@@ -1,19 +1,17 @@
 <template>
   <DefaultLayout>
-    <div class="container py-5">
-      <div class="row justify-content-center mb-5">
-        <div class="col-lg-8 text-center">
-          <h1 class="display-4 text-white mb-3 fw-bold">
-            <i class="fas fa-crystal-ball text-primary me-3"></i>
+    <div class="page-container">
+      <div class="content-wrapper">
+        <!-- 페이지 헤더 -->
+        <div class="page-header">
+          <h1 class="page-title">
+            <i class="fas fa-crystal-ball text-primary"></i>
             오늘의 운세
           </h1>
-          <p class="lead text-white opacity-75">당신의 오늘을 빛낼 운세를 확인해보세요</p>
+          <p class="page-subtitle">당신의 오늘을 빛낼 운세를 확인해보세요</p>
         </div>
-      </div>
 
-      <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-1 px-md-3">
-          <div class="glass-card responsive-padding">
+      <div v-if="fortune" class="card-base card-lg section-spacing">
             <div class="fortune-circle">
               <svg width="220" height="220">
                 <defs>
@@ -32,29 +30,25 @@
               </div>
             </div>
 
-            <div class="row text-center mt-5 g-3 justify-content-center">
-              <div class="col-md-4">
+            <div class="badge-row mt-5">
+              <div class="text-center">
                 <h6 class="text-primary-light mb-2">별자리</h6>
                 <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2 d-inline-flex align-items-center gap-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
                   <img v-if="getZodiacIcon(fortune.zodiac_sign)" :src="getZodiacIcon(fortune.zodiac_sign)" alt="" class="zodiac-icon">
                   {{ fortune.zodiac_sign || '-' }}
                 </span>
               </div>
-              <div class="col-md-4">
+              <div class="text-center">
                 <h6 class="text-primary-light mb-2">띠</h6>
                 <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(167, 139, 250, 0.2)); border-color: rgba(167, 139, 250, 0.5) !important;">
                   {{ fortune.chinese_zodiac || '-' }}
                 </span>
               </div>
             </div>
-          </div>
-        </div>
       </div>
 
       <!-- Fortune Details Tabs -->
-      <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-1 px-md-3">
-          <div class="glass-card overflow-hidden">
+      <div v-if="fortune" class="card-base card-lg section-spacing overflow-hidden">
             <div class="card-header border-0 responsive-padding-header">
               <ul class="nav nav-pills fortune-tabs gap-2 mobile-grid-tabs justify-content-center" role="tablist">
                 <li class="nav-item">
@@ -158,15 +152,10 @@
                 </div>
               </div>
             </div>
-          </div>
-        </div>
       </div>
 
       <!-- Lucky Colors Section -->
-      <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-1 px-md-3">
-          <div class="glass-card">
-            <div class="card-body responsive-padding">
+      <div v-if="fortune" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
@@ -197,16 +186,10 @@
               <p class="text-center text-white opacity-75 mt-4 mb-0">
                 이 색상들은 오늘 하루 당신을 지켜주고 자신감을 불어넣어 줄 것입니다!
               </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Lucky Item Section -->
-      <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-1 px-md-3">
-          <div class="glass-card">
-            <div class="card-body responsive-padding">
+      <div v-if="fortune" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
@@ -258,16 +241,10 @@
                   <i class="fas fa-search me-2"></i> 내 아이템 행운도 측정하기
                 </router-link>
               </div>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Lucky Numbers Section (성인만 표시) -->
-      <div v-if="fortune && !isMinor" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-1 px-md-3">
-          <div class="glass-card">
-            <div class="card-body responsive-padding">
+      <div v-if="fortune && !isMinor" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-4">
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
@@ -285,47 +262,40 @@
               <p class="text-white opacity-50 mt-4 text-center">
                 <small>※ 오락용이며 실제 당첨과는 무관합니다</small>
               </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <!-- Recommendations -->
-      <div v-if="fortune" class="row justify-content-center mb-4">
-        <div class="col-lg-8 col-12 px-1 px-md-3">
-          <div class="row g-4">
-            <div class="col-md-6">
-              <div class="glass-card h-100 p-4 text-center hover-lift">
+      <div v-if="fortune" class="card-grid cols-2 section-spacing">
+            <div class="card-base card-md card-interactive text-center">
                 <i class="fas fa-tshirt fa-3x mb-3" style="color: #a78bfa;"></i>
                 <h5 class="text-white">OOTD 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
                 <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4">
                   추천 받기 <i class="fas fa-arrow-right ms-2"></i>
                 </router-link>
-              </div>
             </div>
-            <div class="col-md-6">
-              <div class="glass-card h-100 p-4 text-center hover-lift">
+            <div class="card-base card-md card-interactive text-center">
                 <i class="fas fa-utensils fa-3x mb-3" style="color: #a78bfa;"></i>
                 <h5 class="text-white">메뉴 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">운세에 맞는 행운의 메뉴</p>
                 <router-link to="/recommendations/menu" class="btn btn-outline-light rounded-pill px-4">
                   추천 받기 <i class="fas fa-arrow-right ms-2"></i>
                 </router-link>
-              </div>
             </div>
-          </div>
-        </div>
       </div>
 
       <!-- No Fortune Yet -->
-      <div v-if="!fortune" class="glass-card p-5 text-center">
-        <i class="fas fa-question-circle fa-5x text-white opacity-50 mb-4"></i>
-        <h3 class="text-white mb-3">운세 정보가 없습니다</h3>
-        <p class="text-white opacity-75 mb-4">먼저 운세를 계산해주세요</p>
-        <router-link to="/fortune/calculate" class="btn btn-primary btn-lg rounded-pill px-5">
-          <i class="fas fa-calculator me-2"></i> 운세 계산하기
-        </router-link>
+      <div v-if="!fortune" class="card-base card-lg">
+        <div class="empty-state">
+          <i class="fas fa-question-circle empty-icon"></i>
+          <h3 class="empty-title">운세 정보가 없습니다</h3>
+          <p class="empty-text">먼저 운세를 계산해주세요</p>
+          <router-link to="/fortune/calculate" class="btn btn-primary btn-lg rounded-pill px-5">
+            <i class="fas fa-calculator me-2"></i> 운세 계산하기
+          </router-link>
+        </div>
+      </div>
+
       </div>
     </div>
   </DefaultLayout>

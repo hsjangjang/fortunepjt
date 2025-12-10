@@ -574,3 +574,382 @@ h6 {
     color: white;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
+
+/* ========================================
+   BASE CARD TEMPLATE SYSTEM
+   fortune/today 페이지를 기준으로 한 통일된 레이아웃
+   모든 페이지에서 이 클래스들을 사용하여 일관된 디자인 유지
+   ======================================== */
+
+/* Page Container - 페이지 전체 래퍼 */
+.page-container {
+    padding: 2rem 0;
+    min-height: calc(100vh - 200px);
+}
+
+/* Content Wrapper - 콘텐츠 최대 너비 제한 */
+.content-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.content-wrapper.wide {
+    max-width: 1100px;
+}
+
+.content-wrapper.narrow {
+    max-width: 700px;
+}
+
+/* Page Header - 페이지 헤더 */
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+}
+
+.page-header .page-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.75);
+    margin: 0;
+}
+
+/* Card Base - 기본 카드 스타일 (글래스모피즘) */
+.card-base {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-base:hover {
+    box-shadow: var(--shadow-glow);
+}
+
+/* Card Sizes */
+.card-base.card-lg {
+    padding: 2.5rem;
+}
+
+.card-base.card-md {
+    padding: 1.5rem;
+}
+
+.card-base.card-sm {
+    padding: 1rem;
+}
+
+/* Card Interactive - 호버 시 상승 효과 */
+.card-base.card-interactive:hover {
+    transform: translateY(-5px);
+}
+
+/* Card Internal Structure */
+.card-header-section {
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-header-section.no-border {
+    border-bottom: none;
+}
+
+.card-body-section {
+    padding: 0;
+}
+
+.card-footer-section {
+    border-top: 1px solid var(--glass-border);
+    padding-top: 1rem;
+    margin-top: 1.5rem;
+}
+
+.card-footer-section.no-border {
+    border-top: none;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 1rem;
+}
+
+/* Card Grid - CSS Grid 레이아웃 */
+.card-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.card-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.card-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.card-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Card Row - Flexbox 가로 배치 */
+.card-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.card-row > * {
+    flex: 1;
+    min-width: 150px;
+}
+
+/* Section Spacing */
+.section-spacing {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-spacing-lg {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+}
+
+/* Info Box - 정보 박스 */
+.info-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    transition: transform 0.2s ease;
+}
+
+.info-box:hover {
+    transform: translateY(-2px);
+}
+
+.info-box.info-primary {
+    background: rgba(124, 58, 237, 0.15);
+    border-color: rgba(124, 58, 237, 0.3);
+}
+
+.info-box.info-success {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.info-box.info-warning {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.info-box.info-danger {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.info-box.info-info {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Badge Row */
+.badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+}
+
+/* Action Buttons */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-buttons.left {
+    justify-content: flex-start;
+}
+
+.action-buttons.right {
+    justify-content: flex-end;
+}
+
+/* Text Content */
+.text-content {
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.8;
+}
+
+.text-content.text-lg {
+    font-size: 1.1rem;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state .empty-icon {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.empty-state .empty-title {
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state .empty-text {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.5rem;
+}
+
+/* Primary Color Variants */
+.text-primary-light {
+    color: var(--primary-light) !important;
+}
+
+/* ========================================
+   RESPONSIVE - 반응형 디자인
+   ======================================== */
+
+/* Tablet (992px 이하) */
+@media (max-width: 992px) {
+    .card-grid.cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card-grid.cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .page-header .page-title {
+        font-size: 2rem;
+    }
+
+    .card-base.card-lg {
+        padding: 2rem;
+    }
+}
+
+/* Mobile (768px 이하) */
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1rem 0;
+    }
+
+    .content-wrapper {
+        padding: 0 0.5rem;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header .page-title {
+        font-size: 1.75rem;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .page-header .page-subtitle {
+        font-size: 1rem;
+    }
+
+    .card-base {
+        border-radius: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .card-base.card-lg {
+        padding: 1.25rem;
+    }
+
+    .card-base.card-md {
+        padding: 1rem;
+    }
+
+    .card-base.card-sm {
+        padding: 0.75rem;
+    }
+
+    .card-grid.cols-2,
+    .card-grid.cols-3,
+    .card-grid.cols-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .card-row {
+        flex-direction: column;
+    }
+
+    .card-row > * {
+        min-width: 100%;
+    }
+
+    .section-spacing {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 3rem;
+    }
+
+    .empty-state .empty-title {
+        font-size: 1.25rem;
+    }
+}
+
+/* Small Mobile (480px 이하) */
+@media (max-width: 480px) {
+    .page-header .page-title {
+        font-size: 1.5rem;
+    }
+
+    .card-base.card-lg {
+        padding: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+    }
+
+    .badge-row {
+        gap: 1rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+    }
+}

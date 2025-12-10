@@ -106,43 +106,42 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-8 mx-auto">
-        <!-- Header -->
-        <div class="card glass-card mb-4">
-            <div class="card-body text-center py-4">
-                <h1 class="display-5 fw-bold">OOTD 추천</h1>
-                <p class="lead text-muted">날씨와 행운색 기반 오늘의 코디</p>
-                {% if lucky_colors %}
-                <div class="mt-3">
-                    <span class="me-2 text-white-50"><i class="fas fa-star text-warning"></i> 오늘의 행운색:</span>
-                    {% for color in lucky_colors %}
-                    <span class="badge fs-6 px-3 py-2 me-1 dynamic-color-badge">{{ color }}</span>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <div class="mt-3">
-                    <a href="{% url 'fortune:calculate' %}" class="btn btn-outline-primary btn-sm">
-                        <i class="fas fa-moon me-1"></i> 오늘의 운세를 먼저 확인하세요
-                    </a>
-                </div>
-                {% endif %}
-            </div>
+<div class="page-container">
+    <div class="content-wrapper">
+        {# 페이지 헤더 #}
+        {% include 'includes/page_header.html' with title="OOTD 추천" subtitle="날씨와 행운색 기반 오늘의 코디" icon="fas fa-tshirt" %}
+
+        {# 행운색 표시 #}
+        {% if lucky_colors %}
+        <div class="card-base card-md section-spacing text-center">
+            <span class="me-2 text-white opacity-75"><i class="fas fa-star text-warning"></i> 오늘의 행운색:</span>
+            {% for color in lucky_colors %}
+            <span class="badge fs-6 px-3 py-2 me-1 dynamic-color-badge">{{ color }}</span>
+            {% endfor %}
         </div>
+        {% else %}
+        <div class="card-base card-md section-spacing text-center">
+            <a href="{% url 'fortune:calculate' %}" class="btn btn-outline-primary btn-sm rounded-pill">
+                <i class="fas fa-moon me-1"></i> 오늘의 운세를 먼저 확인하세요
+            </a>
+        </div>
+        {% endif %}
 
         {% if not user.is_authenticated %}
-        <!-- 비로그인 사용자 메시지 -->
-        <div class="alert alert-warning text-center" role="alert">
-            <i class="fas fa-lock"></i> <strong>로그인 후 이용해주세요</strong>
-            <br>
-            <p class="mt-2 mb-0">OOTD 추천 서비스는 회원 전용 기능입니다.</p>
-            <div class="mt-3">
-                <a href="{% url 'users:login' %}?next={% url 'recommendations:ootd' %}" class="btn btn-primary">
-                    로그인하기
-                </a>
-                <a href="{% url 'users:register' %}" class="btn btn-outline-primary">
-                    회원가입하기
-                </a>
+        {# 비로그인 사용자 메시지 #}
+        <div class="card-base card-lg">
+            <div class="empty-state">
+                <i class="fas fa-lock empty-icon"></i>
+                <h3 class="empty-title">로그인 후 이용해주세요</h3>
+                <p class="empty-text">OOTD 추천 서비스는 회원 전용 기능입니다.</p>
+                <div class="action-buttons">
+                    <a href="{% url 'users:login' %}?next={% url 'recommendations:ootd' %}" class="btn btn-primary rounded-pill px-4">
+                        로그인하기
+                    </a>
+                    <a href="{% url 'users:register' %}" class="btn btn-outline-light rounded-pill px-4">
+                        회원가입하기
+                    </a>
+                </div>
             </div>
         </div>
         {% else %}
