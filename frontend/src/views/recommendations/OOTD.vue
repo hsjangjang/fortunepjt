@@ -601,6 +601,14 @@ const renderTempChart = (hourlyData) => {
   const temps = hourlyData.map(item => Math.round(item.temp))
   const labels = hourlyData.map(item => item.time)
 
+  // 컨테이너 너비 기준으로 패딩 계산
+  const containerWidth = tempChart.value.parentElement?.clientWidth || 600
+  const isMobile = window.innerWidth <= 768
+  const itemCount = isMobile ? 6 : 12
+  const itemWidth = containerWidth / itemCount
+  // 좌우 패딩 = 컬럼 너비의 절반 (점이 컬럼 중앙에 오도록)
+  const sidePadding = itemWidth / 2
+
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
@@ -622,6 +630,12 @@ const renderTempChart = (hourlyData) => {
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: {
+        padding: {
+          left: sidePadding,
+          right: sidePadding
+        }
+      },
       plugins: {
         legend: { display: false },
         datalabels: { display: false },
