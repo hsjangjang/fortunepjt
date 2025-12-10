@@ -20,6 +20,20 @@
         </div>
 
         <template v-else>
+          <!-- 운세 미생성 시 유도 배너 -->
+          <div v-if="!fortuneData" class="fortune-prompt-banner mb-4">
+            <div class="fortune-prompt-content">
+              <i class="fas fa-magic fortune-prompt-icon"></i>
+              <div class="fortune-prompt-text">
+                <p class="fortune-prompt-title">오늘의 운세를 아직 확인하지 않으셨네요!</p>
+                <p class="fortune-prompt-desc">당신의 아이템이 오늘 어떤 행운을 불러올지 궁금하다면, 지금 오늘의 운세를 확인해보세요!</p>
+              </div>
+              <router-link to="/fortune/today" class="btn btn-primary rounded-pill px-4">
+                <i class="fas fa-crystal-ball me-1"></i> 운세 확인하기
+              </router-link>
+            </div>
+          </div>
+
           <!-- 운세 카테고리 선택 -->
           <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
             <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
@@ -495,6 +509,47 @@ onMounted(() => {
   font-size: 0.9rem;
 }
 
+/* 운세 미생성 시 유도 배너 */
+.fortune-prompt-banner {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(59, 130, 246, 0.2));
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+
+.fortune-prompt-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.fortune-prompt-icon {
+  font-size: 2rem;
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+
+.fortune-prompt-text {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+}
+
+.fortune-prompt-title {
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+
+.fortune-prompt-desc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
 @media (max-width: 767.98px) {
   .fortune-cat-btn {
     font-size: 0.7rem;
@@ -503,6 +558,22 @@ onMounted(() => {
 
   .fortune-label {
     font-size: 0.8rem;
+  }
+
+  .fortune-prompt-banner {
+    padding: 1rem;
+  }
+
+  .fortune-prompt-icon {
+    font-size: 1.5rem;
+  }
+
+  .fortune-prompt-title {
+    font-size: 0.95rem;
+  }
+
+  .fortune-prompt-desc {
+    font-size: 0.85rem;
   }
 }
 </style>

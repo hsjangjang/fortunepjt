@@ -12,25 +12,24 @@
         </div>
 
         <div v-if="item" class="card-base card-lg">
-          <div class="row g-0">
-            <div class="col-md-5">
-              <img
-                v-if="item.image"
-                :src="item.image"
-                class="img-fluid rounded-start h-100"
-                :alt="item.item_name"
-                style="object-fit: cover; min-height: 400px;"
-              >
-              <div
-                v-else
-                class="d-flex align-items-center justify-content-center h-100 bg-light"
-                style="min-height: 400px;"
-              >
-                <span class="text-muted">이미지 없음</span>
-              </div>
+          <!-- 이미지 섹션 (상단) -->
+          <div class="item-image-container">
+            <img
+              v-if="item.image"
+              :src="item.image"
+              class="item-image"
+              :alt="item.item_name"
+            >
+            <div
+              v-else
+              class="item-image-placeholder"
+            >
+              <span class="text-muted">이미지 없음</span>
             </div>
-            <div class="col-md-7">
-              <div class="card-body p-4">
+          </div>
+
+          <!-- 콘텐츠 섹션 (하단) -->
+          <div class="card-body p-4">
                 <!-- 아이템 이름 (수정 모드) -->
                 <div class="d-flex justify-content-between align-items-start mb-3">
                   <div v-if="isEditing" class="flex-grow-1 me-2">
@@ -85,8 +84,22 @@
 
                 <hr class="my-4">
 
-                <!-- 행운도 측정 버튼 -->
-                <div class="alert mb-4 text-center" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.15)); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
+                <!-- 운세 미생성 시 유도 배너 -->
+                <div v-if="!fortuneStore.hasTodayFortune" class="fortune-prompt-banner mb-4">
+                  <div class="fortune-prompt-content">
+                    <i class="fas fa-magic fortune-prompt-icon"></i>
+                    <div class="fortune-prompt-text">
+                      <p class="fortune-prompt-title">오늘의 운세를 아직 확인하지 않으셨네요!</p>
+                      <p class="fortune-prompt-desc">이 아이템이 오늘 어떤 행운을 불러올지 궁금하다면, 지금 운세를 확인해보세요!</p>
+                    </div>
+                    <router-link to="/fortune/today" class="btn btn-primary rounded-pill px-4">
+                      <i class="fas fa-crystal-ball me-1"></i> 운세 확인하기
+                    </router-link>
+                  </div>
+                </div>
+
+                <!-- 행운도 측정 버튼 (운세 있을 때만) -->
+                <div v-else class="alert mb-4 text-center" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.15)); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
                   <h6 class="mb-2"><i class="fas fa-magic text-primary me-2"></i>오늘의 행운도 측정</h6>
                   <small class="text-muted d-block mb-3">오늘의 행운과 얼마나 맞는지 확인하세요</small>
                   <button class="btn btn-primary rounded-pill px-4" @click="checkLuck">
@@ -133,8 +146,8 @@
                   </div>
                 </div>
 
-                <!-- 운세별 보완력 -->
-                <div class="fortune-boost-section mb-4">
+                <!-- 운세별 보완력 (운세 있을 때만) -->
+                <div v-if="fortuneStore.hasTodayFortune" class="fortune-boost-section mb-4">
                   <h5 class="fw-bold mb-3"><i class="fas fa-chart-bar text-info"></i> 운세별 보완력</h5>
                   <p class="text-muted small mb-3">이 아이템이 각 운세에 얼마나 도움을 줄 수 있는지 나타냅니다</p>
                   <div class="fortune-stats">
@@ -144,11 +157,11 @@
                         {{ cat.label }}
                       </span>
                       <div class="stat-bar-container">
-                        <div 
-                          class="stat-bar" 
-                          :style="{ 
-                            width: getFortuneBoost(cat.key) + '%', 
-                            background: `linear-gradient(90deg, ${cat.color}, ${cat.color}dd)` 
+                        <div
+                          class="stat-bar"
+                          :style="{
+                            width: getFortuneBoost(cat.key) + '%',
+                            background: `linear-gradient(90deg, ${cat.color}, ${cat.color}dd)`
                           }"
                         ></div>
                       </div>
@@ -171,8 +184,6 @@
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
         </div>
 
         <!-- Loading State -->
@@ -378,6 +389,33 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 아이템 이미지 섹션 */
+.item-image-container {
+  width: 100%;
+  max-height: 400px;
+  overflow: hidden;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.item-image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+}
+
+.item-image-placeholder {
+  width: 100%;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.05);
+}
+
 /* 운세별 보완력 섹션 */
 .fortune-boost-section {
   background: rgba(255, 255, 255, 0.03);
@@ -435,6 +473,47 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+/* 운세 미생성 시 유도 배너 */
+.fortune-prompt-banner {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(59, 130, 246, 0.2));
+  border: 1px solid rgba(124, 58, 237, 0.4);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+}
+
+.fortune-prompt-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.fortune-prompt-icon {
+  font-size: 2rem;
+  color: #a78bfa;
+  flex-shrink: 0;
+}
+
+.fortune-prompt-text {
+  flex: 1;
+  min-width: 200px;
+  text-align: center;
+}
+
+.fortune-prompt-title {
+  color: #fff;
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+  font-size: 1rem;
+}
+
+.fortune-prompt-desc {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 0;
+}
+
 /* 모바일 반응형 */
 @media (max-width: 767.98px) {
   .fortune-boost-section {
@@ -453,6 +532,22 @@ onMounted(() => {
   .stat-value {
     font-size: 0.85rem;
     width: 28px;
+  }
+
+  .fortune-prompt-banner {
+    padding: 1rem;
+  }
+
+  .fortune-prompt-icon {
+    font-size: 1.5rem;
+  }
+
+  .fortune-prompt-title {
+    font-size: 0.95rem;
+  }
+
+  .fortune-prompt-desc {
+    font-size: 0.85rem;
   }
 }
 </style>

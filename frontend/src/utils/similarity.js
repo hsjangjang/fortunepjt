@@ -95,13 +95,24 @@ export const getLuckyItemSimilarity = (item, luckyItem) => {
 
 /**
  * 아이템이 특정 운세 카테고리와 얼마나 관련있는지 점수 계산
+ * AI 분석 시 저장된 fortune_scores 사용, 없으면 태그 기반 fallback
  * @param {Object} item - 유저 아이템
- * @param {string} category - 운세 카테고리
+ * @param {string} category - 운세 카테고리 (love, money, work, health, study, overall)
  * @returns {number} 0~100 점수
  */
 export const getItemCategoryScore = (item, category) => {
   if (!item) return 0
 
+  // 1. AI 분석 시 저장된 fortune_scores가 있으면 사용
+  const fortuneScores = item.ai_analysis?.fortune_scores
+  if (fortuneScores && category !== 'overall') {
+    const score = fortuneScores[category]
+    if (typeof score === 'number') {
+      return Math.max(0, Math.min(100, score))
+    }
+  }
+
+  // 2. overall(종합운)이거나 fortune_scores가 없으면 태그 기반 계산
   const itemTags = item.ai_analysis?.tags || []
   const itemName = item.item_name || ''
   const keywords = fortuneKeywords[category] || []
@@ -135,10 +146,10 @@ export const getItemCategoryScore = (item, category) => {
  * @param {Array} luckyColors - 행운색 배열
  * @param {string} category - 운세 카테고리
  * @param {Function} getColorMatchScore - 색상 매칭 점수 함수
- * @param {Object} luckyItem - 오늘의 행운 아이템 (optional)
- * @returns {number} 40~90 점수
+ * @param {Object} luckyItem - 오늘의 행운 아이템
+ * @returns {number} 40~90 점수 (종합운은 40~100)
  */
-export const getFortuneBoostScore = (item, luckyColors, category, getColorMatchScore, luckyItem = null) => {
+export const getFortuneBoostScore = (item, luckyColors, category, getColorMatchScore, luckyItem) => {
   if (!item) return 40
 
   // 1. 아이템-카테고리 관련도 점수 (0~100)
@@ -148,32 +159,32 @@ export const getFortuneBoostScore = (item, luckyColors, category, getColorMatchS
   const colorScore = getColorMatchScore(item.dominant_colors, luckyColors)
 
   // 3. 오늘의 행운 아이템과 코사인 유사도 (0~100)
-  const similarityScore = luckyItem ? getLuckyItemSimilarity(item, luckyItem) : 0
+  const similarityScore = getLuckyItemSimilarity(item, luckyItem)
 
-  // 4. 종합운 보너스
-  let overallBonus = 0
+  // 4. 최종 점수: 카테고리(35%) + 색상(35%) + 행운아이템 유사도(30%)
+  const rawScore = Math.round(categoryScore * 0.35 + colorScore * 0.35 + similarityScore * 0.30)
+
+  // 5. 점수 범위 압축: 0~100 → 40~90
+  let finalScore = Math.round(40 + (Math.min(100, rawScore) / 100) * 50)
+  finalScore = Math.max(40, Math.min(90, finalScore))
+
+  // 6. 종합운 보너스 (40~90 점수 조정 후 추가, 최대 100점 가능)
   if (category === 'overall') {
-    const allKeywords = Object.values(fortuneKeywords).flat()
     const itemTags = item.ai_analysis?.tags || []
-    for (const keyword of allKeywords) {
-      if (itemTags.some(tag => tag.includes(keyword))) {
-        overallBonus = 10
-        break
+    const fortuneCategories = ['love', 'money', 'work', 'health', 'study']
+    let matchedCount = 0
+
+    for (const cat of fortuneCategories) {
+      const keywords = fortuneKeywords[cat] || []
+      if (keywords.some(kw => itemTags.some(tag => tag.includes(kw)))) {
+        matchedCount++
       }
     }
+
+    // 매칭된 카테고리 수에 따라 보너스 (최대 5개 × 2점 = 10점)
+    const overallBonus = matchedCount * 2
+    finalScore = Math.min(100, finalScore + overallBonus)
   }
 
-  // 5. 최종 점수: 카테고리(35%) + 색상(35%) + 행운아이템 유사도(30%)
-  let rawScore
-  if (luckyItem) {
-    rawScore = Math.round(categoryScore * 0.35 + colorScore * 0.35 + similarityScore * 0.30) + overallBonus
-  } else {
-    // 행운 아이템 없으면 카테고리:색상 = 5:5
-    rawScore = Math.round(categoryScore * 0.5 + colorScore * 0.5) + overallBonus
-  }
-
-  // 점수 범위 압축: 0~100 → 40~90
-  const finalScore = Math.round(40 + (Math.min(100, rawScore) / 100) * 50)
-
-  return Math.max(40, Math.min(90, finalScore))
+  return finalScore
 }

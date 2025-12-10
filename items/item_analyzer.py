@@ -1,7 +1,10 @@
 """
-아이템 이미지 색상 분석 모듈
-무료 버전: Pillow + 색상 클러스터링 사용
-AI 버전: Google Gemini Vision API
+아이템 이미지 분석 모듈
+- 색상 분석: Pillow + 색상 클러스터링
+- AI 분석: Google Gemini Vision API
+  - 아이템 이름 자동 감지
+  - 관련 태그 생성
+  - 운세별 점수 계산 (love, money, work, health, study)
 """
 from PIL import Image
 
@@ -10,8 +13,8 @@ import colorsys
 import json
 import os
 
-class ImageColorAnalyzer:
-    """이미지 색상 분석 클래스"""
+class ItemAnalyzer:
+    """아이템 이미지 분석 클래스 (색상 + AI 분석)"""
     
     def __init__(self):
         # 한국어 색상 이름 매핑
@@ -204,21 +207,37 @@ class ImageColorAnalyzer:
 
             4. tags: 해시태그 3개 (아이템 특성과 행운 관련)
                - 첫 번째: 아이템 종류 (예: '지갑', '향수', '키링')
-               - 두 번째: 관련 운세 (예: '금전운', '애정운', '건강운', '학업운', '직장운')
+               - 두 번째: **반드시** 아래 5개 운세 중 하나 선택 (필수!):
+                 '애정운', '금전운', '직장운', '건강운', '학업운'
                - 세 번째: 아이템 느낌이나 특성 (예: '고급스러움', '심플함', '귀여움', '세련됨')
+
+            5. fortune_scores: 이 아이템이 각 운세를 얼마나 강화해주는지 점수 (0~100)
+               - love: 애정운 강화 점수
+               - money: 금전운 강화 점수
+               - work: 직장운 강화 점수
+               - health: 건강운 강화 점수
+               - study: 학업운 강화 점수
+               - 아이템 특성에 따라 판단:
+                 * 지갑, 돈, 금고 → money 높음
+                 * 향수, 반지, 꽃 → love 높음
+                 * 마우스, 명함, 볼펜 → work 높음
+                 * 운동용품, 물병, 비타민 → health 높음
+                 * 노트, 펜, 책 → study 높음
 
             **중요**:
             - 반드시 유효한 JSON 형식으로만 응답
-            - 모든 값은 한글로 작성
+            - 모든 값은 한글로 작성 (fortune_scores의 키는 영문)
             - 마크다운 코드 블록(```) 절대 사용 금지
             - 단색 물체는 secondary_colors를 빈 배열로!
+            - tags의 두 번째 요소는 반드시 '애정운', '금전운', '직장운', '건강운', '학업운' 중 하나!
 
             예시 1 (검은 지갑):
             {
               "item_name": "지갑",
               "primary_color": "검은색",
               "secondary_colors": [],
-              "tags": ["지갑", "금전운", "고급스러움"]
+              "tags": ["지갑", "금전운", "고급스러움"],
+              "fortune_scores": {"love": 20, "money": 95, "work": 50, "health": 10, "study": 15}
             }
 
             예시 2 (분홍+금색 향수):
@@ -226,7 +245,8 @@ class ImageColorAnalyzer:
               "item_name": "향수",
               "primary_color": "분홍색",
               "secondary_colors": ["금색"],
-              "tags": ["향수", "애정운", "화려함"]
+              "tags": ["향수", "애정운", "화려함"],
+              "fortune_scores": {"love": 90, "money": 30, "work": 40, "health": 15, "study": 10}
             }
 
             예시 3 (검은 마우스):
@@ -234,7 +254,8 @@ class ImageColorAnalyzer:
               "item_name": "마우스",
               "primary_color": "검은색",
               "secondary_colors": [],
-              "tags": ["마우스", "직장운", "심플함"]
+              "tags": ["마우스", "직장운", "심플함"],
+              "fortune_scores": {"love": 10, "money": 40, "work": 85, "health": 15, "study": 30}
             }
             """
             
@@ -635,3 +656,7 @@ class ImageColorAnalyzer:
             return '약간의 행운이 깃들어 있습니다. 💫'
         else:
             return '오늘은 다른 아이템을 시도해보세요. 💭'
+
+
+# 하위 호환성을 위한 별칭
+ImageColorAnalyzer = ItemAnalyzer

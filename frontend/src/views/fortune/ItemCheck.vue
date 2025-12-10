@@ -148,9 +148,18 @@
                   </div>
                 </div>
 
-                <div class="text-center mt-4">
+                <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
                   <button class="btn btn-primary btn-lg rounded-pill px-4" @click="resetUpload">
                     <i class="fas fa-redo me-2"></i> 다시 측정
+                  </button>
+                  <button
+                    v-if="canSaveItem"
+                    class="btn btn-outline-light btn-lg rounded-pill px-4"
+                    @click="saveAsMyItem"
+                    :disabled="isSaving"
+                  >
+                    <i class="fas fa-plus me-2"></i>
+                    {{ isSaving ? '저장 중...' : '내 아이템으로 등록' }}
                   </button>
                 </div>
               </div>
@@ -232,6 +241,9 @@ const luckyColor = ref('#667eea')
 const matchTitle = ref('분석 중...')
 const matchDescription = ref('아이템을 분석하고 있습니다.')
 const userItems = ref([])
+const isSaving = ref(false)
+const currentAnalysisFile = ref(null)  // 분석한 원본 파일 저장
+const isFromExistingItem = ref(false)  // 기존 아이템에서 선택한 경우
 const luckyItems = ref({
   main: '미니 키링',
   zodiac: '실버 키링',
@@ -242,6 +254,14 @@ const luckyColorsWithHex = ref([])
 const luckProgressOffset = computed(() => {
   const circumference = 2 * Math.PI * 90
   return circumference - (displayLuckScore.value / 100 * circumference)
+})
+
+// 저장 가능 여부 (새로 업로드한 아이템만 저장 가능)
+const canSaveItem = computed(() => {
+  return showResult.value &&
+         currentAnalysisFile.value !== null &&
+         !isFromExistingItem.value &&
+         authStore.isAuthenticated
 })
 
 
@@ -294,6 +314,8 @@ const handleFile = (file) => {
 const analyzeItem = async (file, imageData) => {
   itemPreview.value = imageData
   showResult.value = true
+  currentAnalysisFile.value = file  // 원본 파일 저장
+  isFromExistingItem.value = false  // 새로 업로드한 아이템
   // 분석 시작 시 이전 결과 초기화
   detectedItem.value = '분석 중...'
   detectedColors.value = []
@@ -377,6 +399,8 @@ const selectExistingItem = (item) => {
   showItemModal.value = false
   itemPreview.value = getImageUrl(item.image)
   showResult.value = true
+  currentAnalysisFile.value = null  // 기존 아이템은 파일 없음
+  isFromExistingItem.value = true   // 기존 아이템에서 선택
 
   // AI 분석 결과에서 아이템 이름 가져오기 (더 정확한 인식)
   const aiAnalysis = item.ai_analysis || {}
@@ -591,8 +615,48 @@ const resetUpload = () => {
   detectedItem.value = '분석중...'
   detectedColors.value = []
   displayLuckScore.value = 0
+  currentAnalysisFile.value = null
+  isFromExistingItem.value = false
   if (cameraInput.value) cameraInput.value.value = ''
   if (galleryInput.value) galleryInput.value.value = ''
+}
+
+// 분석한 아이템을 내 아이템으로 저장
+const saveAsMyItem = async () => {
+  if (!currentAnalysisFile.value || !authStore.isAuthenticated) {
+    alert('저장할 수 없습니다.')
+    return
+  }
+
+  isSaving.value = true
+
+  try {
+    const formData = new FormData()
+    formData.append('image', currentAnalysisFile.value)
+    formData.append('item_name', detectedItem.value || '새 아이템')
+    formData.append('main_category', 'etc')
+    formData.append('category', 'etc')
+    formData.append('is_favorite', false)
+
+    const response = await api.post('/api/items/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 60000
+    })
+
+    if (response.data.success) {
+      alert('아이템이 등록되었습니다!')
+      currentAnalysisFile.value = null  // 저장 후 버튼 숨김
+      // 사용자 아이템 목록 갱신
+      fetchUserItems()
+    } else {
+      alert(response.data.message || '저장에 실패했습니다.')
+    }
+  } catch (error) {
+    console.error('아이템 저장 실패:', error)
+    alert('저장 중 오류가 발생했습니다.')
+  } finally {
+    isSaving.value = false
+  }
 }
 
 const fetchFortuneData = async () => {
@@ -691,8 +755,10 @@ onMounted(() => {
 }
 
 .item-preview {
+  width: 100%;
   max-width: 300px;
   max-height: 300px;
+  object-fit: contain;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
 }

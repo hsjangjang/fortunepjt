@@ -57,7 +57,7 @@ class ItemListAPIView(APIView):
 
         try:
             # 이미지 분석 (업로드 파일 직접 처리 - 임시 파일 관리 내장)
-            from .color_analyzer import ImageColorAnalyzer
+            from .item_analyzer import ImageColorAnalyzer
             analyzer = ImageColorAnalyzer()
             analysis_result = analyzer.analyze_from_file_or_upload(image)
 
@@ -194,7 +194,7 @@ class ItemAnalyzeAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            from .color_analyzer import ImageColorAnalyzer
+            from .item_analyzer import ImageColorAnalyzer
             analyzer = ImageColorAnalyzer()
             analysis_result = analyzer.analyze_from_file_or_upload(image)
 
