@@ -58,16 +58,15 @@
                   :to="`/items/${item.id}`"
                   class="text-decoration-none h-100 d-flex flex-column"
                 >
-                  <div class="card-body flex-grow-1">
-                    <h5 class="card-title text-white mb-1">{{ item.item_name }}</h5>
-                    <p class="card-text small mb-2" style="color: rgba(255,255,255,0.5);">{{ item.category_display }}</p>
+                  <div class="card-body flex-grow-1 d-flex flex-column">
+                    <h5 class="card-title text-white mb-2">{{ item.item_name }}</h5>
 
                     <!-- 색상 태그 -->
                     <div v-if="item.dominant_colors && item.dominant_colors.length > 0" class="mb-2">
                       <span
-                        v-for="(color, index) in item.dominant_colors.slice(0, 3)"
+                        v-for="(color, index) in item.dominant_colors.slice(0, 1)"
                         :key="index"
-                        class="badge rounded-pill me-1"
+                        class="badge rounded-pill"
                         :style="{
                           backgroundColor: color.hex,
                           color: (color.name === 'white' || color.name === 'yellow') ? '#000' : '#fff',
@@ -77,8 +76,9 @@
                         {{ color.korean_name }}
                       </span>
                     </div>
+
                     <!-- AI 분석 태그 -->
-                    <div v-if="item.ai_analysis && item.ai_analysis.tags && item.ai_analysis.tags.length > 0" class="mb-2">
+                    <div v-if="item.ai_analysis && item.ai_analysis.tags && item.ai_analysis.tags.length > 0" class="mb-3">
                       <span
                         v-for="(tag, index) in item.ai_analysis.tags.slice(0, 3)"
                         :key="'tag-' + index"
@@ -88,9 +88,23 @@
                         #{{ tag }}
                       </span>
                     </div>
-                    <!-- 날짜 -->
-                    <div class="mt-auto pt-2">
-                      <small style="color: rgba(255,255,255,0.4);">{{ formatDate(item.created_at) }}</small>
+
+                    <!-- 게임 스탯 스타일 운세 영향도 -->
+                    <div class="mt-auto stat-section">
+                      <div class="stat-row">
+                        <span class="stat-label"><i class="fas fa-palette"></i> 색상</span>
+                        <div class="stat-bar-container">
+                          <div class="stat-bar" :style="{ width: getColorStat(item) + '%', background: 'linear-gradient(90deg, #a78bfa, #7c3aed)' }"></div>
+                        </div>
+                        <span class="stat-value">{{ getColorStat(item) }}</span>
+                      </div>
+                      <div class="stat-row">
+                        <span class="stat-label"><i class="fas fa-star"></i> 행운</span>
+                        <div class="stat-bar-container">
+                          <div class="stat-bar" :style="{ width: getLuckStat(item) + '%', background: 'linear-gradient(90deg, #fbbf24, #f59e0b)' }"></div>
+                        </div>
+                        <span class="stat-value">{{ getLuckStat(item) }}</span>
+                      </div>
                     </div>
                   </div>
                 </router-link>
@@ -141,6 +155,33 @@ const fetchItems = async () => {
   }
 }
 
+// 색상 스탯 계산 (색상 다양성 기준)
+const getColorStat = (item) => {
+  if (!item.dominant_colors || item.dominant_colors.length === 0) return 50
+  // 색상 개수와 다양성에 따라 스탯 계산
+  const colorCount = item.dominant_colors.length
+  const baseStat = Math.min(colorCount * 25 + 25, 100)
+  // 약간의 랜덤성 추가 (아이템 ID 기반으로 일관된 값)
+  const variation = (item.id % 20) - 10
+  return Math.max(30, Math.min(100, baseStat + variation))
+}
+
+// 행운 스탯 계산 (AI 분석 결과 기준)
+const getLuckStat = (item) => {
+  let stat = 50
+  if (item.ai_analysis) {
+    if (item.ai_analysis.tags && item.ai_analysis.tags.length > 0) {
+      stat += item.ai_analysis.tags.length * 8
+    }
+    if (item.ai_analysis.matching_colors && item.ai_analysis.matching_colors.length > 0) {
+      stat += item.ai_analysis.matching_colors.length * 5
+    }
+  }
+  // 아이템 ID 기반 변동
+  const variation = ((item.id * 7) % 20) - 10
+  return Math.max(30, Math.min(100, stat + variation))
+}
+
 const deleteItem = async (itemId) => {
   if (!confirm('정말 이 아이템을 삭제하시겠습니까?')) {
     return
@@ -159,14 +200,6 @@ const deleteItem = async (itemId) => {
     console.error('삭제 실패:', error)
     alert('삭제 중 오류가 발생했습니다.')
   }
-}
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
-  return `${year}.${month}.${day}`
 }
 
 onMounted(() => {
@@ -215,5 +248,56 @@ onMounted(() => {
   background: rgba(239, 68, 68, 0.9);
   color: #fff;
   transform: scale(1.1);
+}
+
+/* 게임 스탯 스타일 */
+.stat-section {
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.stat-row:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  width: 50px;
+  flex-shrink: 0;
+}
+
+.stat-label i {
+  margin-right: 4px;
+}
+
+.stat-bar-container {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.stat-bar {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.stat-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  width: 24px;
+  text-align: right;
+  flex-shrink: 0;
 }
 </style>

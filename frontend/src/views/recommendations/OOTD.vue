@@ -12,9 +12,8 @@
               <div class="text-white-50 d-flex align-items-center justify-content-center mb-2">
                 <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
               </div>
-              <div class="d-flex flex-wrap align-items-center justify-content-center gap-3">
-                <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white">
-                  <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
+              <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+                <span v-for="color in luckyColors" :key="color" class="badge dynamic-color-badge">
                   {{ color }}
                 </span>
               </div>
@@ -58,13 +57,18 @@
             <!-- Hourly Forecast Chart -->
             <div class="hourly-forecast-section">
               <div class="hourly-scroll-container">
-                <div class="hourly-content" ref="hourlyContent">
+                <!-- 아이콘 행 -->
+                <div class="hourly-icons" ref="hourlyIcons">
                   <!-- 동적으로 생성됨 -->
                 </div>
-              </div>
-              <!-- 온도 라인 그래프 -->
-              <div class="chart-container">
-                <canvas ref="tempChart"></canvas>
+                <!-- 온도 라인 그래프 (아이콘과 온도 사이) -->
+                <div class="chart-container">
+                  <canvas ref="tempChart"></canvas>
+                </div>
+                <!-- 온도/시간/강수확률 행 -->
+                <div class="hourly-details" ref="hourlyDetails">
+                  <!-- 동적으로 생성됨 -->
+                </div>
               </div>
             </div>
           </div>
@@ -320,7 +324,8 @@ Chart.register(...registerables, ChartDataLabels)
 
 const authStore = useAuthStore()
 const { showToast } = useToast()
-const hourlyContent = ref(null)
+const hourlyIcons = ref(null)
+const hourlyDetails = ref(null)
 const tempChart = ref(null)
 let chartInstance = null
 
@@ -512,36 +517,51 @@ const getWeatherIconSvg = (sky, pty, isMobile = false) => {
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`
 }
 
-// 시간별 예보 렌더링 (아이콘 + 온도 + 시간 + 강수확률)
+// 시간별 예보 렌더링 (아이콘 행 / 그래프 / 온도+시간+강수확률 행 분리)
 const renderHourlyForecast = (hourlyData) => {
-  if (!hourlyContent.value) return
+  if (!hourlyIcons.value || !hourlyDetails.value) return
 
-  hourlyContent.value.innerHTML = ''
+  hourlyIcons.value.innerHTML = ''
+  hourlyDetails.value.innerHTML = ''
 
-  // 컨테이너에 인라인 스타일 적용 (scoped CSS 문제 해결)
-  hourlyContent.value.style.cssText = 'display: flex; gap: 0;'
+  // 컨테이너에 인라인 스타일 적용
+  hourlyIcons.value.style.cssText = 'display: flex; gap: 0;'
+  hourlyDetails.value.style.cssText = 'display: flex; gap: 0;'
 
-  // 모든 시간 데이터를 1시간 간격으로 표시 (12개)
   const isMobile = window.innerWidth <= 768
   const itemWidth = isMobile ? 'calc(100% / 6)' : 'calc(100% / 12)'
 
   hourlyData.forEach((item) => {
-    const itemDiv = document.createElement('div')
-    itemDiv.style.cssText = `
+    // 아이콘 행 아이템
+    const iconItem = document.createElement('div')
+    iconItem.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 0 0 ${itemWidth};
+      min-width: ${itemWidth};
+      max-width: ${itemWidth};
+      padding: ${isMobile ? '4px 2px' : '6px 4px'};
+      box-sizing: border-box;
+    `
+    const iconDiv = document.createElement('div')
+    iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty, isMobile)
+    iconItem.appendChild(iconDiv)
+    hourlyIcons.value.appendChild(iconItem)
+
+    // 상세 정보 행 아이템 (온도, 시간, 강수확률)
+    const detailItem = document.createElement('div')
+    detailItem.style.cssText = `
       display: flex;
       flex-direction: column;
       align-items: center;
       flex: 0 0 ${itemWidth};
       min-width: ${itemWidth};
       max-width: ${itemWidth};
-      padding: ${isMobile ? '6px 2px' : '8px 4px'};
+      padding: ${isMobile ? '4px 2px' : '6px 4px'};
       box-sizing: border-box;
     `
-
-    // 날씨 아이콘
-    const iconDiv = document.createElement('div')
-    iconDiv.style.cssText = `margin-bottom: ${isMobile ? '4px' : '8px'};`
-    iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty, isMobile)
 
     // 온도
     const tempDiv = document.createElement('div')
@@ -550,7 +570,7 @@ const renderHourlyForecast = (hourlyData) => {
 
     // 시간
     const timeDiv = document.createElement('div')
-    timeDiv.style.cssText = `font-size: ${isMobile ? '10px' : '11px'}; color: rgba(255, 255, 255, 0.7); margin-bottom: 6px;`
+    timeDiv.style.cssText = `font-size: ${isMobile ? '10px' : '11px'}; color: rgba(255, 255, 255, 0.7); margin-bottom: 4px;`
     timeDiv.textContent = item.time
 
     // 강수확률
@@ -558,12 +578,10 @@ const renderHourlyForecast = (hourlyData) => {
     probDiv.style.cssText = `font-size: ${isMobile ? '10px' : '11px'}; color: #81d4fa;`
     probDiv.textContent = `${item.rain_probability}%`
 
-    itemDiv.appendChild(iconDiv)
-    itemDiv.appendChild(tempDiv)
-    itemDiv.appendChild(timeDiv)
-    itemDiv.appendChild(probDiv)
-
-    hourlyContent.value.appendChild(itemDiv)
+    detailItem.appendChild(tempDiv)
+    detailItem.appendChild(timeDiv)
+    detailItem.appendChild(probDiv)
+    hourlyDetails.value.appendChild(detailItem)
   })
 
   // 온도 라인 차트 렌더링
@@ -583,25 +601,22 @@ const renderTempChart = (hourlyData) => {
   const temps = hourlyData.map(item => Math.round(item.temp))
   const labels = hourlyData.map(item => item.time)
 
-  // 그라데이션 생성
-  const gradient = ctx.createLinearGradient(0, 0, 0, 100)
-  gradient.addColorStop(0, 'rgba(167, 139, 250, 0.4)')
-  gradient.addColorStop(1, 'rgba(167, 139, 250, 0)')
-
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
       datasets: [{
         data: temps,
-        borderColor: '#a78bfa',
+        borderColor: '#ffffff',
         borderWidth: 2,
-        backgroundColor: gradient,
-        fill: true,
+        backgroundColor: 'transparent',
+        fill: false,
         tension: 0.4,
-        pointRadius: 0,
-        pointHoverRadius: 4,
-        pointHoverBackgroundColor: '#a78bfa'
+        pointRadius: 3,
+        pointBackgroundColor: '#ffffff',
+        pointBorderColor: '#ffffff',
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: '#ffffff'
       }]
     },
     options: {
@@ -759,14 +774,19 @@ onMounted(() => {
   display: none; /* Chrome, Safari */
 }
 
-.hourly-content {
+.hourly-icons {
+  display: flex;
+  gap: 0;
+}
+
+.hourly-details {
   display: flex;
   gap: 0;
 }
 
 .chart-container {
-  height: 60px;
-  margin-top: -10px;
+  height: 50px;
+  margin: 0;
   padding: 0 4px;
 }
 
