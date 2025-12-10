@@ -8,14 +8,16 @@
               <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
             </h1>
             <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-3 d-flex align-items-center justify-content-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
-              <span class="text-white-50 d-inline-flex align-items-center flex-shrink-0">
+            <div v-if="luckyColors && luckyColors.length" class="mt-3">
+              <div class="text-white-50 d-flex align-items-center justify-content-center mb-2">
                 <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
-              </span>
-              <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white flex-shrink-0">
-                <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
-                {{ color }}
-              </span>
+              </div>
+              <div class="d-flex flex-wrap align-items-center justify-content-center gap-3">
+                <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white">
+                  <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
+                  {{ color }}
+                </span>
+              </div>
             </div>
         </div>
 
@@ -55,53 +57,42 @@
 
             <!-- Hourly Forecast Chart -->
             <div class="hourly-forecast-section">
-              <!-- 아이콘 행 -->
-              <div class="hourly-icons-row" ref="hourlyIconsRow"></div>
-              <!-- 차트 영역 -->
-              <div class="chart-wrapper">
-                <canvas ref="weatherChart"></canvas>
+              <div class="hourly-scroll-container">
+                <div class="hourly-content" ref="hourlyContent">
+                  <!-- 동적으로 생성됨 -->
+                </div>
               </div>
-              <!-- 강수확률 행 -->
-              <div class="hourly-prob-row" ref="hourlyProbRow"></div>
+              <!-- 온도 라인 그래프 -->
+              <div class="chart-container">
+                <canvas ref="tempChart"></canvas>
+              </div>
             </div>
           </div>
 
           <!-- Main OOTD Recommendation -->
           <div class="row">
             <div class="col-md-6 mb-4">
-              <div class="card glass-card outfit-card h-100 p-0">
-                <div class="card-header bg-transparent border-bottom text-center" style="border-color: rgba(255,255,255,0.1);">
+              <div class="card glass-card outfit-card h-100 py-3">
+                <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
                   <h5 class="mb-0 text-white">오늘의 상의</h5>
                 </div>
-                <div class="card-body text-center responsive-padding">
+                <div class="card-body text-center">
                   <div class="mb-3 d-flex justify-content-center">
                     <img :src="getTopImage" alt="Top" width="100" class="img-fluid drop-shadow" />
                   </div>
                   <h4>{{ outfit.top || '니트' }}</h4>
                   <p class="text-muted">{{ outfit.top_desc || '따뜻하고 포근한 느낌' }}</p>
-                  <div class="mt-3">
-                    <h6 class="text-white-50 d-flex align-items-center justify-content-center mb-2">
-                      <Star v-if="luckyColors" class="text-warning me-1" :size="12" />
-                      {{ luckyColors ? '행운색 기반' : '추천 색상' }}
-                    </h6>
-                    <div class="d-flex align-items-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
-                      <span class="d-flex align-items-center text-white small flex-shrink-0">
-                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[outfit.top_color] || '#ddd'}`"></span>
-                        {{ outfit.top_color || '베이지' }}
-                      </span>
-                      <span v-for="color in outfit.top_alt_colors" :key="color" class="d-flex align-items-center text-white small flex-shrink-0">
-                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[color] || '#ddd'}`"></span>
-                        {{ color }}
-                      </span>
-                    </div>
+                  <div class="d-flex justify-content-center gap-2 mt-2 flex-wrap">
+                    <span class="badge dynamic-color-badge">{{ outfit.top_color || '베이지' }}</span>
+                    <span v-for="color in outfit.top_alt_colors" :key="color" class="badge dynamic-color-badge">{{ color }}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <div class="col-md-6 mb-4">
-              <div class="card glass-card outfit-card h-100">
-                <div class="card-header bg-transparent border-bottom text-center" style="border-color: rgba(255,255,255,0.1);">
+              <div class="card glass-card outfit-card h-100 py-3">
+                <div class="card-header bg-transparent border-bottom text-center mb-3" style="border-color: rgba(255,255,255,0.05) !important;">
                   <h5 class="mb-0 text-white">오늘의 하의</h5>
                 </div>
                 <div class="card-body text-center">
@@ -110,21 +101,9 @@
                   </div>
                   <h4>{{ outfit.bottom || '청바지' }}</h4>
                   <p class="text-muted">{{ outfit.bottom_desc || '편안한 일상 바지' }}</p>
-                  <div class="mt-3">
-                    <h6 class="text-white-50 d-flex align-items-center justify-content-center mb-2">
-                      <Star v-if="luckyColors" class="text-warning me-1" :size="12" />
-                      {{ luckyColors ? '행운색 기반' : '추천 색상' }}
-                    </h6>
-                    <div class="d-flex align-items-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
-                      <span class="d-flex align-items-center text-white small flex-shrink-0">
-                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[outfit.bottom_color] || '#ddd'}`"></span>
-                        {{ outfit.bottom_color || '블랙' }}
-                      </span>
-                      <span v-for="color in outfit.bottom_alt_colors" :key="color" class="d-flex align-items-center text-white small flex-shrink-0">
-                        <span class="color-dot small me-1" :style="`background-color: ${colorMap[color] || '#ddd'}`"></span>
-                        {{ color }}
-                      </span>
-                    </div>
+                  <div class="d-flex justify-content-center gap-2 mt-2 flex-wrap">
+                    <span class="badge dynamic-color-badge">{{ outfit.bottom_color || '블랙' }}</span>
+                    <span v-for="color in outfit.bottom_alt_colors" :key="color" class="badge dynamic-color-badge">{{ color }}</span>
                   </div>
                 </div>
               </div>
@@ -341,9 +320,9 @@ Chart.register(...registerables, ChartDataLabels)
 
 const authStore = useAuthStore()
 const { showToast } = useToast()
-const weatherChart = ref(null)
-const hourlyIconsRow = ref(null)
-const hourlyProbRow = ref(null)
+const hourlyContent = ref(null)
+const tempChart = ref(null)
+let chartInstance = null
 
 const isLoading = ref(true)
 const luckyColors = ref([])
@@ -372,8 +351,6 @@ const outfit = ref({
   outer_desc: '',
   accessories: []
 })
-
-let chartInstance = null
 
 const weatherIcon = computed(() => {
   const temp = weather.value.temp
@@ -511,99 +488,120 @@ const updateWeatherUI = (data) => {
 }
 
 // 날씨 아이콘 SVG 반환 (sky: 하늘상태, pty: 강수형태)
-const getWeatherIconSvg = (sky, pty) => {
+const getWeatherIconSvg = (sky, pty, isMobile = false) => {
   // pty(강수형태): 0=없음, 1=비, 2=비/눈, 3=눈, 4=소나기
   // sky(하늘상태): 1=맑음, 3=구름많음, 4=흐림
+  const size = isMobile ? 18 : 24
   if (pty === 1 || pty === 4) {
     // 비 또는 소나기
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#81d4fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#81d4fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>`
   }
   if (pty === 2 || pty === 3) {
     // 눈 또는 비/눈
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></svg>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></svg>`
   }
   if (sky === 1) {
     // 맑음
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
   }
   if (sky === 3) {
-    // 구름많음
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><circle cx="12" cy="12" r="4"/><path d="M3 17h.01"/><path d="M5 15h.01"/><path d="M13 17h.01"/><path d="M15 15h.01"/><path d="M4.5 13A2.5 2.5 0 1 1 7 15.5h-2a3 3 0 0 1 0-6 3.5 3.5 0 0 1 6.5 1.5H9a2 2 0 1 0-4 2.5h-.5z"/></svg>`
+    // 구름많음 (해+구름)
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><circle cx="12" cy="10" r="4"/><path d="M4 15.5a3.5 3.5 0 0 1 3.5-3.5c.36 0 .72.05 1.05.15A5.5 5.5 0 0 1 18.5 14a4 4 0 0 1 .22 7.99H6a4 4 0 0 1-.22-7.99" stroke="#9ca3af"/></svg>`
   }
   // 흐림 (sky === 4 또는 기본)
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`
 }
 
-// 시간별 예보 렌더링 (아이콘 + 차트 + 강수확률)
+// 시간별 예보 렌더링 (아이콘 + 온도 + 시간 + 강수확률)
 const renderHourlyForecast = (hourlyData) => {
-  if (!weatherChart.value) return
+  if (!hourlyContent.value) return
 
-  const ctx = weatherChart.value.getContext('2d')
+  hourlyContent.value.innerHTML = ''
 
+  // 컨테이너에 인라인 스타일 적용 (scoped CSS 문제 해결)
+  hourlyContent.value.style.cssText = 'display: flex; gap: 0;'
+
+  // 모든 시간 데이터를 1시간 간격으로 표시 (12개)
+  const isMobile = window.innerWidth <= 768
+  const itemWidth = isMobile ? 'calc(100% / 6)' : 'calc(100% / 12)'
+
+  hourlyData.forEach((item) => {
+    const itemDiv = document.createElement('div')
+    itemDiv.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 0 0 ${itemWidth};
+      min-width: ${itemWidth};
+      max-width: ${itemWidth};
+      padding: ${isMobile ? '6px 2px' : '8px 4px'};
+      box-sizing: border-box;
+    `
+
+    // 날씨 아이콘
+    const iconDiv = document.createElement('div')
+    iconDiv.style.cssText = `margin-bottom: ${isMobile ? '4px' : '8px'};`
+    iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty, isMobile)
+
+    // 온도
+    const tempDiv = document.createElement('div')
+    tempDiv.style.cssText = `font-size: ${isMobile ? '14px' : '16px'}; font-weight: 600; color: white; margin-bottom: 4px;`
+    tempDiv.textContent = `${Math.round(item.temp)}°`
+
+    // 시간
+    const timeDiv = document.createElement('div')
+    timeDiv.style.cssText = `font-size: ${isMobile ? '10px' : '11px'}; color: rgba(255, 255, 255, 0.7); margin-bottom: 6px;`
+    timeDiv.textContent = item.time
+
+    // 강수확률
+    const probDiv = document.createElement('div')
+    probDiv.style.cssText = `font-size: ${isMobile ? '10px' : '11px'}; color: #81d4fa;`
+    probDiv.textContent = `${item.rain_probability}%`
+
+    itemDiv.appendChild(iconDiv)
+    itemDiv.appendChild(tempDiv)
+    itemDiv.appendChild(timeDiv)
+    itemDiv.appendChild(probDiv)
+
+    hourlyContent.value.appendChild(itemDiv)
+  })
+
+  // 온도 라인 차트 렌더링
+  renderTempChart(hourlyData)
+}
+
+// 온도 라인 차트 렌더링
+const renderTempChart = (hourlyData) => {
+  if (!tempChart.value) return
+
+  // 기존 차트 제거
   if (chartInstance) {
     chartInstance.destroy()
   }
 
-  // 화면 크기에 따른 표시 간격
-  const isMobile = window.innerWidth < 768
-  const tickInterval = isMobile ? 2 : 1
-
+  const ctx = tempChart.value.getContext('2d')
+  const temps = hourlyData.map(item => Math.round(item.temp))
   const labels = hourlyData.map(item => item.time)
-  const temps = hourlyData.map(item => item.temp)
 
-  // 아이콘 행 렌더링
-  if (hourlyIconsRow.value) {
-    hourlyIconsRow.value.innerHTML = ''
-    hourlyData.forEach((item, index) => {
-      if (index % tickInterval !== 0) return
-      const iconDiv = document.createElement('div')
-      iconDiv.className = 'hourly-icon-item'
-      iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty)
-      hourlyIconsRow.value.appendChild(iconDiv)
-    })
-  }
-
-  // 강수확률 행 렌더링
-  if (hourlyProbRow.value) {
-    hourlyProbRow.value.innerHTML = ''
-    hourlyData.forEach((item, index) => {
-      if (index % tickInterval !== 0) return
-      const probDiv = document.createElement('div')
-      probDiv.className = 'hourly-prob-item'
-      probDiv.textContent = `${item.rain_probability}%`
-      hourlyProbRow.value.appendChild(probDiv)
-    })
-  }
+  // 그라데이션 생성
+  const gradient = ctx.createLinearGradient(0, 0, 0, 100)
+  gradient.addColorStop(0, 'rgba(167, 139, 250, 0.4)')
+  gradient.addColorStop(1, 'rgba(167, 139, 250, 0)')
 
   chartInstance = new Chart(ctx, {
     type: 'line',
     data: {
       labels: labels,
       datasets: [{
-        label: '기온 (°C)',
         data: temps,
-        borderColor: 'rgba(255, 255, 255, 0.9)',
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: '#a78bfa',
         borderWidth: 2,
-        pointBackgroundColor: 'rgba(255, 255, 255, 1)',
-        pointRadius: 4,
+        backgroundColor: gradient,
+        fill: true,
         tension: 0.4,
-        fill: false,
-        datalabels: {
-          align: 'top',
-          anchor: 'end',
-          color: 'white',
-          font: {
-            weight: 'bold',
-            size: 12
-          },
-          formatter: function(value) {
-            return Math.round(value) + '°'
-          },
-          display: function(context) {
-            return context.dataIndex % tickInterval === 0
-          }
-        }
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointHoverBackgroundColor: '#a78bfa'
       }]
     },
     options: {
@@ -611,35 +609,29 @@ const renderHourlyForecast = (hourlyData) => {
       maintainAspectRatio: false,
       plugins: {
         legend: { display: false },
-        tooltip: { enabled: false },
-        datalabels: { display: true }
-      },
-      scales: {
-        x: {
-          grid: { display: false, drawBorder: false },
-          ticks: {
-            color: 'rgba(255, 255, 255, 0.8)',
-            maxRotation: 0,
-            minRotation: 0,
-            autoSkip: false,
-            font: { size: 11 },
-            padding: 2,
-            callback: function(_value, index) {
-              if (index % tickInterval === 0) {
-                return labels[index]
-              }
-              return ''
-            }
+        datalabels: { display: false },
+        tooltip: {
+          enabled: true,
+          backgroundColor: 'rgba(0, 0, 0, 0.7)',
+          titleColor: '#fff',
+          bodyColor: '#fff',
+          displayColors: false,
+          callbacks: {
+            label: (context) => `${context.raw}°C`
           }
-        },
-        y: {
-          display: false,
-          min: Math.min(...temps) - 5,
-          max: Math.max(...temps) + 8
         }
       },
-      layout: {
-        padding: { left: 10, right: 10, top: 25, bottom: 5 }
+      scales: {
+        x: { display: false },
+        y: {
+          display: false,
+          min: Math.min(...temps) - 2,
+          max: Math.max(...temps) + 2
+        }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index'
       }
     }
   })
@@ -756,38 +748,57 @@ onMounted(() => {
   padding-top: 15px;
 }
 
-/* 아이콘 행 */
-.hourly-icons-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px;
-  margin-bottom: 5px;
+.hourly-scroll-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
 }
 
-.hourly-icon-item {
-  flex: 1;
+.hourly-scroll-container::-webkit-scrollbar {
+  display: none; /* Chrome, Safari */
+}
+
+.hourly-content {
   display: flex;
-  justify-content: center;
+  gap: 0;
+}
+
+.chart-container {
+  height: 60px;
+  margin-top: -10px;
+  padding: 0 4px;
+}
+
+.hourly-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  flex: 0 0 calc(100% / 12); /* 웹: 12개 모두 표시 */
+  min-width: calc(100% / 12);
+  max-width: calc(100% / 12);
+  padding: 8px 4px;
+  box-sizing: border-box;
 }
 
-/* 차트 영역 */
-.chart-wrapper {
-  width: 100%;
-  height: 120px;
+.hourly-icon {
+  margin-bottom: 8px;
 }
 
-/* 강수확률 행 */
-.hourly-prob-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0 10px;
-  margin-top: 5px;
+.hourly-temp {
+  font-size: 16px;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 4px;
 }
 
-.hourly-prob-item {
-  flex: 1;
-  text-align: center;
+.hourly-time {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 6px;
+}
+
+.hourly-prob {
   font-size: 11px;
   color: #81d4fa;
 }
@@ -876,25 +887,32 @@ onMounted(() => {
     border-radius: 12px;
   }
 
-  /* 모바일에서 시간별 예보 */
-  .hourly-icons-row {
-    padding: 0 5px;
+  /* 모바일에서 시간별 예보: 6개만 보이고 스크롤 */
+  .hourly-item {
+    flex: 0 0 calc(100% / 6) !important; /* 모바일: 6개만 화면에 표시 */
+    min-width: calc(100% / 6) !important;
+    max-width: calc(100% / 6) !important;
+    padding: 6px 2px;
   }
 
-  .hourly-icon-item svg {
+  .hourly-icon {
+    margin-bottom: 4px;
+  }
+
+  .hourly-icon svg {
     width: 18px;
     height: 18px;
   }
 
-  .chart-wrapper {
-    height: 100px;
+  .hourly-temp {
+    font-size: 14px;
   }
 
-  .hourly-prob-row {
-    padding: 0 5px;
+  .hourly-time {
+    font-size: 10px;
   }
 
-  .hourly-prob-item {
+  .hourly-prob {
     font-size: 10px;
   }
 }
