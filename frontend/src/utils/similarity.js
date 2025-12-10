@@ -1,4 +1,4 @@
-// 아이템-운세 관련도 계산 유틸리티 (간결화 버전)
+// 아이템-운세 관련도 계산 유틸리티
 
 // 운세 카테고리별 키워드 매핑
 export const fortuneKeywords = {
@@ -10,10 +10,93 @@ export const fortuneKeywords = {
   'study': ['학업운', '시험운', '공부', '합격', '수험', '학습', '교육', '지식']
 }
 
+// 코사인 유사도 계산용 키워드 목록
+const featureKeywords = [
+  // 운세 관련
+  '애정운', '연애운', '사랑', '로맨스', '인연',
+  '금전운', '재물운', '돈', '부자', '재물',
+  '직장운', '사업운', '업무', '승진', '취업', '커리어',
+  '건강운', '건강', '체력', '활력',
+  '학업운', '시험운', '공부', '합격', '수험',
+  '행운', '대박', '럭키',
+  // 아이템 카테고리
+  '액세서리', '악세서리', '장신구', '귀걸이', '반지', '목걸이', '팔찌',
+  '가방', '파우치', '지갑', '케이스',
+  '패션', '의류', '옷', '스카프', '머플러',
+  '문구', '펜', '노트', '다이어리', '메모',
+  '화장품', '향수', '립밤', '뷰티',
+  '시계', '키링', '키홀더', '거울'
+]
+
+// 텍스트를 특성 벡터로 변환
+const textToVector = (texts) => {
+  const vector = new Array(featureKeywords.length).fill(0)
+  const textArray = Array.isArray(texts) ? texts : [texts]
+
+  for (let i = 0; i < featureKeywords.length; i++) {
+    const keyword = featureKeywords[i]
+    for (const text of textArray) {
+      if (text && text.includes(keyword)) {
+        vector[i] = 1
+        break
+      }
+    }
+  }
+  return vector
+}
+
+// 코사인 유사도 계산
+const cosineSimilarity = (vecA, vecB) => {
+  let dotProduct = 0
+  let normA = 0
+  let normB = 0
+
+  for (let i = 0; i < vecA.length; i++) {
+    dotProduct += vecA[i] * vecB[i]
+    normA += vecA[i] * vecA[i]
+    normB += vecB[i] * vecB[i]
+  }
+
+  normA = Math.sqrt(normA)
+  normB = Math.sqrt(normB)
+
+  if (normA === 0 || normB === 0) return 0
+  return dotProduct / (normA * normB)
+}
+
+/**
+ * 오늘의 행운 아이템과 유저 아이템의 코사인 유사도 계산
+ * @param {Object} item - 유저 아이템 { item_name, ai_analysis: { tags: [] } }
+ * @param {Object} luckyItem - 행운 아이템 { main, description, weak_fortunes }
+ * @returns {number} 0~100 점수
+ */
+export const getLuckyItemSimilarity = (item, luckyItem) => {
+  if (!item || !luckyItem || !luckyItem.main) return 0
+
+  const itemTags = item.ai_analysis?.tags || []
+  const itemName = item.item_name || ''
+
+  // 행운 아이템 텍스트
+  const luckyTexts = [
+    luckyItem.main || '',
+    luckyItem.description || '',
+    luckyItem.weak_fortunes || ''
+  ]
+
+  // 유저 아이템 텍스트
+  const itemTexts = [...itemTags, itemName]
+
+  // 벡터 변환 및 코사인 유사도 계산
+  const luckyVector = textToVector(luckyTexts)
+  const itemVector = textToVector(itemTexts)
+
+  return Math.round(cosineSimilarity(luckyVector, itemVector) * 100)
+}
+
 /**
  * 아이템이 특정 운세 카테고리와 얼마나 관련있는지 점수 계산
- * @param {Object} item - 유저 아이템 { item_name, ai_analysis: { tags: [] } }
- * @param {string} category - 운세 카테고리 (overall, love, money, work, health, study)
+ * @param {Object} item - 유저 아이템
+ * @param {string} category - 운세 카테고리
  * @returns {number} 0~100 점수
  */
 export const getItemCategoryScore = (item, category) => {
@@ -25,7 +108,6 @@ export const getItemCategoryScore = (item, category) => {
 
   if (keywords.length === 0) return 0
 
-  // 태그와 아이템명에서 키워드 매칭 확인
   const allTexts = [...itemTags, itemName].join(' ').toLowerCase()
 
   let matchCount = 0
@@ -34,32 +116,30 @@ export const getItemCategoryScore = (item, category) => {
   for (const keyword of keywords) {
     if (allTexts.includes(keyword)) {
       matchCount++
-      // 직접적인 운세 태그 매칭 (예: #애정운, #금전운)
       if (itemTags.some(tag => tag.includes(keyword))) {
         hasDirectMatch = true
       }
     }
   }
 
-  // 직접 태그 매칭이 있으면 높은 점수
   if (hasDirectMatch) {
     return Math.min(100, 70 + matchCount * 10)
   }
 
-  // 키워드 매칭 비율로 점수 계산
   return Math.min(100, Math.round((matchCount / keywords.length) * 100))
 }
 
 /**
  * 아이템의 운세 부스트 점수 계산 (최종 점수)
  * @param {Object} item - 유저 아이템
- * @param {Array} luckyColors - 행운색 배열 ['하늘색', '연두색']
+ * @param {Array} luckyColors - 행운색 배열
  * @param {string} category - 운세 카테고리
- * @param {Function} getColorMatchScore - 색상 매칭 점수 함수 (colors.js에서 import)
- * @returns {number} 20~100 점수
+ * @param {Function} getColorMatchScore - 색상 매칭 점수 함수
+ * @param {Object} luckyItem - 오늘의 행운 아이템 (optional)
+ * @returns {number} 40~90 점수
  */
-export const getFortuneBoostScore = (item, luckyColors, category, getColorMatchScore) => {
-  if (!item) return 30
+export const getFortuneBoostScore = (item, luckyColors, category, getColorMatchScore, luckyItem = null) => {
+  if (!item) return 40
 
   // 1. 아이템-카테고리 관련도 점수 (0~100)
   const categoryScore = getItemCategoryScore(item, category)
@@ -67,21 +147,33 @@ export const getFortuneBoostScore = (item, luckyColors, category, getColorMatchS
   // 2. 색상 유사도 점수 (0~100)
   const colorScore = getColorMatchScore(item.dominant_colors, luckyColors)
 
-  // 3. 종합운은 모든 카테고리 키워드 확인
+  // 3. 오늘의 행운 아이템과 코사인 유사도 (0~100)
+  const similarityScore = luckyItem ? getLuckyItemSimilarity(item, luckyItem) : 0
+
+  // 4. 종합운 보너스
   let overallBonus = 0
   if (category === 'overall') {
     const allKeywords = Object.values(fortuneKeywords).flat()
     const itemTags = item.ai_analysis?.tags || []
     for (const keyword of allKeywords) {
       if (itemTags.some(tag => tag.includes(keyword))) {
-        overallBonus = 15
+        overallBonus = 10
         break
       }
     }
   }
 
-  // 4. 최종 점수: 카테고리 관련도(50%) + 색상(50%) + 종합운 보너스
-  const finalScore = Math.round(categoryScore * 0.5 + colorScore * 0.5) + overallBonus
+  // 5. 최종 점수: 카테고리(35%) + 색상(35%) + 행운아이템 유사도(30%)
+  let rawScore
+  if (luckyItem) {
+    rawScore = Math.round(categoryScore * 0.35 + colorScore * 0.35 + similarityScore * 0.30) + overallBonus
+  } else {
+    // 행운 아이템 없으면 카테고리:색상 = 5:5
+    rawScore = Math.round(categoryScore * 0.5 + colorScore * 0.5) + overallBonus
+  }
 
-  return Math.max(20, Math.min(100, finalScore))
+  // 점수 범위 압축: 0~100 → 40~90
+  const finalScore = Math.round(40 + (Math.min(100, rawScore) / 100) * 50)
+
+  return Math.max(40, Math.min(90, finalScore))
 }

@@ -189,7 +189,7 @@ const selectedCategoryColor = computed(() => {
 
 // 아이템별 운세 점수 계산 (유틸리티 사용)
 const getFortuneBoost = (item, category) => {
-  return getFortuneBoostScore(item, luckyColors.value, category, getColorMatchScore)
+  return getFortuneBoostScore(item, luckyColors.value, category, getColorMatchScore, fortuneData.value?.lucky_item)
 }
 
 // 선택된 카테고리 기준 최고 행운 아이템 ID 계산

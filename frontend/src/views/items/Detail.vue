@@ -236,7 +236,7 @@ const fortuneCategories = [
 
 // 아이템의 운세별 보완 점수 계산 (유틸리티 사용)
 const getFortuneBoost = (category) => {
-  return getFortuneBoostScore(item.value, fortuneStore.luckyColors, category, getColorMatchScore)
+  return getFortuneBoostScore(item.value, fortuneStore.luckyColors, category, getColorMatchScore, fortuneStore.luckyItem)
 }
 
 // 주요 운세 태그 찾기 (가장 높은 점수의 운세)
