@@ -8,14 +8,16 @@
               <i class="fas fa-tshirt me-2" style="color: #a78bfa !important;"></i> OOTD 추천
             </h1>
             <p class="lead text-white-50">날씨와 행운색 기반 오늘의 코디</p>
-            <div v-if="luckyColors && luckyColors.length" class="mt-3 d-flex align-items-center justify-content-center overflow-auto flex-nowrap gap-3 pb-2" style="scrollbar-width: none;">
-              <span class="text-white-50 d-inline-flex align-items-center flex-shrink-0">
+            <div v-if="luckyColors && luckyColors.length" class="mt-3">
+              <div class="text-white-50 d-flex align-items-center justify-content-center mb-2">
                 <Star class="text-warning me-1" :size="16" /> 오늘의 행운색:
-              </span>
-              <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white flex-shrink-0">
-                <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
-                {{ color }}
-              </span>
+              </div>
+              <div class="d-flex flex-wrap align-items-center justify-content-center gap-3">
+                <span v-for="color in luckyColors" :key="color" class="d-flex align-items-center text-white">
+                  <span class="color-dot me-2" :style="`background-color: ${colorMap[color] || '#a78bfa'}`"></span>
+                  {{ color }}
+                </span>
+              </div>
             </div>
         </div>
 
@@ -698,8 +700,11 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-width: calc(100% / 12); /* 웹: 12개 모두 표시 */
+  flex: 0 0 calc(100% / 12); /* 웹: 12개 모두 표시 */
+  min-width: calc(100% / 12);
+  max-width: calc(100% / 12);
   padding: 8px 4px;
+  box-sizing: border-box;
 }
 
 .hourly-icon {
@@ -810,13 +815,19 @@ onMounted(() => {
 
   /* 모바일에서 시간별 예보: 6개만 보이고 스크롤 */
   .hourly-item {
-    min-width: calc(100% / 6); /* 모바일: 6개만 화면에 표시 */
+    flex: 0 0 calc(100% / 6) !important; /* 모바일: 6개만 화면에 표시 */
+    min-width: calc(100% / 6) !important;
+    max-width: calc(100% / 6) !important;
     padding: 6px 2px;
   }
 
+  .hourly-icon {
+    margin-bottom: 4px;
+  }
+
   .hourly-icon svg {
-    width: 22px;
-    height: 22px;
+    width: 18px;
+    height: 18px;
   }
 
   .hourly-temp {
