@@ -57,7 +57,7 @@
 
           <div v-if="items.length > 0" class="row g-2 g-md-4">
             <div v-for="item in items" :key="item.id" class="col-6 col-md-4 mb-2 mb-md-4">
-              <div class="card h-100 item-card border-0" :class="{ 'top-luck-item': item.id === topLuckItemId }">
+              <div class="card h-100 item-card border-0" :class="{ 'top-luck-item': item.id === topLuckItemId }" :style="item.id === topLuckItemId ? `--luck-color: ${selectedCategoryColor}` : ''">
                 <!-- 최고 행운 배지 -->
                 <div v-if="item.id === topLuckItemId" class="top-luck-badge">
                   <i class="fas fa-crown"></i> <span class="d-none d-md-inline">{{ fortuneCategories.find(c => c.key === selectedCategory)?.label }} 최고</span>
@@ -177,13 +177,19 @@ const luckyColors = ref([])
 
 // 세부 운세 카테고리 (색상 매핑 포함)
 const fortuneCategories = [
-  { key: 'overall', label: '종합운', icon: 'fa-star', color: '#fbbf24' },
+  { key: 'overall', label: '종합운', icon: 'fa-star', color: '#a78bfa' },
   { key: 'love', label: '애정운', icon: 'fa-heart', color: '#f472b6' },
   { key: 'money', label: '금전운', icon: 'fa-coins', color: '#facc15' },
   { key: 'work', label: '직장운', icon: 'fa-briefcase', color: '#60a5fa' },
-  { key: 'health', label: '건강운', icon: 'fa-heartbeat', color: '#4ade80' }
+  { key: 'health', label: '건강운', icon: 'fa-heartbeat', color: '#4ade80' },
+  { key: 'study', label: '학업운', icon: 'fa-book', color: '#38bdf8' }
 ]
 const selectedCategory = ref('overall')
+
+// 선택된 카테고리의 색상
+const selectedCategoryColor = computed(() => {
+  return fortuneCategories.find(c => c.key === selectedCategory.value)?.color || '#a78bfa'
+})
 
 // 아이템별 세부 운세 스탯 계산
 const getFortuneBoost = (item, category) => {
@@ -205,7 +211,8 @@ const getFortuneBoost = (item, category) => {
     love: 0.8 + (item.id % 5) * 0.1,
     money: 0.7 + (item.id % 7) * 0.08,
     work: 0.75 + (item.id % 6) * 0.09,
-    health: 0.85 + (item.id % 4) * 0.07
+    health: 0.85 + (item.id % 4) * 0.07,
+    study: 0.78 + (item.id % 5) * 0.08
   }
 
   const baseScore = 40 + matchScore
@@ -359,20 +366,21 @@ onMounted(() => {
 
 /* 최고 행운 아이템 강조 */
 .top-luck-item {
-  box-shadow: 0 0 0 2px #fbbf24, 0 0 20px rgba(251, 191, 36, 0.4);
+  --luck-color: #a78bfa;
+  box-shadow: 0 0 0 2px var(--luck-color), 0 0 20px color-mix(in srgb, var(--luck-color) 40%, transparent);
   animation: luck-glow 2s ease-in-out infinite;
 }
 
 .top-luck-item:hover {
-  box-shadow: 0 0 0 2px #fbbf24, 0 8px 30px rgba(251, 191, 36, 0.5);
+  box-shadow: 0 0 0 2px var(--luck-color), 0 8px 30px color-mix(in srgb, var(--luck-color) 50%, transparent);
 }
 
 @keyframes luck-glow {
   0%, 100% {
-    box-shadow: 0 0 0 2px #fbbf24, 0 0 15px rgba(251, 191, 36, 0.3);
+    box-shadow: 0 0 0 2px var(--luck-color), 0 0 15px color-mix(in srgb, var(--luck-color) 30%, transparent);
   }
   50% {
-    box-shadow: 0 0 0 2px #fbbf24, 0 0 25px rgba(251, 191, 36, 0.6);
+    box-shadow: 0 0 0 2px var(--luck-color), 0 0 25px color-mix(in srgb, var(--luck-color) 60%, transparent);
   }
 }
 
@@ -381,14 +389,15 @@ onMounted(() => {
   top: -1px;
   left: 50%;
   transform: translateX(-50%);
-  background: linear-gradient(135deg, #fbbf24, #f59e0b);
-  color: #1a1a2e;
+  background: linear-gradient(135deg, var(--luck-color), color-mix(in srgb, var(--luck-color) 80%, black));
+  color: #fff;
   padding: 4px 12px;
   border-radius: 0 0 10px 10px;
   font-size: 11px;
   font-weight: 700;
   z-index: 10;
   white-space: nowrap;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.3);
 }
 
 .top-luck-badge i {

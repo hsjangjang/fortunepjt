@@ -1,6 +1,6 @@
 <template>
   <!-- Navigation - Django base.html과 동일 -->
-  <nav ref="navbarRef" class="navbar navbar-expand-lg navbar-dark fixed-top" @mouseleave="handleNavbarMouseLeave" @mouseenter="handleNavbarMouseEnter">
+  <nav ref="navbarRef" class="navbar navbar-expand-xl navbar-dark fixed-top" @mouseleave="handleNavbarMouseLeave" @mouseenter="handleNavbarMouseEnter">
     <div class="container">
       <router-link class="navbar-brand" to="/">
         <MoonStar class="text-warning me-2" :size="24" />
@@ -248,7 +248,7 @@ const handleLogout = async () => {
 }
 
 /* 모바일에서 네비게이션 항목 애니메이션 */
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .navbar-collapse.show .nav-item {
     animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
   }
@@ -281,7 +281,7 @@ const handleLogout = async () => {
 }
 
 /* 데스크톱에서는 기본 동작 유지 */
-@media (min-width: 992px) {
+@media (min-width: 1200px) {
   .navbar-collapse {
     max-height: none !important;
     opacity: 1 !important;
@@ -300,7 +300,7 @@ const handleLogout = async () => {
 }
 
 /* 모바일에서 드롭다운 위치 조정 */
-@media (max-width: 991.98px) {
+@media (max-width: 1199.98px) {
   .navbar .nav-item.dropdown {
     position: relative;
   }

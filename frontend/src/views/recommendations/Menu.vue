@@ -59,34 +59,35 @@
 
           <!-- Main Menu Recommendations -->
           <div v-if="!isLoading" class="card-grid cols-2 section-spacing">
-            <div v-for="rec in recommendations" :key="rec.rank" class="card-base card-md card-interactive position-relative overflow-hidden text-center">
+            <div v-for="rec in recommendations" :key="rec.rank" class="card-base card-md card-interactive position-relative overflow-hidden">
                 <!-- Subtle Gradient Background Glow -->
                 <div class="position-absolute top-0 start-50 translate-middle-x mt-n4"
                      :style="`width: 150px; height: 150px; background: ${rec.bg_gradient}; filter: blur(60px); opacity: 0.2;`"></div>
 
-                  <div class="mb-3 position-relative">
+                  <div class="mb-3 position-relative text-center">
                     <span class="badge rounded-pill px-3 py-2 text-white"
                           style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); font-size: 1.1rem;">
                       {{ rec.rank === 1 ? '🥇 1순위 추천' : '🥈 2순위 추천' }}
                     </span>
                   </div>
 
-                  <div class="menu-icon mb-4 animate-float d-flex justify-content-center position-relative">
-                    <div class="rounded-circle overflow-hidden shadow-lg border border-2 border-white border-opacity-25" style="width: 150px; height: 150px;">
-                      <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
+                  <!-- 좌측 이미지 / 우측 텍스트 레이아웃 -->
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="menu-icon animate-float flex-shrink-0">
+                      <div class="rounded-circle overflow-hidden shadow-lg border border-2 border-white border-opacity-25 main-menu-img">
+                        <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
+                      </div>
+                    </div>
+                    <div class="flex-grow-1">
+                      <h3 class="fw-bold mb-1 text-white">{{ rec.menu.name }}</h3>
+                      <p class="text-white-50 mb-2 small">{{ rec.menu.category }}</p>
+                      <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center" :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
+                        <i class="fas fa-palette me-1"></i> {{ rec.color }}
+                      </span>
                     </div>
                   </div>
 
-                  <h3 class="fw-bold mb-2 text-white position-relative">{{ rec.menu.name }}</h3>
-                  <p class="text-white-50 mb-4 position-relative">{{ rec.menu.category }}</p>
-
-                  <div class="mb-4 position-relative">
-                    <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center" :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
-                      <i class="fas fa-palette me-1"></i> {{ rec.color }}
-                    </span>
-                  </div>
-
-                  <div class="info-box position-relative">
+                  <div class="info-box position-relative mt-3">
                     <p class="small mb-0 text-white">{{ rec.menu.desc }}</p>
                   </div>
             </div>
@@ -106,12 +107,14 @@
             </div>
 
             <div class="card-grid cols-3">
-              <div v-for="item in otherRecommendations" :key="item.menu.name" class="info-box text-center hover-lift d-flex flex-column align-items-center justify-content-center">
-                  <div class="mb-2 flex-shrink-0">
+              <div v-for="item in otherRecommendations" :key="item.menu.name" class="info-box hover-lift d-flex align-items-center gap-2 other-menu-card">
+                  <div class="flex-shrink-0">
                     <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" class="other-menu-img rounded-circle" />
                   </div>
-                  <h6 class="small mb-2 text-white menu-name justify-content-center">{{ item.menu.name }}</h6>
-                  <span class="badge rounded-pill mt-auto" :style="`background-color: ${colorMap[item.color] || '#6B7280'}; color: ${getTextColor(colorMap[item.color])}; font-size: 0.7rem;`">{{ item.color }}</span>
+                  <div class="d-flex flex-column justify-content-center flex-grow-1 text-start">
+                    <h6 class="mb-1 text-white menu-name-lg">{{ item.menu.name }}</h6>
+                    <span class="badge rounded-pill align-self-start" :style="`background-color: ${colorMap[item.color] || '#6B7280'}; color: ${getTextColor(colorMap[item.color])}; font-size: 0.75rem;`">{{ item.color }}</span>
+                  </div>
               </div>
 
               <div v-if="!otherRecommendations.length" class="text-center">
@@ -357,10 +360,17 @@ onMounted(() => {
     transform: translateY(-10px);
   }
 }
+/* 메인 추천 메뉴 이미지 */
+.main-menu-img {
+  width: 120px;
+  height: 120px;
+}
+
 /* 그 외 추천 메뉴 카드 스타일 */
 .other-menu-card {
-  min-height: 140px;
+  min-height: 70px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.75rem;
 }
 
 .other-menu-img {
@@ -369,12 +379,11 @@ onMounted(() => {
   object-fit: cover;
 }
 
-.menu-name {
+.menu-name-lg {
+  font-size: 0.95rem;
+  font-weight: 500;
   line-height: 1.3;
   word-break: keep-all;
-  min-height: 2.6em;
-  display: flex;
-  align-items: center;
 }
 
 @media (max-width: 768px) {
@@ -382,9 +391,14 @@ onMounted(() => {
     padding: 3% !important;
   }
 
+  .main-menu-img {
+    width: 90px;
+    height: 90px;
+  }
+
   .other-menu-card {
-    min-height: 120px;
-    padding: 0.75rem !important;
+    min-height: 60px;
+    padding: 0.5rem !important;
   }
 
   .other-menu-img {
@@ -392,8 +406,8 @@ onMounted(() => {
     height: 40px;
   }
 
-  .menu-name {
-    font-size: 0.75rem !important;
+  .menu-name-lg {
+    font-size: 0.8rem !important;
   }
 }
 </style>

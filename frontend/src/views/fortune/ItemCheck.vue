@@ -139,9 +139,9 @@
                     </div>
                   </div>
                   <div class="mt-3 d-flex align-items-center justify-content-center flex-wrap gap-1">
-                    <span class="text-white opacity-75 me-2">행운색:</span>
+                    <span class="text-white opacity-75 me-2 lucky-color-label"><i class="fas fa-palette text-primary me-1"></i>오늘의 행운색:</span>
                     <span v-for="color in luckyColorsWithHex" :key="color.name"
-                          class="badge rounded-pill me-1 border border-light border-opacity-25 flex-shrink-0"
+                          class="badge rounded-pill me-1 border border-light border-opacity-25 flex-shrink-0 px-2"
                           :style="`background-color: ${color.hex}; color: ${getTextColor(color.hex)}; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
                       {{ color.name }}
                     </span>
@@ -857,5 +857,10 @@ onMounted(() => {
     padding: 0.45rem 0.8rem;
     font-size: 0.85rem;
   }
+}
+
+/* 오늘의 행운색 라벨 스타일 */
+.lucky-color-label {
+  font-size: 0.875rem;
 }
 </style>
