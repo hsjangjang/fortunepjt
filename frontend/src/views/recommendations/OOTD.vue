@@ -506,27 +506,28 @@ const updateWeatherUI = (data) => {
 }
 
 // 날씨 아이콘 SVG 반환 (sky: 하늘상태, pty: 강수형태)
-const getWeatherIconSvg = (sky, pty) => {
+const getWeatherIconSvg = (sky, pty, isMobile = false) => {
   // pty(강수형태): 0=없음, 1=비, 2=비/눈, 3=눈, 4=소나기
   // sky(하늘상태): 1=맑음, 3=구름많음, 4=흐림
+  const size = isMobile ? 18 : 24
   if (pty === 1 || pty === 4) {
     // 비 또는 소나기
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#81d4fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#81d4fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M16 14v6"/><path d="M8 14v6"/><path d="M12 16v6"/></svg>`
   }
   if (pty === 2 || pty === 3) {
     // 눈 또는 비/눈
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></svg>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#e0e0e0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M8 15h.01"/><path d="M8 19h.01"/><path d="M12 17h.01"/><path d="M12 21h.01"/><path d="M16 15h.01"/><path d="M16 19h.01"/></svg>`
   }
   if (sky === 1) {
     // 맑음
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>`
   }
   if (sky === 3) {
-    // 구름많음
-    return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><path d="M15.947 12.65a4 4 0 0 0-5.925-4.128"/><circle cx="12" cy="12" r="4"/><path d="M3 17h.01"/><path d="M5 15h.01"/><path d="M13 17h.01"/><path d="M15 15h.01"/><path d="M4.5 13A2.5 2.5 0 1 1 7 15.5h-2a3 3 0 0 1 0-6 3.5 3.5 0 0 1 6.5 1.5H9a2 2 0 1 0-4 2.5h-.5z"/></svg>`
+    // 구름많음 (해+구름)
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="M20 12h2"/><path d="m19.07 4.93-1.41 1.41"/><circle cx="12" cy="10" r="4"/><path d="M4 15.5a3.5 3.5 0 0 1 3.5-3.5c.36 0 .72.05 1.05.15A5.5 5.5 0 0 1 18.5 14a4 4 0 0 1 .22 7.99H6a4 4 0 0 1-.22-7.99" stroke="#9ca3af"/></svg>`
   }
   // 흐림 (sky === 4 또는 기본)
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"/></svg>`
 }
 
 // 시간별 예보 렌더링 (아이콘 + 온도 + 시간 + 강수확률)
@@ -535,29 +536,44 @@ const renderHourlyForecast = (hourlyData) => {
 
   hourlyContent.value.innerHTML = ''
 
+  // 컨테이너에 인라인 스타일 적용 (scoped CSS 문제 해결)
+  hourlyContent.value.style.cssText = 'display: flex; gap: 0;'
+
   // 모든 시간 데이터를 1시간 간격으로 표시 (12개)
+  const isMobile = window.innerWidth <= 768
+  const itemWidth = isMobile ? 'calc(100% / 6)' : 'calc(100% / 12)'
+
   hourlyData.forEach((item) => {
     const itemDiv = document.createElement('div')
-    itemDiv.className = 'hourly-item'
+    itemDiv.style.cssText = `
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 0 0 ${itemWidth};
+      min-width: ${itemWidth};
+      max-width: ${itemWidth};
+      padding: ${isMobile ? '6px 2px' : '8px 4px'};
+      box-sizing: border-box;
+    `
 
     // 날씨 아이콘
     const iconDiv = document.createElement('div')
-    iconDiv.className = 'hourly-icon'
-    iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty)
+    iconDiv.style.cssText = `margin-bottom: ${isMobile ? '4px' : '8px'};`
+    iconDiv.innerHTML = getWeatherIconSvg(item.sky, item.pty, isMobile)
 
     // 온도
     const tempDiv = document.createElement('div')
-    tempDiv.className = 'hourly-temp'
+    tempDiv.style.cssText = `font-size: ${isMobile ? '14px' : '16px'}; font-weight: 600; color: white; margin-bottom: 4px;`
     tempDiv.textContent = `${Math.round(item.temp)}°`
 
     // 시간
     const timeDiv = document.createElement('div')
-    timeDiv.className = 'hourly-time'
+    timeDiv.style.cssText = `font-size: ${isMobile ? '10px' : '11px'}; color: rgba(255, 255, 255, 0.7); margin-bottom: 6px;`
     timeDiv.textContent = item.time
 
     // 강수확률
     const probDiv = document.createElement('div')
-    probDiv.className = 'hourly-prob'
+    probDiv.style.cssText = `font-size: ${isMobile ? '10px' : '11px'}; color: #81d4fa;`
     probDiv.textContent = `${item.rain_probability}%`
 
     itemDiv.appendChild(iconDiv)
