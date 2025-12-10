@@ -226,62 +226,51 @@
 {% endblock %}
 
 {% block content %}
-<div class="container py-5">
-    <div class="row justify-content-center mb-5">
-        <div class="col-lg-10 text-center">
-            <h1 class="display-4 text-white mb-3 fw-bold">
-                <i class="fas fa-crystal-ball text-primary me-3"></i>
-                오늘의 운세
-            </h1>
-            <p class="lead text-white opacity-75">당신의 오늘을 빛낼 운세를 확인해보세요</p>
-        </div>
-    </div>
+<div class="page-container">
+    <div class="content-wrapper">
+        {# 페이지 헤더 #}
+        {% include 'includes/page_header.html' with title="오늘의 운세" subtitle="당신의 오늘을 빛낼 운세를 확인해보세요" icon="fas fa-crystal-ball" %}
 
     {% if fortune %}
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-10">
-            <div class="glass-card p-5">
-                <div class="fortune-circle">
-                    <svg width="220" height="220">
-                        <defs>
-                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
-                                <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
-                            </linearGradient>
-                        </defs>
-                        <circle cx="110" cy="110" r="100" class="fortune-circle-bg"></circle>
-                        <circle cx="110" cy="110" r="100" class="fortune-circle-progress"
-                                data-score="{{ fortune.fortune_score|default:0 }}"></circle>
-                    </svg>
-                    <div class="fortune-score-text">
-                        <div class="score">{{ fortune.fortune_score|default:0 }}</div>
-                        <div class="label">점</div>
-                    </div>
+        {# 운세 점수 카드 #}
+        <div class="card-base card-lg section-spacing">
+            <div class="fortune-circle">
+                <svg width="220" height="220">
+                    <defs>
+                        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    <circle cx="110" cy="110" r="100" class="fortune-circle-bg"></circle>
+                    <circle cx="110" cy="110" r="100" class="fortune-circle-progress"
+                            data-score="{{ fortune.fortune_score|default:0 }}"></circle>
+                </svg>
+                <div class="fortune-score-text">
+                    <div class="score">{{ fortune.fortune_score|default:0 }}</div>
+                    <div class="label">점</div>
                 </div>
+            </div>
 
-                <div class="row text-center mt-5 g-3 justify-content-center">
-                    <div class="col-md-4">
-                        <h6 class="text-primary-light mb-2">별자리</h6>
-                        <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2">
-                            {{ fortune.zodiac_sign|default:"-" }}
-                        </span>
-                    </div>
-                    <div class="col-md-4">
-                        <h6 class="text-primary-light mb-2">띠</h6>
-                        <span class="badge rounded-pill bg-success bg-opacity-25 border border-success text-white fs-5 px-4 py-2">
-                            {{ fortune.chinese_zodiac|default:"-" }}
-                        </span>
-                    </div>
+            <div class="badge-row mt-4">
+                <div class="text-center">
+                    <h6 class="text-primary-light mb-2">별자리</h6>
+                    <span class="badge rounded-pill bg-primary bg-opacity-25 border border-primary text-white fs-5 px-4 py-2">
+                        {{ fortune.zodiac_sign|default:"-" }}
+                    </span>
+                </div>
+                <div class="text-center">
+                    <h6 class="text-primary-light mb-2">띠</h6>
+                    <span class="badge rounded-pill bg-success bg-opacity-25 border border-success text-white fs-5 px-4 py-2">
+                        {{ fortune.chinese_zodiac|default:"-" }}
+                    </span>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Fortune Details Tabs -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-10">
-            <div class="glass-card overflow-hidden">
-            <div class="card-header border-0 p-4">
+        {# 운세 상세 탭 카드 #}
+        <div class="card-base section-spacing" style="overflow: hidden;">
+            <div class="card-header-section no-border" style="padding: 1.5rem;">
                 <ul class="nav nav-pills fortune-tabs nav-fill gap-2" role="tablist">
                     <li class="nav-item">
                         <a class="nav-link active" id="tab-total" data-bs-toggle="tab" href="#total">종합운</a>
@@ -300,7 +289,7 @@
                     </li>
                 </ul>
             </div>
-            <div class="card-body p-4 p-md-5">
+            <div class="card-body-section" style="padding: 1.5rem 2rem 2rem;">
                 <div class="tab-content">
                     <!-- 종합운 -->
                     <div class="tab-pane fade show active" id="total">
@@ -378,220 +367,188 @@
                     </div>
                 </div>
             </div>
-            </div>
         </div>
-    </div>
 
-    <!-- Lucky Colors Section -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-10">
-            <div class="glass-card">
-                <div class="card-body p-4 p-md-5">
-                    <h4 class="text-white text-center mb-4">
-                        <i class="fas fa-palette text-primary me-2"></i>
-                        오늘의 행운색
-                    </h4>
-                    <h5 class="text-center text-white opacity-90 mb-4">오늘 당신에게 행운을 가져다 줄 색상</h5>
+        {# 행운색 카드 #}
+        <div class="card-base card-lg section-spacing">
+            <h4 class="card-title text-center mb-4">
+                <i class="fas fa-palette text-primary"></i>
+                오늘의 행운색
+            </h4>
+            <p class="text-center text-white opacity-75 mb-4">오늘 당신에게 행운을 가져다 줄 색상</p>
 
-                    {% if fortune.lucky_colors %}
-                    <div class="d-flex justify-content-center flex-wrap">
-                        {% for color in fortune.lucky_colors %}
-                        <div class="m-3 text-center">
-                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background:
-                                {% if color == '빨간색' %}#FF0000
-                                {% elif color == '진한 빨간색' %}#8B0000
-                                {% elif color == '주황색' %}#FFA500
-                                {% elif color == '노란색' %}#FFFF00
-                                {% elif color == '초록색' %}#00FF00
-                                {% elif color == '연두색' %}#90EE90
-                                {% elif color == '하늘색' %}#87CEEB
-                                {% elif color == '파란색' %}#0000FF
-                                {% elif color == '남색' %}#000080
-                                {% elif color == '보라색' %}#800080
-                                {% elif color == '연보라색' %}#DA70D6
-                                {% elif color == '분홍색' %}#FFC0CB
-                                {% elif color == '갈색' %}#8B4513
-                                {% elif color == '베이지색' %}#F5DEB3
-                                {% elif color == '검은색' %}#000000
-                                {% elif color == '흰색' %}#FFFFFF
-                                {% elif color == '회색' %}#808080
-                                {% elif color == '은색' %}#C0C0C0
-                                {% elif color == '금색' %}#FFD700
-                                {% else %}#7c3aed{% endif %};">
-                            </div>
-                            <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">{{ color }}</p>
-                        </div>
-                        {% endfor %}
+            {% if fortune.lucky_colors %}
+            <div class="d-flex justify-content-center flex-wrap">
+                {% for color in fortune.lucky_colors %}
+                <div class="m-3 text-center">
+                    <div class="lucky-color-circle" style="background:
+                        {% if color == '빨간색' %}#FF0000
+                        {% elif color == '진한 빨간색' %}#8B0000
+                        {% elif color == '주황색' %}#FFA500
+                        {% elif color == '노란색' %}#FFFF00
+                        {% elif color == '초록색' %}#00FF00
+                        {% elif color == '연두색' %}#90EE90
+                        {% elif color == '하늘색' %}#87CEEB
+                        {% elif color == '파란색' %}#0000FF
+                        {% elif color == '남색' %}#000080
+                        {% elif color == '보라색' %}#800080
+                        {% elif color == '연보라색' %}#DA70D6
+                        {% elif color == '분홍색' %}#FFC0CB
+                        {% elif color == '갈색' %}#8B4513
+                        {% elif color == '베이지색' %}#F5DEB3
+                        {% elif color == '검은색' %}#000000
+                        {% elif color == '흰색' %}#FFFFFF
+                        {% elif color == '회색' %}#808080
+                        {% elif color == '은색' %}#C0C0C0
+                        {% elif color == '금색' %}#FFD700
+                        {% else %}#7c3aed{% endif %};">
                     </div>
-                    {% else %}
-                    <div class="d-flex justify-content-center flex-wrap">
-                        <div class="m-3 text-center">
-                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background: #87CEEB;"></div>
-                            <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">하늘색</p>
-                        </div>
-                        <div class="m-3 text-center">
-                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background: #90EE90;"></div>
-                            <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">연두색</p>
-                        </div>
-                        <div class="m-3 text-center">
-                            <div style="width: 100px; height: 100px; border-radius: 50%; margin: 0 auto; box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2); border: 3px solid rgba(255, 255, 255, 0.3); background: #800080;"></div>
-                            <p class="mt-3 mb-0 fw-bold text-white" style="font-size: 1.1rem; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">보라색</p>
-                        </div>
-                    </div>
-                    {% endif %}
-
-                    <p class="text-center text-white opacity-75 mt-4 mb-0">
-                        이 색상들을 옷이나 액세서리에 활용하면 오늘 하루가 더욱 행운으로 가득할 것입니다!
-                    </p>
+                    <p class="lucky-color-name mt-3 mb-0">{{ color }}</p>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="d-flex justify-content-center flex-wrap">
+                <div class="m-3 text-center">
+                    <div class="lucky-color-circle" style="background: #87CEEB;"></div>
+                    <p class="lucky-color-name mt-3 mb-0">하늘색</p>
+                </div>
+                <div class="m-3 text-center">
+                    <div class="lucky-color-circle" style="background: #90EE90;"></div>
+                    <p class="lucky-color-name mt-3 mb-0">연두색</p>
+                </div>
+                <div class="m-3 text-center">
+                    <div class="lucky-color-circle" style="background: #800080;"></div>
+                    <p class="lucky-color-name mt-3 mb-0">보라색</p>
                 </div>
             </div>
+            {% endif %}
+
+            <p class="text-center text-white opacity-75 mt-4 mb-0">
+                이 색상들을 옷이나 액세서리에 활용하면 오늘 하루가 더욱 행운으로 가득할 것입니다!
+            </p>
         </div>
-    </div>
 
-    <!-- Lucky Item Section -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-10">
-            <div class="glass-card">
-                <div class="card-body p-4 p-md-5">
-                    <h4 class="text-white text-center mb-4">
-                        <i class="fas fa-gem text-warning me-2"></i>
-                        오늘의 행운 아이템
-                    </h4>
-                    <p class="text-center text-white opacity-75 mb-4">오늘 당신에게 행운을 가져다 줄 아이템들</p>
+        {# 행운 아이템 카드 #}
+        <div class="card-base card-lg section-spacing">
+            <h4 class="card-title text-center mb-4">
+                <i class="fas fa-gem text-warning"></i>
+                오늘의 행운 아이템
+            </h4>
+            <p class="text-center text-white opacity-75 mb-4">오늘 당신에게 행운을 가져다 줄 아이템들</p>
 
-                    {% if fortune.lucky_item %}
-                    <div class="row g-4 justify-content-center align-items-stretch">
-                        <div class="col-md-5 d-flex">
-                            <div class="lucky-item-card text-center p-4 w-100 d-flex flex-column"
-                                 style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;"
-                                 onclick="this.querySelector('.item-desc-toggle').classList.toggle('show'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-down'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-up'); var txt = this.querySelector('.toggle-text'); txt.textContent = txt.textContent === '설명 보기' ? '접기' : '설명 보기';">
-                                <div class="mb-2">
-                                    <span class="badge bg-primary">운세 기반</span>
-                                </div>
-                                <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item.emoji|default:"🎁" }}</span>
-                                <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item.main|default:"행운 아이템" }}</h5>
-                                <div class="item-desc-toggle">
-                                    <p class="text-white opacity-75 small mb-0">{{ fortune.lucky_item.description|default:"" }}</p>
-                                </div>
-                                <div class="toggle-hint mt-2">
-                                    <i class="fas fa-chevron-down toggle-icon"></i>
-                                    <span class="small text-white opacity-50 ms-1 toggle-text">설명 보기</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-5 d-flex">
-                            <div class="lucky-item-card text-center p-4 w-100 d-flex flex-column"
-                                 style="background: rgba(59, 130, 246, 0.15); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 15px;"
-                                 onclick="this.querySelector('.item-desc-toggle').classList.toggle('show'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-down'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-up'); var txt = this.querySelector('.toggle-text'); txt.textContent = txt.textContent === '설명 보기' ? '접기' : '설명 보기';">
-                                <div class="mb-2">
-                                    <span class="badge bg-info">{{ fortune.zodiac_sign }} 추천</span>
-                                </div>
-                                <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item.zodiac_emoji|default:"⭐" }}</span>
-                                <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item.zodiac|default:"별자리 아이템" }}</h5>
-                                <div class="item-desc-toggle">
-                                    <p class="text-white opacity-75 small mb-0">{{ fortune.lucky_item.zodiac_description }}</p>
-                                </div>
-                                <div class="toggle-hint mt-2">
-                                    <i class="fas fa-chevron-down toggle-icon"></i>
-                                    <span class="small text-white opacity-50 ms-1 toggle-text">설명 보기</span>
-                                </div>
-                            </div>
-                        </div>
+            {% if fortune.lucky_item %}
+            <div class="card-row">
+                <div class="info-box info-primary text-center lucky-item-card"
+                     onclick="this.querySelector('.item-desc-toggle').classList.toggle('show'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-down'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-up'); var txt = this.querySelector('.toggle-text'); txt.textContent = txt.textContent === '설명 보기' ? '접기' : '설명 보기';">
+                    <div class="mb-2">
+                        <span class="badge bg-primary">운세 기반</span>
                     </div>
-                    {% else %}
-                    <div class="text-center">
-                        <span class="lucky-item-icon">🎁</span>
-                        <h5 class="text-white mt-3">미니 키링</h5>
-                        <p class="text-white opacity-75">새로운 문을 여는 열쇠가 됩니다</p>
+                    <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item.emoji|default:"🎁" }}</span>
+                    <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item.main|default:"행운 아이템" }}</h5>
+                    <div class="item-desc-toggle">
+                        <p class="text-white opacity-75 small mb-0">{{ fortune.lucky_item.description|default:"" }}</p>
                     </div>
-                    {% endif %}
-
-                    <div class="text-center mt-4">
-                        <a href="{% url 'fortune:item_check' %}" class="btn btn-outline-light rounded-pill px-4">
-                            <i class="fas fa-search me-2"></i> 내 아이템 행운도 측정하기
-                        </a>
+                    <div class="toggle-hint mt-2">
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                        <span class="small text-white opacity-50 ms-1 toggle-text">설명 보기</span>
+                    </div>
+                </div>
+                <div class="info-box info-info text-center lucky-item-card"
+                     onclick="this.querySelector('.item-desc-toggle').classList.toggle('show'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-down'); this.querySelector('.toggle-icon').classList.toggle('fa-chevron-up'); var txt = this.querySelector('.toggle-text'); txt.textContent = txt.textContent === '설명 보기' ? '접기' : '설명 보기';">
+                    <div class="mb-2">
+                        <span class="badge bg-info">{{ fortune.zodiac_sign }} 추천</span>
+                    </div>
+                    <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item.zodiac_emoji|default:"⭐" }}</span>
+                    <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item.zodiac|default:"별자리 아이템" }}</h5>
+                    <div class="item-desc-toggle">
+                        <p class="text-white opacity-75 small mb-0">{{ fortune.lucky_item.zodiac_description }}</p>
+                    </div>
+                    <div class="toggle-hint mt-2">
+                        <i class="fas fa-chevron-down toggle-icon"></i>
+                        <span class="small text-white opacity-50 ms-1 toggle-text">설명 보기</span>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+            {% else %}
+            <div class="text-center">
+                <span class="lucky-item-icon">🎁</span>
+                <h5 class="text-white mt-3">미니 키링</h5>
+                <p class="text-white opacity-75">새로운 문을 여는 열쇠가 됩니다</p>
+            </div>
+            {% endif %}
 
-    <!-- Lucky Numbers Section (성인만 표시) -->
-    {% if not is_minor %}
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-10">
-            <div class="glass-card">
-                <div class="card-body p-4 p-md-5">
-                    <h4 class="text-white text-center mb-4">
-                        <i class="fas fa-dice text-warning me-2"></i>
-                        재미로 보는 오늘의 추천 로또 번호
-                    </h4>
-                    {% if fortune.lotto_numbers %}
-                    <div class="lotto-numbers">
-                        {% for number in fortune.lotto_numbers %}
-                        <div class="lotto-ball" style="background:
-                            {% if number <= 10 %}linear-gradient(135deg, #fbbf24, #d97706)
-                            {% elif number <= 20 %}linear-gradient(135deg, #60a5fa, #2563eb)
-                            {% elif number <= 30 %}linear-gradient(135deg, #f87171, #dc2626)
-                            {% elif number <= 40 %}linear-gradient(135deg, #34d399, #059669)
-                            {% else %}linear-gradient(135deg, #c084fc, #7c3aed){% endif %};">
-                            {{ number }}
-                        </div>
-                        {% endfor %}
-                    </div>
-                    {% else %}
-                    <div class="text-center">
-                        <p class="text-white opacity-75">로또 번호를 불러오는 중...</p>
-                    </div>
-                    {% endif %}
-                    <p class="text-white opacity-50 mt-4 text-center">
-                        <small>※ 오락용이며 실제 당첨과는 무관합니다</small>
-                    </p>
-                </div>
+            <div class="action-buttons mt-4">
+                <a href="{% url 'fortune:item_check' %}" class="btn btn-outline-light rounded-pill px-4">
+                    <i class="fas fa-search me-2"></i> 내 아이템 행운도 측정하기
+                </a>
             </div>
         </div>
-    </div>
-    {% endif %}
 
-    <!-- Recommendations -->
-    <div class="row justify-content-center mb-4">
-        <div class="col-lg-10">
-            <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="glass-card h-100 p-4 text-center hover-lift">
-                        <i class="fas fa-tshirt fa-3x text-primary mb-3"></i>
-                        <h5 class="text-white">OOTD 추천 받기</h5>
-                        <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
-                        <a href="{% url 'recommendations:ootd' %}" class="btn btn-outline-light rounded-pill px-4">
-                            추천 받기 <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
+        {# 로또 번호 카드 (성인만) #}
+        {% if not is_minor %}
+        <div class="card-base card-lg section-spacing">
+            <h4 class="card-title text-center mb-4">
+                <i class="fas fa-dice text-warning"></i>
+                재미로 보는 오늘의 추천 로또 번호
+            </h4>
+            {% if fortune.lotto_numbers %}
+            <div class="lotto-numbers">
+                {% for number in fortune.lotto_numbers %}
+                <div class="lotto-ball" style="background:
+                    {% if number <= 10 %}linear-gradient(135deg, #fbbf24, #d97706)
+                    {% elif number <= 20 %}linear-gradient(135deg, #60a5fa, #2563eb)
+                    {% elif number <= 30 %}linear-gradient(135deg, #f87171, #dc2626)
+                    {% elif number <= 40 %}linear-gradient(135deg, #34d399, #059669)
+                    {% else %}linear-gradient(135deg, #c084fc, #7c3aed){% endif %};">
+                    {{ number }}
                 </div>
-                <div class="col-md-6">
-                    <div class="glass-card h-100 p-4 text-center hover-lift">
-                        <i class="fas fa-utensils fa-3x text-success mb-3"></i>
-                        <h5 class="text-white">메뉴 추천 받기</h5>
-                        <p class="text-white opacity-75 small mb-4">운세에 맞는 행운의 메뉴</p>
-                        <a href="{% url 'recommendations:menu' %}" class="btn btn-outline-light rounded-pill px-4">
-                            추천 받기 <i class="fas fa-arrow-right ms-2"></i>
-                        </a>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
-        </div>
-    </div>
-
-    {% else %}
-        <!-- No Fortune Yet -->
-        <div class="glass-card p-5 text-center">
-            <i class="fas fa-question-circle fa-5x text-white opacity-50 mb-4"></i>
-            <h3 class="text-white mb-3">운세 정보가 없습니다</h3>
-            <p class="text-white opacity-75 mb-4">먼저 운세를 계산해주세요</p>
-            <a href="{% url 'fortune:calculate' %}" class="btn btn-primary btn-lg rounded-pill px-5">
-                <i class="fas fa-calculator me-2"></i> 운세 계산하기
-            </a>
+            {% else %}
+            <div class="text-center">
+                <p class="text-white opacity-75">로또 번호를 불러오는 중...</p>
+            </div>
+            {% endif %}
+            <p class="text-white opacity-50 mt-4 text-center">
+                <small>※ 오락용이며 실제 당첨과는 무관합니다</small>
+            </p>
         </div>
         {% endif %}
+
+        {# 추천 카드 그리드 #}
+        <div class="card-grid cols-2 section-spacing">
+            <div class="card-base card-md card-interactive text-center hover-lift">
+                <i class="fas fa-tshirt fa-3x text-primary mb-3"></i>
+                <h5 class="text-white">OOTD 추천 받기</h5>
+                <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
+                <a href="{% url 'recommendations:ootd' %}" class="btn btn-outline-light rounded-pill px-4">
+                    추천 받기 <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+            <div class="card-base card-md card-interactive text-center hover-lift">
+                <i class="fas fa-utensils fa-3x text-success mb-3"></i>
+                <h5 class="text-white">메뉴 추천 받기</h5>
+                <p class="text-white opacity-75 small mb-4">운세에 맞는 행운의 메뉴</p>
+                <a href="{% url 'recommendations:menu' %}" class="btn btn-outline-light rounded-pill px-4">
+                    추천 받기 <i class="fas fa-arrow-right ms-2"></i>
+                </a>
+            </div>
+        </div>
+
+    {% else %}
+        {# 운세 없음 상태 #}
+        <div class="card-base card-lg">
+            <div class="empty-state">
+                <i class="fas fa-question-circle empty-icon"></i>
+                <h3 class="empty-title">운세 정보가 없습니다</h3>
+                <p class="empty-text">먼저 운세를 계산해주세요</p>
+                <a href="{% url 'fortune:calculate' %}" class="btn btn-primary btn-lg rounded-pill px-5">
+                    <i class="fas fa-calculator me-2"></i> 운세 계산하기
+                </a>
+            </div>
+        </div>
+    {% endif %}
     </div>
 </div>
 {% endblock %}

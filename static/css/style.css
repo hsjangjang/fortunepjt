@@ -581,6 +581,369 @@ h6 {
     box-shadow: none;
 }
 
+/* ============================================
+   BASE CARD TEMPLATE SYSTEM
+   - 모든 페이지에서 재사용 가능한 카드 레이아웃
+   - 웹과 모바일 반응형 지원
+   ============================================ */
+
+/* Page Container - 페이지 전체 래퍼 */
+.page-container {
+    padding: 2rem 0;
+}
+
+/* Page Header - 페이지 타이틀 섹션 */
+.page-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.page-header .page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.page-header .page-subtitle {
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.75);
+    font-weight: 300;
+}
+
+/* Content Wrapper - 콘텐츠 최대 너비 제한 */
+.content-wrapper {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.content-wrapper.wide {
+    max-width: 1100px;
+}
+
+.content-wrapper.narrow {
+    max-width: 700px;
+}
+
+/* Card Base - 기본 카드 스타일 */
+.card-base {
+    background: var(--glass-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card-base:hover {
+    box-shadow: var(--shadow-glow);
+}
+
+/* Card Padding Variants - 카드 패딩 변형 */
+.card-base.card-lg {
+    padding: 2.5rem;
+}
+
+.card-base.card-md {
+    padding: 1.5rem;
+}
+
+.card-base.card-sm {
+    padding: 1rem;
+}
+
+/* Card Header - 카드 내 헤더 */
+.card-base .card-header-section {
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-base .card-header-section.no-border {
+    border-bottom: none;
+}
+
+/* Card Title - 카드 타이틀 */
+.card-base .card-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: white;
+    margin-bottom: 0;
+}
+
+.card-base .card-title i {
+    margin-right: 0.5rem;
+}
+
+/* Card Body - 카드 본문 */
+.card-base .card-body-section {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Card Footer - 카드 푸터 */
+.card-base .card-footer-section {
+    border-top: 1px solid var(--glass-border);
+    padding-top: 1rem;
+    margin-top: 1.5rem;
+}
+
+.card-base .card-footer-section.no-border {
+    border-top: none;
+}
+
+/* Interactive Card - 클릭 가능한 카드 */
+.card-base.card-interactive {
+    cursor: pointer;
+}
+
+.card-base.card-interactive:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(124, 58, 237, 0.3);
+}
+
+/* Card Grid - 카드 그리드 레이아웃 */
+.card-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.card-grid.cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.card-grid.cols-3 {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.card-grid.cols-4 {
+    grid-template-columns: repeat(4, 1fr);
+}
+
+/* Card Row - 가로 배치 카드 */
+.card-row {
+    display: flex;
+    gap: 1.5rem;
+}
+
+.card-row > * {
+    flex: 1;
+}
+
+/* Section Spacing - 섹션 간격 */
+.section-spacing {
+    margin-bottom: 2rem;
+}
+
+.section-spacing-lg {
+    margin-bottom: 3rem;
+}
+
+/* Info Box - 정보 박스 */
+.info-box {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: var(--radius-md);
+    padding: 1.25rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.info-box.info-primary {
+    background: rgba(124, 58, 237, 0.15);
+    border-color: rgba(124, 58, 237, 0.3);
+}
+
+.info-box.info-success {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: rgba(16, 185, 129, 0.3);
+}
+
+.info-box.info-warning {
+    background: rgba(245, 158, 11, 0.15);
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.info-box.info-danger {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.info-box.info-info {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* Text Content - 텍스트 콘텐츠 박스 */
+.text-content {
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 1rem;
+    text-align: justify;
+}
+
+.text-content.text-lg {
+    font-size: 1.1rem;
+}
+
+/* Badge Row - 뱃지 행 */
+.badge-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+}
+
+/* Action Buttons - 액션 버튼 영역 */
+.action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.action-buttons.left {
+    justify-content: flex-start;
+}
+
+.action-buttons.right {
+    justify-content: flex-end;
+}
+
+/* Empty State - 빈 상태 */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1.5rem;
+}
+
+.empty-state .empty-icon {
+    font-size: 4rem;
+    color: rgba(255, 255, 255, 0.3);
+    margin-bottom: 1.5rem;
+}
+
+.empty-state .empty-title {
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 0.75rem;
+}
+
+.empty-state .empty-text {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 1.5rem;
+}
+
+/* Responsive - 반응형 */
+@media (max-width: 992px) {
+    .page-header .page-title {
+        font-size: 2rem;
+    }
+
+    .content-wrapper {
+        padding: 0 0.75rem;
+    }
+
+    .card-base.card-lg {
+        padding: 1.75rem;
+    }
+
+    .card-grid.cols-4 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .card-grid.cols-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .page-container {
+        padding: 1.5rem 0;
+    }
+
+    .page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .page-header .page-title {
+        font-size: 1.75rem;
+    }
+
+    .page-header .page-subtitle {
+        font-size: 1rem;
+    }
+
+    .content-wrapper {
+        padding: 0 0.5rem;
+    }
+
+    .card-base {
+        margin-bottom: 1rem;
+        border-radius: var(--radius-md);
+    }
+
+    .card-base.card-lg {
+        padding: 1.25rem;
+    }
+
+    .card-base.card-md {
+        padding: 1rem;
+    }
+
+    .card-base.card-sm {
+        padding: 0.75rem;
+    }
+
+    .card-grid {
+        gap: 1rem;
+    }
+
+    .card-grid.cols-2,
+    .card-grid.cols-3,
+    .card-grid.cols-4 {
+        grid-template-columns: 1fr;
+    }
+
+    .card-row {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .section-spacing {
+        margin-bottom: 1.5rem;
+    }
+
+    .section-spacing-lg {
+        margin-bottom: 2rem;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-buttons .btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header .page-title {
+        font-size: 1.5rem;
+    }
+
+    .card-base.card-lg {
+        padding: 1rem;
+    }
+
+    .empty-state {
+        padding: 2rem 1rem;
+    }
+
+    .empty-state .empty-icon {
+        font-size: 3rem;
+    }
+}
+
 /* Mobile Navbar Slide Animation */
 @media (max-width: 991.98px) {
     .navbar-collapse {

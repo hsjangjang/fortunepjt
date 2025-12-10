@@ -1,0 +1,20 @@
+{# Page Header Component
+
+   사용법:
+   {% include 'includes/page_header.html' with title="페이지 제목" subtitle="부제목" icon="fas fa-star" %}
+
+   변수:
+   - title: 페이지 타이틀 (필수)
+   - subtitle: 부제목 (선택)
+   - icon: Font Awesome 아이콘 클래스 (선택)
+   - icon_color: 아이콘 색상 클래스 (선택, 기본: text-primary)
+#}
+<div class="page-header">
+    <h1 class="page-title">
+        {% if icon %}<i class="{{ icon }} {{ icon_color|default:'text-primary' }} me-3"></i>{% endif %}
+        {{ title }}
+    </h1>
+    {% if subtitle %}
+    <p class="page-subtitle">{{ subtitle }}</p>
+    {% endif %}
+</div>
