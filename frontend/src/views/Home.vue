@@ -137,7 +137,7 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 @media (max-width: 768px) {
   .display-title {
-    font-size: 2.3rem;
+    font-size: 2.15rem;
   }
 }
 </style>
