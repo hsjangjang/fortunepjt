@@ -272,7 +272,7 @@
       <div v-if="fortune" class="card-grid cols-2 section-spacing">
             <div class="card-base card-md card-interactive text-center">
                 <i class="fas fa-tshirt fa-3x mb-3" style="color: #a78bfa;"></i>
-                <h5 class="text-white">OOTD 추천 받기</h5>
+                <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
                 <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4">
                   추천 받기 <i class="fas fa-arrow-right ms-2"></i>
@@ -280,7 +280,7 @@
             </div>
             <div class="card-base card-md card-interactive text-center">
                 <i class="fas fa-utensils fa-3x mb-3" style="color: #a78bfa;"></i>
-                <h5 class="text-white">메뉴 추천 받기</h5>
+                <h5 class="text-white recommend-title">메뉴 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">운세에 맞는 행운의 메뉴</p>
                 <router-link to="/recommendations/menu" class="btn btn-outline-light rounded-pill px-4">
                   추천 받기 <i class="fas fa-arrow-right ms-2"></i>
@@ -945,6 +945,12 @@ onMounted(async () => {
 
   /* 모바일 로또 타이틀 */
   .lotto-title {
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+
+  /* 모바일 추천 타이틀 */
+  .recommend-title {
     font-size: 0.85rem;
     white-space: nowrap;
   }
