@@ -954,5 +954,14 @@ onMounted(async () => {
     font-size: 0.9rem !important;
     white-space: nowrap;
   }
+
+  /* 모바일 별자리/띠 배열 */
+  .badge-row {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    justify-content: center;
+    gap: 1rem;
+  }
 }
 </style>
