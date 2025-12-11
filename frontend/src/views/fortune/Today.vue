@@ -914,5 +914,33 @@ onMounted(async () => {
     align-items: center;
     justify-content: center;
   }
+
+  /* 모바일 행운 아이템 카드 */
+  .lucky-item-card {
+    padding: 0.75rem !important;
+  }
+
+  .lucky-item-card .lucky-item-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .lucky-item-card h5 {
+    font-size: 0.9rem;
+  }
+
+  .lucky-item-card .badge {
+    font-size: 0.65rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .lucky-item-card .toggle-hint {
+    font-size: 0.7rem;
+  }
+
+  .lucky-item-card .item-desc-toggle p {
+    font-size: 0.75rem;
+    padding: 10px;
+  }
 }
 </style>
