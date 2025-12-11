@@ -1,7 +1,7 @@
 """
 아이템 이미지 분석 모듈
 - 색상 분석: Pillow + 색상 클러스터링
-- AI 분석: Google Gemini Vision API
+- AI 분석: OpenAI GPT-4o Vision API (GMS)
   - 아이템 이름 자동 감지
   - 관련 태그 생성
   - 운세별 점수 계산 (love, money, work, health, study)
@@ -12,6 +12,7 @@ from collections import Counter
 import colorsys
 import json
 import os
+import base64
 
 class ItemAnalyzer:
     """아이템 이미지 분석 클래스 (색상 + AI 분석)"""
@@ -117,72 +118,45 @@ class ItemAnalyzer:
                     pass
 
     def analyze_image_with_ai(self, image_path):
-        """Gemini Vision API를 사용한 AI 이미지 분석"""
+        """GPT-4o Vision API를 사용한 AI 이미지 분석 (GMS)"""
         print(f"[DEBUG] AI 분석 시작: {image_path}")
         try:
-            import google.generativeai as genai
+            from openai import OpenAI
             from django.conf import settings
-            
-            # API 키 설정
-            api_key = settings.GEMINI_API_KEY
-            print(f"[DEBUG] API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
-            
-            if not api_key:
-                raise ValueError("GEMINI_API_KEY not configured")
-            
-            genai.configure(api_key=api_key)
-            print("[DEBUG] Gemini 설정 완료")
-            
-            # 사용 가능한 모델 목록 확인
-            vision_model = None
-            try:
-                print("[DEBUG] 사용 가능한 모델 목록 확인 중...")
-                available_models = []
-                for m in genai.list_models():
-                    if 'generateContent' in m.supported_generation_methods:
-                        available_models.append(m.name)
-                        print(f"[DEBUG] - {m.name}")
-                
-                # 1순위: flash 모델 (무료)
-                for model_name in available_models:
-                    if 'flash' in model_name.lower() and 'image' not in model_name.lower():
-                        vision_model = model_name
-                        print(f"[DEBUG] Flash 모델 발견: {vision_model}")
-                        break
-                
-                # 2순위: vision 모델
-                if not vision_model:
-                    for model_name in available_models:
-                        if 'vision' in model_name.lower():
-                            vision_model = model_name
-                            break
-                
-                # 3순위: 아무 모델
-                if not vision_model and available_models:
-                    vision_model = available_models[0]
-                    
-            except Exception as e:
-                print(f"[WARNING] 모델 목록 조회 실패, 기본 모델 사용 시도: {e}")
-                vision_model = 'gemini-pro-vision'
 
-            if not vision_model:
-                raise ValueError("사용 가능한 모델을 찾을 수 없습니다")
-            
-            print(f"[DEBUG] 선택된 모델: {vision_model}")
-            model = genai.GenerativeModel(vision_model)
-            print("[DEBUG] 모델 초기화 완료")
-            
-            # 이미지 파일 읽기
+            # GMS API 설정
+            api_key = getattr(settings, 'GMS_API_KEY', '')
+            api_base = getattr(settings, 'GMS_API_BASE_URL', 'https://api.openai.com/v1')
+
+            print(f"[DEBUG] GMS API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
+            print(f"[DEBUG] GMS API Base URL: {api_base}")
+
+            if not api_key:
+                raise ValueError("GMS_API_KEY not configured")
+
+            # OpenAI 클라이언트 초기화 (GMS 엔드포인트 사용)
+            client = OpenAI(
+                api_key=api_key,
+                base_url=api_base
+            )
+            print("[DEBUG] OpenAI 클라이언트 초기화 완료")
+
+            # 이미지 파일을 base64로 인코딩
             with open(image_path, 'rb') as f:
                 image_data = f.read()
-            
-            image_parts = [
-                {
-                    "mime_type": "image/jpeg",
-                    "data": image_data
-                }
-            ]
-            
+
+            base64_image = base64.b64encode(image_data).decode('utf-8')
+
+            # 이미지 MIME 타입 추론
+            ext = os.path.splitext(image_path)[1].lower()
+            mime_type = {
+                '.jpg': 'image/jpeg',
+                '.jpeg': 'image/jpeg',
+                '.png': 'image/png',
+                '.gif': 'image/gif',
+                '.webp': 'image/webp'
+            }.get(ext, 'image/jpeg')
+
             prompt = """
             이 이미지에 있는 **물체**를 분석해주세요. 배경은 무시하고 주요 물체만 분석하세요.
 
@@ -258,12 +232,28 @@ class ItemAnalyzer:
               "fortune_scores": {"love": 10, "money": 40, "work": 85, "health": 15, "study": 30}
             }
             """
-            
-            print("[DEBUG] Gemini API 호출 시작")
-            response = model.generate_content([prompt, image_parts[0]])
-            response.resolve()
-            response_text = response.text
-            print("[DEBUG] Gemini API 응답 수신 완료")
+
+            print("[DEBUG] GPT-4o-mini Vision API 호출 시작")
+            response = client.chat.completions.create(
+                model="gpt-4o-mini",
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {"type": "text", "text": prompt},
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:{mime_type};base64,{base64_image}"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                max_tokens=1000
+            )
+            response_text = response.choices[0].message.content
+            print("[DEBUG] GPT-4o Vision API 응답 수신 완료")
             
             if response_text.endswith('```'):
                 response_text = response_text[:-3]
@@ -326,7 +316,7 @@ class ItemAnalyzer:
 
             # API 할당량 초과 에러 확인
             if '429' in error_str or 'quota' in error_str.lower() or 'rate' in error_str.lower():
-                print("[ERROR] Gemini API 할당량 초과 - Pillow fallback 없이 에러 반환")
+                print("[ERROR] GPT-4o API 할당량 초과 - Pillow fallback 없이 에러 반환")
                 return {
                     'success': False,
                     'error': 'API 할당량 초과',

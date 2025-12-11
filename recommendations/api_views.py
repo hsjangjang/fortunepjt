@@ -16,19 +16,24 @@ from config.weather_config import latlon_to_grid, get_weather_description, SKY_C
 def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int = None) -> str:
     """GMS GPT-5-nano를 사용해 종합운을 한 문장으로 요약"""
     if not total_text:
+        print("[Fortune Summary] Empty total_text received")
         return ''
 
     # 캐시 키 생성 (오늘 날짜 + 별자리 + 유저ID 기반)
-    cache_key = f"fortune_summary_{zodiac_sign}_{user_id}_{date.today()}"
+    cache_key = f"fortune_summary_v2_{zodiac_sign}_{user_id}_{date.today()}"
     cached_result = cache.get(cache_key)
     if cached_result:
+        print(f"[Fortune Summary] Using cached result: {cached_result}")
         return cached_result
 
     # GMS API 설정
     gms_api_key = getattr(settings, 'GMS_API_KEY', '')
     gms_api_base = getattr(settings, 'GMS_API_BASE_URL', '')
 
+    print(f"[Fortune Summary] GMS API Key exists: {bool(gms_api_key)}, Base URL: {gms_api_base}")
+
     if not gms_api_key:
+        print("[Fortune Summary] No GMS API key, using fallback")
         return total_text.split('.')[0] + '.' if total_text else ''
 
     try:
@@ -54,12 +59,14 @@ def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int =
 
 한 문장만 출력하세요:"""
 
+        print(f"[Fortune Summary] Calling GMS API with gpt-5-nano...")
         response = client.chat.completions.create(
             model="gpt-5-nano",
             messages=[{"role": "user", "content": prompt}],
             max_tokens=100
         )
         summary = response.choices[0].message.content.strip().strip('"').strip("'")
+        print(f"[Fortune Summary] GMS API success: {summary}")
 
         # 캐시에 저장 (24시간)
         cache.set(cache_key, summary, 60 * 60 * 24)
@@ -67,8 +74,12 @@ def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int =
         return summary
     except Exception as e:
         print(f"[Fortune Summary LLM Error] {e}")
+        import traceback
+        traceback.print_exc()
         # 실패 시 첫 문장 반환
-        return total_text.split('.')[0] + '.' if total_text else ''
+        fallback = total_text.split('.')[0] + '.' if total_text else ''
+        print(f"[Fortune Summary] Using fallback: {fallback}")
+        return fallback
 
 
 def load_ootd_data():
