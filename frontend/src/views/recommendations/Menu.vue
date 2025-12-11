@@ -21,31 +21,20 @@
             <h5 class="text-white-50">메뉴 추천을 불러오는 중...</h5>
           </div>
 
-          <!-- Fortune Info -->
-          <div v-if="!isLoading && fortuneData" class="card-base card-md section-spacing">
+          <!-- Fortune Info (OOTD 스타일) -->
+          <div v-if="!isLoading && fortuneData" class="card-base card-sm text-center section-spacing">
               <!-- 종합 운세 한줄 요약 -->
-              <p v-if="fortuneData.fortune_summary" class="text-white text-center mb-3" style="font-size: 1rem; line-height: 1.6;">
-                <i class="fas fa-quote-left text-primary opacity-50 me-2" style="font-size: 0.8rem;"></i>
+              <p v-if="fortuneData.fortune_summary" class="text-white mb-2" style="font-size: 0.95rem;">
+                <i class="fas fa-star-half-alt text-warning me-1"></i>
                 {{ fortuneData.fortune_summary }}
-                <i class="fas fa-quote-right text-primary opacity-50 ms-2" style="font-size: 0.8rem;"></i>
               </p>
-
-              <!-- 오늘의 행운색 배지 -->
-              <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="text-center mb-4">
-                <div class="d-inline-flex align-items-center gap-2 flex-wrap justify-content-center">
-                  <span class="text-white opacity-75">
-                    <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
-                    오늘의 행운색:
-                  </span>
-                  <span
-                    v-for="color in fortuneData.lucky_colors"
-                    :key="color"
-                    class="badge rounded-pill px-3 py-2"
-                    :style="`background-color: ${colorMap[color] || '#a78bfa'}; color: ${getTextColor(colorMap[color])}; font-size: 0.85rem;`"
-                  >
-                    {{ color }}
-                  </span>
-                </div>
+              <!-- 오늘의 행운색 - 텍스트로 표시 -->
+              <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+                <span class="text-white opacity-75 me-1">
+                  <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
+                  오늘의 행운색:
+                </span>
+                <span class="text-white">{{ fortuneData.lucky_colors.join(', ') }}</span>
               </div>
           </div>
 
@@ -107,18 +96,18 @@
               <h5 class="mb-0 text-white">그 외 추천 메뉴</h5>
             </div>
 
-            <div class="card-grid cols-3">
-              <div v-for="item in otherRecommendations" :key="item.menu.name" class="info-box hover-lift d-flex align-items-center gap-2 other-menu-card">
-                  <div class="flex-shrink-0">
+            <div class="row text-center g-3">
+              <div v-for="item in otherRecommendations" :key="item.menu.name" class="col-4 col-md-2">
+                <div class="other-menu-item p-2 rounded-3 hover-lift">
+                  <div class="mb-2">
                     <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" class="other-menu-img rounded-circle" />
                   </div>
-                  <div class="d-flex flex-column justify-content-center flex-grow-1 text-start">
-                    <h6 class="mb-1 text-white menu-name-lg">{{ item.menu.name }}</h6>
-                    <span class="badge rounded-pill align-self-start" :style="`background-color: ${colorMap[item.color] || '#6B7280'}; color: ${getTextColor(colorMap[item.color])}; font-size: 0.75rem;`">{{ item.color }}</span>
-                  </div>
+                  <h6 class="small mb-1 text-white menu-name-sm">{{ item.menu.name }}</h6>
+                  <span class="badge bg-secondary bg-opacity-50 text-white" style="font-size: 0.7rem;">{{ item.color }}</span>
+                </div>
               </div>
 
-              <div v-if="!otherRecommendations.length" class="text-center">
+              <div v-if="!otherRecommendations.length" class="col-12">
                 <p class="text-white opacity-50">추가 추천 메뉴가 없습니다.</p>
               </div>
             </div>
@@ -371,21 +360,24 @@ onMounted(() => {
   font-size: 1.5rem;
 }
 
-/* 그 외 추천 메뉴 카드 스타일 */
-.other-menu-card {
-  min-height: 80px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  padding: 1rem;
+/* 그 외 추천 메뉴 스타일 */
+.other-menu-item {
+  background: rgba(255, 255, 255, 0.02);
+  transition: all 0.3s ease;
+}
+
+.other-menu-item:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .other-menu-img {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
 }
 
-.menu-name-lg {
-  font-size: 1rem;
+.menu-name-sm {
+  font-size: 0.85rem;
   font-weight: 500;
   line-height: 1.3;
   word-break: keep-all;
@@ -405,18 +397,13 @@ onMounted(() => {
     font-size: 1.2rem;
   }
 
-  .other-menu-card {
-    min-height: 60px;
-    padding: 0.5rem !important;
-  }
-
   .other-menu-img {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
   }
 
-  .menu-name-lg {
-    font-size: 0.85rem !important;
+  .menu-name-sm {
+    font-size: 0.75rem !important;
   }
 }
 </style>
