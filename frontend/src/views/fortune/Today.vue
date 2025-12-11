@@ -249,7 +249,7 @@
 
       <!-- Lucky Numbers Section (성인만 표시) -->
       <div v-if="fortune && !isMinor" class="card-base card-lg section-spacing">
-              <h4 class="text-white text-center mb-4">
+              <h4 class="text-white text-center mb-4 lotto-title">
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
               </h4>
@@ -941,6 +941,11 @@ onMounted(async () => {
   .lucky-item-card .item-desc-toggle p {
     font-size: 0.75rem;
     padding: 10px;
+  }
+
+  /* 모바일 로또 타이틀 */
+  .lotto-title {
+    font-size: 1rem;
   }
 }
 </style>
