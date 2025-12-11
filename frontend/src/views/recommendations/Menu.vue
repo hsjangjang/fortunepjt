@@ -23,66 +23,74 @@
 
           <!-- Fortune Info -->
           <div v-if="!isLoading && fortuneData" class="card-base card-md section-spacing">
-              <!-- 운세 요약 -->
-              <p v-if="fortuneData.fortune_summary" class="text-white text-center mb-3" style="font-size: 0.95rem;">
-                <i class="fas fa-star-half-alt text-warning me-1"></i>
+              <!-- 종합 운세 한줄 요약 -->
+              <p v-if="fortuneData.fortune_summary" class="text-white text-center mb-3" style="font-size: 1rem; line-height: 1.6;">
+                <i class="fas fa-quote-left text-primary opacity-50 me-2" style="font-size: 0.8rem;"></i>
                 {{ fortuneData.fortune_summary }}
+                <i class="fas fa-quote-right text-primary opacity-50 ms-2" style="font-size: 0.8rem;"></i>
               </p>
-              <!-- 오늘의 행운색 -->
-              <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="text-center mb-3">
-                <span class="text-white opacity-75 me-2">
-                  <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
-                  오늘의 행운색:
-                </span>
-                <span class="text-white">{{ fortuneData.lucky_colors.join(', ') }}</span>
-              </div>
-              <!-- 운세 정보 배지 -->
-              <div class="badge-row justify-content-center">
-                <div class="text-center px-4">
-                  <h6 class="text-white opacity-75 mb-2">오늘의 운세 점수</h6>
-                  <h3 class="text-primary-light mb-0">{{ fortuneData.fortune_score || 0 }}점</h3>
-                </div>
-                <div class="text-center px-4">
-                  <h6 class="text-white opacity-75 mb-2">별자리</h6>
-                  <h4 class="text-white mb-0">{{ fortuneData.zodiac_sign || '-' }}</h4>
-                </div>
-                <div class="text-center px-4">
-                  <h6 class="text-white opacity-75 mb-2">띠</h6>
-                  <h4 class="text-white mb-0">{{ fortuneData.chinese_zodiac || '-' }}</h4>
+
+              <!-- 오늘의 행운색 배지 -->
+              <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="text-center mb-4">
+                <div class="d-inline-flex align-items-center gap-2 flex-wrap justify-content-center">
+                  <span class="text-white opacity-75">
+                    <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
+                    오늘의 행운색:
+                  </span>
+                  <span
+                    v-for="color in fortuneData.lucky_colors"
+                    :key="color"
+                    class="badge rounded-pill px-3 py-2"
+                    :style="`background-color: ${colorMap[color] || '#a78bfa'}; color: ${getTextColor(colorMap[color])}; font-size: 0.85rem;`"
+                  >
+                    {{ color }}
+                  </span>
                 </div>
               </div>
           </div>
 
-          <!-- Main Menu Recommendations -->
+          <!-- Main Menu Recommendations (2열 그리드) -->
           <div v-if="!isLoading" class="section-spacing">
-            <div v-for="rec in recommendations" :key="rec.rank" class="card-base card-md card-interactive position-relative overflow-hidden mb-4">
-                <!-- Subtle Gradient Background Glow -->
-                <div class="position-absolute top-0 start-0"
-                     :style="`width: 200px; height: 200px; background: ${rec.bg_gradient}; filter: blur(80px); opacity: 0.15;`"></div>
+            <div class="row g-4">
+              <div v-for="rec in recommendations" :key="rec.rank" class="col-md-6">
+                <div class="card-base card-md card-interactive h-100 position-relative overflow-hidden text-center p-4">
+                  <!-- Subtle Gradient Background Glow -->
+                  <div class="position-absolute top-0 start-50 translate-middle-x"
+                       :style="`width: 150px; height: 150px; background: ${rec.bg_gradient}; filter: blur(60px); opacity: 0.2; margin-top: -40px;`"></div>
 
-                  <!-- 좌측 이미지 / 우측 텍스트 - 전체 너비 활용 -->
-                  <div class="row g-0 align-items-center">
-                    <div class="col-5 col-md-4 text-center position-relative">
-                      <div class="rank-badge-top">
-                        {{ rec.rank === 1 ? '🥇 1순위' : '🥈 2순위' }}
-                      </div>
-                      <div class="menu-icon animate-float">
-                        <div class="rounded-circle overflow-hidden shadow-lg border border-3 border-white border-opacity-25 main-menu-img mx-auto">
-                          <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-7 col-md-8 ps-3 ps-md-4">
-                      <h2 class="fw-bold mb-2 text-white main-menu-name">{{ rec.menu.name }}</h2>
-                      <p class="text-white-50 mb-3">{{ rec.menu.category }}</p>
-                      <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center mb-3" :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: white; text-shadow: 0 1px 2px rgba(0,0,0,0.3); font-size: 0.9rem;`">
-                        <i class="fas fa-palette me-1"></i> {{ rec.color }}
-                      </span>
-                      <div class="info-box">
-                        <p class="mb-0 text-white" style="font-size: 0.95rem;">{{ rec.menu.desc }}</p>
-                      </div>
+                  <!-- 순위 배지 -->
+                  <div class="mb-3 position-relative">
+                    <span class="badge rounded-pill border border-white border-opacity-25 px-3 py-2 text-white"
+                          style="background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); font-size: 1rem;">
+                      {{ rec.rank === 1 ? '🥇 1순위 추천' : '🥈 2순위 추천' }}
+                    </span>
+                  </div>
+
+                  <!-- 이미지 (위) -->
+                  <div class="menu-icon mb-4 animate-float d-flex justify-content-center position-relative">
+                    <div class="rounded-circle overflow-hidden shadow-lg border border-2 border-white border-opacity-25 main-menu-img">
+                      <img :src="getFoodImage(rec.menu.category, rec.menu.name)" :alt="rec.menu.name" class="w-100 h-100 object-fit-cover" />
                     </div>
                   </div>
+
+                  <!-- 텍스트 (아래) -->
+                  <h3 class="fw-bold mb-2 text-white position-relative main-menu-name">{{ rec.menu.name }}</h3>
+                  <p class="text-white-50 mb-3 position-relative">{{ rec.menu.category }}</p>
+
+                  <!-- 행운색 배지 -->
+                  <div class="mb-4 position-relative">
+                    <span class="badge px-3 py-2 rounded-pill d-inline-flex align-items-center"
+                          :style="`background-color: ${colorMap[rec.color] || '#a78bfa'}; color: ${getTextColor(colorMap[rec.color])}; text-shadow: 0 1px 2px rgba(0,0,0,0.2);`">
+                      <i class="fas fa-palette me-1"></i> {{ rec.color }}
+                    </span>
+                  </div>
+
+                  <!-- 설명 -->
+                  <div class="info-box position-relative">
+                    <p class="small mb-0 text-white">{{ rec.menu.desc }}</p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div v-if="!recommendations.length" class="text-center">
@@ -353,29 +361,14 @@ onMounted(() => {
     transform: translateY(-10px);
   }
 }
-/* 메인 추천 메뉴 이미지 - 크게 */
+/* 메인 추천 메뉴 이미지 */
 .main-menu-img {
-  width: 180px;
-  height: 180px;
+  width: 150px;
+  height: 150px;
 }
 
 .main-menu-name {
-  font-size: 2rem;
-}
-
-.rank-badge-top {
-  position: absolute;
-  top: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(5px);
-  padding: 0.4rem 1rem;
-  border-radius: 20px;
-  font-size: 0.9rem;
-  color: #fff;
-  white-space: nowrap;
-  z-index: 5;
+  font-size: 1.5rem;
 }
 
 /* 그 외 추천 메뉴 카드 스타일 */
@@ -404,17 +397,12 @@ onMounted(() => {
   }
 
   .main-menu-img {
-    width: 120px;
-    height: 120px;
+    width: 110px;
+    height: 110px;
   }
 
   .main-menu-name {
-    font-size: 1.4rem;
-  }
-
-  .rank-badge-top {
-    font-size: 0.75rem;
-    padding: 0.3rem 0.7rem;
+    font-size: 1.2rem;
   }
 
   .other-menu-card {
