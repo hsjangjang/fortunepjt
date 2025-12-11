@@ -957,6 +957,7 @@ h6 {
 
     .badge-row {
         gap: 1rem;
+        flex-wrap: nowrap;
     }
 
     .action-buttons {
