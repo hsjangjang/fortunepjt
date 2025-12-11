@@ -905,7 +905,11 @@ h6 {
         padding: 0.75rem;
     }
 
-    .card-grid.cols-2,
+    .card-grid.cols-2 {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
     .card-grid.cols-3,
     .card-grid.cols-4 {
         grid-template-columns: 1fr;
