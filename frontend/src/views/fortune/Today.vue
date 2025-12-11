@@ -945,13 +945,13 @@ onMounted(async () => {
 
   /* 모바일 로또 타이틀 */
   .lotto-title {
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     white-space: nowrap;
   }
 
   /* 모바일 추천 타이틀 */
   .recommend-title {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     white-space: nowrap;
   }
 }
