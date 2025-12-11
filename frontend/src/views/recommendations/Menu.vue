@@ -126,7 +126,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { colorMap } from '@/utils/colors'
+import { colorMap, getTextColor } from '@/utils/colors'
 
 // 75개 음식 개별 이미지 imports
 import kimchiJjigae from '@/assets/images/food/kimchi_jjigae.png'
