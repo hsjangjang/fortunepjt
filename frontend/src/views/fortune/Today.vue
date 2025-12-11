@@ -945,7 +945,8 @@ onMounted(async () => {
 
   /* 모바일 로또 타이틀 */
   .lotto-title {
-    font-size: 1rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
   }
 }
 </style>
