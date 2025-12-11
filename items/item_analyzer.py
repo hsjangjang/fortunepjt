@@ -124,9 +124,9 @@ class ItemAnalyzer:
             from openai import OpenAI
             from django.conf import settings
 
-            # GMS API 설정
+            # GMS API 설정 (OpenAI 모델용 URL 사용)
             api_key = getattr(settings, 'GMS_API_KEY', '')
-            api_base = getattr(settings, 'GMS_API_BASE_URL', 'https://api.openai.com/v1')
+            api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
 
             print(f"[DEBUG] GMS API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
             print(f"[DEBUG] GMS API Base URL: {api_base}")

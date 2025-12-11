@@ -26,9 +26,9 @@ def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int =
         print(f"[Fortune Summary] Using cached result: {cached_result}")
         return cached_result
 
-    # GMS API 설정
+    # GMS API 설정 (OpenAI 모델용 URL 사용)
     gms_api_key = getattr(settings, 'GMS_API_KEY', '')
-    gms_api_base = getattr(settings, 'GMS_API_BASE_URL', '')
+    gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
 
     print(f"[Fortune Summary] GMS API Key exists: {bool(gms_api_key)}, Base URL: {gms_api_base}")
 

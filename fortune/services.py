@@ -239,9 +239,9 @@ class FortuneCalculator:
             print("[DEBUG] 캐시된 운세 텍스트 사용")
             return cached_result
 
-        # GMS API 먼저 시도 (Claude 사용)
+        # GMS API 먼저 시도 (OpenAI 모델용 URL 사용)
         gms_api_key = getattr(settings, 'GMS_API_KEY', '')
-        gms_api_base = getattr(settings, 'GMS_API_BASE_URL', '')
+        gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
 
         # Gemini API (백업)
         gemini_api_key = settings.GEMINI_API_KEY
