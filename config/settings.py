@@ -320,6 +320,8 @@ OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-3.5-turbo')
 GMS_API_KEY = config('GMS_API_KEY', default='')  # GMS API 키
 # OpenAI 모델용 (gpt-4o-mini, gpt-5-nano 등)
 GMS_OPENAI_BASE_URL = config('GMS_OPENAI_BASE_URL', default='https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+# Gemini 모델용 (gemini-2.5-flash 등) - 이미지 분석에 사용
+GMS_GEMINI_BASE_URL = config('GMS_GEMINI_BASE_URL', default='https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta')
 # 기존 호환성 유지 (deprecated)
 GMS_API_BASE_URL = config('GMS_API_BASE_URL', default='https://gms.ssafy.io/gmsapi/')
 

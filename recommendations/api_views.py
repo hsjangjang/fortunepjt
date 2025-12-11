@@ -63,7 +63,7 @@ def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int =
         response = client.chat.completions.create(
             model="gpt-5-nano",
             messages=[{"role": "user", "content": prompt}],
-            max_tokens=100
+            max_completion_tokens=100
         )
         summary = response.choices[0].message.content.strip().strip('"').strip("'")
         print(f"[Fortune Summary] GMS API success: {summary}")

@@ -1,7 +1,7 @@
 """
 아이템 이미지 분석 모듈
 - 색상 분석: Pillow + 색상 클러스터링
-- AI 분석: OpenAI GPT-4o Vision API (GMS)
+- AI 분석: Gemini 2.5 Flash Vision API (GMS)
   - 아이템 이름 자동 감지
   - 관련 태그 생성
   - 운세별 점수 계산 (love, money, work, health, study)
@@ -118,28 +118,21 @@ class ItemAnalyzer:
                     pass
 
     def analyze_image_with_ai(self, image_path):
-        """GPT-4o Vision API를 사용한 AI 이미지 분석 (GMS)"""
+        """Gemini 2.5 Flash Vision API를 사용한 AI 이미지 분석 (GMS)"""
         print(f"[DEBUG] AI 분석 시작: {image_path}")
         try:
-            from openai import OpenAI
+            import requests
             from django.conf import settings
 
-            # GMS API 설정 (OpenAI 모델용 URL 사용)
+            # GMS API 설정 (Gemini 모델용 URL 사용)
             api_key = getattr(settings, 'GMS_API_KEY', '')
-            api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+            gemini_base_url = getattr(settings, 'GMS_GEMINI_BASE_URL', 'https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta')
 
             print(f"[DEBUG] GMS API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
-            print(f"[DEBUG] GMS API Base URL: {api_base}")
+            print(f"[DEBUG] GMS Gemini Base URL: {gemini_base_url}")
 
             if not api_key:
                 raise ValueError("GMS_API_KEY not configured")
-
-            # OpenAI 클라이언트 초기화 (GMS 엔드포인트 사용)
-            client = OpenAI(
-                api_key=api_key,
-                base_url=api_base
-            )
-            print("[DEBUG] OpenAI 클라이언트 초기화 완료")
 
             # 이미지 파일을 base64로 인코딩
             with open(image_path, 'rb') as f:
@@ -233,27 +226,46 @@ class ItemAnalyzer:
             }
             """
 
-            print("[DEBUG] GPT-4o-mini Vision API 호출 시작")
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
+            # Gemini API URL 구성 (GMS에서 제공하는 모델명 사용)
+            gemini_url = f"{gemini_base_url}/models/gemini-2.0-flash-exp-image-generation:generateContent?key={api_key}"
+            print(f"[DEBUG] Gemini API URL: {gemini_url[:80]}...")
+
+            # Gemini API 요청 데이터 구성
+            request_data = {
+                "contents": [
                     {
-                        "role": "user",
-                        "content": [
-                            {"type": "text", "text": prompt},
+                        "parts": [
+                            {"text": prompt},
                             {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:{mime_type};base64,{base64_image}"
+                                "inline_data": {
+                                    "mime_type": mime_type,
+                                    "data": base64_image
                                 }
                             }
                         ]
                     }
                 ],
-                max_tokens=1000
+                "generationConfig": {
+                    "temperature": 0.4,
+                    "maxOutputTokens": 1000
+                }
+            }
+
+            print("[DEBUG] Gemini 2.5 Flash Vision API 호출 시작")
+            response = requests.post(
+                gemini_url,
+                json=request_data,
+                headers={"Content-Type": "application/json"},
+                timeout=30
             )
-            response_text = response.choices[0].message.content
-            print("[DEBUG] GPT-4o Vision API 응답 수신 완료")
+
+            if response.status_code != 200:
+                print(f"[ERROR] Gemini API 오류: {response.status_code} - {response.text}")
+                raise ValueError(f"Gemini API error: {response.status_code}")
+
+            result = response.json()
+            response_text = result['candidates'][0]['content']['parts'][0]['text']
+            print("[DEBUG] Gemini Vision API 응답 수신 완료")
             
             if response_text.endswith('```'):
                 response_text = response_text[:-3]
@@ -316,7 +328,7 @@ class ItemAnalyzer:
 
             # API 할당량 초과 에러 확인
             if '429' in error_str or 'quota' in error_str.lower() or 'rate' in error_str.lower():
-                print("[ERROR] GPT-4o API 할당량 초과 - Pillow fallback 없이 에러 반환")
+                print("[ERROR] Gemini API 할당량 초과 - Pillow fallback 없이 에러 반환")
                 return {
                     'success': False,
                     'error': 'API 할당량 초과',

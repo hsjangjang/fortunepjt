@@ -333,7 +333,7 @@ class FortuneCalculator:
                     response = client.chat.completions.create(
                         model="gpt-5-nano",
                         messages=[{"role": "user", "content": prompt}],
-                        max_tokens=4000
+                        max_completion_tokens=4000
                     )
 
                     text = response.choices[0].message.content.strip()
