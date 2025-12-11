@@ -35,8 +35,29 @@ ALLOWED_HOSTS += [
     '.elasticbeanstalk.com',
     '.vercel.app',
     '.cloudfront.net',
-    '172.31.11.44',  # EB 내부 IP (헬스체크용)
 ]
+
+# EB 헬스체크를 위한 내부 IP 허용
+# AWS EB 로드밸런서는 내부 IP로 헬스체크를 하므로 EC2 메타데이터에서 IP를 가져옴
+import socket
+try:
+    local_ip = socket.gethostbyname(socket.gethostname())
+    if local_ip not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(local_ip)
+except:
+    pass
+
+# AWS 환경에서 EC2 메타데이터 서비스로 private IP 가져오기
+try:
+    import urllib.request
+    ec2_private_ip = urllib.request.urlopen(
+        'http://169.254.169.254/latest/meta-data/local-ipv4',
+        timeout=1
+    ).read().decode()
+    if ec2_private_ip and ec2_private_ip not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(ec2_private_ip)
+except:
+    pass
 
 # Application definition
 INSTALLED_APPS = [
