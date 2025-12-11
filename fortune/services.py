@@ -228,7 +228,7 @@ class FortuneCalculator:
         lucky_item_name: Optional[str] = None,
         zodiac_item_name: Optional[str] = None
     ) -> Optional[Dict]:
-        """Gemini를 사용한 운세 텍스트 생성 (재시도 로직 + 캐싱)"""
+        """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
         import time
 
         # 캐시 키 생성
@@ -239,15 +239,19 @@ class FortuneCalculator:
             print("[DEBUG] 캐시된 운세 텍스트 사용")
             return cached_result
 
-        api_key = settings.GEMINI_API_KEY
-        if not api_key:
-            print("[ERROR] GEMINI_API_KEY가 설정되지 않음")
+        # GMS API 먼저 시도 (Claude 사용)
+        gms_api_key = getattr(settings, 'GMS_API_KEY', '')
+        gms_api_base = getattr(settings, 'GMS_API_BASE_URL', '')
+
+        # Gemini API (백업)
+        gemini_api_key = settings.GEMINI_API_KEY
+
+        if not gms_api_key and not gemini_api_key:
+            print("[ERROR] API 키가 설정되지 않음 (GMS_API_KEY 또는 GEMINI_API_KEY)")
             return None
 
-        # 시도할 모델 목록 (순서대로 시도)
-        models_to_try = ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-pro']
-        max_retries = 2
-        retry_delay = 3  # 재시도 간 딜레이 (초)
+        max_retries = 1
+        retry_delay = 2  # 재시도 간 딜레이 (초)
 
         mbti_info = f"- MBTI: {mbti}" if mbti else "- MBTI: 정보 없음"
         lucky_item_info = f"- 운세 기반 행운 아이템: {lucky_item_name}" if lucky_item_name else ""
@@ -315,19 +319,21 @@ class FortuneCalculator:
 }}}}
 """
 
-        # 모델별로 시도
-        for model_name in models_to_try:
+        # 1. GMS API (Claude) 먼저 시도
+        if gms_api_key:
             for attempt in range(max_retries + 1):
                 try:
-                    import google.generativeai as genai
-                    genai.configure(api_key=api_key)
-                    model = genai.GenerativeModel(model_name)
+                    from openai import OpenAI
+                    client = OpenAI(api_key=gms_api_key, base_url=gms_api_base)
 
-                    print(f"[DEBUG] Gemini 운세 생성 요청 (모델: {model_name}, 시도: {attempt + 1}/{max_retries + 1})...")
-                    response = model.generate_content(prompt)
+                    print(f"[DEBUG] GMS Claude 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
+                    response = client.chat.completions.create(
+                        model="claude-3-5-sonnet-latest",
+                        messages=[{"role": "user", "content": prompt}],
+                        max_tokens=4000
+                    )
 
-                    # JSON 파싱
-                    text = response.text.strip()
+                    text = response.choices[0].message.content.strip()
                     if text.startswith('```json'):
                         text = text[7:]
                     if text.startswith('```'):
@@ -336,34 +342,47 @@ class FortuneCalculator:
                         text = text[:-3]
 
                     result = json.loads(text.strip())
-                    print(f"[DEBUG] Gemini 운세 생성 성공! (모델: {model_name})")
+                    print("[DEBUG] GMS Claude 운세 생성 성공!")
 
                     # 결과 캐싱 (24시간)
                     cache.set(cache_key, result, 60 * 60 * 24)
-
                     return result
 
                 except Exception as e:
-                    error_msg = str(e).lower()
-                    print(f"[ERROR] Gemini 운세 생성 오류 (모델: {model_name}, 시도: {attempt + 1}): {e}")
-
-                    # Rate limit 에러인 경우 더 오래 대기
-                    if 'rate' in error_msg or 'quota' in error_msg or '429' in error_msg:
-                        wait_time = retry_delay * (attempt + 2)  # 점점 더 오래 대기
-                        print(f"[DEBUG] Rate limit 감지, {wait_time}초 대기 후 재시도...")
-                        time.sleep(wait_time)
-                    elif attempt < max_retries:
-                        time.sleep(retry_delay)
-
-                    # 마지막 시도가 아니면 계속 진행
+                    print(f"[ERROR] GMS Claude 운세 생성 오류 (시도: {attempt + 1}): {e}")
                     if attempt < max_retries:
-                        continue
-                    else:
-                        # 이 모델은 실패, 다음 모델 시도
-                        break
+                        time.sleep(retry_delay)
+                    continue
 
-        # 모든 모델/재시도 실패
-        print("[ERROR] 모든 Gemini 모델 시도 실패, 동적 텍스트 생성으로 대체")
+        # 2. Gemini API 백업 시도
+        if gemini_api_key:
+            try:
+                import google.generativeai as genai
+                genai.configure(api_key=gemini_api_key)
+                model = genai.GenerativeModel('gemini-2.0-flash')
+
+                print("[DEBUG] Gemini 운세 생성 요청 (백업)...")
+                response = model.generate_content(prompt)
+
+                text = response.text.strip()
+                if text.startswith('```json'):
+                    text = text[7:]
+                if text.startswith('```'):
+                    text = text[3:]
+                if text.endswith('```'):
+                    text = text[:-3]
+
+                result = json.loads(text.strip())
+                print("[DEBUG] Gemini 운세 생성 성공!")
+
+                cache.set(cache_key, result, 60 * 60 * 24)
+                return result
+
+            except Exception as e:
+                print(f"[ERROR] Gemini 운세 생성 오류: {e}")
+
+        # 모든 API 실패
+        print("[ERROR] 모든 LLM API 시도 실패, 동적 텍스트 생성으로 대체")
         return None
     
     def _calculate_all_fortunes(self, birth_date: date, today: date, saju_data: Dict = None) -> Dict:
