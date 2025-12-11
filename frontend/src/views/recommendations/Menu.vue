@@ -97,13 +97,13 @@
             </div>
 
             <div class="row text-center g-3">
-              <div v-for="item in otherRecommendations" :key="item.menu.name" class="col-4 col-md-2">
-                <div class="other-menu-item p-2 rounded-3 hover-lift">
+              <div v-for="item in otherRecommendations" :key="item.menu.name" class="col-6 col-md-4">
+                <div class="other-menu-item p-3 rounded-3 hover-lift">
                   <div class="mb-2">
                     <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" class="other-menu-img rounded-circle" />
                   </div>
-                  <h6 class="small mb-1 text-white menu-name-sm">{{ item.menu.name }}</h6>
-                  <span class="badge bg-secondary bg-opacity-50 text-white" style="font-size: 0.7rem;">{{ item.color }}</span>
+                  <h6 class="mb-1 text-white menu-name-md">{{ item.menu.name }}</h6>
+                  <span class="badge bg-secondary bg-opacity-50 text-white" style="font-size: 0.75rem;">{{ item.color }}</span>
                 </div>
               </div>
 
@@ -371,13 +371,13 @@ onMounted(() => {
 }
 
 .other-menu-img {
-  width: 50px;
-  height: 50px;
+  width: 70px;
+  height: 70px;
   object-fit: cover;
 }
 
-.menu-name-sm {
-  font-size: 0.85rem;
+.menu-name-md {
+  font-size: 0.95rem;
   font-weight: 500;
   line-height: 1.3;
   word-break: keep-all;
@@ -398,12 +398,12 @@ onMounted(() => {
   }
 
   .other-menu-img {
-    width: 40px;
-    height: 40px;
+    width: 55px;
+    height: 55px;
   }
 
-  .menu-name-sm {
-    font-size: 0.75rem !important;
+  .menu-name-md {
+    font-size: 0.85rem !important;
   }
 }
 </style>

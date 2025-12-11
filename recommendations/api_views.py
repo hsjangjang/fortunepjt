@@ -498,6 +498,8 @@ class MenuRecommendationAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         lucky_color = fortune_data.get('lucky_colors', ['노란색'])[0]
+        lucky_colors = fortune_data.get('lucky_colors', [])[:3]
+        fortune_summary = fortune_data.get('overall_fortune', {}).get('summary', '')
 
         # 음식 데이터 로드
         all_foods = load_food_data()
@@ -548,6 +550,10 @@ class MenuRecommendationAPIView(APIView):
             'lucky_color': lucky_color,
             'recommendations': recommendations,
             'other_recommendations': other_recommendations,
+            'fortune_data': {
+                'lucky_colors': lucky_colors,
+                'fortune_summary': fortune_summary,
+            },
             'date': str(date.today())
         })
 
