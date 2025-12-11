@@ -499,7 +499,12 @@ class MenuRecommendationAPIView(APIView):
 
         lucky_color = fortune_data.get('lucky_colors', ['노란색'])[0]
         lucky_colors = fortune_data.get('lucky_colors', [])[:3]
-        fortune_summary = fortune_data.get('overall_fortune', {}).get('summary', '')
+
+        # fortune_texts에서 종합운(total) 가져오기
+        fortune_texts = fortune_data.get('fortune_texts', {})
+        total_text = fortune_texts.get('total', '')
+        # 첫 번째 문장만 추출하여 한줄 요약으로 사용
+        fortune_summary = total_text.split('.')[0] + '.' if total_text else ''
 
         # 음식 데이터 로드
         all_foods = load_food_data()

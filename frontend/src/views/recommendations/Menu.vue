@@ -103,7 +103,10 @@
                     <img :src="getFoodImage(item.menu.category, item.menu.name)" :alt="item.menu.name" class="other-menu-img rounded-circle" />
                   </div>
                   <h6 class="mb-1 text-white menu-name-md">{{ item.menu.name }}</h6>
-                  <span class="badge bg-secondary bg-opacity-50 text-white" style="font-size: 0.75rem;">{{ item.color }}</span>
+                  <span class="badge rounded-pill px-2 py-1"
+                        :style="`background-color: ${colorMap[item.color] || '#6b7280'}; color: ${getTextColor(colorMap[item.color])}; font-size: 0.75rem;`">
+                    {{ item.color }}
+                  </span>
                 </div>
               </div>
 
