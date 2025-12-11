@@ -951,7 +951,7 @@ onMounted(async () => {
 
   /* 모바일 추천 타이틀 */
   .recommend-title {
-    font-size: 0.9rem;
+    font-size: 0.9rem !important;
     white-space: nowrap;
   }
 }
