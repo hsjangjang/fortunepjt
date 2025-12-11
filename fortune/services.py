@@ -319,16 +319,16 @@ class FortuneCalculator:
 }}}}
 """
 
-        # 1. GMS API (Claude) 먼저 시도
+        # 1. GMS API (GPT-5-nano) 먼저 시도 - 1크레딧으로 효율적
         if gms_api_key:
             for attempt in range(max_retries + 1):
                 try:
                     from openai import OpenAI
                     client = OpenAI(api_key=gms_api_key, base_url=gms_api_base)
 
-                    print(f"[DEBUG] GMS Claude 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
+                    print(f"[DEBUG] GMS GPT-5-nano 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
                     response = client.chat.completions.create(
-                        model="claude-3-5-sonnet-latest",
+                        model="gpt-5-nano",
                         messages=[{"role": "user", "content": prompt}],
                         max_tokens=4000
                     )
@@ -342,14 +342,14 @@ class FortuneCalculator:
                         text = text[:-3]
 
                     result = json.loads(text.strip())
-                    print("[DEBUG] GMS Claude 운세 생성 성공!")
+                    print("[DEBUG] GMS GPT-5-nano 운세 생성 성공!")
 
                     # 결과 캐싱 (24시간)
                     cache.set(cache_key, result, 60 * 60 * 24)
                     return result
 
                 except Exception as e:
-                    print(f"[ERROR] GMS Claude 운세 생성 오류 (시도: {attempt + 1}): {e}")
+                    print(f"[ERROR] GMS GPT-5-nano 운세 생성 오류 (시도: {attempt + 1}): {e}")
                     if attempt < max_retries:
                         time.sleep(retry_delay)
                     continue
