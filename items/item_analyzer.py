@@ -183,29 +183,24 @@ class ItemAnalyzer:
 
             print(f"[DEBUG] 이미지 크기 - 원본: {len(image_data_full)} bytes, GMS용: {len(image_data_small)} bytes")
 
-            prompt = """
-            이미지에서 **전경의 메인 물체**만 분석하세요.
+            prompt = """당신은 물체 색상 분석 전문가입니다. 사용자가 손에 들고 있거나 촬영한 "물건"의 색상만 분석합니다.
 
-            🚫 절대 분석 금지:
-            - 배경 (테이블, 책상, 바닥, 벽, 조명 등)
-            - 물체 아래/뒤 표면의 색상
-            - 그림자 색상
+중요: 베이지색(#E7E5E4), 흰색(#F3F4F6, #FFFFFF), 회색(#808080), 갈색(#8B4513) 등은 대부분 배경/테이블/바닥 색상입니다. 물건 자체가 정말로 그 색상이 아니면 절대 선택하지 마세요.
 
-            ✅ 분석 대상:
-            - 손으로 들거나 사용하는 물체
-            - 이미지 중앙의 주인공 아이템
+분석 규칙:
+1. 이미지에서 "물건"을 찾으세요 (예: 텀블러, 가방, 시계, 폰케이스, 지갑, 액세서리 등)
+2. 그 물건의 표면 색상만 분석하세요
+3. 배경, 테이블, 손, 그림자는 무시하세요
 
-            JSON 응답:
-            1. item_name: 물체 이름 (한글)
-            2. primary_color_hex: 물체 본체의 HEX (배경 색 아님!)
-            3. secondary_color_hex: 보조색 HEX (없으면 null)
-            4. tags: [종류, 운세, 느낌]
-            5. fortune_scores: {"love": 0-100, "money": 0-100, "work": 0-100, "health": 0-100, "study": 0-100}
+JSON 형식으로 응답:
+{"item_name": "물건 이름(한글)", "primary_color_hex": "#물건색상", "secondary_color_hex": "#보조색 또는 null", "tags": ["종류", "특징", "느낌"], "fortune_scores": {"love": 50, "money": 50, "work": 50, "health": 50, "study": 50}}
 
-            예: {"item_name": "텀블러", "primary_color_hex": "#38BDF8", "secondary_color_hex": null, "tags": ["텀블러", "건강운", "심플함"], "fortune_scores": {"love": 30, "money": 40, "work": 50, "health": 70, "study": 40}}
+예시:
+- 파란 텀블러 → primary_color_hex: "#3B82F6" (파란색)
+- 검은 가방 → primary_color_hex: "#1f2937" (검은색)
+- 분홍 폰케이스 → primary_color_hex: "#F472B6" (분홍색)
 
-            JSON만 응답.
-            """
+JSON만 출력하세요."""
 
             # API 엔드포인트 목록 (우선순위: Google Cloud 직접 → GMS fallback)
             api_endpoints = []
