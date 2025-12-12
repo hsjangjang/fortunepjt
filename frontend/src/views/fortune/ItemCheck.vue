@@ -155,7 +155,7 @@
                   <button
                     v-if="canSaveItem"
                     class="btn btn-outline-light btn-lg rounded-pill px-4"
-                    @click="saveAsMyItem"
+                    @click="showSaveModal = true"
                     :disabled="isSaving"
                   >
                     <i class="fas fa-plus me-2"></i>
