@@ -358,7 +358,7 @@ const handleDelete = async () => {
   }
 
   try {
-    const response = await api.delete(`/api/items/${item.value.id}/delete/`)
+    const response = await api.delete(`/api/items/${item.value.id}/`)
     if (response.data.success) {
       alert('삭제되었습니다.')
       router.push('/items')
