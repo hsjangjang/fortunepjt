@@ -1,7 +1,7 @@
 """
 아이템 이미지 분석 모듈
-- 색상 분석: 색상 클러스터링
-- AI 분석: Gemini 2.5 Flash Vision API (GMS)
+- 색상 분석: Pillow + 색상 클러스터링
+- AI 분석: Google Gemini Vision API
   - 아이템 이름 자동 감지
   - 관련 태그 생성
   - 운세별 점수 계산 (love, money, work, health, study)
@@ -12,35 +12,15 @@ from collections import Counter
 import colorsys
 import json
 import os
-import base64
 
 class ItemAnalyzer:
     """아이템 이미지 분석 클래스 (색상 + AI 분석)"""
     
     def __init__(self):
-        # 한국어 색상 이름 매핑 (colors.js와 동일)
-        self.color_map = {
-            '검은색': '#1f2937',
-            '흰색': '#f3f4f6',
-            '회색': '#6B7280',
-            '빨간색': '#EF4444',
-            '분홍색': '#F472B6',
-            '주황색': '#F59E0B',
-            '노란색': '#FCD34D',
-            '금색': '#FFD700',
-            '초록색': '#10B981',
-            '파란색': '#3B82F6',
-            '하늘색': '#38BDF8',
-            '남색': '#1E3A8A',
-            '보라색': '#8B5CF6',
-            '갈색': '#92400E',
-            '베이지색': '#E7E5E4',
-        }
-
-        # 기존 호환성용 (영문 → 한글)
+        # 한국어 색상 이름 매핑
         self.color_names = {
             'red': '빨간색',
-            'orange': '주황색',
+            'orange': '주황색', 
             'yellow': '노란색',
             'green': '초록색',
             'lightgreen': '연두색',
@@ -137,147 +117,153 @@ class ItemAnalyzer:
                     pass
 
     def analyze_image_with_ai(self, image_path):
-        """Gemini Vision API를 사용한 AI 이미지 분석 (Google Cloud 직접 → GMS fallback)"""
+        """Gemini Vision API를 사용한 AI 이미지 분석"""
         print(f"[DEBUG] AI 분석 시작: {image_path}")
         try:
-            import requests
-            import io
+            import google.generativeai as genai
             from django.conf import settings
-
+            
             # API 키 설정
-            # 1차: Google Cloud 직접 연결 (GEMINI_API_KEY)
-            # 2차: GMS 프록시 (GMS_API_KEY)
-            gemini_api_key = getattr(settings, 'GEMINI_API_KEY', '')
-            gms_api_key = getattr(settings, 'GMS_API_KEY', '')
-
-            print(f"[DEBUG] Gemini API 키: {'있음' if gemini_api_key else '없음'}")
-            print(f"[DEBUG] GMS API 키: {'있음' if gms_api_key else '없음'}")
-
-            if not gemini_api_key and not gms_api_key:
-                raise ValueError("API 키가 설정되지 않음 (GEMINI_API_KEY 또는 GMS_API_KEY 필요)")
-
-            # 이미지 로드
-            img = Image.open(image_path)
-
-            # RGB로 변환 (RGBA인 경우)
-            if img.mode in ('RGBA', 'P'):
-                img = img.convert('RGB')
-
-            # Google Cloud 직접 연결용 이미지 (리사이징 불필요, 고품질 유지)
-            buffer_full = io.BytesIO()
-            # 원본이 너무 크면 2048px로 제한 (Google Cloud도 20MB 제한 있음)
-            if img.width > 2048 or img.height > 2048:
-                img_full = img.copy()
-                img_full.thumbnail((2048, 2048), Image.Resampling.LANCZOS)
-                img_full.save(buffer_full, format='JPEG', quality=90)
-            else:
-                img.save(buffer_full, format='JPEG', quality=90)
-            image_data_full = buffer_full.getvalue()
-
-            # GMS용 이미지 (작게 리사이징 - 프록시 제한 회피)
-            img_small = img.copy()
-            img_small.thumbnail((512, 512), Image.Resampling.LANCZOS)
-            buffer_small = io.BytesIO()
-            img_small.save(buffer_small, format='JPEG', quality=60)
-            image_data_small = buffer_small.getvalue()
-
-            print(f"[DEBUG] 이미지 크기 - 원본: {len(image_data_full)} bytes, GMS용: {len(image_data_small)} bytes")
-
-            prompt = """당신은 물체 색상 분석 전문가입니다. 사용자가 손에 들고 있거나 촬영한 "물건"의 색상만 분석합니다.
-
-중요: 베이지색(#E7E5E4), 흰색(#F3F4F6, #FFFFFF), 회색(#808080), 갈색(#8B4513) 등은 대부분 배경/테이블/바닥 색상입니다. 물건 자체가 정말로 그 색상이 아니면 절대 선택하지 마세요.
-
-분석 규칙:
-1. 이미지에서 "물건"을 찾으세요 (예: 텀블러, 가방, 시계, 폰케이스, 지갑, 액세서리 등)
-2. 그 물건의 표면 색상만 분석하세요
-3. 배경, 테이블, 손, 그림자는 무시하세요
-
-JSON 형식으로 응답:
-{"item_name": "물건 이름(한글)", "primary_color_hex": "#물건색상", "secondary_color_hex": "#보조색 또는 null", "tags": ["종류", "특징", "느낌"], "fortune_scores": {"love": 50, "money": 50, "work": 50, "health": 50, "study": 50}}
-
-예시:
-- 파란 텀블러 → primary_color_hex: "#3B82F6" (파란색)
-- 검은 가방 → primary_color_hex: "#1f2937" (검은색)
-- 분홍 폰케이스 → primary_color_hex: "#F472B6" (분홍색)
-
-JSON만 출력하세요."""
-
-            # API 엔드포인트 목록 (우선순위: Google Cloud 직접 → GMS fallback)
-            api_endpoints = []
-
-            # 1차: Google Cloud 직접 연결 (GEMINI_API_KEY가 있을 때)
-            if gemini_api_key:
-                api_endpoints.append({
-                    'name': 'Google Cloud Direct',
-                    'url': 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
-                    'api_key': gemini_api_key,
-                    'image_data': image_data_full,  # 고품질 이미지 사용
-                })
-
-            # 2차: GMS 프록시 (fallback)
-            if gms_api_key:
-                gms_base = 'https://gms.ssafy.io/gmsapi/gemini.googleapis.com/v1beta'
-                api_endpoints.extend([
-                    {
-                        'name': 'GMS gemini-2.0-flash',
-                        'url': f'{gms_base}/models/gemini-2.0-flash:generateContent',
-                        'api_key': gms_api_key,
-                        'image_data': image_data_small,  # 작은 이미지 사용
-                    },
-                    {
-                        'name': 'GMS gemini-2.5-flash',
-                        'url': f'{gms_base}/models/gemini-2.5-flash:generateContent',
-                        'api_key': gms_api_key,
-                        'image_data': image_data_small,
-                    },
-                ])
-
-            response = None
-            last_error = None
-
-            for endpoint in api_endpoints:
-                base64_image = base64.b64encode(endpoint['image_data']).decode('utf-8')
-
-                request_data = {
-                    "contents": [{
-                        "parts": [
-                            {"text": prompt},
-                            {"inline_data": {"mime_type": "image/jpeg", "data": base64_image}}
-                        ]
-                    }],
-                    "generationConfig": {"temperature": 0.4, "maxOutputTokens": 1000}
-                }
-
-                full_url = f"{endpoint['url']}?key={endpoint['api_key']}"
-                print(f"[DEBUG] API 시도: {endpoint['name']}")
-
-                try:
-                    response = requests.post(
-                        full_url,
-                        json=request_data,
-                        headers={"Content-Type": "application/json"},
-                        timeout=30
-                    )
-
-                    if response.status_code == 200:
-                        print(f"[DEBUG] 성공: {endpoint['name']}")
+            api_key = settings.GEMINI_API_KEY
+            print(f"[DEBUG] API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
+            
+            if not api_key:
+                raise ValueError("GEMINI_API_KEY not configured")
+            
+            genai.configure(api_key=api_key)
+            print("[DEBUG] Gemini 설정 완료")
+            
+            # 사용 가능한 모델 목록 확인
+            vision_model = None
+            try:
+                print("[DEBUG] 사용 가능한 모델 목록 확인 중...")
+                available_models = []
+                for m in genai.list_models():
+                    if 'generateContent' in m.supported_generation_methods:
+                        available_models.append(m.name)
+                        print(f"[DEBUG] - {m.name}")
+                
+                # 1순위: flash 모델 (무료)
+                for model_name in available_models:
+                    if 'flash' in model_name.lower() and 'image' not in model_name.lower():
+                        vision_model = model_name
+                        print(f"[DEBUG] Flash 모델 발견: {vision_model}")
                         break
-                    else:
-                        last_error = f"{response.status_code} - {response.text[:200]}"
-                        print(f"[WARN] {endpoint['name']} 실패: {last_error}")
-                        response = None
-                except Exception as e:
-                    last_error = str(e)
-                    print(f"[WARN] {endpoint['name']} 예외: {last_error}")
-                    response = None
+                
+                # 2순위: vision 모델
+                if not vision_model:
+                    for model_name in available_models:
+                        if 'vision' in model_name.lower():
+                            vision_model = model_name
+                            break
+                
+                # 3순위: 아무 모델
+                if not vision_model and available_models:
+                    vision_model = available_models[0]
+                    
+            except Exception as e:
+                print(f"[WARNING] 모델 목록 조회 실패, 기본 모델 사용 시도: {e}")
+                vision_model = 'gemini-pro-vision'
 
-            if response is None or response.status_code != 200:
-                print(f"[ERROR] 모든 API 엔드포인트 실패: {last_error}")
-                raise ValueError(f"Gemini API error: {last_error}")
+            if not vision_model:
+                raise ValueError("사용 가능한 모델을 찾을 수 없습니다")
+            
+            print(f"[DEBUG] 선택된 모델: {vision_model}")
+            model = genai.GenerativeModel(vision_model)
+            print("[DEBUG] 모델 초기화 완료")
+            
+            # 이미지 파일 읽기
+            with open(image_path, 'rb') as f:
+                image_data = f.read()
+            
+            image_parts = [
+                {
+                    "mime_type": "image/jpeg",
+                    "data": image_data
+                }
+            ]
+            
+            prompt = """
+            이 이미지에 있는 **물체**를 분석해주세요. 배경은 무시하고 주요 물체만 분석하세요.
 
-            result = response.json()
-            response_text = result['candidates'][0]['content']['parts'][0]['text']
-            print("[DEBUG] Gemini Vision API 응답 수신 완료")
+            다음 정보를 JSON 형식으로 제공해주세요:
+
+            1. item_name: 물체의 구체적인 이름 (한글로, 2-4글자)
+               - 예시: '마우스', '향수', '지갑', '키링', '인형', '껌', '사탕', '초콜릿', '이어폰', '목걸이', '반지', '팔찌', '립스틱', '볼펜', '텀블러' 등
+               - 구체적인 물건 이름을 사용하세요
+
+            2. primary_color: 물체의 **가장 넓은 면적을 차지하는** 주요 색상 (한글로)
+               - **반드시 아래 15가지 중 하나만 선택**:
+                 '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색'
+               - 배경색이나 작은 로고 색상은 제외하고 물체 자체의 색상만 판단
+               - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로 분류
+
+            3. secondary_colors: 보조 색상 배열
+               - **단색 물체(한 가지 색만 보이는 경우)는 반드시 빈 배열 []**
+               - 두 가지 이상의 색이 **전체 면적의 20% 이상**을 차지할 때만 추가
+               - 로고, 스티칭(박음질), 지퍼, 단추, 장식 등 작은 부분의 색상은 무시
+               - 그라데이션, 반사광, 그림자는 별도 색상으로 취급하지 않음
+               - **확실하지 않으면 빈 배열 []로 응답**
+
+            4. tags: 해시태그 3개 (아이템 특성과 행운 관련)
+               - 첫 번째: 아이템 종류 (예: '지갑', '향수', '키링')
+               - 두 번째: **반드시** 아래 5개 운세 중 하나 선택 (필수!):
+                 '애정운', '금전운', '직장운', '건강운', '학업운'
+               - 세 번째: 아이템 느낌이나 특성 (예: '고급스러움', '심플함', '귀여움', '세련됨')
+
+            5. fortune_scores: 이 아이템이 각 운세를 얼마나 강화해주는지 점수 (0~100)
+               - love: 애정운 강화 점수
+               - money: 금전운 강화 점수
+               - work: 직장운 강화 점수
+               - health: 건강운 강화 점수
+               - study: 학업운 강화 점수
+               - 아이템 특성에 따라 판단:
+                 * 지갑, 돈, 금고 → money 높음
+                 * 향수, 반지, 꽃 → love 높음
+                 * 마우스, 명함, 볼펜 → work 높음
+                 * 운동용품, 물병, 비타민 → health 높음
+                 * 노트, 펜, 책 → study 높음
+
+            **중요**:
+            - 반드시 유효한 JSON 형식으로만 응답
+            - 모든 값은 한글로 작성 (fortune_scores의 키는 영문)
+            - 마크다운 코드 블록(```) 절대 사용 금지
+            - 단색 물체는 secondary_colors를 빈 배열로!
+            - tags의 두 번째 요소는 반드시 '애정운', '금전운', '직장운', '건강운', '학업운' 중 하나!
+
+            예시 1 (검은 지갑):
+            {
+              "item_name": "지갑",
+              "primary_color": "검은색",
+              "secondary_colors": [],
+              "tags": ["지갑", "금전운", "고급스러움"],
+              "fortune_scores": {"love": 20, "money": 95, "work": 50, "health": 10, "study": 15}
+            }
+
+            예시 2 (분홍+금색 향수):
+            {
+              "item_name": "향수",
+              "primary_color": "분홍색",
+              "secondary_colors": ["금색"],
+              "tags": ["향수", "애정운", "화려함"],
+              "fortune_scores": {"love": 90, "money": 30, "work": 40, "health": 15, "study": 10}
+            }
+
+            예시 3 (검은 마우스):
+            {
+              "item_name": "마우스",
+              "primary_color": "검은색",
+              "secondary_colors": [],
+              "tags": ["마우스", "직장운", "심플함"],
+              "fortune_scores": {"love": 10, "money": 40, "work": 85, "health": 15, "study": 30}
+            }
+            """
+            
+            print("[DEBUG] Gemini API 호출 시작")
+            response = model.generate_content([prompt, image_parts[0]])
+            response.resolve()
+            response_text = response.text
+            print("[DEBUG] Gemini API 응답 수신 완료")
             
             if response_text.endswith('```'):
                 response_text = response_text[:-3]
@@ -295,41 +281,33 @@ JSON만 출력하세요."""
             # item_name을 category로도 저장 (하위 호환성)
             if 'item_name' in ai_result and 'category' not in ai_result:
                 ai_result['category'] = ai_result['item_name']
-
-            # 색상 정보를 표준 형식으로 변환 (HEX → 가장 가까운 한글 색상명)
+            
+            # 색상 정보를 표준 형식으로 변환
             colors = []
-            primary_hex = ai_result.get('primary_color_hex')
-            if primary_hex:
-                # HEX 코드를 가장 가까운 한글 색상명으로 매핑
-                korean_name, matched_hex = self._find_closest_color(primary_hex)
-                rgb = self._hex_to_rgb(primary_hex)
+            if ai_result.get('primary_color'):
+                primary_color_name = ai_result['primary_color']
+                # AI가 한글로 응답하므로 그대로 사용
                 colors.append({
                     'name': 'primary',
-                    'korean_name': korean_name,
-                    'hex': matched_hex,  # 매핑된 표준 hex
-                    'original_hex': primary_hex,  # AI가 감지한 원본 hex
-                    'rgb': rgb,
+                    'korean_name': primary_color_name,  # 한글 색상명 (AI가 직접 한글로 제공)
+                    'hex': self._color_name_to_hex(primary_color_name),  # 매칭용
+                    'rgb': (128, 128, 128),
                     'percentage': 80.0
                 })
-                # ai_result에도 한글 색상명 추가 (하위 호환성)
-                ai_result['primary_color'] = korean_name
 
-            # 보조 색상 처리
-            secondary_hex = ai_result.get('secondary_color_hex')
-            if secondary_hex:
-                korean_name, matched_hex = self._find_closest_color(secondary_hex)
-                rgb = self._hex_to_rgb(secondary_hex)
-                colors.append({
-                    'name': 'secondary_0',
-                    'korean_name': korean_name,
-                    'hex': matched_hex,
-                    'original_hex': secondary_hex,
-                    'rgb': rgb,
-                    'percentage': 10.0
-                })
-                ai_result['secondary_colors'] = [korean_name]
-            else:
-                ai_result['secondary_colors'] = []
+            # 보조 색상 (있을 때만 추가, 최대 1개만)
+            secondary_colors = ai_result.get('secondary_colors', [])
+            if secondary_colors:  # 빈 배열이 아닐 때만
+                # 첫 번째 색상만 사용 (AI가 너무 많이 추가하는 경향이 있음)
+                for idx, sec_color in enumerate(secondary_colors[:1]):  # 최대 1개만!
+                    if sec_color:  # 빈 문자열 체크
+                        colors.append({
+                            'name': f'secondary_{idx}',
+                            'korean_name': sec_color,  # 한글 색상명 (AI가 직접 한글로 제공)
+                            'hex': self._color_name_to_hex(sec_color),
+                            'rgb': (100, 100, 100),
+                            'percentage': 10.0
+                        })
             
             print("[DEBUG] AI 분석 성공!")
             return {
@@ -348,7 +326,7 @@ JSON만 출력하세요."""
 
             # API 할당량 초과 에러 확인
             if '429' in error_str or 'quota' in error_str.lower() or 'rate' in error_str.lower():
-                print("[ERROR] Gemini API 할당량 초과")
+                print("[ERROR] Gemini API 할당량 초과 - Pillow fallback 없이 에러 반환")
                 return {
                     'success': False,
                     'error': 'API 할당량 초과',
@@ -357,14 +335,8 @@ JSON만 출력하세요."""
                     'colors': []
                 }
 
-            # 기타 에러도 그대로 반환 (Pillow fallback 제거)
-            return {
-                'success': False,
-                'error': error_str,
-                'error_type': 'ai_analysis_failed',
-                'message': f'AI 분석 실패: {error_str}',
-                'colors': []
-            }
+            # 기타 에러는 Pillow fallback
+            return self.analyze_image(image_path)
     
     def _english_to_korean_color(self, english_name):
         """영문 색상명을 한글로 변환"""
@@ -463,36 +435,7 @@ JSON만 출력하세요."""
         # 기본값 (회색)
         print(f"[WARNING] 알 수 없는 색상: {color_name}, 회색으로 표시")
         return '#808080'
-
-    def _hex_to_rgb(self, hex_color):
-        """HEX를 RGB 튜플로 변환"""
-        hex_color = hex_color.lstrip('#')
-        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
-
-    def _color_distance(self, hex1, hex2):
-        """두 HEX 색상 간의 유클리드 거리 계산"""
-        rgb1 = self._hex_to_rgb(hex1)
-        rgb2 = self._hex_to_rgb(hex2)
-        return ((rgb1[0] - rgb2[0]) ** 2 +
-                (rgb1[1] - rgb2[1]) ** 2 +
-                (rgb1[2] - rgb2[2]) ** 2) ** 0.5
-
-    def _find_closest_color(self, hex_color):
-        """주어진 HEX에 가장 가까운 한글 색상명 찾기 (colors.js와 동일한 로직)"""
-        min_distance = float('inf')
-        closest_color = '회색'  # 기본값
-        closest_hex = '#6B7280'
-
-        for color_name, color_hex in self.color_map.items():
-            distance = self._color_distance(hex_color, color_hex)
-            if distance < min_distance:
-                min_distance = distance
-                closest_color = color_name
-                closest_hex = color_hex
-
-        print(f"[DEBUG] HEX {hex_color} → 가장 가까운 색상: {closest_color} ({closest_hex}), 거리: {min_distance:.2f}")
-        return closest_color, closest_hex
-
+    
     def analyze_image(self, image_path):
         """이미지 분석 메인 함수"""
         try:
