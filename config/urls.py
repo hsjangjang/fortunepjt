@@ -21,12 +21,6 @@ urlpatterns = [
     path('api/recommendations/', include('recommendations.api_urls')),  # 추천 API
     path('api/items/', include('items.api_urls')),          # 아이템 API
 
-    # ===== 기존 템플릿 뷰 (레거시) =====
-    path('users/', include('users.urls')),
-    path('fortune/', include('fortune.urls')),
-    path('recommendations/', include('recommendations.urls')),
-    path('items/', include('items.urls')),
-
     # Vue SPA (모든 /vue/* 경로를 Vue 앱으로)
     re_path(r'^vue/.*$', vue_app, name='vue-app'),
 ]
