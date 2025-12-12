@@ -154,18 +154,28 @@ class ItemAnalyzer:
             if not api_key:
                 raise ValueError("GMS_API_KEY not configured")
 
-            # 원본 이미지 그대로 사용
-            with open(image_path, 'rb') as f:
-                image_data = f.read()
+            # 이미지 리사이징 (GMS 프록시 body size 제한 회피, 해상도 유지하면서 용량만 줄임)
+            img = Image.open(image_path)
 
-            print(f"[DEBUG] 이미지 크기: {len(image_data)} bytes")
+            # 최대 1024px로 리사이징 (색상 분석에 충분한 해상도)
+            max_size = 1024
+            if img.width > max_size or img.height > max_size:
+                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+
+            # RGB로 변환 (RGBA인 경우)
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+
+            # JPEG로 저장 (quality 85 - 품질 유지하면서 용량 줄임)
+            import io
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=85)
+            image_data = buffer.getvalue()
+
+            print(f"[DEBUG] 이미지 크기: {len(image_data)} bytes, {img.width}x{img.height}")
 
             base64_image = base64.b64encode(image_data).decode('utf-8')
-
-            # MIME 타입 추론
-            import imghdr
-            img_type = imghdr.what(image_path)
-            mime_type = f'image/{img_type}' if img_type else 'image/jpeg'
+            mime_type = 'image/jpeg'
 
             prompt = """
             이미지에서 **전경의 메인 물체**만 분석하세요.
