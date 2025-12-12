@@ -176,8 +176,8 @@
   },
   {
     "id": 26,
-    "name_ko": "새우(조리됨)",
-    "name_en": "Shrimp (Cooked)",
+    "name_ko": "새우",
+    "name_en": "Shrimp",
     "color_category": "Orange",
     "type": "Seafood"
   },
@@ -218,7 +218,7 @@
   },
   {
     "id": 32,
-    "name_ko": "와사비",
+    "name_ko": "고추냉이",
     "name_en": "Wasabi",
     "color_category": "Green",
     "type": "Spice"
@@ -253,7 +253,7 @@
   },
   {
     "id": 37,
-    "name_ko": "수박(속)",
+    "name_ko": "수박",
     "name_en": "Watermelon",
     "color_category": "Red",
     "type": "Fruit"
@@ -344,7 +344,7 @@
   },
   {
     "id": 50,
-    "name_ko": "랍스터(조리됨)",
+    "name_ko": "랍스터",
     "name_en": "Lobster",
     "color_category": "Red",
     "type": "Seafood"
@@ -365,5767 +365,2638 @@
   },
   {
     "id": 53,
-    "name_ko": "연유",
-    "name_en": "Condensed Milk",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 54,
     "name_ko": "다크 초콜릿",
     "name_en": "Dark Chocolate",
     "color_category": "Black/Dark Brown",
     "type": "Dessert"
   },
   {
-    "id": 55,
+    "id": 54,
     "name_ko": "망고",
     "name_en": "Mango",
     "color_category": "Yellow",
     "type": "Fruit"
   },
   {
-    "id": 56,
+    "id": 55,
     "name_ko": "비트",
     "name_en": "Beet",
     "color_category": "Dark Red",
     "type": "Vegetable"
   },
   {
-    "id": 57,
+    "id": 56,
     "name_ko": "크림 파스타",
     "name_en": "Carbonara",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 58,
+    "id": 57,
     "name_ko": "된장찌개",
     "name_en": "Doenjang Jjigae",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 59,
+    "id": 58,
     "name_ko": "라임",
     "name_en": "Lime",
     "color_category": "Green",
     "type": "Fruit"
   },
   {
-    "id": 60,
+    "id": 59,
     "name_ko": "훈제 오리",
     "name_en": "Smoked Duck",
     "color_category": "Pink/Brown",
     "type": "Dish"
   },
   {
-    "id": 61,
+    "id": 60,
     "name_ko": "치킨 무",
     "name_en": "Pickled Radish",
     "color_category": "White",
     "type": "Side Dish"
   },
   {
-    "id": 62,
+    "id": 61,
     "name_ko": "간짜장",
     "name_en": "Gan-Jajang",
     "color_category": "Black",
     "type": "Dish"
   },
   {
-    "id": 63,
+    "id": 62,
     "name_ko": "블랙베리",
     "name_en": "Blackberry",
     "color_category": "Black",
     "type": "Fruit"
   },
   {
-    "id": 64,
+    "id": 63,
     "name_ko": "살구",
     "name_en": "Apricot",
     "color_category": "Orange",
     "type": "Fruit"
   },
   {
-    "id": 65,
+    "id": 64,
     "name_ko": "민트 초코",
     "name_en": "Mint Chocolate",
     "color_category": "Cyan/Green",
     "type": "Dessert"
   },
   {
-    "id": 66,
-    "name_ko": "마카롱(딸기)",
-    "name_en": "Strawberry Macaron",
-    "color_category": "Pink",
-    "type": "Dessert"
-  },
-  {
-    "id": 67,
+    "id": 65,
     "name_ko": "짬뽕",
     "name_en": "Jjamppong",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 68,
+    "id": 66,
     "name_ko": "콩국수",
     "name_en": "Kong-guksu",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 69,
+    "id": 67,
     "name_ko": "메론",
     "name_en": "Melon",
     "color_category": "Pale Green",
     "type": "Fruit"
   },
   {
-    "id": 71,
+    "id": 68,
     "name_ko": "피클",
     "name_en": "Pickle",
     "color_category": "Green",
     "type": "Side Dish"
   },
   {
-    "id": 72,
+    "id": 69,
     "name_ko": "레드 와인",
     "name_en": "Red Wine",
     "color_category": "Dark Red",
     "type": "Beverage"
   },
   {
-    "id": 73,
+    "id": 70,
     "name_ko": "맥주(라거)",
     "name_en": "Beer (Lager)",
     "color_category": "Yellow/Gold",
     "type": "Beverage"
   },
   {
-    "id": 74,
-    "name_ko": "양송이 버섯",
-    "name_en": "Button Mushroom",
-    "color_category": "White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 75,
-    "name_ko": "표고 버섯",
-    "name_en": "Shiitake Mushroom",
-    "color_category": "Brown",
-    "type": "Vegetable"
-  },
-  {
-    "id": 76,
+    "id": 71,
     "name_ko": "잡곡밥",
     "name_en": "Multi-grain Rice",
     "color_category": "Purple/Brown",
     "type": "Grain"
   },
   {
-    "id": 77,
+    "id": 72,
     "name_ko": "오렌지 주스",
     "name_en": "Orange Juice",
     "color_category": "Orange",
     "type": "Beverage"
   },
   {
-    "id": 78,
+    "id": 73,
     "name_ko": "케첩",
     "name_en": "Ketchup",
     "color_category": "Red",
     "type": "Condiment"
   },
   {
-    "id": 79,
+    "id": 74,
     "name_ko": "마요네즈",
     "name_en": "Mayonnaise",
     "color_category": "Cream/White",
     "type": "Condiment"
   },
   {
-    "id": 80,
+    "id": 75,
     "name_ko": "춘장",
     "name_en": "Chunjang",
     "color_category": "Black",
     "type": "Condiment"
   },
   {
-    "id": 81,
+    "id": 76,
     "name_ko": "대파",
     "name_en": "Green Onion",
     "color_category": "Green/White",
     "type": "Vegetable"
   },
   {
-    "id": 82,
+    "id": 77,
     "name_ko": "무",
     "name_en": "Radish",
     "color_category": "White",
     "type": "Vegetable"
   },
   {
-    "id": 83,
+    "id": 78,
     "name_ko": "연근",
     "name_en": "Lotus Root",
     "color_category": "Beige",
     "type": "Vegetable"
   },
   {
-    "id": 84,
+    "id": 79,
     "name_ko": "도토리묵",
     "name_en": "Acorn Jelly",
     "color_category": "Brown",
     "type": "Side Dish"
   },
   {
-    "id": 85,
+    "id": 80,
     "name_ko": "삼겹살(생)",
     "name_en": "Pork Belly (Raw)",
     "color_category": "Pink",
     "type": "Meat"
   },
   {
-    "id": 86,
+    "id": 81,
     "name_ko": "소고기 육회",
     "name_en": "Beef Tartare",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 87,
+    "id": 82,
     "name_ko": "치킨(후라이드)",
     "name_en": "Fried Chicken",
     "color_category": "Golden Brown",
     "type": "Dish"
   },
   {
-    "id": 88,
+    "id": 83,
     "name_ko": "양념치킨",
     "name_en": "Seasoned Chicken",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 89,
+    "id": 84,
     "name_ko": "순대",
     "name_en": "Sundae",
     "color_category": "Dark Brown/Black",
     "type": "Dish"
   },
   {
-    "id": 90,
+    "id": 85,
     "name_ko": "녹차 아이스크림",
     "name_en": "Green Tea Ice Cream",
     "color_category": "Green",
     "type": "Dessert"
   },
   {
-    "id": 91,
+    "id": 86,
     "name_ko": "석류",
     "name_en": "Pomegranate",
     "color_category": "Red",
     "type": "Fruit"
   },
   {
-    "id": 92,
+    "id": 87,
     "name_ko": "복숭아",
     "name_en": "Peach",
     "color_category": "Pink",
     "type": "Fruit"
   },
   {
-    "id": 93,
+    "id": 88,
     "name_ko": "우엉",
     "name_en": "Burdock Root",
     "color_category": "Brown",
     "type": "Vegetable"
   },
   {
-    "id": 94,
+    "id": 89,
     "name_ko": "콜리플라워",
     "name_en": "Cauliflower",
     "color_category": "White",
     "type": "Vegetable"
   },
   {
-    "id": 95,
-    "name_ko": "파프리카(노랑)",
-    "name_en": "Yellow Paprika",
-    "color_category": "Yellow",
-    "type": "Vegetable"
-  },
-  {
-    "id": 96,
+    "id": 90,
     "name_ko": "고등어 구이",
     "name_en": "Grilled Mackerel",
     "color_category": "Brown/Silver",
     "type": "Seafood"
   },
   {
-    "id": 97,
+    "id": 91,
     "name_ko": "미역국",
     "name_en": "Seaweed Soup",
     "color_category": "Dark Green",
     "type": "Dish"
   },
   {
-    "id": 98,
+    "id": 92,
     "name_ko": "감자",
     "name_en": "Potato",
     "color_category": "Beige",
     "type": "Vegetable"
   },
   {
-    "id": 99,
+    "id": 93,
     "name_ko": "고구마 라떼",
     "name_en": "Sweet Potato Latte",
     "color_category": "Purple",
     "type": "Beverage"
   },
   {
-    "id": 100,
+    "id": 94,
     "name_ko": "팥빙수",
     "name_en": "Red Bean Shaved Ice",
     "color_category": "White/Brown",
     "type": "Dessert"
   },
   {
-    "id": 101,
+    "id": 95,
     "name_ko": "김밥",
     "name_en": "Gimbap",
     "color_category": "Black/White",
     "type": "Dish"
   },
   {
-    "id": 102,
+    "id": 96,
     "name_ko": "불고기",
     "name_en": "Bulgogi",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 103,
+    "id": 97,
     "name_ko": "갈비찜",
     "name_en": "Galbi-jjim",
     "color_category": "Dark Brown",
     "type": "Dish"
   },
   {
-    "id": 104,
+    "id": 98,
     "name_ko": "잡채",
     "name_en": "Japchae",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 105,
+    "id": 99,
     "name_ko": "순두부찌개",
     "name_en": "Sundubu-jjigae",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 106,
+    "id": 100,
     "name_ko": "보쌈",
     "name_en": "Bossam",
     "color_category": "Beige",
     "type": "Dish"
   },
   {
-    "id": 107,
+    "id": 101,
     "name_ko": "족발",
     "name_en": "Jokbal",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 108,
+    "id": 102,
     "name_ko": "삼계탕",
     "name_en": "Samgyetang",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 109,
+    "id": 103,
     "name_ko": "냉면",
     "name_en": "Naengmyeon",
     "color_category": "Gray/Brown",
     "type": "Dish"
   },
   {
-    "id": 110,
+    "id": 104,
     "name_ko": "칼국수",
     "name_en": "Kalguksu",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 111,
+    "id": 105,
     "name_ko": "라면",
     "name_en": "Instant Ramen",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 112,
+    "id": 106,
     "name_ko": "우동",
     "name_en": "Udon",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 113,
+    "id": 107,
     "name_ko": "해물파전",
     "name_en": "Haemul Pajeon",
     "color_category": "Green/Brown",
     "type": "Dish"
   },
   {
-    "id": 114,
+    "id": 108,
     "name_ko": "김치전",
     "name_en": "Kimchi Pancake",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 115,
+    "id": 109,
     "name_ko": "감자전",
     "name_en": "Potato Pancake",
     "color_category": "Beige",
     "type": "Dish"
   },
   {
-    "id": 116,
+    "id": 110,
     "name_ko": "육개장",
     "name_en": "Yukgaejang",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 117,
+    "id": 111,
     "name_ko": "설렁탕",
     "name_en": "Seolleongtang",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 118,
+    "id": 112,
     "name_ko": "부대찌개",
     "name_en": "Budae Jjigae",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 119,
+    "id": 113,
     "name_ko": "제육볶음",
     "name_en": "Stir-fried Spicy Pork",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 120,
+    "id": 114,
     "name_ko": "낙지볶음",
     "name_en": "Stir-fried Octopus",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 121,
+    "id": 115,
     "name_ko": "피자",
     "name_en": "Pizza",
     "color_category": "Red/Yellow",
     "type": "Dish"
   },
   {
-    "id": 122,
+    "id": 116,
     "name_ko": "햄버거",
     "name_en": "Hamburger",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 123,
+    "id": 117,
     "name_ko": "샌드위치",
     "name_en": "Sandwich",
     "color_category": "Beige/Green",
     "type": "Dish"
   },
   {
-    "id": 125,
+    "id": 118,
     "name_ko": "감자튀김",
     "name_en": "French Fries",
     "color_category": "Yellow",
     "type": "Side Dish"
   },
   {
-    "id": 126,
-    "name_ko": "초밥(광어)",
-    "name_en": "Sushi (Flatfish)",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 127,
-    "name_ko": "초밥(새우)",
-    "name_en": "Sushi (Shrimp)",
-    "color_category": "Orange",
-    "type": "Dish"
-  },
-  {
-    "id": 128,
+    "id": 119,
     "name_ko": "회(생선)",
     "name_en": "Sashimi",
     "color_category": "White/Red",
     "type": "Dish"
   },
   {
-    "id": 129,
+    "id": 120,
     "name_ko": "타코",
     "name_en": "Tacos",
     "color_category": "Yellow",
     "type": "Dish"
   },
   {
-    "id": 130,
+    "id": 121,
     "name_ko": "쌀국수",
     "name_en": "Pho",
     "color_category": "White/Clear",
     "type": "Dish"
   },
   {
-    "id": 131,
+    "id": 122,
     "name_ko": "팟타이",
     "name_en": "Pad Thai",
     "color_category": "Orange/Brown",
     "type": "Dish"
   },
   {
-    "id": 132,
+    "id": 123,
     "name_ko": "딤섬",
     "name_en": "Dim Sum",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 133,
+    "id": 124,
     "name_ko": "마라탕",
     "name_en": "Malatang",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 134,
+    "id": 125,
     "name_ko": "탕수육",
     "name_en": "Sweet and Sour Pork",
     "color_category": "Golden/Brown",
     "type": "Dish"
   },
   {
-    "id": 135,
+    "id": 126,
     "name_ko": "양꼬치",
     "name_en": "Lamb Skewers",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 136,
+    "id": 127,
     "name_ko": "리조또",
     "name_en": "Risotto",
     "color_category": "White/Cream",
     "type": "Dish"
   },
   {
-    "id": 137,
+    "id": 128,
     "name_ko": "라자냐",
     "name_en": "Lasagna",
     "color_category": "Red/Yellow",
     "type": "Dish"
   },
   {
-    "id": 138,
+    "id": 129,
     "name_ko": "그릭 요거트",
     "name_en": "Greek Yogurt",
     "color_category": "White",
     "type": "Dairy"
   },
   {
-    "id": 139,
+    "id": 130,
     "name_ko": "시리얼",
     "name_en": "Cereal",
     "color_category": "Brown/Yellow",
     "type": "Grain"
   },
   {
-    "id": 140,
+    "id": 131,
     "name_ko": "오트밀",
     "name_en": "Oatmeal",
     "color_category": "Beige",
     "type": "Grain"
   },
   {
-    "id": 141,
+    "id": 132,
     "name_ko": "식빵",
     "name_en": "White Bread",
     "color_category": "White/Brown",
     "type": "Bakery"
   },
   {
-    "id": 142,
+    "id": 133,
     "name_ko": "크루아상",
     "name_en": "Croissant",
     "color_category": "Golden Brown",
     "type": "Bakery"
   },
   {
-    "id": 143,
+    "id": 134,
     "name_ko": "베이글",
     "name_en": "Bagel",
     "color_category": "Beige",
     "type": "Bakery"
   },
   {
-    "id": 144,
+    "id": 135,
     "name_ko": "도넛",
     "name_en": "Donut",
     "color_category": "Brown/Pink",
     "type": "Bakery"
   },
   {
-    "id": 145,
+    "id": 136,
     "name_ko": "와플",
     "name_en": "Waffle",
     "color_category": "Golden Brown",
     "type": "Dessert"
   },
   {
-    "id": 146,
+    "id": 137,
     "name_ko": "팬케이크",
     "name_en": "Pancake",
     "color_category": "Golden",
     "type": "Dessert"
   },
   {
-    "id": 147,
+    "id": 138,
     "name_ko": "치즈케이크",
     "name_en": "Cheesecake",
     "color_category": "Yellow",
     "type": "Dessert"
   },
   {
-    "id": 148,
+    "id": 139,
     "name_ko": "티라미수",
     "name_en": "Tiramisu",
     "color_category": "Brown/White",
     "type": "Dessert"
   },
   {
-    "id": 149,
+    "id": 140,
     "name_ko": "푸딩",
     "name_en": "Pudding",
     "color_category": "Yellow",
     "type": "Dessert"
   },
   {
-    "id": 150,
+    "id": 141,
     "name_ko": "젤리",
     "name_en": "Jelly",
     "color_category": "Colorful",
     "type": "Dessert"
   },
   {
-    "id": 153,
+    "id": 142,
     "name_ko": "오뎅(어묵)",
     "name_en": "Fish Cake",
     "color_category": "Beige",
     "type": "Side Dish"
   },
   {
-    "id": 154,
+    "id": 143,
     "name_ko": "만두",
     "name_en": "Dumpling",
     "color_category": "White/Beige",
     "type": "Dish"
   },
   {
-    "id": 155,
+    "id": 144,
     "name_ko": "소주",
     "name_en": "Soju",
     "color_category": "Clear",
     "type": "Beverage"
   },
   {
-    "id": 156,
+    "id": 145,
     "name_ko": "막걸리",
     "name_en": "Makgeolli",
     "color_category": "Milky White",
     "type": "Beverage"
   },
   {
-    "id": 157,
+    "id": 146,
     "name_ko": "사이다",
     "name_en": "Cider/Sprite",
     "color_category": "Clear",
     "type": "Beverage"
   },
   {
-    "id": 158,
+    "id": 147,
     "name_ko": "홍차",
     "name_en": "Black Tea",
     "color_category": "Dark Red",
     "type": "Beverage"
   },
   {
-    "id": 159,
+    "id": 148,
     "name_ko": "녹차",
     "name_en": "Green Tea",
     "color_category": "Green",
     "type": "Beverage"
   },
   {
-    "id": 160,
+    "id": 149,
     "name_ko": "핫초코",
     "name_en": "Hot Chocolate",
     "color_category": "Brown",
     "type": "Beverage"
   },
   {
-    "id": 161,
+    "id": 150,
     "name_ko": "레모네이드",
     "name_en": "Lemonade",
     "color_category": "Yellow",
     "type": "Beverage"
   },
   {
-    "id": 162,
+    "id": 151,
     "name_ko": "스무디(딸기)",
     "name_en": "Strawberry Smoothie",
     "color_category": "Pink",
     "type": "Beverage"
   },
   {
-    "id": 163,
+    "id": 152,
     "name_ko": "생수",
     "name_en": "Water",
     "color_category": "Clear",
     "type": "Beverage"
   },
   {
-    "id": 164,
-    "name_ko": "보리차",
-    "name_en": "Barley Tea",
-    "color_category": "Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 165,
+    "id": 153,
     "name_ko": "배추",
     "name_en": "Napa Cabbage",
     "color_category": "Green/White",
     "type": "Vegetable"
   },
   {
-    "id": 166,
+    "id": 154,
     "name_ko": "상추",
     "name_en": "Lettuce",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 167,
+    "id": 155,
     "name_ko": "깻잎",
     "name_en": "Perilla Leaf",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 168,
+    "id": 156,
     "name_ko": "콩나물",
     "name_en": "Bean Sprouts",
     "color_category": "Yellow/White",
     "type": "Vegetable"
   },
   {
-    "id": 169,
+    "id": 157,
     "name_ko": "숙주나물",
     "name_en": "Mung Bean Sprouts",
     "color_category": "White",
     "type": "Vegetable"
   },
   {
-    "id": 170,
+    "id": 158,
     "name_ko": "청경채",
     "name_en": "Bok Choy",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 171,
+    "id": 159,
     "name_ko": "부추",
     "name_en": "Chives",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 172,
+    "id": 160,
     "name_ko": "아스파라거스",
     "name_en": "Asparagus",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 173,
+    "id": 161,
     "name_ko": "샐러리",
     "name_en": "Celery",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 174,
+    "id": 162,
     "name_ko": "케일",
     "name_en": "Kale",
     "color_category": "Dark Green",
     "type": "Vegetable"
   },
   {
-    "id": 175,
+    "id": 163,
     "name_ko": "애호박",
     "name_en": "Zucchini",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 176,
+    "id": 164,
     "name_ko": "청양고추",
     "name_en": "Cheongyang Chili Pepper",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 177,
+    "id": 165,
     "name_ko": "피망",
     "name_en": "Bell Pepper",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 178,
+    "id": 166,
     "name_ko": "생강",
     "name_en": "Ginger",
     "color_category": "Beige",
     "type": "Vegetable"
   },
   {
-    "id": 179,
+    "id": 167,
     "name_ko": "고사리",
     "name_en": "Bracken",
     "color_category": "Brown",
     "type": "Vegetable"
   },
   {
-    "id": 180,
+    "id": 168,
     "name_ko": "도라지",
     "name_en": "Bellflower Root",
     "color_category": "White",
     "type": "Vegetable"
   },
   {
-    "id": 181,
+    "id": 169,
     "name_ko": "한라봉",
     "name_en": "Hallabong",
     "color_category": "Orange",
     "type": "Fruit"
   },
   {
-    "id": 182,
+    "id": 170,
     "name_ko": "귤",
     "name_en": "Mandarin",
     "color_category": "Orange",
     "type": "Fruit"
   },
   {
-    "id": 183,
+    "id": 171,
     "name_ko": "자몽",
     "name_en": "Grapefruit",
     "color_category": "Pink/Orange",
     "type": "Fruit"
   },
   {
-    "id": 184,
+    "id": 172,
     "name_ko": "파인애플",
     "name_en": "Pineapple",
     "color_category": "Yellow",
     "type": "Fruit"
   },
   {
-    "id": 185,
+    "id": 173,
     "name_ko": "코코넛",
     "name_en": "Coconut",
     "color_category": "White/Brown",
     "type": "Fruit"
   },
   {
-    "id": 186,
+    "id": 174,
     "name_ko": "두리안",
     "name_en": "Durian",
     "color_category": "Yellow",
     "type": "Fruit"
   },
   {
-    "id": 187,
+    "id": 175,
     "name_ko": "망고스틴",
     "name_en": "Mangosteen",
     "color_category": "Purple/White",
     "type": "Fruit"
   },
   {
-    "id": 188,
+    "id": 176,
     "name_ko": "자두",
     "name_en": "Plum",
     "color_category": "Purple/Red",
     "type": "Fruit"
   },
   {
-    "id": 189,
+    "id": 177,
     "name_ko": "무화과",
     "name_en": "Fig",
     "color_category": "Red/Purple",
     "type": "Fruit"
   },
   {
-    "id": 190,
+    "id": 178,
     "name_ko": "배",
     "name_en": "Pear (Korean)",
     "color_category": "Beige/Yellow",
     "type": "Fruit"
   },
   {
-    "id": 191,
+    "id": 179,
     "name_ko": "체리",
     "name_en": "Cherry",
     "color_category": "Dark Red",
     "type": "Fruit"
   },
   {
-    "id": 192,
+    "id": 180,
     "name_ko": "샤인머스캣",
     "name_en": "Shine Muscat",
     "color_category": "Light Green",
     "type": "Fruit"
   },
   {
-    "id": 193,
+    "id": 181,
     "name_ko": "대추",
     "name_en": "Jujube",
     "color_category": "Dark Red",
     "type": "Fruit"
   },
   {
-    "id": 194,
+    "id": 182,
     "name_ko": "유자",
     "name_en": "Yuzu",
     "color_category": "Yellow",
     "type": "Fruit"
   },
   {
-    "id": 195,
+    "id": 183,
     "name_ko": "모과",
     "name_en": "Quince",
     "color_category": "Yellow",
     "type": "Fruit"
   },
   {
-    "id": 196,
+    "id": 184,
     "name_ko": "소금",
     "name_en": "Salt",
     "color_category": "White",
     "type": "Ingredient"
   },
   {
-    "id": 197,
+    "id": 185,
     "name_ko": "후추",
     "name_en": "Black Pepper",
     "color_category": "Black/Gray",
     "type": "Ingredient"
   },
   {
-    "id": 198,
+    "id": 186,
     "name_ko": "식초",
     "name_en": "Vinegar",
     "color_category": "Clear",
     "type": "Condiment"
   },
   {
-    "id": 199,
+    "id": 187,
     "name_ko": "참기름",
     "name_en": "Sesame Oil",
     "color_category": "Brown",
     "type": "Condiment"
   },
   {
-    "id": 200,
+    "id": 188,
     "name_ko": "밀가루",
     "name_en": "Flour",
     "color_category": "White",
     "type": "Ingredient"
   },
   {
-    "id": 201,
+    "id": 189,
     "name_ko": "전분",
     "name_en": "Starch",
     "color_category": "White",
     "type": "Ingredient"
   },
   {
-    "id": 202,
+    "id": 190,
     "name_ko": "꿀",
     "name_en": "Honey",
     "color_category": "Amber",
     "type": "Ingredient"
   },
   {
-    "id": 203,
+    "id": 191,
     "name_ko": "올리브유",
     "name_en": "Olive Oil",
     "color_category": "Yellow/Green",
     "type": "Ingredient"
   },
   {
-    "id": 204,
+    "id": 192,
     "name_ko": "쌈장",
     "name_en": "Ssamjang",
     "color_category": "Brown",
     "type": "Condiment"
   },
   {
-    "id": 205,
+    "id": 193,
     "name_ko": "된장",
     "name_en": "Doenjang",
     "color_category": "Brown",
     "type": "Condiment"
   },
   {
-    "id": 206,
+    "id": 194,
     "name_ko": "청국장",
     "name_en": "Cheonggukjang",
     "color_category": "Brown",
     "type": "Condiment"
   },
   {
-    "id": 207,
+    "id": 195,
     "name_ko": "굴소스",
     "name_en": "Oyster Sauce",
     "color_category": "Dark Brown",
     "type": "Condiment"
   },
   {
-    "id": 208,
+    "id": 196,
     "name_ko": "칠리소스",
     "name_en": "Chili Sauce",
     "color_category": "Red",
     "type": "Condiment"
   },
   {
-    "id": 209,
+    "id": 197,
     "name_ko": "발사믹 식초",
     "name_en": "Balsamic Vinegar",
     "color_category": "Dark Brown",
     "type": "Condiment"
   },
   {
-    "id": 210,
-    "name_ko": "파마산 치즈",
-    "name_en": "Parmesan Cheese",
-    "color_category": "Pale Yellow",
-    "type": "Dairy"
-  },
-  {
-    "id": 211,
-    "name_ko": "모짜렐라 치즈",
-    "name_en": "Mozzarella Cheese",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 212,
-    "name_ko": "리코타 치즈",
-    "name_en": "Ricotta Cheese",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 213,
-    "name_ko": "크림치즈",
-    "name_en": "Cream Cheese",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 214,
+    "id": 198,
     "name_ko": "두유",
     "name_en": "Soy Milk",
     "color_category": "Beige",
     "type": "Beverage"
   },
   {
-    "id": 215,
-    "name_ko": "아몬드 브리즈",
-    "name_en": "Almond Milk",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 216,
-    "name_ko": "보리",
-    "name_en": "Barley",
-    "color_category": "Brown",
-    "type": "Grain"
-  },
-  {
-    "id": 217,
-    "name_ko": "현미",
-    "name_en": "Brown Rice",
-    "color_category": "Brown",
-    "type": "Grain"
-  },
-  {
-    "id": 218,
-    "name_ko": "귀리(오트)",
-    "name_en": "Oats",
-    "color_category": "Beige",
-    "type": "Grain"
-  },
-  {
-    "id": 219,
-    "name_ko": "메밀",
-    "name_en": "Buckwheat",
-    "color_category": "Brown",
-    "type": "Grain"
-  },
-  {
-    "id": 220,
-    "name_ko": "퀴노아",
-    "name_en": "Quinoa",
-    "color_category": "White/Red",
-    "type": "Grain"
-  },
-  {
-    "id": 221,
+    "id": 199,
     "name_ko": "팥",
     "name_en": "Red Bean",
     "color_category": "Red",
     "type": "Grain"
   },
   {
-    "id": 222,
-    "name_ko": "강낭콩",
-    "name_en": "Kidney Bean",
-    "color_category": "Red",
-    "type": "Grain"
-  },
-  {
-    "id": 223,
-    "name_ko": "완두콩",
-    "name_en": "Pea",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 224,
-    "name_ko": "병아리콩",
-    "name_en": "Chickpea",
-    "color_category": "Beige",
-    "type": "Grain"
-  },
-  {
-    "id": 225,
-    "name_ko": "렌틸콩",
-    "name_en": "Lentil",
-    "color_category": "Brown/Orange",
-    "type": "Grain"
-  },
-  {
-    "id": 226,
+    "id": 200,
     "name_ko": "갈비탕",
     "name_en": "Galbitang",
     "color_category": "Clear/Brown",
     "type": "Dish"
   },
   {
-    "id": 227,
+    "id": 201,
     "name_ko": "감자탕",
     "name_en": "Gamjatang",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 228,
+    "id": 202,
     "name_ko": "추어탕",
     "name_en": "Loach Soup",
     "color_category": "Dark Green",
     "type": "Dish"
   },
   {
-    "id": 229,
+    "id": 203,
     "name_ko": "동태찌개",
     "name_en": "Pollock Stew",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 230,
+    "id": 204,
     "name_ko": "알탕",
     "name_en": "Spicy Roe Stew",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 231,
+    "id": 205,
     "name_ko": "장어구이",
     "name_en": "Grilled Eel",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 232,
+    "id": 206,
     "name_ko": "곱창구이",
     "name_en": "Grilled Tripe",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 233,
+    "id": 207,
     "name_ko": "막창",
     "name_en": "Makchang",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 234,
+    "id": 208,
     "name_ko": "닭발",
     "name_en": "Chicken Feet",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 235,
+    "id": 209,
     "name_ko": "닭갈비",
     "name_en": "Dakgalbi",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 236,
+    "id": 210,
     "name_ko": "안동찜닭",
     "name_en": "Andong Jjimdak",
     "color_category": "Dark Brown",
     "type": "Dish"
   },
   {
-    "id": 237,
+    "id": 211,
     "name_ko": "비빔국수",
     "name_en": "Spicy Noodles",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 238,
+    "id": 212,
     "name_ko": "잔치국수",
     "name_en": "Banquet Noodles",
     "color_category": "Clear/White",
     "type": "Dish"
   },
   {
-    "id": 239,
+    "id": 213,
     "name_ko": "메밀소바",
     "name_en": "Buckwheat Soba",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 240,
-    "name_ko": "파스타(토마토)",
+    "id": 214,
+    "name_ko": "토마토 파스타",
     "name_en": "Tomato Pasta",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 241,
-    "name_ko": "파스타(알리오올리오)",
+    "id": 215,
+    "name_ko": "알리오 올리오",
     "name_en": "Aglio e Olio",
     "color_category": "Yellow/Clear",
     "type": "Dish"
   },
   {
-    "id": 242,
+    "id": 216,
     "name_ko": "감바스",
     "name_en": "Gambas al Ajillo",
     "color_category": "Yellow/Red",
     "type": "Dish"
   },
   {
-    "id": 243,
+    "id": 217,
     "name_ko": "에그 타르트",
     "name_en": "Egg Tart",
     "color_category": "Yellow",
     "type": "Dessert"
   },
   {
-    "id": 249,
+    "id": 218,
     "name_ko": "양갱",
     "name_en": "Yanggaeng",
     "color_category": "Dark Brown",
     "type": "Dessert"
   },
   {
-    "id": 250,
+    "id": 219,
     "name_ko": "약과",
     "name_en": "Yakgwa",
     "color_category": "Brown",
     "type": "Dessert"
   },
   {
-    "id": 251,
+    "id": 220,
     "name_ko": "수정과",
     "name_en": "Sujeonggwa",
     "color_category": "Dark Brown",
     "type": "Beverage"
   },
   {
-    "id": 252,
+    "id": 221,
     "name_ko": "식혜",
     "name_en": "Sikhye",
     "color_category": "White/Clear",
     "type": "Beverage"
   },
   {
-    "id": 253,
-    "name_ko": "맥주(에일)",
-    "name_en": "Beer (Ale)",
-    "color_category": "Amber",
-    "type": "Beverage"
-  },
-  {
-    "id": 254,
-    "name_ko": "맥주(흑맥주)",
+    "id": 222,
+    "name_ko": "흑맥주",
     "name_en": "Beer (Stout)",
     "color_category": "Black",
     "type": "Beverage"
   },
   {
-    "id": 255,
+    "id": 223,
     "name_ko": "화이트 와인",
     "name_en": "White Wine",
     "color_category": "Clear/Yellow",
     "type": "Beverage"
   },
   {
-    "id": 256,
+    "id": 224,
     "name_ko": "샴페인",
     "name_en": "Champagne",
     "color_category": "Pale Gold",
     "type": "Beverage"
   },
   {
-    "id": 257,
+    "id": 225,
     "name_ko": "위스키",
     "name_en": "Whisky",
     "color_category": "Amber",
     "type": "Beverage"
   },
   {
-    "id": 258,
+    "id": 226,
     "name_ko": "하이볼",
     "name_en": "Highball",
     "color_category": "Clear/Yellow",
     "type": "Beverage"
   },
   {
-    "id": 259,
-    "name_ko": "칵테일(모히또)",
-    "name_en": "Mojito",
-    "color_category": "Green",
-    "type": "Beverage"
-  },
-  {
-    "id": 260,
+    "id": 227,
     "name_ko": "에스프레소",
     "name_en": "Espresso",
     "color_category": "Dark Brown",
     "type": "Beverage"
   },
   {
-    "id": 261,
+    "id": 228,
     "name_ko": "카푸치노",
     "name_en": "Cappuccino",
     "color_category": "Brown/White",
     "type": "Beverage"
   },
   {
-    "id": 262,
+    "id": 229,
     "name_ko": "바닐라 라떼",
     "name_en": "Vanilla Latte",
     "color_category": "Beige",
     "type": "Beverage"
   },
   {
-    "id": 263,
+    "id": 230,
     "name_ko": "버블티",
     "name_en": "Bubble Tea",
     "color_category": "Beige/Black",
     "type": "Beverage"
   },
   {
-    "id": 264,
+    "id": 231,
     "name_ko": "전복죽",
     "name_en": "Abalone Porridge",
     "color_category": "Green/Beige",
     "type": "Dish"
   },
   {
-    "id": 265,
+    "id": 232,
     "name_ko": "호박죽",
     "name_en": "Pumpkin Porridge",
     "color_category": "Yellow",
     "type": "Dish"
   },
   {
-    "id": 266,
+    "id": 233,
     "name_ko": "쇠고기죽",
     "name_en": "Beef Porridge",
     "color_category": "Brown/White",
     "type": "Dish"
   },
   {
-    "id": 267,
+    "id": 234,
     "name_ko": "참치마요 주먹밥",
     "name_en": "Tuna Mayo Rice Ball",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 268,
+    "id": 235,
     "name_ko": "오므라이스",
     "name_en": "Omurice",
     "color_category": "Yellow/Red",
     "type": "Dish"
   },
   {
-    "id": 269,
+    "id": 236,
     "name_ko": "돈까스",
     "name_en": "Pork Cutlet",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 270,
+    "id": 237,
     "name_ko": "생선까스",
     "name_en": "Fish Cutlet",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 271,
+    "id": 238,
     "name_ko": "함박스테이크",
     "name_en": "Hamburg Steak",
     "color_category": "Dark Brown",
     "type": "Dish"
   },
   {
-    "id": 272,
+    "id": 239,
     "name_ko": "해물찜",
     "name_en": "Steamed Seafood",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 273,
-    "name_ko": "아귀찜",
-    "name_en": "Steamed Monkfish",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 274,
+    "id": 240,
     "name_ko": "꽃게탕",
     "name_en": "Blue Crab Stew",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 275,
+    "id": 241,
     "name_ko": "조개구이",
     "name_en": "Grilled Clams",
     "color_category": "White/Brown",
     "type": "Seafood"
   },
   {
-    "id": 276,
-    "name_ko": "가리비",
-    "name_en": "Scallop",
-    "color_category": "White",
-    "type": "Seafood"
-  },
-  {
-    "id": 277,
-    "name_ko": "키조개",
-    "name_en": "Pen Shell",
-    "color_category": "Beige",
-    "type": "Seafood"
-  },
-  {
-    "id": 278,
-    "name_ko": "멍게",
-    "name_en": "Sea Squirt",
-    "color_category": "Orange",
-    "type": "Seafood"
-  },
-  {
-    "id": 279,
-    "name_ko": "해삼",
-    "name_en": "Sea Cucumber",
-    "color_category": "Brown",
-    "type": "Seafood"
-  },
-  {
-    "id": 280,
-    "name_ko": "개불",
-    "name_en": "Spoon Worm",
-    "color_category": "Pink",
-    "type": "Seafood"
-  },
-  {
-    "id": 281,
+    "id": 242,
     "name_ko": "산낙지",
     "name_en": "Live Octopus",
     "color_category": "Gray",
     "type": "Seafood"
   },
   {
-    "id": 282,
+    "id": 243,
     "name_ko": "홍합",
     "name_en": "Mussel",
     "color_category": "Black",
     "type": "Seafood"
   },
   {
-    "id": 283,
-    "name_ko": "바지락",
-    "name_en": "Manila Clam",
-    "color_category": "Gray",
-    "type": "Seafood"
-  },
-  {
-    "id": 284,
-    "name_ko": "꼬막",
-    "name_en": "Cockle",
-    "color_category": "Brown",
-    "type": "Seafood"
-  },
-  {
-    "id": 285,
+    "id": 244,
     "name_ko": "대게",
     "name_en": "Snow Crab",
     "color_category": "Red",
     "type": "Seafood"
   },
   {
-    "id": 286,
+    "id": 245,
     "name_ko": "킹크랩",
     "name_en": "King Crab",
     "color_category": "Red",
     "type": "Seafood"
   },
   {
-    "id": 287,
+    "id": 246,
     "name_ko": "과카몰리",
     "name_en": "Guacamole",
     "color_category": "Green",
     "type": "Dish"
   },
   {
-    "id": 288,
+    "id": 247,
     "name_ko": "살사 소스",
     "name_en": "Salsa",
     "color_category": "Red",
     "type": "Condiment"
   },
   {
-    "id": 289,
-    "name_ko": "사워크림",
-    "name_en": "Sour Cream",
-    "color_category": "White",
-    "type": "Condiment"
-  },
-  {
-    "id": 290,
+    "id": 248,
     "name_ko": "바질 페스토",
     "name_en": "Basil Pesto",
     "color_category": "Green",
     "type": "Condiment"
   },
   {
-    "id": 291,
+    "id": 249,
     "name_ko": "트러플 오일",
     "name_en": "Truffle Oil",
     "color_category": "Yellow",
     "type": "Ingredient"
   },
   {
-    "id": 293,
-    "name_ko": "푸아그라",
-    "name_en": "Foie Gras",
-    "color_category": "Beige",
-    "type": "Dish"
-  },
-  {
-    "id": 294,
-    "name_ko": "하몽",
-    "name_en": "Jamon",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 295,
-    "name_ko": "살라미",
-    "name_en": "Salami",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 296,
+    "id": 250,
     "name_ko": "베이컨",
     "name_en": "Bacon",
     "color_category": "Red/White",
     "type": "Meat"
   },
   {
-    "id": 297,
+    "id": 251,
     "name_ko": "닭가슴살",
     "name_en": "Chicken Breast",
     "color_category": "White",
     "type": "Meat"
   },
   {
-    "id": 298,
+    "id": 252,
     "name_ko": "안심(소고기)",
     "name_en": "Tenderloin",
     "color_category": "Red",
     "type": "Meat"
   },
   {
-    "id": 299,
+    "id": 253,
     "name_ko": "등심(소고기)",
     "name_en": "Sirloin",
     "color_category": "Red",
     "type": "Meat"
   },
   {
-    "id": 300,
+    "id": 254,
     "name_ko": "차돌박이",
     "name_en": "Beef Brisket",
     "color_category": "Red/White",
     "type": "Meat"
   },
   {
-    "id": 301,
+    "id": 255,
     "name_ko": "깍두기",
     "name_en": "Radish Kimchi",
     "color_category": "Red",
     "type": "Side Dish"
   },
   {
-    "id": 302,
-    "name_ko": "총각김치",
-    "name_en": "Ponytail Radish Kimchi",
-    "color_category": "Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 303,
-    "name_ko": "열무김치",
-    "name_en": "Young Radish Kimchi",
-    "color_category": "Green/Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 304,
+    "id": 256,
     "name_ko": "백김치",
     "name_en": "White Kimchi",
     "color_category": "White",
     "type": "Side Dish"
   },
   {
-    "id": 305,
-    "name_ko": "동치미",
-    "name_en": "Radish Water Kimchi",
-    "color_category": "Clear/White",
-    "type": "Side Dish"
-  },
-  {
-    "id": 306,
-    "name_ko": "갓김치",
-    "name_en": "Mustard Leaf Kimchi",
-    "color_category": "Green/Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 307,
-    "name_ko": "오이소박이",
-    "name_en": "Cucumber Kimchi",
-    "color_category": "Green/Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 308,
+    "id": 257,
     "name_ko": "파김치",
     "name_en": "Green Onion Kimchi",
     "color_category": "Green/Red",
     "type": "Side Dish"
   },
   {
-    "id": 309,
-    "name_ko": "깻잎김치",
-    "name_en": "Perilla Leaf Kimchi",
-    "color_category": "Green/Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 310,
-    "name_ko": "나박김치",
-    "name_en": "Water Kimchi",
-    "color_category": "Red/Clear",
-    "type": "Side Dish"
-  },
-  {
-    "id": 311,
+    "id": 258,
     "name_ko": "멸치볶음",
     "name_en": "Stir-fried Anchovies",
     "color_category": "Silver/Brown",
     "type": "Side Dish"
   },
   {
-    "id": 312,
-    "name_ko": "진미채볶음",
-    "name_en": "Stir-fried Dried Squid",
-    "color_category": "Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 313,
+    "id": 259,
     "name_ko": "콩자반",
     "name_en": "Braised Soybeans",
     "color_category": "Black",
     "type": "Side Dish"
   },
   {
-    "id": 314,
+    "id": 260,
     "name_ko": "계란말이",
     "name_en": "Rolled Omelet",
     "color_category": "Yellow",
     "type": "Side Dish"
   },
   {
-    "id": 315,
+    "id": 261,
     "name_ko": "계란찜",
     "name_en": "Steamed Egg",
     "color_category": "Yellow",
     "type": "Dish"
   },
   {
-    "id": 316,
+    "id": 262,
     "name_ko": "두부조림",
     "name_en": "Braised Tofu",
     "color_category": "Red",
     "type": "Side Dish"
   },
   {
-    "id": 317,
+    "id": 263,
     "name_ko": "감자조림",
     "name_en": "Braised Potato",
     "color_category": "Brown",
     "type": "Side Dish"
   },
   {
-    "id": 318,
+    "id": 264,
     "name_ko": "연근조림",
     "name_en": "Braised Lotus Root",
     "color_category": "Dark Brown",
     "type": "Side Dish"
   },
   {
-    "id": 319,
+    "id": 265,
     "name_ko": "우엉조림",
     "name_en": "Braised Burdock",
     "color_category": "Dark Brown",
     "type": "Side Dish"
   },
   {
-    "id": 320,
-    "name_ko": "시금치무침",
-    "name_en": "Seasoned Spinach",
-    "color_category": "Green",
-    "type": "Side Dish"
-  },
-  {
-    "id": 321,
-    "name_ko": "콩나물무침",
-    "name_en": "Seasoned Bean Sprouts",
-    "color_category": "Yellow/White",
-    "type": "Side Dish"
-  },
-  {
-    "id": 322,
-    "name_ko": "무생채",
-    "name_en": "Radish Salad",
-    "color_category": "Red/White",
-    "type": "Side Dish"
-  },
-  {
-    "id": 323,
-    "name_ko": "고사리나물",
-    "name_en": "Seasoned Fern",
-    "color_category": "Brown",
-    "type": "Side Dish"
-  },
-  {
-    "id": 324,
-    "name_ko": "도라지무침",
-    "name_en": "Seasoned Bellflower",
-    "color_category": "Red/White",
-    "type": "Side Dish"
-  },
-  {
-    "id": 325,
+    "id": 266,
     "name_ko": "미역줄기볶음",
     "name_en": "Stir-fried Seaweed",
     "color_category": "Green",
     "type": "Side Dish"
   },
   {
-    "id": 326,
+    "id": 267,
     "name_ko": "갈치조림",
     "name_en": "Braised Hairtail",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 327,
+    "id": 268,
     "name_ko": "고등어조림",
     "name_en": "Braised Mackerel",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 328,
+    "id": 269,
     "name_ko": "꽁치구이",
     "name_en": "Grilled Saury",
     "color_category": "Brown/Silver",
     "type": "Dish"
   },
   {
-    "id": 329,
-    "name_ko": "임연수구이",
-    "name_en": "Grilled Atka Mackerel",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 330,
-    "name_ko": "황태구이",
-    "name_en": "Grilled Dried Pollack",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 331,
+    "id": 270,
     "name_ko": "더덕구이",
     "name_en": "Grilled Deodeok",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 332,
+    "id": 271,
     "name_ko": "북엇국",
     "name_en": "Dried Pollack Soup",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 333,
+    "id": 272,
     "name_ko": "콩나물국",
     "name_en": "Bean Sprout Soup",
     "color_category": "Clear",
     "type": "Dish"
   },
   {
-    "id": 334,
+    "id": 273,
     "name_ko": "소고기무국",
     "name_en": "Beef Radish Soup",
     "color_category": "Clear/Brown",
     "type": "Dish"
   },
   {
-    "id": 335,
+    "id": 274,
     "name_ko": "떡국",
     "name_en": "Rice Cake Soup",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 336,
+    "id": 275,
     "name_ko": "만둣국",
     "name_en": "Dumpling Soup",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 337,
+    "id": 276,
     "name_ko": "사골국",
     "name_en": "Beef Bone Soup",
     "color_category": "Milky White",
     "type": "Dish"
   },
   {
-    "id": 338,
+    "id": 277,
     "name_ko": "곰탕",
     "name_en": "Gomtang",
     "color_category": "Clear/White",
     "type": "Dish"
   },
   {
-    "id": 339,
-    "name_ko": "도가니탕",
-    "name_en": "Ox Knee Soup",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 340,
+    "id": 278,
     "name_ko": "도가니 수육",
     "name_en": "Boiled Ox Knee Slices",
     "color_category": "White/Beige",
     "type": "Dish"
   },
   {
-    "id": 341,
+    "id": 279,
     "name_ko": "매운탕",
     "name_en": "Spicy Fish Stew",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 342,
-    "name_ko": "아귀탕",
-    "name_en": "Monkfish Stew",
-    "color_category": "Red/Clear",
-    "type": "Dish"
-  },
-  {
-    "id": 343,
-    "name_ko": "연포탕",
-    "name_en": "Octopus Soup",
-    "color_category": "Clear",
-    "type": "Dish"
-  },
-  {
-    "id": 344,
+    "id": 280,
     "name_ko": "낙지탕탕이",
     "name_en": "Chopped Live Octopus",
     "color_category": "Gray",
     "type": "Seafood"
   },
   {
-    "id": 345,
-    "name_ko": "홍어무침",
-    "name_en": "Seasoned Skate",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 346,
-    "name_ko": "홍어삼합",
-    "name_en": "Fermented Skate Trio",
-    "color_category": "Beige/Red",
-    "type": "Dish"
-  },
-  {
-    "id": 347,
+    "id": 281,
     "name_ko": "편육",
     "name_en": "Boiled Pork Slices",
     "color_category": "Beige",
     "type": "Meat"
   },
   {
-    "id": 348,
+    "id": 282,
     "name_ko": "수육",
     "name_en": "Boiled Pork/Beef",
     "color_category": "Beige",
     "type": "Meat"
   },
   {
-    "id": 349,
+    "id": 283,
     "name_ko": "빈대떡",
     "name_en": "Mung Bean Pancake",
     "color_category": "Golden Brown",
     "type": "Dish"
   },
   {
-    "id": 350,
+    "id": 284,
     "name_ko": "육전",
     "name_en": "Meat Pancake",
     "color_category": "Golden",
     "type": "Dish"
   },
   {
-    "id": 351,
+    "id": 285,
     "name_ko": "호박전",
     "name_en": "Zucchini Pancake",
     "color_category": "Yellow/Green",
     "type": "Dish"
   },
   {
-    "id": 352,
+    "id": 286,
     "name_ko": "동그랑땡",
     "name_en": "Meatballs (Korean)",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 353,
+    "id": 287,
     "name_ko": "산적",
     "name_en": "Skewered Pancake",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 354,
-    "name_ko": "약밥",
-    "name_en": "Sweet Rice",
-    "color_category": "Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 355,
-    "name_ko": "경단",
-    "name_en": "Sweet Rice Balls",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 356,
+    "id": 288,
     "name_ko": "인절미",
     "name_en": "Injeolmi",
     "color_category": "Beige",
     "type": "Dessert"
   },
   {
-    "id": 357,
-    "name_ko": "절편",
-    "name_en": "Jeolpyeon",
-    "color_category": "White/Green",
-    "type": "Dessert"
-  },
-  {
-    "id": 358,
+    "id": 289,
     "name_ko": "백설기",
     "name_en": "Baekseolgi",
     "color_category": "White",
     "type": "Dessert"
   },
   {
-    "id": 359,
-    "name_ko": "무지개떡",
-    "name_en": "Rainbow Rice Cake",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 360,
+    "id": 290,
     "name_ko": "시루떡",
     "name_en": "Sirutteok",
     "color_category": "Red/Brown",
     "type": "Dessert"
   },
   {
-    "id": 361,
-    "name_ko": "가래떡",
-    "name_en": "Garaetteok",
-    "color_category": "White",
-    "type": "Grain"
-  },
-  {
-    "id": 362,
-    "name_ko": "꿀떡",
-    "name_en": "Honey Rice Cake",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 363,
-    "name_ko": "송편",
-    "name_en": "Songpyeon",
-    "color_category": "White/Green",
-    "type": "Dessert"
-  },
-  {
-    "id": 367,
+    "id": 291,
     "name_ko": "소보로빵",
     "name_en": "Streusel Bread",
     "color_category": "Brown",
     "type": "Bakery"
   },
   {
-    "id": 368,
+    "id": 292,
     "name_ko": "단팥빵",
     "name_en": "Red Bean Bread",
     "color_category": "Brown",
     "type": "Bakery"
   },
   {
-    "id": 369,
+    "id": 293,
     "name_ko": "슈크림빵",
     "name_en": "Cream Puff Bread",
     "color_category": "Golden",
     "type": "Bakery"
   },
   {
-    "id": 370,
+    "id": 294,
     "name_ko": "카스텔라",
     "name_en": "Castella",
     "color_category": "Yellow",
     "type": "Bakery"
   },
   {
-    "id": 371,
+    "id": 295,
     "name_ko": "롤케이크",
     "name_en": "Roll Cake",
     "color_category": "Colorful",
     "type": "Dessert"
   },
   {
-    "id": 372,
-    "name_ko": "마들렌",
-    "name_en": "Madeleine",
-    "color_category": "Golden",
-    "type": "Dessert"
-  },
-  {
-    "id": 373,
+    "id": 296,
     "name_ko": "휘낭시에",
     "name_en": "Financier",
     "color_category": "Brown",
     "type": "Dessert"
   },
   {
-    "id": 374,
+    "id": 297,
     "name_ko": "까눌레",
     "name_en": "Canele",
     "color_category": "Dark Brown",
     "type": "Dessert"
   },
   {
-    "id": 375,
-    "name_ko": "에클레어",
-    "name_en": "Eclair",
-    "color_category": "Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 376,
-    "name_ko": "슈(홈런볼)",
-    "name_en": "Choux Cream",
-    "color_category": "Beige",
-    "type": "Dessert"
-  },
-  {
-    "id": 377,
+    "id": 298,
     "name_ko": "스콘",
     "name_en": "Scone",
     "color_category": "Beige",
     "type": "Bakery"
   },
   {
-    "id": 378,
+    "id": 299,
     "name_ko": "브라우니",
     "name_en": "Brownie",
     "color_category": "Dark Brown",
     "type": "Dessert"
   },
   {
-    "id": 379,
+    "id": 300,
     "name_ko": "머핀",
     "name_en": "Muffin",
     "color_category": "Brown",
     "type": "Bakery"
   },
   {
-    "id": 382,
-    "name_ko": "치아바타",
-    "name_en": "Ciabatta",
-    "color_category": "Beige",
-    "type": "Bakery"
-  },
-  {
-    "id": 383,
-    "name_ko": "포카치아",
-    "name_en": "Focaccia",
-    "color_category": "Beige",
-    "type": "Bakery"
-  },
-  {
-    "id": 384,
-    "name_ko": "사워도우",
-    "name_en": "Sourdough",
-    "color_category": "Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 385,
-    "name_ko": "호밀빵",
-    "name_en": "Rye Bread",
-    "color_category": "Dark Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 386,
-    "name_ko": "브리오슈",
-    "name_en": "Brioche",
-    "color_category": "Golden",
-    "type": "Bakery"
-  },
-  {
-    "id": 387,
-    "name_ko": "난(인도빵)",
-    "name_en": "Naan",
-    "color_category": "Beige",
-    "type": "Bakery"
-  },
-  {
-    "id": 388,
-    "name_ko": "또띠아",
-    "name_en": "Tortilla",
-    "color_category": "White",
-    "type": "Grain"
-  },
-  {
-    "id": 389,
-    "name_ko": "피타 브레드",
-    "name_en": "Pita Bread",
-    "color_category": "Beige",
-    "type": "Bakery"
-  },
-  {
-    "id": 390,
+    "id": 301,
     "name_ko": "뇨끼",
     "name_en": "Gnocchi",
     "color_category": "White/Yellow",
     "type": "Dish"
   },
   {
-    "id": 391,
-    "name_ko": "라비올리",
-    "name_en": "Ravioli",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 392,
-    "name_ko": "펜네",
-    "name_en": "Penne",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 393,
-    "name_ko": "푸실리",
-    "name_en": "Fusilli",
-    "color_category": "Colorful",
-    "type": "Grain"
-  },
-  {
-    "id": 394,
-    "name_ko": "마카로니",
-    "name_en": "Macaroni",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 395,
+    "id": 302,
     "name_ko": "미트볼",
     "name_en": "Meatball",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 396,
+    "id": 303,
     "name_ko": "소시지 야채볶음",
     "name_en": "Sausage Vegetable Stir-fry",
     "color_category": "Red/Brown",
     "type": "Dish"
   },
   {
-    "id": 397,
-    "name_ko": "콘치즈",
-    "name_en": "Corn Cheese",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 398,
-    "name_ko": "감자 샐러드",
-    "name_en": "Potato Salad",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 399,
-    "name_ko": "단호박 샐러드",
-    "name_en": "Pumpkin Salad",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 400,
-    "name_ko": "리코타 치즈 샐러드",
-    "name_en": "Ricotta Cheese Salad",
-    "color_category": "Green/White",
-    "type": "Dish"
-  },
-  {
-    "id": 401,
-    "name_ko": "시저 샐러드",
-    "name_en": "Caesar Salad",
-    "color_category": "Green/White",
-    "type": "Dish"
-  },
-  {
-    "id": 402,
+    "id": 304,
     "name_ko": "카프레제",
     "name_en": "Caprese Salad",
     "color_category": "Red/White",
     "type": "Dish"
   },
   {
-    "id": 403,
-    "name_ko": "콥 샐러드",
-    "name_en": "Cobb Salad",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 404,
+    "id": 305,
     "name_ko": "월남쌈",
     "name_en": "Spring Rolls (Vietnamese)",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 405,
+    "id": 306,
     "name_ko": "분짜",
     "name_en": "Bun Cha",
     "color_category": "Green/Brown",
     "type": "Dish"
   },
   {
-    "id": 406,
+    "id": 307,
     "name_ko": "반미",
     "name_en": "Banh Mi",
     "color_category": "Brown/Green",
     "type": "Dish"
   },
   {
-    "id": 407,
+    "id": 308,
     "name_ko": "나시고랭",
     "name_en": "Nasi Goreng",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 408,
-    "name_ko": "미고랭",
-    "name_en": "Mie Goreng",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 409,
+    "id": 309,
     "name_ko": "똠양꿍",
     "name_en": "Tom Yum Goong",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 410,
+    "id": 310,
     "name_ko": "푸팟퐁커리",
     "name_en": "Poo Pad Pong Curry",
     "color_category": "Yellow",
     "type": "Dish"
   },
   {
-    "id": 411,
+    "id": 311,
     "name_ko": "마파두부",
     "name_en": "Mapo Tofu",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 412,
+    "id": 312,
     "name_ko": "동파육",
     "name_en": "Dongpo Pork",
     "color_category": "Dark Brown",
     "type": "Dish"
   },
   {
-    "id": 413,
+    "id": 313,
     "name_ko": "팔보채",
     "name_en": "Palbochae",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 414,
+    "id": 314,
     "name_ko": "유산슬",
     "name_en": "Yusanseul",
     "color_category": "Beige",
     "type": "Dish"
   },
   {
-    "id": 415,
+    "id": 315,
     "name_ko": "깐풍기",
     "name_en": "Kkanpunggi",
     "color_category": "Red/Brown",
     "type": "Dish"
   },
   {
-    "id": 416,
+    "id": 316,
     "name_ko": "유린기",
     "name_en": "Yuringi",
     "color_category": "Brown/Green",
     "type": "Dish"
   },
   {
-    "id": 417,
+    "id": 317,
     "name_ko": "고추잡채",
     "name_en": "Pepper Japchae",
     "color_category": "Green/Red",
     "type": "Dish"
   },
   {
-    "id": 418,
+    "id": 318,
     "name_ko": "멘보샤",
     "name_en": "Menbosha",
     "color_category": "Golden",
     "type": "Dish"
   },
   {
-    "id": 419,
+    "id": 319,
     "name_ko": "오코노미야끼",
     "name_en": "Okonomiyaki",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 420,
+    "id": 320,
     "name_ko": "야끼소바",
     "name_en": "Yakisoba",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 421,
+    "id": 321,
     "name_ko": "가츠동",
     "name_en": "Katsudon",
     "color_category": "Brown/Yellow",
     "type": "Dish"
   },
   {
-    "id": 422,
+    "id": 322,
     "name_ko": "규동",
     "name_en": "Gyudon",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 423,
+    "id": 323,
     "name_ko": "텐동",
     "name_en": "Tendon",
     "color_category": "Golden",
     "type": "Dish"
   },
   {
-    "id": 424,
+    "id": 324,
     "name_ko": "장어덮밥",
     "name_en": "Unadon",
     "color_category": "Dark Brown",
     "type": "Dish"
   },
   {
-    "id": 425,
+    "id": 325,
     "name_ko": "낫또",
     "name_en": "Natto",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 426,
+    "id": 326,
     "name_ko": "부리또",
     "name_en": "Burrito",
     "color_category": "Beige",
     "type": "Dish"
   },
   {
-    "id": 427,
-    "name_ko": "퀘사디아",
-    "name_en": "Quesadilla",
-    "color_category": "Golden",
-    "type": "Dish"
-  },
-  {
-    "id": 428,
-    "name_ko": "파히타",
-    "name_en": "Fajita",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 429,
-    "name_ko": "칠리 콘 카르네",
-    "name_en": "Chili Con Carne",
-    "color_category": "Red/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 430,
-    "name_ko": "빠에야",
-    "name_en": "Paella",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 431,
+    "id": 327,
     "name_ko": "라따뚜이",
     "name_en": "Ratatouille",
     "color_category": "Red/Green",
     "type": "Dish"
   },
   {
-    "id": 432,
-    "name_ko": "에스카르고",
-    "name_en": "Escargot",
-    "color_category": "Green/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 433,
-    "name_ko": "슈니첼",
-    "name_en": "Schnitzel",
-    "color_category": "Golden",
-    "type": "Dish"
-  },
-  {
-    "id": 434,
+    "id": 328,
     "name_ko": "피쉬 앤 칩스",
     "name_en": "Fish and Chips",
     "color_category": "Golden",
     "type": "Dish"
   },
   {
-    "id": 435,
-    "name_ko": "셰퍼드 파이",
-    "name_en": "Shepherd's Pie",
-    "color_category": "Golden/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 436,
-    "name_ko": "굴라쉬",
-    "name_en": "Goulash",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 437,
-    "name_ko": "퐁듀",
-    "name_en": "Fondue",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 438,
-    "name_ko": "브루스케타",
-    "name_en": "Bruschetta",
-    "color_category": "Red/Green",
-    "type": "Dish"
-  },
-  {
-    "id": 439,
-    "name_ko": "후무스",
-    "name_en": "Hummus",
-    "color_category": "Beige",
-    "type": "Dish"
-  },
-  {
-    "id": 440,
+    "id": 329,
     "name_ko": "케밥",
     "name_en": "Kebab",
     "color_category": "Brown",
     "type": "Dish"
   },
   {
-    "id": 441,
+    "id": 330,
     "name_ko": "탄두리 치킨",
     "name_en": "Tandoori Chicken",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 442,
-    "name_ko": "마카롱(초코)",
-    "name_en": "Macaron (Chocolate)",
-    "color_category": "Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 443,
-    "name_ko": "마카롱(바닐라)",
-    "name_en": "Macaron (Vanilla)",
-    "color_category": "Beige",
-    "type": "Dessert"
-  },
-  {
-    "id": 444,
-    "name_ko": "마카롱(피스타치오)",
-    "name_en": "Macaron (Pistachio)",
-    "color_category": "Green",
-    "type": "Dessert"
-  },
-  {
-    "id": 445,
-    "name_ko": "마카롱(레몬)",
-    "name_en": "Macaron (Lemon)",
-    "color_category": "Yellow",
-    "type": "Dessert"
-  },
-  {
-    "id": 446,
-    "name_ko": "파운드 케이크",
-    "name_en": "Pound Cake",
-    "color_category": "Yellow",
-    "type": "Bakery"
-  },
-  {
-    "id": 447,
-    "name_ko": "쉬폰 케이크",
-    "name_en": "Chiffon Cake",
-    "color_category": "Beige",
-    "type": "Bakery"
-  },
-  {
-    "id": 448,
-    "name_ko": "타르트(과일)",
-    "name_en": "Fruit Tart",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 449,
-    "name_ko": "타르트(호두)",
-    "name_en": "Walnut Tart",
-    "color_category": "Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 450,
+    "id": 331,
     "name_ko": "몽블랑",
     "name_en": "Mont Blanc",
     "color_category": "Brown",
     "type": "Dessert"
   },
   {
-    "id": 451,
+    "id": 332,
     "name_ko": "크레페",
     "name_en": "Crepe",
     "color_category": "Beige",
     "type": "Dessert"
   },
   {
-    "id": 452,
+    "id": 333,
     "name_ko": "밀푀유",
     "name_en": "Mille-feuille",
     "color_category": "Yellow/Brown",
     "type": "Dessert"
   },
   {
-    "id": 453,
-    "name_ko": "팡도르",
-    "name_en": "Pandoro",
-    "color_category": "White",
-    "type": "Bakery"
-  },
-  {
-    "id": 454,
-    "name_ko": "앙버터",
-    "name_en": "Red Bean Butter Bread",
-    "color_category": "Brown/Yellow",
-    "type": "Bakery"
-  },
-  {
-    "id": 455,
-    "name_ko": "맘모스빵",
-    "name_en": "Mammoth Bread",
-    "color_category": "Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 456,
+    "id": 334,
     "name_ko": "크로플",
     "name_en": "Croffle",
     "color_category": "Golden Brown",
     "type": "Dessert"
   },
   {
-    "id": 457,
-    "name_ko": "빙수(망고)",
-    "name_en": "Mango Bingsu",
-    "color_category": "Yellow",
-    "type": "Dessert"
-  },
-  {
-    "id": 458,
-    "name_ko": "빙수(딸기)",
-    "name_en": "Strawberry Bingsu",
-    "color_category": "Red",
-    "type": "Dessert"
-  },
-  {
-    "id": 459,
-    "name_ko": "빙수(인절미)",
-    "name_en": "Injeolmi Bingsu",
-    "color_category": "Beige",
-    "type": "Dessert"
-  },
-  {
-    "id": 460,
+    "id": 335,
     "name_ko": "소프트 아이스크림",
     "name_en": "Soft Serve Ice Cream",
     "color_category": "White",
     "type": "Dessert"
   },
   {
-    "id": 461,
-    "name_ko": "구슬 아이스크림",
-    "name_en": "Dippin' Dots",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 462,
+    "id": 336,
     "name_ko": "젤라또",
     "name_en": "Gelato",
     "color_category": "Colorful",
     "type": "Dessert"
   },
   {
-    "id": 463,
-    "name_ko": "셔벗",
-    "name_en": "Sorbet",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 464,
-    "name_ko": "파르페",
-    "name_en": "Parfait",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 476,
-    "name_ko": "맛살",
-    "name_en": "Imitation Crab",
-    "color_category": "Red/White",
-    "type": "Ingredient"
-  },
-  {
-    "id": 477,
-    "name_ko": "비엔나 소시지",
-    "name_en": "Vienna Sausage",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 478,
+    "id": 337,
     "name_ko": "스팸",
     "name_en": "Spam",
     "color_category": "Pink",
     "type": "Meat"
   },
   {
-    "id": 479,
+    "id": 338,
     "name_ko": "참치캔",
     "name_en": "Canned Tuna",
     "color_category": "Beige",
     "type": "Seafood"
   },
   {
-    "id": 480,
+    "id": 339,
     "name_ko": "골뱅이",
     "name_en": "Whelk",
     "color_category": "Brown",
     "type": "Seafood"
   },
   {
-    "id": 482,
+    "id": 340,
     "name_ko": "용과",
     "name_en": "Dragon Fruit",
     "color_category": "Pink/White",
     "type": "Fruit"
   },
   {
-    "id": 483,
+    "id": 341,
     "name_ko": "리치",
     "name_en": "Lychee",
     "color_category": "White",
     "type": "Fruit"
   },
   {
-    "id": 484,
-    "name_ko": "람부탄",
-    "name_en": "Rambutan",
-    "color_category": "White",
-    "type": "Fruit"
-  },
-  {
-    "id": 485,
+    "id": 342,
     "name_ko": "패션후르츠",
     "name_en": "Passion Fruit",
     "color_category": "Yellow/Orange",
     "type": "Fruit"
   },
   {
-    "id": 486,
-    "name_ko": "구아바",
-    "name_en": "Guava",
-    "color_category": "Green/Pink",
-    "type": "Fruit"
-  },
-  {
-    "id": 487,
-    "name_ko": "파파야",
-    "name_en": "Papaya",
-    "color_category": "Orange",
-    "type": "Fruit"
-  },
-  {
-    "id": 488,
+    "id": 343,
     "name_ko": "스타푸르트",
     "name_en": "Starfruit",
     "color_category": "Yellow",
     "type": "Fruit"
   },
   {
-    "id": 489,
-    "name_ko": "크랜베리",
-    "name_en": "Cranberry",
-    "color_category": "Red",
-    "type": "Fruit"
-  },
-  {
-    "id": 490,
+    "id": 344,
     "name_ko": "라즈베리",
     "name_en": "Raspberry",
     "color_category": "Red",
     "type": "Fruit"
   },
   {
-    "id": 491,
-    "name_ko": "오디",
-    "name_en": "Mulberry",
-    "color_category": "Black/Purple",
-    "type": "Fruit"
-  },
-  {
-    "id": 492,
+    "id": 345,
     "name_ko": "앵두",
     "name_en": "Korean Cherry",
     "color_category": "Red",
     "type": "Fruit"
   },
   {
-    "id": 493,
+    "id": 346,
     "name_ko": "금귤",
     "name_en": "Kumquat",
     "color_category": "Orange",
     "type": "Fruit"
   },
   {
-    "id": 494,
-    "name_ko": "아로니아",
-    "name_en": "Aronia",
-    "color_category": "Black",
-    "type": "Fruit"
-  },
-  {
-    "id": 495,
+    "id": 347,
     "name_ko": "매실",
     "name_en": "Green Plum",
     "color_category": "Green",
     "type": "Fruit"
   },
   {
-    "id": 496,
-    "name_ko": "탱자",
-    "name_en": "Hardy Orange",
-    "color_category": "Green",
-    "type": "Fruit"
-  },
-  {
-    "id": 497,
-    "name_ko": "여주",
-    "name_en": "Bitter Melon",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 498,
-    "name_ko": "오크라",
-    "name_en": "Okra",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 499,
-    "name_ko": "아티초크",
-    "name_en": "Artichoke",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 500,
-    "name_ko": "펜넬",
-    "name_en": "Fennel",
-    "color_category": "White/Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 501,
+    "id": 348,
     "name_ko": "엔다이브",
     "name_en": "Endive",
     "color_category": "White/Yellow",
     "type": "Vegetable"
   },
   {
-    "id": 502,
-    "name_ko": "루꼴라",
-    "name_en": "Arugula",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 503,
-    "name_ko": "라디치오",
-    "name_en": "Radicchio",
-    "color_category": "Purple/White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 504,
-    "name_ko": "치커리",
-    "name_en": "Chicory",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 505,
+    "id": 349,
     "name_ko": "쑥",
     "name_en": "Mugwort",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 506,
-    "name_ko": "냉이",
-    "name_en": "Shepherd's Purse",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 507,
-    "name_ko": "달래",
-    "name_en": "Wild Chive",
-    "color_category": "Green/White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 508,
+    "id": 350,
     "name_ko": "미나리",
     "name_en": "Water Dropwort",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 509,
-    "name_ko": "참나물",
-    "name_en": "Chamnamul",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 510,
-    "name_ko": "취나물",
-    "name_en": "Aster Scaber",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 511,
-    "name_ko": "곤드레",
-    "name_en": "Thistle",
-    "color_category": "Dark Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 512,
-    "name_ko": "시래기",
-    "name_en": "Dried Radish Greens",
-    "color_category": "Green/Brown",
-    "type": "Vegetable"
-  },
-  {
-    "id": 513,
-    "name_ko": "우거지",
-    "name_en": "Dried Cabbage Leaves",
-    "color_category": "Green/Brown",
-    "type": "Vegetable"
-  },
-  {
-    "id": 514,
-    "name_ko": "토란",
-    "name_en": "Taro",
-    "color_category": "White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 515,
-    "name_ko": "마",
-    "name_en": "Yam",
-    "color_category": "White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 516,
-    "name_ko": "더덕",
-    "name_en": "Deodeok",
-    "color_category": "White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 517,
-    "name_ko": "인삼",
-    "name_en": "Ginseng",
-    "color_category": "Beige",
-    "type": "Vegetable"
-  },
-  {
-    "id": 518,
+    "id": 351,
     "name_ko": "산삼",
     "name_en": "Wild Ginseng",
     "color_category": "Beige",
     "type": "Vegetable"
   },
   {
-    "id": 519,
-    "name_ko": "황기",
-    "name_en": "Milkvetch Root",
-    "color_category": "Beige",
-    "type": "Vegetable"
-  },
-  {
-    "id": 520,
-    "name_ko": "계피",
-    "name_en": "Cinnamon",
-    "color_category": "Brown",
-    "type": "Spice"
-  },
-  {
-    "id": 521,
-    "name_ko": "강황(터메릭)",
-    "name_en": "Turmeric",
-    "color_category": "Yellow",
-    "type": "Spice"
-  },
-  {
-    "id": 522,
-    "name_ko": "큐민",
-    "name_en": "Cumin",
-    "color_category": "Brown",
-    "type": "Spice"
-  },
-  {
-    "id": 523,
-    "name_ko": "코리안더(고수씨)",
-    "name_en": "Coriander Seed",
+    "id": 352,
+    "name_ko": "고수",
+    "name_en": "Coriander",
     "color_category": "Beige",
     "type": "Spice"
   },
   {
-    "id": 524,
-    "name_ko": "넛맥",
-    "name_en": "Nutmeg",
-    "color_category": "Brown",
-    "type": "Spice"
-  },
-  {
-    "id": 525,
-    "name_ko": "정향",
-    "name_en": "Cloves",
-    "color_category": "Dark Brown",
-    "type": "Spice"
-  },
-  {
-    "id": 526,
-    "name_ko": "샤프란",
-    "name_en": "Saffron",
-    "color_category": "Red",
-    "type": "Spice"
-  },
-  {
-    "id": 527,
+    "id": 353,
     "name_ko": "바닐라 빈",
     "name_en": "Vanilla Bean",
     "color_category": "Black",
     "type": "Spice"
   },
   {
-    "id": 528,
-    "name_ko": "로즈마리",
-    "name_en": "Rosemary",
-    "color_category": "Green",
-    "type": "Spice"
-  },
-  {
-    "id": 529,
-    "name_ko": "타임",
-    "name_en": "Thyme",
-    "color_category": "Green",
-    "type": "Spice"
-  },
-  {
-    "id": 530,
-    "name_ko": "오레가노",
-    "name_en": "Oregano",
-    "color_category": "Green",
-    "type": "Spice"
-  },
-  {
-    "id": 531,
-    "name_ko": "딜",
-    "name_en": "Dill",
-    "color_category": "Green",
-    "type": "Spice"
-  },
-  {
-    "id": 532,
+    "id": 354,
     "name_ko": "애플민트",
     "name_en": "Apple Mint",
     "color_category": "Green",
     "type": "Spice"
   },
   {
-    "id": 533,
-    "name_ko": "레몬밤",
-    "name_en": "Lemon Balm",
-    "color_category": "Green",
-    "type": "Spice"
-  },
-  {
-    "id": 534,
+    "id": 355,
     "name_ko": "라벤더",
     "name_en": "Lavender",
     "color_category": "Purple",
     "type": "Spice"
   },
   {
-    "id": 535,
+    "id": 356,
     "name_ko": "얼그레이",
     "name_en": "Earl Grey",
     "color_category": "Brown",
     "type": "Beverage"
   },
   {
-    "id": 536,
+    "id": 357,
     "name_ko": "캐모마일",
     "name_en": "Chamomile",
     "color_category": "Yellow",
     "type": "Beverage"
   },
   {
-    "id": 537,
+    "id": 358,
     "name_ko": "페퍼민트",
     "name_en": "Peppermint Tea",
     "color_category": "Green",
     "type": "Beverage"
   },
   {
-    "id": 538,
-    "name_ko": "루이보스",
-    "name_en": "Rooibos",
-    "color_category": "Red",
-    "type": "Beverage"
-  },
-  {
-    "id": 539,
-    "name_ko": "우롱차",
-    "name_en": "Oolong Tea",
-    "color_category": "Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 540,
-    "name_ko": "자스민차",
-    "name_en": "Jasmine Tea",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 541,
-    "name_ko": "유자차",
-    "name_en": "Citron Tea",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 542,
-    "name_ko": "생강차",
-    "name_en": "Ginger Tea",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 543,
-    "name_ko": "대추차",
-    "name_en": "Jujube Tea",
-    "color_category": "Dark Red",
-    "type": "Beverage"
-  },
-  {
-    "id": 544,
-    "name_ko": "오미자차",
-    "name_en": "Omija Tea",
-    "color_category": "Red",
-    "type": "Beverage"
-  },
-  {
-    "id": 545,
-    "name_ko": "매실차",
-    "name_en": "Plum Tea",
-    "color_category": "Green/Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 546,
+    "id": 359,
     "name_ko": "카페라떼",
     "name_en": "Caffe Latte",
     "color_category": "Beige",
     "type": "Beverage"
   },
   {
-    "id": 547,
+    "id": 360,
     "name_ko": "카라멜 마키아또",
     "name_en": "Caramel Macchiato",
     "color_category": "Beige",
     "type": "Beverage"
   },
   {
-    "id": 548,
-    "name_ko": "카페모카",
-    "name_en": "Caffe Mocha",
-    "color_category": "Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 549,
+    "id": 361,
     "name_ko": "아인슈페너",
     "name_en": "Einspanner",
     "color_category": "Black/White",
     "type": "Beverage"
   },
   {
-    "id": 550,
+    "id": 362,
     "name_ko": "아포가토",
     "name_en": "Affogato",
     "color_category": "Brown/White",
     "type": "Dessert"
   },
   {
-    "id": 551,
+    "id": 363,
     "name_ko": "밀크쉐이크",
     "name_en": "Milkshake",
     "color_category": "White",
     "type": "Beverage"
   },
   {
-    "id": 552,
+    "id": 364,
     "name_ko": "오렌지 에이드",
     "name_en": "Orange Ade",
     "color_category": "Orange",
     "type": "Beverage"
   },
   {
-    "id": 553,
+    "id": 365,
     "name_ko": "자몽 에이드",
     "name_en": "Grapefruit Ade",
     "color_category": "Pink",
     "type": "Beverage"
   },
   {
-    "id": 554,
-    "name_ko": "청포도 에이드",
-    "name_en": "Green Grape Ade",
-    "color_category": "Green",
-    "type": "Beverage"
-  },
-  {
-    "id": 555,
-    "name_ko": "레드 와인(메를로)",
-    "name_en": "Merlot",
+    "id": 366,
+    "name_ko": "레드 와인",
+    "name_en": "Red Wine",
     "color_category": "Dark Red",
     "type": "Beverage"
   },
   {
-    "id": 556,
-    "name_ko": "화이트 와인(샤르도네)",
-    "name_en": "Chardonnay",
+    "id": 367,
+    "name_ko": "화이트 와인",
+    "name_en": "White Wine",
     "color_category": "Yellow",
     "type": "Beverage"
   },
   {
-    "id": 557,
-    "name_ko": "로제 와인",
-    "name_en": "Rose Wine",
-    "color_category": "Pink",
-    "type": "Beverage"
-  },
-  {
-    "id": 558,
-    "name_ko": "보드카",
-    "name_en": "Vodka",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 559,
-    "name_ko": "진",
-    "name_en": "Gin",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 560,
-    "name_ko": "럼",
-    "name_en": "Rum",
-    "color_category": "Clear/Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 561,
-    "name_ko": "데킬라",
-    "name_en": "Tequila",
-    "color_category": "Clear/Gold",
-    "type": "Beverage"
-  },
-  {
-    "id": 562,
-    "name_ko": "브랜디",
-    "name_en": "Brandy",
-    "color_category": "Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 563,
+    "id": 368,
     "name_ko": "사케",
     "name_en": "Sake",
     "color_category": "Clear",
     "type": "Beverage"
   },
   {
-    "id": 564,
-    "name_ko": "고량주",
-    "name_en": "Kaoliang Liquor",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 565,
+    "id": 369,
     "name_ko": "복분자주",
     "name_en": "Bokbunja Ju",
     "color_category": "Dark Red",
     "type": "Beverage"
   },
   {
-    "id": 566,
-    "name_ko": "청하",
-    "name_en": "Cheongha",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 567,
-    "name_ko": "브리 치즈",
-    "name_en": "Brie Cheese",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 568,
-    "name_ko": "까망베르 치즈",
-    "name_en": "Camembert Cheese",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 569,
-    "name_ko": "고다 치즈",
-    "name_en": "Gouda Cheese",
-    "color_category": "Yellow",
-    "type": "Dairy"
-  },
-  {
-    "id": 570,
+    "id": 370,
     "name_ko": "고르곤졸라 치즈",
     "name_en": "Gorgonzola Cheese",
     "color_category": "Blue/White",
     "type": "Dairy"
   },
   {
-    "id": 571,
-    "name_ko": "마스카포네 치즈",
-    "name_en": "Mascarpone Cheese",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 572,
-    "name_ko": "페타 치즈",
-    "name_en": "Feta Cheese",
-    "color_category": "White",
-    "type": "Dairy"
-  },
-  {
-    "id": 573,
-    "name_ko": "에멘탈 치즈",
-    "name_en": "Emmental Cheese",
-    "color_category": "Yellow",
-    "type": "Dairy"
-  },
-  {
-    "id": 574,
+    "id": 371,
     "name_ko": "부라타 치즈",
     "name_en": "Burrata Cheese",
     "color_category": "White",
     "type": "Dairy"
   },
   {
-    "id": 575,
-    "name_ko": "할라피뇨",
-    "name_en": "Jalapeno",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 576,
-    "name_ko": "올리브(블랙)",
+    "id": 372,
+    "name_ko": "올리브",
     "name_en": "Black Olive",
     "color_category": "Black",
     "type": "Vegetable"
   },
   {
-    "id": 577,
-    "name_ko": "올리브(그린)",
-    "name_en": "Green Olive",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 578,
-    "name_ko": "케이퍼",
-    "name_en": "Caper",
-    "color_category": "Green",
-    "type": "Spice"
-  },
-  {
-    "id": 579,
-    "name_ko": "차지키 소스",
-    "name_en": "Tzatziki",
-    "color_category": "White",
-    "type": "Condiment"
-  },
-  {
-    "id": 580,
+    "id": 373,
     "name_ko": "스리라차 소스",
     "name_en": "Sriracha",
     "color_category": "Red",
     "type": "Condiment"
   },
   {
-    "id": 581,
-    "name_ko": "타바스코 소스",
-    "name_en": "Tabasco",
-    "color_category": "Red",
-    "type": "Condiment"
-  },
-  {
-    "id": 582,
-    "name_ko": "데미글라스 소스",
-    "name_en": "Demi-glace",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 583,
-    "name_ko": "타르타르 소스",
-    "name_en": "Tartar Sauce",
-    "color_category": "White",
-    "type": "Condiment"
-  },
-  {
-    "id": 584,
-    "name_ko": "홀그레인 머스타드",
-    "name_en": "Wholegrain Mustard",
-    "color_category": "Yellow",
-    "type": "Condiment"
-  },
-  {
-    "id": 585,
+    "id": 374,
     "name_ko": "땅콩 버터",
     "name_en": "Peanut Butter",
     "color_category": "Brown",
     "type": "Condiment"
   },
   {
-    "id": 586,
+    "id": 375,
     "name_ko": "딸기잼",
     "name_en": "Strawberry Jam",
     "color_category": "Red",
     "type": "Condiment"
   },
   {
-    "id": 587,
-    "name_ko": "포도잼",
-    "name_en": "Grape Jam",
-    "color_category": "Purple",
-    "type": "Condiment"
-  },
-  {
-    "id": 588,
-    "name_ko": "사과잼",
-    "name_en": "Apple Jam",
-    "color_category": "Yellow",
-    "type": "Condiment"
-  },
-  {
-    "id": 589,
+    "id": 376,
     "name_ko": "누텔라",
     "name_en": "Nutella",
     "color_category": "Dark Brown",
     "type": "Condiment"
   },
   {
-    "id": 590,
-    "name_ko": "메이플 시럽",
-    "name_en": "Maple Syrup",
-    "color_category": "Amber",
-    "type": "Condiment"
-  },
-  {
-    "id": 591,
-    "name_ko": "아가베 시럽",
-    "name_en": "Agave Syrup",
-    "color_category": "Yellow",
-    "type": "Condiment"
-  },
-  {
-    "id": 592,
+    "id": 377,
     "name_ko": "코코넛 오일",
     "name_en": "Coconut Oil",
     "color_category": "White",
     "type": "Ingredient"
   },
   {
-    "id": 593,
-    "name_ko": "포도씨유",
-    "name_en": "Grape Seed Oil",
-    "color_category": "Yellow",
-    "type": "Ingredient"
-  },
-  {
-    "id": 594,
-    "name_ko": "카놀라유",
-    "name_en": "Canola Oil",
-    "color_category": "Yellow",
-    "type": "Ingredient"
-  },
-  {
-    "id": 595,
-    "name_ko": "들기름",
-    "name_en": "Perilla Oil",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 596,
-    "name_ko": "액젓",
-    "name_en": "Fish Sauce",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 597,
-    "name_ko": "맛술",
-    "name_en": "Cooking Wine",
-    "color_category": "Clear",
-    "type": "Condiment"
-  },
-  {
-    "id": 598,
-    "name_ko": "조청",
-    "name_en": "Rice Syrup",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 599,
-    "name_ko": "물엿",
-    "name_en": "Corn Syrup",
-    "color_category": "Clear",
-    "type": "Condiment"
-  },
-  {
-    "id": 600,
+    "id": 378,
     "name_ko": "짜장 소스",
     "name_en": "Black Bean Sauce",
     "color_category": "Black",
     "type": "Condiment"
   },
   {
-    "id": 601,
-    "name_ko": "마티니",
-    "name_en": "Martini",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 602,
-    "name_ko": "마가리타",
-    "name_en": "Margarita",
-    "color_category": "White/Green",
-    "type": "Beverage"
-  },
-  {
-    "id": 603,
-    "name_ko": "코스모폴리탄",
-    "name_en": "Cosmopolitan",
-    "color_category": "Pink",
-    "type": "Beverage"
-  },
-  {
-    "id": 604,
-    "name_ko": "피나 콜라다",
-    "name_en": "Pina Colada",
-    "color_category": "White",
-    "type": "Beverage"
-  },
-  {
-    "id": 605,
-    "name_ko": "블루 하와이",
-    "name_en": "Blue Hawaii",
-    "color_category": "Blue",
-    "type": "Beverage"
-  },
-  {
-    "id": 606,
-    "name_ko": "롱 아일랜드 아이스 티",
-    "name_en": "Long Island Iced Tea",
-    "color_category": "Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 607,
+    "id": 379,
     "name_ko": "모히또",
     "name_en": "Mojito",
     "color_category": "Green/Clear",
     "type": "Beverage"
   },
   {
-    "id": 608,
-    "name_ko": "상그리아",
-    "name_en": "Sangria",
-    "color_category": "Red",
-    "type": "Beverage"
-  },
-  {
-    "id": 609,
-    "name_ko": "올드 패션드",
-    "name_en": "Old Fashioned",
-    "color_category": "Amber",
-    "type": "Beverage"
-  },
-  {
-    "id": 610,
-    "name_ko": "위스키 사워",
-    "name_en": "Whisky Sour",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 611,
-    "name_ko": "진 토닉",
-    "name_en": "Gin and Tonic",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 612,
-    "name_ko": "블랙 러시안",
-    "name_en": "Black Russian",
-    "color_category": "Dark Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 613,
-    "name_ko": "화이트 러시안",
-    "name_en": "White Russian",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 614,
-    "name_ko": "미모사",
-    "name_en": "Mimosa",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 615,
-    "name_ko": "벨리니",
-    "name_en": "Bellini",
-    "color_category": "Pink",
-    "type": "Beverage"
-  },
-  {
-    "id": 616,
-    "name_ko": "스크류 드라이버",
-    "name_en": "Screwdriver",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 617,
-    "name_ko": "깔루아 밀크",
-    "name_en": "Kahlua Milk",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 618,
-    "name_ko": "피치 크러쉬",
-    "name_en": "Peach Crush",
-    "color_category": "Pink",
-    "type": "Beverage"
-  },
-  {
-    "id": 619,
-    "name_ko": "준 벅",
-    "name_en": "June Bug",
-    "color_category": "Green",
-    "type": "Beverage"
-  },
-  {
-    "id": 620,
-    "name_ko": "아이리쉬 커피",
-    "name_en": "Irish Coffee",
-    "color_category": "Dark Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 621,
+    "id": 380,
     "name_ko": "아메리카노",
     "name_en": "Americano",
     "color_category": "Black",
     "type": "Beverage"
   },
   {
-    "id": 622,
-    "name_ko": "플랫 화이트",
-    "name_en": "Flat White",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 623,
-    "name_ko": "콜드 브루",
-    "name_en": "Cold Brew",
-    "color_category": "Black",
-    "type": "Beverage"
-  },
-  {
-    "id": 624,
-    "name_ko": "돌체 라떼",
-    "name_en": "Dolce Latte",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 625,
-    "name_ko": "토피넛 라떼",
-    "name_en": "Toffee Nut Latte",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 626,
+    "id": 381,
     "name_ko": "밀크티",
     "name_en": "Milk Tea",
     "color_category": "Beige",
     "type": "Beverage"
   },
   {
-    "id": 627,
-    "name_ko": "차이 티",
-    "name_en": "Chai Tea",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 628,
-    "name_ko": "콤부차",
-    "name_en": "Kombucha",
-    "color_category": "Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 629,
-    "name_ko": "푸얼차(보이차)",
-    "name_en": "Pu-erh Tea",
-    "color_category": "Dark Brown",
-    "type": "Beverage"
-  },
-  {
-    "id": 630,
-    "name_ko": "루이보스 티",
-    "name_en": "Rooibos Tea",
-    "color_category": "Red",
-    "type": "Beverage"
-  },
-  {
-    "id": 631,
+    "id": 382,
     "name_ko": "성게알(우니)",
     "name_en": "Sea Urchin",
     "color_category": "Yellow/Orange",
     "type": "Seafood"
   },
   {
-    "id": 632,
-    "name_ko": "연어알",
-    "name_en": "Salmon Roe",
-    "color_category": "Orange",
-    "type": "Seafood"
-  },
-  {
-    "id": 633,
-    "name_ko": "날치알",
-    "name_en": "Flying Fish Roe",
-    "color_category": "Orange",
-    "type": "Seafood"
-  },
-  {
-    "id": 634,
+    "id": 383,
     "name_ko": "명란젓",
     "name_en": "Salted Pollock Roe",
     "color_category": "Pink/Red",
     "type": "Side Dish"
   },
   {
-    "id": 636,
-    "name_ko": "오징어젓",
-    "name_en": "Salted Squid",
-    "color_category": "Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 637,
-    "name_ko": "낙지젓",
-    "name_en": "Salted Octopus",
-    "color_category": "Red",
-    "type": "Side Dish"
-  },
-  {
-    "id": 638,
-    "name_ko": "새우젓",
-    "name_en": "Salted Shrimp",
-    "color_category": "Pink/White",
-    "type": "Condiment"
-  },
-  {
-    "id": 639,
-    "name_ko": "멸치액젓",
-    "name_en": "Anchovy Sauce",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 640,
-    "name_ko": "까나리액젓",
-    "name_en": "Sand Lance Sauce",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 641,
+    "id": 384,
     "name_ko": "참치 뱃살(도로)",
     "name_en": "Fatty Tuna",
     "color_category": "Pink",
     "type": "Seafood"
   },
   {
-    "id": 642,
-    "name_ko": "광어",
-    "name_en": "Flatfish",
-    "color_category": "White",
-    "type": "Seafood"
-  },
-  {
-    "id": 643,
-    "name_ko": "우럭",
-    "name_en": "Rockfish",
-    "color_category": "Gray/White",
-    "type": "Seafood"
-  },
-  {
-    "id": 644,
-    "name_ko": "도미",
-    "name_en": "Sea Bream",
-    "color_category": "White/Pink",
-    "type": "Seafood"
-  },
-  {
-    "id": 645,
-    "name_ko": "방어",
-    "name_en": "Yellowtail",
-    "color_category": "Red/White",
-    "type": "Seafood"
-  },
-  {
-    "id": 646,
+    "id": 385,
     "name_ko": "과메기",
     "name_en": "Half-dried Herring",
     "color_category": "Dark Brown",
     "type": "Seafood"
   },
   {
-    "id": 647,
-    "name_ko": "홍어",
-    "name_en": "Skate",
-    "color_category": "Pink/Gray",
-    "type": "Seafood"
-  },
-  {
-    "id": 648,
-    "name_ko": "아귀",
-    "name_en": "Monkfish",
-    "color_category": "Brown/White",
-    "type": "Seafood"
-  },
-  {
-    "id": 649,
-    "name_ko": "미더덕",
-    "name_en": "Styela Clava",
-    "color_category": "Brown",
-    "type": "Seafood"
-  },
-  {
-    "id": 650,
-    "name_ko": "소라",
-    "name_en": "Conch",
-    "color_category": "Beige",
-    "type": "Seafood"
-  },
-  {
-    "id": 651,
+    "id": 386,
     "name_ko": "스파게티",
     "name_en": "Spaghetti",
     "color_category": "Yellow",
     "type": "Grain"
   },
   {
-    "id": 652,
-    "name_ko": "링귀니",
-    "name_en": "Linguine",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 653,
-    "name_ko": "페투치니",
-    "name_en": "Fettuccine",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 654,
-    "name_ko": "탈리아텔레",
-    "name_en": "Tagliatelle",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 655,
-    "name_ko": "파파르델레",
-    "name_en": "Pappardelle",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 656,
-    "name_ko": "파르팔레(나비)",
-    "name_en": "Farfalle",
-    "color_category": "Colorful",
-    "type": "Grain"
-  },
-  {
-    "id": 657,
-    "name_ko": "리가토니",
-    "name_en": "Rigatoni",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 658,
-    "name_ko": "토르텔리니",
-    "name_en": "Tortellini",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 659,
-    "name_ko": "버미셀리",
-    "name_en": "Vermicelli",
-    "color_category": "White",
-    "type": "Grain"
-  },
-  {
-    "id": 660,
-    "name_ko": "엔젤헤어",
-    "name_en": "Angel Hair",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 661,
+    "id": 387,
     "name_ko": "소바",
     "name_en": "Soba Noodles",
     "color_category": "Brown",
     "type": "Grain"
   },
   {
-    "id": 662,
-    "name_ko": "당면",
-    "name_en": "Glass Noodles",
-    "color_category": "Clear/Gray",
-    "type": "Grain"
-  },
-  {
-    "id": 663,
+    "id": 388,
     "name_ko": "쫄면",
     "name_en": "Jjolmyeon",
-    "color_category": "Yellow",
+    "color_category": "Red",
     "type": "Grain"
   },
   {
-    "id": 664,
-    "name_ko": "중면",
-    "name_en": "Jungmyeon",
-    "color_category": "White",
-    "type": "Grain"
-  },
-  {
-    "id": 665,
-    "name_ko": "도삭면",
-    "name_en": "Knife-cut Noodles",
-    "color_category": "White",
-    "type": "Grain"
-  },
-  {
-    "id": 666,
-    "name_ko": "분모자",
-    "name_en": "Chinese Vermicelli",
-    "color_category": "Clear/White",
-    "type": "Ingredient"
-  },
-  {
-    "id": 667,
-    "name_ko": "넓적당면",
-    "name_en": "Wide Glass Noodles",
-    "color_category": "Clear",
-    "type": "Ingredient"
-  },
-  {
-    "id": 668,
-    "name_ko": "옥수수면",
-    "name_en": "Corn Noodles",
-    "color_category": "Yellow",
-    "type": "Grain"
-  },
-  {
-    "id": 669,
-    "name_ko": "곤약면",
-    "name_en": "Konjac Noodles",
-    "color_category": "White/Gray",
-    "type": "Ingredient"
-  },
-  {
-    "id": 670,
-    "name_ko": "천사채",
-    "name_en": "Kelp Noodle",
-    "color_category": "Clear/White",
-    "type": "Ingredient"
-  },
-  {
-    "id": 671,
+    "id": 389,
     "name_ko": "클램 차우더",
     "name_en": "Clam Chowder",
     "color_category": "White",
     "type": "Dish"
   },
   {
-    "id": 672,
-    "name_ko": "미네스트로네",
-    "name_en": "Minestrone",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 673,
-    "name_ko": "프렌치 어니언 스프",
-    "name_en": "French Onion Soup",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 674,
+    "id": 390,
     "name_ko": "콘 스프",
     "name_en": "Corn Soup",
     "color_category": "Yellow",
     "type": "Dish"
   },
   {
-    "id": 675,
-    "name_ko": "버섯 스프",
-    "name_en": "Mushroom Soup",
-    "color_category": "Beige",
-    "type": "Dish"
-  },
-  {
-    "id": 676,
-    "name_ko": "브로콜리 스프",
-    "name_en": "Broccoli Soup",
-    "color_category": "Green",
-    "type": "Dish"
-  },
-  {
-    "id": 677,
-    "name_ko": "토마토 스프",
-    "name_en": "Tomato Soup",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 678,
-    "name_ko": "비스크",
-    "name_en": "Bisque",
-    "color_category": "Orange",
-    "type": "Dish"
-  },
-  {
-    "id": 679,
-    "name_ko": "가스파초",
-    "name_en": "Gazpacho",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 680,
-    "name_ko": "보르시",
-    "name_en": "Borscht",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 681,
-    "name_ko": "검보",
-    "name_en": "Gumbo",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 682,
-    "name_ko": "잠발라야",
-    "name_en": "Jambalaya",
-    "color_category": "Red/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 683,
-    "name_ko": "치킨 누들 스프",
-    "name_en": "Chicken Noodle Soup",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 684,
-    "name_ko": "완탕",
-    "name_en": "Wonton Soup",
-    "color_category": "Clear",
-    "type": "Dish"
-  },
-  {
-    "id": 685,
-    "name_ko": "콘소메",
-    "name_en": "Consomme",
-    "color_category": "Clear/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 686,
-    "name_ko": "비프 스튜",
-    "name_en": "Beef Stew",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 687,
-    "name_ko": "크림 스튜",
-    "name_en": "Cream Stew",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 688,
-    "name_ko": "칠리",
-    "name_en": "Chili",
-    "color_category": "Red/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 689,
+    "id": 391,
     "name_ko": "김치찜",
     "name_en": "Braised Kimchi",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 690,
+    "id": 392,
     "name_ko": "전골",
     "name_en": "Jeongol",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 691,
-    "name_ko": "채끝살",
-    "name_en": "Striploin",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 692,
-    "name_ko": "부채살",
-    "name_en": "Top Blade",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 693,
-    "name_ko": "살치살",
-    "name_en": "Chuck Flap Tail",
-    "color_category": "Pink/Red",
-    "type": "Meat"
-  },
-  {
-    "id": 694,
-    "name_ko": "갈비살",
-    "name_en": "Rib Meat",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 695,
-    "name_ko": "토시살",
-    "name_en": "Hanging Tender",
-    "color_category": "Dark Red",
-    "type": "Meat"
-  },
-  {
-    "id": 696,
-    "name_ko": "안창살",
-    "name_en": "Outside Skirt",
-    "color_category": "Dark Red",
-    "type": "Meat"
-  },
-  {
-    "id": 697,
-    "name_ko": "양지",
-    "name_en": "Brisket",
-    "color_category": "Red/White",
-    "type": "Meat"
-  },
-  {
-    "id": 698,
-    "name_ko": "사태",
-    "name_en": "Shank",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 699,
-    "name_ko": "우설",
-    "name_en": "Beef Tongue",
-    "color_category": "Pink",
-    "type": "Meat"
-  },
-  {
-    "id": 700,
-    "name_ko": "티본",
-    "name_en": "T-bone",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 701,
-    "name_ko": "항정살",
-    "name_en": "Pork Jowl",
-    "color_category": "Pink/White",
-    "type": "Meat"
-  },
-  {
-    "id": 702,
-    "name_ko": "가브리살",
-    "name_en": "Pork Cheek",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 703,
-    "name_ko": "갈매기살",
-    "name_en": "Skirt Meat",
-    "color_category": "Dark Red",
-    "type": "Meat"
-  },
-  {
-    "id": 704,
-    "name_ko": "목살",
-    "name_en": "Pork Neck",
-    "color_category": "Pink",
-    "type": "Meat"
-  },
-  {
-    "id": 705,
-    "name_ko": "앞다리살",
-    "name_en": "Pork Front Leg",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 706,
-    "name_ko": "뒷다리살",
-    "name_en": "Pork Hind Leg",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 707,
-    "name_ko": "등갈비",
-    "name_en": "Back Ribs",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 708,
-    "name_ko": "껍데기",
-    "name_en": "Pork Rind",
-    "color_category": "Beige",
-    "type": "Meat"
-  },
-  {
-    "id": 709,
-    "name_ko": "곱창",
-    "name_en": "Small Intestine",
-    "color_category": "White/Pink",
-    "type": "Meat"
-  },
-  {
-    "id": 710,
-    "name_ko": "대창",
-    "name_en": "Large Intestine",
-    "color_category": "White",
-    "type": "Meat"
-  },
-  {
-    "id": 711,
-    "name_ko": "염통",
-    "name_en": "Heart",
-    "color_category": "Dark Red",
-    "type": "Meat"
-  },
-  {
-    "id": 712,
-    "name_ko": "천엽",
-    "name_en": "Omasum",
-    "color_category": "Gray",
-    "type": "Meat"
-  },
-  {
-    "id": 713,
-    "name_ko": "간",
-    "name_en": "Liver",
-    "color_category": "Dark Red",
-    "type": "Meat"
-  },
-  {
-    "id": 714,
-    "name_ko": "양고기 숄더랙",
-    "name_en": "Lamb Shoulder Rack",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 715,
-    "name_ko": "양고기 프렌치랙",
-    "name_en": "Lamb French Rack",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 716,
+    "id": 393,
     "name_ko": "칠면조",
     "name_en": "Turkey",
     "color_category": "Beige",
     "type": "Meat"
   },
   {
-    "id": 717,
-    "name_ko": "거위",
-    "name_en": "Goose",
-    "color_category": "Dark Red",
-    "type": "Meat"
-  },
-  {
-    "id": 718,
-    "name_ko": "메추리",
-    "name_en": "Quail",
-    "color_category": "Pink",
-    "type": "Meat"
-  },
-  {
-    "id": 719,
-    "name_ko": "꿩",
-    "name_en": "Pheasant",
-    "color_category": "Red",
-    "type": "Meat"
-  },
-  {
-    "id": 720,
-    "name_ko": "사슴고기",
-    "name_en": "Venison",
-    "color_category": "Dark Red",
-    "type": "Meat"
-  },
-  {
-    "id": 735,
+    "id": 394,
     "name_ko": "컵밥",
     "name_en": "Cup Rice",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 737,
-    "name_ko": "시나몬롤",
-    "name_en": "Cinnamon Roll",
-    "color_category": "Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 738,
-    "name_ko": "애플파이",
-    "name_en": "Apple Pie",
-    "color_category": "Golden",
-    "type": "Bakery"
-  },
-  {
-    "id": 739,
-    "name_ko": "피칸파이",
-    "name_en": "Pecan Pie",
-    "color_category": "Dark Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 740,
-    "name_ko": "호두파이",
-    "name_en": "Walnut Pie",
-    "color_category": "Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 741,
-    "name_ko": "펌킨파이",
-    "name_en": "Pumpkin Pie",
-    "color_category": "Orange",
-    "type": "Bakery"
-  },
-  {
-    "id": 742,
-    "name_ko": "미트파이",
-    "name_en": "Meat Pie",
-    "color_category": "Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 743,
-    "name_ko": "치킨파이",
-    "name_en": "Chicken Pie",
-    "color_category": "Beige",
-    "type": "Bakery"
-  },
-  {
-    "id": 744,
+    "id": 395,
     "name_ko": "바나나 브레드",
     "name_en": "Banana Bread",
     "color_category": "Dark Brown",
     "type": "Bakery"
   },
   {
-    "id": 745,
-    "name_ko": "진저브레드",
-    "name_en": "Gingerbread",
-    "color_category": "Brown",
-    "type": "Bakery"
-  },
-  {
-    "id": 746,
-    "name_ko": "쇼트케이크",
-    "name_en": "Shortcake",
-    "color_category": "White/Red",
-    "type": "Dessert"
-  },
-  {
-    "id": 747,
+    "id": 396,
     "name_ko": "레드벨벳 케이크",
     "name_en": "Red Velvet Cake",
     "color_category": "Red",
     "type": "Dessert"
   },
   {
-    "id": 748,
+    "id": 397,
     "name_ko": "당근 케이크",
     "name_en": "Carrot Cake",
     "color_category": "Brown/White",
     "type": "Dessert"
   },
   {
-    "id": 749,
+    "id": 398,
     "name_ko": "녹차 케이크",
     "name_en": "Green Tea Cake",
     "color_category": "Green",
     "type": "Dessert"
   },
   {
-    "id": 750,
+    "id": 399,
     "name_ko": "고구마 케이크",
     "name_en": "Sweet Potato Cake",
     "color_category": "Yellow",
     "type": "Dessert"
   },
   {
-    "id": 751,
-    "name_ko": "오페라 케이크",
-    "name_en": "Opera Cake",
-    "color_category": "Dark Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 752,
-    "name_ko": "자허토르테",
-    "name_en": "Sachertorte",
-    "color_category": "Dark Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 753,
-    "name_ko": "블랙 포레스트",
-    "name_en": "Black Forest Cake",
-    "color_category": "Dark Brown/White",
-    "type": "Dessert"
-  },
-  {
-    "id": 754,
-    "name_ko": "바움쿠헨",
-    "name_en": "Baumkuchen",
-    "color_category": "Beige",
-    "type": "Dessert"
-  },
-  {
-    "id": 755,
-    "name_ko": "파나코타",
-    "name_en": "Panna Cotta",
-    "color_category": "White",
-    "type": "Dessert"
-  },
-  {
-    "id": 756,
+    "id": 400,
     "name_ko": "크렘 브륄레",
     "name_en": "Creme Brulee",
     "color_category": "Yellow/Brown",
     "type": "Dessert"
   },
   {
-    "id": 757,
-    "name_ko": "무스 케이크",
-    "name_en": "Mousse Cake",
-    "color_category": "Colorful",
-    "type": "Dessert"
-  },
-  {
-    "id": 758,
-    "name_ko": "터키쉬 딜라이트",
-    "name_en": "Turkish Delight",
-    "color_category": "Pink",
-    "type": "Dessert"
-  },
-  {
-    "id": 759,
-    "name_ko": "바클라바",
-    "name_en": "Baklava",
-    "color_category": "Golden",
-    "type": "Dessert"
-  },
-  {
-    "id": 760,
-    "name_ko": "할바",
-    "name_en": "Halva",
-    "color_category": "Beige",
-    "type": "Dessert"
-  },
-  {
-    "id": 761,
+    "id": 401,
     "name_ko": "모찌(찹쌀떡)",
     "name_en": "Mochi",
     "color_category": "White",
     "type": "Dessert"
   },
   {
-    "id": 762,
-    "name_ko": "다이후쿠",
-    "name_en": "Daifuku",
-    "color_category": "White",
-    "type": "Dessert"
-  },
-  {
-    "id": 763,
-    "name_ko": "도라야끼",
-    "name_en": "Dorayaki",
-    "color_category": "Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 764,
-    "name_ko": "만주",
-    "name_en": "Manju",
-    "color_category": "Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 765,
-    "name_ko": "월병",
-    "name_en": "Mooncake",
-    "color_category": "Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 767,
-    "name_ko": "펑리수",
-    "name_en": "Pineapple Cake",
-    "color_category": "Golden",
-    "type": "Dessert"
-  },
-  {
-    "id": 768,
-    "name_ko": "카놀리",
-    "name_en": "Cannoli",
-    "color_category": "Beige",
-    "type": "Dessert"
-  },
-  {
-    "id": 769,
-    "name_ko": "비스코티",
-    "name_en": "Biscotti",
-    "color_category": "Beige",
-    "type": "Dessert"
-  },
-  {
-    "id": 784,
-    "name_ko": "건포도",
-    "name_en": "Raisin",
-    "color_category": "Black",
-    "type": "Fruit"
-  },
-  {
-    "id": 793,
-    "name_ko": "마카다미아",
-    "name_en": "Macadamia",
-    "color_category": "White",
-    "type": "Nut"
-  },
-  {
-    "id": 794,
-    "name_ko": "브라질 너트",
-    "name_en": "Brazil Nut",
-    "color_category": "Beige",
-    "type": "Nut"
-  },
-  {
-    "id": 795,
-    "name_ko": "사차인치",
-    "name_en": "Sacha Inchi",
-    "color_category": "Brown",
-    "type": "Nut"
-  },
-  {
-    "id": 796,
-    "name_ko": "타이거 너트",
-    "name_en": "Tiger Nut",
-    "color_category": "Brown",
-    "type": "Nut"
-  },
-  {
-    "id": 797,
-    "name_ko": "카카오 닙스",
-    "name_en": "Cacao Nibs",
-    "color_category": "Dark Brown",
-    "type": "Ingredient"
-  },
-  {
-    "id": 798,
-    "name_ko": "햄프씨드",
-    "name_en": "Hemp Seed",
-    "color_category": "Beige",
-    "type": "Ingredient"
-  },
-  {
-    "id": 799,
+    "id": 402,
     "name_ko": "치아씨드",
     "name_en": "Chia Seed",
     "color_category": "Black/Gray",
     "type": "Ingredient"
   },
   {
-    "id": 800,
-    "name_ko": "바질 씨드",
-    "name_en": "Basil Seed",
-    "color_category": "Black",
-    "type": "Ingredient"
-  },
-  {
-    "id": 801,
-    "name_ko": "잭푸르트",
-    "name_en": "Jackfruit",
-    "color_category": "Yellow",
-    "type": "Fruit"
-  },
-  {
-    "id": 802,
-    "name_ko": "블랙커런트",
-    "name_en": "Blackcurrant",
-    "color_category": "Black",
-    "type": "Fruit"
-  },
-  {
-    "id": 803,
-    "name_ko": "구스베리",
-    "name_en": "Gooseberry",
-    "color_category": "Green",
-    "type": "Fruit"
-  },
-  {
-    "id": 804,
-    "name_ko": "엘더베리",
-    "name_en": "Elderberry",
-    "color_category": "Black",
-    "type": "Fruit"
-  },
-  {
-    "id": 805,
-    "name_ko": "캔탈루프 멜론",
-    "name_en": "Cantaloupe",
-    "color_category": "Orange",
-    "type": "Fruit"
-  },
-  {
-    "id": 806,
-    "name_ko": "허니듀 멜론",
-    "name_en": "Honeydew Melon",
-    "color_category": "Pale Green",
-    "type": "Fruit"
-  },
-  {
-    "id": 807,
-    "name_ko": "플랜테인",
-    "name_en": "Plantain",
-    "color_category": "Green/Yellow",
-    "type": "Fruit"
-  },
-  {
-    "id": 808,
-    "name_ko": "카사바",
-    "name_en": "Cassava",
-    "color_category": "Brown/White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 809,
-    "name_ko": "루바브",
-    "name_en": "Rhubarb",
-    "color_category": "Red",
-    "type": "Vegetable"
-  },
-  {
-    "id": 810,
-    "name_ko": "파스닙",
-    "name_en": "Parsnip",
-    "color_category": "Beige",
-    "type": "Vegetable"
-  },
-  {
-    "id": 811,
-    "name_ko": "샬롯",
-    "name_en": "Shallot",
-    "color_category": "Purple",
-    "type": "Vegetable"
-  },
-  {
-    "id": 812,
-    "name_ko": "리크(서양대파)",
-    "name_en": "Leek",
-    "color_category": "Green/White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 813,
-    "name_ko": "콜라비",
-    "name_en": "Kohlrabi",
-    "color_category": "Purple",
-    "type": "Vegetable"
-  },
-  {
-    "id": 814,
-    "name_ko": "방울 양배추",
-    "name_en": "Brussels Sprout",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 815,
-    "name_ko": "콜리플라워(퍼플)",
-    "name_en": "Purple Cauliflower",
-    "color_category": "Purple",
-    "type": "Vegetable"
-  },
-  {
-    "id": 816,
-    "name_ko": "공심채(모닝글로리)",
-    "name_en": "Water Spinach",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 817,
+    "id": 403,
     "name_ko": "고수(잎)",
     "name_en": "Cilantro",
     "color_category": "Green",
     "type": "Vegetable"
   },
   {
-    "id": 818,
-    "name_ko": "명이나물",
-    "name_en": "Pickled Garlic Leaves",
-    "color_category": "Green",
-    "type": "Side Dish"
-  },
-  {
-    "id": 819,
-    "name_ko": "산마늘",
-    "name_en": "Alpine Leek",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 820,
-    "name_ko": "머위",
-    "name_en": "Butterbur",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 821,
-    "name_ko": "방풍나물",
-    "name_en": "Coastal Hog Fennel",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 822,
-    "name_ko": "비름나물",
-    "name_en": "Amaranth Greens",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 823,
-    "name_ko": "유채나물",
-    "name_en": "Canola Greens",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 824,
-    "name_ko": "씀바귀",
-    "name_en": "Ixeris",
-    "color_category": "Green/White",
-    "type": "Vegetable"
-  },
-  {
-    "id": 825,
-    "name_ko": "고들빼기",
-    "name_en": "Crepidiastrum",
-    "color_category": "Green",
-    "type": "Vegetable"
-  },
-  {
-    "id": 826,
-    "name_ko": "바베큐 소스",
-    "name_en": "BBQ Sauce",
-    "color_category": "Dark Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 827,
-    "name_ko": "데리야끼 소스",
-    "name_en": "Teriyaki Sauce",
-    "color_category": "Dark Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 828,
-    "name_ko": "해선장(호이신)",
-    "name_en": "Hoisin Sauce",
-    "color_category": "Dark Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 829,
-    "name_ko": "두반장",
-    "name_en": "Doubanjiang",
-    "color_category": "Red",
-    "type": "Condiment"
-  },
-  {
-    "id": 830,
-    "name_ko": "XO 소스",
-    "name_en": "XO Sauce",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 831,
-    "name_ko": "폰즈 소스",
-    "name_en": "Ponzu Sauce",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 832,
-    "name_ko": "쯔유",
-    "name_en": "Tsuyu",
-    "color_category": "Dark Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 833,
+    "id": 404,
     "name_ko": "고춧가루",
     "name_en": "Red Pepper Powder",
     "color_category": "Red",
     "type": "Spice"
   },
   {
-    "id": 834,
-    "name_ko": "미원(MSG)",
-    "name_en": "MSG",
-    "color_category": "White",
-    "type": "Ingredient"
-  },
-  {
-    "id": 835,
-    "name_ko": "이스트(효모)",
-    "name_en": "Yeast",
-    "color_category": "Beige",
-    "type": "Ingredient"
-  },
-  {
-    "id": 836,
-    "name_ko": "베이킹 파우더",
-    "name_en": "Baking Powder",
-    "color_category": "White",
-    "type": "Ingredient"
-  },
-  {
-    "id": 837,
-    "name_ko": "젤라틴",
-    "name_en": "Gelatin",
-    "color_category": "Clear/Yellow",
-    "type": "Ingredient"
-  },
-  {
-    "id": 838,
-    "name_ko": "타히니",
-    "name_en": "Tahini",
-    "color_category": "Beige",
-    "type": "Condiment"
-  },
-  {
-    "id": 839,
-    "name_ko": "홀랜다이즈 소스",
-    "name_en": "Hollandaise Sauce",
-    "color_category": "Yellow",
-    "type": "Condiment"
-  },
-  {
-    "id": 840,
-    "name_ko": "베샤멜 소스",
-    "name_en": "Bechamel Sauce",
-    "color_category": "White",
-    "type": "Condiment"
-  },
-  {
-    "id": 841,
-    "name_ko": "마리나라 소스",
-    "name_en": "Marinara Sauce",
-    "color_category": "Red",
-    "type": "Condiment"
-  },
-  {
-    "id": 842,
-    "name_ko": "알프레도 소스",
-    "name_en": "Alfredo Sauce",
-    "color_category": "White",
-    "type": "Condiment"
-  },
-  {
-    "id": 843,
-    "name_ko": "랜치 드레싱",
-    "name_en": "Ranch Dressing",
-    "color_category": "White",
-    "type": "Condiment"
-  },
-  {
-    "id": 844,
-    "name_ko": "사우전드 아일랜드",
-    "name_en": "Thousand Island",
-    "color_category": "Pink",
-    "type": "Condiment"
-  },
-  {
-    "id": 845,
-    "name_ko": "오리엔탈 드레싱",
-    "name_en": "Oriental Dressing",
-    "color_category": "Brown",
-    "type": "Condiment"
-  },
-  {
-    "id": 846,
-    "name_ko": "참깨 드레싱",
-    "name_en": "Sesame Dressing",
-    "color_category": "Beige",
-    "type": "Condiment"
-  },
-  {
-    "id": 847,
-    "name_ko": "이탈리안 드레싱",
-    "name_en": "Italian Dressing",
-    "color_category": "Yellow",
-    "type": "Condiment"
-  },
-  {
-    "id": 848,
-    "name_ko": "엔칠라다",
-    "name_en": "Enchilada",
-    "color_category": "Red/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 849,
-    "name_ko": "치미창가",
-    "name_en": "Chimichanga",
-    "color_category": "Golden",
-    "type": "Dish"
-  },
-  {
-    "id": 850,
-    "name_ko": "타말레",
-    "name_en": "Tamale",
-    "color_category": "Beige",
-    "type": "Dish"
-  },
-  {
-    "id": 851,
-    "name_ko": "기로스",
-    "name_en": "Gyros",
-    "color_category": "Beige/Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 852,
-    "name_ko": "팔라펠",
-    "name_en": "Falafel",
-    "color_category": "Brown/Green",
-    "type": "Dish"
-  },
-  {
-    "id": 853,
-    "name_ko": "샥슈카(에그인헬)",
+    "id": 405,
+    "name_ko": "에그인헬",
     "name_en": "Shakshuka",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 854,
-    "name_ko": "무사카",
-    "name_en": "Moussaka",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 855,
-    "name_ko": "피로시키",
-    "name_en": "Pirozhki",
-    "color_category": "Golden",
-    "type": "Dish"
-  },
-  {
-    "id": 856,
-    "name_ko": "체바피",
-    "name_en": "Cevapi",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 857,
+    "id": 406,
     "name_ko": "포케",
     "name_en": "Poke Bowl",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 858,
+    "id": 407,
     "name_ko": "하와이안 피자",
     "name_en": "Hawaiian Pizza",
     "color_category": "Yellow/Red",
     "type": "Dish"
   },
   {
-    "id": 859,
-    "name_ko": "로코모코",
-    "name_en": "Loco Moco",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 860,
-    "name_ko": "스팸 무스비",
-    "name_en": "Spam Musubi",
-    "color_category": "Pink/White",
-    "type": "Dish"
-  },
-  {
-    "id": 861,
+    "id": 408,
     "name_ko": "닭볶음탕",
     "name_en": "Spicy Chicken Stew",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 862,
+    "id": 409,
     "name_ko": "곱창전골",
     "name_en": "Beef Tripe Hot Pot",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 863,
+    "id": 410,
     "name_ko": "순대국",
     "name_en": "Sundae Soup",
     "color_category": "White/Red",
     "type": "Dish"
   },
   {
-    "id": 864,
+    "id": 411,
     "name_ko": "뼈해장국",
     "name_en": "Pork Bone Hangover Soup",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 865,
-    "name_ko": "선지해장국",
-    "name_en": "Ox Blood Soup",
-    "color_category": "Dark Red",
-    "type": "Dish"
-  },
-  {
-    "id": 866,
-    "name_ko": "황태해장국",
-    "name_en": "Dried Pollack Hangover Soup",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 867,
-    "name_ko": "콩나물국밥",
-    "name_en": "Bean Sprout Soup with Rice",
-    "color_category": "Clear",
-    "type": "Dish"
-  },
-  {
-    "id": 868,
-    "name_ko": "꼬리곰탕",
-    "name_en": "Oxtail Soup",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 869,
-    "name_ko": "신선로",
-    "name_en": "Royal Hot Pot",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 870,
-    "name_ko": "구절판",
-    "name_en": "Platter of Nine Delicacies",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 871,
-    "name_ko": "화양적",
-    "name_en": "Hwayang-jeok",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 872,
-    "name_ko": "탕평채",
-    "name_en": "Tangpyeongchae",
-    "color_category": "White/Green",
-    "type": "Dish"
-  },
-  {
-    "id": 873,
-    "name_ko": "비빔밥(전주)",
+    "id": 412,
+    "name_ko": "전주 비빔밥",
     "name_en": "Jeonju Bibimbap",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 874,
-    "name_ko": "비빔밥(돌솥)",
-    "name_en": "Hot Stone Pot Bibimbap",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 875,
+    "id": 413,
     "name_ko": "김치볶음밥",
     "name_en": "Kimchi Fried Rice",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 876,
-    "name_ko": "새우볶음밥",
-    "name_en": "Shrimp Fried Rice",
-    "color_category": "White/Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 877,
-    "name_ko": "오징어덮밥",
-    "name_en": "Squid Rice Bowl",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 878,
+    "id": 414,
     "name_ko": "제육덮밥",
     "name_en": "Spicy Pork Rice Bowl",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 879,
+    "id": 415,
     "name_ko": "카레라이스",
     "name_en": "Curry Rice",
     "color_category": "Yellow",
     "type": "Dish"
   },
   {
-    "id": 880,
-    "name_ko": "하이라이스",
-    "name_en": "Hayashi Rice",
-    "color_category": "Dark Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 881,
+    "id": 416,
     "name_ko": "주먹밥",
     "name_en": "Rice Ball",
     "color_category": "White/Black",
     "type": "Dish"
   },
   {
-    "id": 882,
+    "id": 417,
     "name_ko": "유부초밥",
     "name_en": "Fried Tofu Rice Balls",
     "color_category": "Beige",
     "type": "Dish"
   },
   {
-    "id": 883,
+    "id": 418,
     "name_ko": "캘리포니아 롤",
     "name_en": "California Roll",
     "color_category": "White/Orange",
     "type": "Dish"
   },
   {
-    "id": 884,
-    "name_ko": "필라델피아 롤",
-    "name_en": "Philadelphia Roll",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 885,
-    "name_ko": "드래곤 롤",
-    "name_en": "Dragon Roll",
-    "color_category": "Green",
-    "type": "Dish"
-  },
-  {
-    "id": 886,
-    "name_ko": "군함말이(성게)",
-    "name_en": "Gunkan Maki (Uni)",
-    "color_category": "Black/Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 887,
-    "name_ko": "군함말이(연어알)",
-    "name_en": "Gunkan Maki (Ikura)",
-    "color_category": "Black/Red",
-    "type": "Dish"
-  },
-  {
-    "id": 888,
-    "name_ko": "테마키",
-    "name_en": "Hand Roll",
-    "color_category": "Black/White",
-    "type": "Dish"
-  },
-  {
-    "id": 889,
-    "name_ko": "지라시 스시",
-    "name_en": "Chirashi Sushi",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 890,
+    "id": 419,
     "name_ko": "후토마키",
     "name_en": "Futomaki",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 891,
+    "id": 420,
     "name_ko": "고등어 봉초밥",
     "name_en": "Mackerel Stick Sushi",
     "color_category": "Silver/Beige",
     "type": "Dish"
   },
   {
-    "id": 892,
-    "name_ko": "오차즈케",
-    "name_en": "Ochazuke",
-    "color_category": "Green/Clear",
-    "type": "Dish"
-  },
-  {
-    "id": 893,
-    "name_ko": "스키야키",
-    "name_en": "Sukiyaki",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 894,
+    "id": 421,
     "name_ko": "샤브샤브",
     "name_en": "Shabu-shabu",
     "color_category": "Colorful",
     "type": "Dish"
   },
   {
-    "id": 895,
+    "id": 422,
     "name_ko": "밀푀유 나베",
     "name_en": "Mille-feuille Nabe",
     "color_category": "Red/Green",
     "type": "Dish"
   },
   {
-    "id": 896,
-    "name_ko": "모츠나베",
-    "name_en": "Offal Hot Pot",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 897,
-    "name_ko": "창코나베",
-    "name_en": "Sumo Stew",
-    "color_category": "Colorful",
-    "type": "Dish"
-  },
-  {
-    "id": 898,
+    "id": 423,
     "name_ko": "탄탄면",
     "name_en": "Dan Dan Noodles",
     "color_category": "Red",
     "type": "Dish"
   },
   {
-    "id": 899,
-    "name_ko": "우육면",
-    "name_en": "Beef Noodle Soup",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 900,
-    "name_ko": "완탕면",
-    "name_en": "Wonton Noodles",
-    "color_category": "Clear",
-    "type": "Dish"
-  },
-  {
-    "id": 901,
-    "name_ko": "쇼롱포",
-    "name_en": "Xiaolongbao",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 902,
-    "name_ko": "하가우",
-    "name_en": "Har Gow",
-    "color_category": "Clear/Pink",
-    "type": "Dish"
-  },
-  {
-    "id": 903,
-    "name_ko": "슈마이",
-    "name_en": "Siu Mai",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 904,
-    "name_ko": "춘권",
-    "name_en": "Spring Roll (Fried)",
-    "color_category": "Golden",
-    "type": "Dish"
-  },
-  {
-    "id": 905,
-    "name_ko": "창펀",
-    "name_en": "Rice Noodle Roll",
-    "color_category": "White",
-    "type": "Dish"
-  },
-  {
-    "id": 906,
-    "name_ko": "반세오",
-    "name_en": "Banh Xeo",
-    "color_category": "Yellow",
-    "type": "Dish"
-  },
-  {
-    "id": 907,
-    "name_ko": "고이꾸온(월남쌈)",
-    "name_en": "Summer Roll",
-    "color_category": "Clear/Green",
-    "type": "Dish"
-  },
-  {
-    "id": 908,
-    "name_ko": "그린 커리",
-    "name_en": "Green Curry",
-    "color_category": "Green",
-    "type": "Dish"
-  },
-  {
-    "id": 909,
-    "name_ko": "레드 커리",
-    "name_en": "Red Curry",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 910,
-    "name_ko": "마사만 커리",
-    "name_en": "Massaman Curry",
-    "color_category": "Brown",
-    "type": "Dish"
-  },
-  {
-    "id": 911,
-    "name_ko": "빈달루",
-    "name_en": "Vindaloo",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 912,
-    "name_ko": "버터 치킨 커리",
-    "name_en": "Butter Chicken Curry",
-    "color_category": "Orange",
-    "type": "Dish"
-  },
-  {
-    "id": 913,
-    "name_ko": "팔락 파니르",
-    "name_en": "Palak Paneer",
-    "color_category": "Green",
-    "type": "Dish"
-  },
-  {
-    "id": 915,
-    "name_ko": "탄두리 킹 프론",
-    "name_en": "Tandoori Prawns",
-    "color_category": "Red",
-    "type": "Dish"
-  },
-  {
-    "id": 916,
-    "name_ko": "라씨",
-    "name_en": "Lassi",
-    "color_category": "White",
-    "type": "Beverage"
-  },
-  {
-    "id": 917,
-    "name_ko": "밀크티(버블티)",
-    "name_en": "Boba Milk Tea",
-    "color_category": "Beige/Black",
-    "type": "Beverage"
-  },
-  {
-    "id": 918,
-    "name_ko": "타로 밀크티",
-    "name_en": "Taro Milk Tea",
-    "color_category": "Purple",
-    "type": "Beverage"
-  },
-  {
-    "id": 919,
+    "id": 424,
     "name_ko": "흑당 버블티",
     "name_en": "Brown Sugar Boba Milk",
     "color_category": "Brown/White",
     "type": "Beverage"
   },
   {
-    "id": 920,
+    "id": 425,
     "name_ko": "망고 스무디",
     "name_en": "Mango Smoothie",
     "color_category": "Yellow",
     "type": "Beverage"
   },
   {
-    "id": 921,
-    "name_ko": "요거트 스무디",
-    "name_en": "Yogurt Smoothie",
-    "color_category": "White",
-    "type": "Beverage"
-  },
-  {
-    "id": 922,
-    "name_ko": "블루베리 스무디",
-    "name_en": "Blueberry Smoothie",
-    "color_category": "Purple",
-    "type": "Beverage"
-  },
-  {
-    "id": 923,
-    "name_ko": "사과 주스",
-    "name_en": "Apple Juice",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 924,
-    "name_ko": "포도 주스",
-    "name_en": "Grape Juice",
-    "color_category": "Purple",
-    "type": "Beverage"
-  },
-  {
-    "id": 925,
-    "name_ko": "토마토 주스",
-    "name_en": "Tomato Juice",
-    "color_category": "Red",
-    "type": "Beverage"
-  },
-  {
-    "id": 926,
-    "name_ko": "크랜베리 주스",
-    "name_en": "Cranberry Juice",
-    "color_category": "Red",
-    "type": "Beverage"
-  },
-  {
-    "id": 927,
-    "name_ko": "당근 주스",
-    "name_en": "Carrot Juice",
-    "color_category": "Orange",
-    "type": "Beverage"
-  },
-  {
-    "id": 928,
-    "name_ko": "케일 주스",
-    "name_en": "Kale Juice",
-    "color_category": "Green",
-    "type": "Beverage"
-  },
-  {
-    "id": 929,
-    "name_ko": "알로에 주스",
-    "name_en": "Aloe Juice",
-    "color_category": "Green/Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 930,
-    "name_ko": "코코넛 워터",
-    "name_en": "Coconut Water",
-    "color_category": "Clear/White",
-    "type": "Beverage"
-  },
-  {
-    "id": 931,
-    "name_ko": "진저 에일",
-    "name_en": "Ginger Ale",
-    "color_category": "Golden",
-    "type": "Beverage"
-  },
-  {
-    "id": 932,
-    "name_ko": "토닉 워터",
-    "name_en": "Tonic Water",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 933,
-    "name_ko": "탄산수",
-    "name_en": "Sparkling Water",
-    "color_category": "Clear",
-    "type": "Beverage"
-  },
-  {
-    "id": 934,
+    "id": 426,
     "name_ko": "이온 음료",
     "name_en": "Sports Drink",
     "color_category": "Blue/White",
     "type": "Beverage"
   },
   {
-    "id": 935,
-    "name_ko": "에너지 드링크",
-    "name_en": "Energy Drink",
-    "color_category": "Yellow/Amber",
-    "type": "Beverage"
-  },
-  {
-    "id": 936,
-    "name_ko": "비타민 음료",
-    "name_en": "Vitamin Drink",
-    "color_category": "Yellow",
-    "type": "Beverage"
-  },
-  {
-    "id": 937,
+    "id": 427,
     "name_ko": "두유(검은콩)",
     "name_en": "Soy Milk (Black Bean)",
     "color_category": "Gray",
     "type": "Beverage"
   },
   {
-    "id": 938,
-    "name_ko": "귀리 우유",
-    "name_en": "Oat Milk",
-    "color_category": "Beige",
-    "type": "Beverage"
-  },
-  {
-    "id": 939,
-    "name_ko": "라이스 밀크",
-    "name_en": "Rice Milk",
-    "color_category": "White",
-    "type": "Beverage"
-  },
-  {
-    "id": 940,
-    "name_ko": "캐슈넛 밀크",
-    "name_en": "Cashew Milk",
-    "color_category": "White",
-    "type": "Beverage"
-  },
-  {
-    "id": 945,
-    "name_ko": "초콜릿 트러플",
-    "name_en": "Chocolate Truffle",
-    "color_category": "Dark Brown",
-    "type": "Dessert"
-  },
-  {
-    "id": 946,
+    "id": 428,
     "name_ko": "화이트 초콜릿",
     "name_en": "White Chocolate",
     "color_category": "White",
     "type": "Dessert"
   },
   {
-    "id": 947,
+    "id": 429,
     "name_ko": "밀크 초콜릿",
     "name_en": "Milk Chocolate",
     "color_category": "Brown",
