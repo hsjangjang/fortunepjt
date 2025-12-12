@@ -135,21 +135,28 @@ class ItemAnalyzer:
             if not api_key:
                 raise ValueError("GMS_API_KEY not configured")
 
-            # 이미지 파일을 base64로 인코딩
-            with open(image_path, 'rb') as f:
-                image_data = f.read()
+            # 이미지 리사이징 (413 에러 방지 - 최대 1MB)
+            img = Image.open(image_path)
+
+            # 이미지가 너무 크면 리사이징
+            max_size = 1024  # 최대 1024px
+            if img.width > max_size or img.height > max_size:
+                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
+
+            # RGB로 변환 (RGBA인 경우)
+            if img.mode in ('RGBA', 'P'):
+                img = img.convert('RGB')
+
+            # 메모리에 저장
+            import io
+            buffer = io.BytesIO()
+            img.save(buffer, format='JPEG', quality=85)
+            image_data = buffer.getvalue()
 
             base64_image = base64.b64encode(image_data).decode('utf-8')
 
-            # 이미지 MIME 타입 추론
-            ext = os.path.splitext(image_path)[1].lower()
-            mime_type = {
-                '.jpg': 'image/jpeg',
-                '.jpeg': 'image/jpeg',
-                '.png': 'image/png',
-                '.gif': 'image/gif',
-                '.webp': 'image/webp'
-            }.get(ext, 'image/jpeg')
+            # MIME 타입은 항상 JPEG (리사이징 후 JPEG로 변환됨)
+            mime_type = 'image/jpeg'
 
             prompt = """
             이 이미지에서 **주인공 물체(메인 아이템)**만 분석해주세요.
