@@ -213,12 +213,14 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from '@/composables/useToast'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
 import { colorMap, getTextColor } from '@/utils/colors'
 
 const authStore = useAuthStore()
+const { showToast } = useToast()
 
 // 이미지 URL에 base URL 추가
 const getImageUrl = (url) => {
@@ -295,12 +297,12 @@ const handleDrop = (event) => {
 
 const handleFile = (file) => {
   if (!file.type.startsWith('image/')) {
-    alert('이미지 파일만 업로드 가능합니다.')
+    showToast('이미지 파일만 업로드 가능합니다.', 'error')
     return
   }
 
   if (file.size > 10 * 1024 * 1024) {
-    alert('파일 크기는 10MB 이하여야 합니다.')
+    showToast('파일 크기는 10MB 이하여야 합니다.', 'error')
     return
   }
 
@@ -356,7 +358,7 @@ const analyzeItem = async (file, imageData) => {
         updateMatchDescription(result.score, detectedItem.value, result.matchedColor)
       }
     } else {
-      alert(data.message || '분석에 실패했습니다.')
+      showToast(data.message || '분석에 실패했습니다.', 'error')
       resetUpload()
     }
   } catch (error) {
@@ -394,7 +396,7 @@ const analyzeItem = async (file, imageData) => {
       errorMessage = '서버 응답이 없습니다. 잠시 후 다시 시도해주세요.'
     }
 
-    alert(errorMessage)
+    showToast(errorMessage, 'error')
     resetUpload()
   }
 }
@@ -599,7 +601,7 @@ const resetUpload = () => {
 // 분석한 아이템을 내 아이템으로 저장
 const saveAsMyItem = async () => {
   if (!currentAnalysisFile.value || !authStore.isAuthenticated) {
-    alert('저장할 수 없습니다.')
+    showToast('저장할 수 없습니다.', 'error')
     return
   }
 
@@ -619,16 +621,16 @@ const saveAsMyItem = async () => {
     })
 
     if (response.data.success) {
-      alert('아이템이 등록되었습니다!')
+      showToast('아이템이 등록되었습니다!', 'success')
       currentAnalysisFile.value = null  // 저장 후 버튼 숨김
       // 사용자 아이템 목록 갱신
       fetchUserItems()
     } else {
-      alert(response.data.message || '저장에 실패했습니다.')
+      showToast(response.data.message || '저장에 실패했습니다.', 'error')
     }
   } catch (error) {
     console.error('아이템 저장 실패:', error)
-    alert('저장 중 오류가 발생했습니다.')
+    showToast('저장 중 오류가 발생했습니다.', 'error')
   } finally {
     isSaving.value = false
   }
