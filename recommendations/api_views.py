@@ -4,12 +4,82 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from datetime import date, datetime, timedelta
 from django.conf import settings
+from django.core.cache import cache
 import requests
 import random
 import json
 import os
 from .utils import get_korean_address
 from config.weather_config import latlon_to_grid, get_weather_description, SKY_CODE, PTY_CODE
+
+
+def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int = None) -> str:
+    """GMS GPT-5-nano를 사용해 종합운을 한 문장으로 요약"""
+    if not total_text:
+        print("[Fortune Summary] Empty total_text received")
+        return ''
+
+    # 캐시 키 생성 (오늘 날짜 + 별자리 + 유저ID 기반)
+    cache_key = f"fortune_summary_v2_{zodiac_sign}_{user_id}_{date.today()}"
+    cached_result = cache.get(cache_key)
+    if cached_result:
+        print(f"[Fortune Summary] Using cached result: {cached_result}")
+        return cached_result
+
+    # GMS API 설정 (OpenAI 모델용 URL 사용)
+    gms_api_key = getattr(settings, 'GMS_API_KEY', '')
+    gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+
+    print(f"[Fortune Summary] GMS API Key exists: {bool(gms_api_key)}, Base URL: {gms_api_base}")
+
+    if not gms_api_key:
+        print("[Fortune Summary] No GMS API key, using fallback")
+        return total_text.split('.')[0] + '.' if total_text else ''
+
+    try:
+        from openai import OpenAI
+        client = OpenAI(api_key=gms_api_key, base_url=gms_api_base)
+
+        prompt = f"""다음 오늘의 종합운세 텍스트를 읽고, 핵심 키워드를 뽑아서 **한 문장(30자 이내)**으로 요약해주세요.
+
+종합운세:
+{total_text}
+
+요구사항:
+- 오늘 하루의 핵심 메시지를 담은 짧은 한 문장
+- "~할 것입니다", "~좋습니다" 같은 운세 말투 사용
+- 구체적인 행동 조언이나 주의사항 포함
+- 별자리 이름 언급하지 않기
+- 30자 이내로 작성
+
+예시:
+- "적극적인 행동이 좋은 결과로 이어질 것입니다"
+- "주변의 조언에 귀 기울이면 기회가 찾아옵니다"
+- "차분한 마음으로 중요한 결정을 내리세요"
+
+한 문장만 출력하세요:"""
+
+        print(f"[Fortune Summary] Calling GMS API with gpt-5-nano...")
+        response = client.chat.completions.create(
+            model="gpt-5-nano",
+            messages=[{"role": "user", "content": prompt}],
+            max_completion_tokens=100
+        )
+        summary = response.choices[0].message.content.strip().strip('"').strip("'")
+        print(f"[Fortune Summary] GMS API success: {summary}")
+
+        # 캐시에 저장 (24시간)
+        cache.set(cache_key, summary, 60 * 60 * 24)
+
+        return summary
+    except Exception as e:
+        print(f"[Fortune Summary LLM Error] {e}")
+        import traceback
+        traceback.print_exc()
+        # 실패 시 첫 문장 반환
+        fallback = total_text.split('.')[0] + '.' if total_text else ''
+        print(f"[Fortune Summary] Using fallback: {fallback}")
+        return fallback
 
 
 def load_ootd_data():
@@ -499,12 +569,13 @@ class MenuRecommendationAPIView(APIView):
 
         lucky_color = fortune_data.get('lucky_colors', ['노란색'])[0]
         lucky_colors = fortune_data.get('lucky_colors', [])[:3]
+        zodiac_sign = fortune_data.get('zodiac_sign', '')
 
         # fortune_texts에서 종합운(total) 가져오기
         fortune_texts = fortune_data.get('fortune_texts', {})
         total_text = fortune_texts.get('total', '')
-        # 첫 번째 문장만 추출하여 한줄 요약으로 사용
-        fortune_summary = total_text.split('.')[0] + '.' if total_text else ''
+        # LLM으로 종합운 한줄 요약 생성 (유저ID 포함하여 캐시 분리)
+        fortune_summary = summarize_fortune_with_llm(total_text, zodiac_sign, request.user.id)
 
         # 음식 데이터 로드
         all_foods = load_food_data()

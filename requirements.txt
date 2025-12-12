@@ -25,6 +25,7 @@ grpcio-status==1.71.2
 httplib2==0.31.0
 idna==3.10
 korean-lunar-calendar==0.3.1
+openai==1.58.1
 pillow==11.3.0
 proto-plus==1.26.1
 protobuf==5.29.5
