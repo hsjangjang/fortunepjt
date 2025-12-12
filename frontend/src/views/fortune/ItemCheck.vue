@@ -155,11 +155,10 @@
                   <button
                     v-if="canSaveItem"
                     class="btn btn-outline-light btn-lg rounded-pill px-4"
-                    @click="showSaveModal = true"
-                    :disabled="isSaving"
+                    @click="goToUploadPage"
                   >
                     <i class="fas fa-plus me-2"></i>
-                    {{ isSaving ? '저장 중...' : '내 아이템으로 등록' }}
+                    내 아이템으로 등록
                   </button>
                 </div>
               </div>
@@ -207,11 +206,13 @@
         </div>
       </div>
     </Teleport>
+
   </DefaultLayout>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
@@ -219,6 +220,7 @@ import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
 import { colorMap, getTextColor } from '@/utils/colors'
 
+const router = useRouter()
 const authStore = useAuthStore()
 const { showToast } = useToast()
 
@@ -243,7 +245,6 @@ const luckyColor = ref('#667eea')
 const matchTitle = ref('분석 중...')
 const matchDescription = ref('아이템을 분석하고 있습니다.')
 const userItems = ref([])
-const isSaving = ref(false)
 const currentAnalysisFile = ref(null)  // 분석한 원본 파일 저장
 const isFromExistingItem = ref(false)  // 기존 아이템에서 선택한 경우
 const luckyItems = ref({
@@ -598,42 +599,21 @@ const resetUpload = () => {
   if (galleryInput.value) galleryInput.value.value = ''
 }
 
-// 분석한 아이템을 내 아이템으로 저장
-const saveAsMyItem = async () => {
-  if (!currentAnalysisFile.value || !authStore.isAuthenticated) {
-    showToast('저장할 수 없습니다.', 'error')
-    return
+// 아이템 등록 페이지로 이동 (분석 데이터 전달)
+const goToUploadPage = () => {
+  if (!currentAnalysisFile.value) return
+
+  // 분석 데이터를 sessionStorage에 저장
+  const uploadData = {
+    itemName: detectedItem.value,
+    colors: detectedColors.value,
+    imagePreview: itemPreview.value
   }
+  sessionStorage.setItem('itemCheckData', JSON.stringify(uploadData))
 
-  isSaving.value = true
-
-  try {
-    const formData = new FormData()
-    formData.append('image', currentAnalysisFile.value)
-    formData.append('item_name', detectedItem.value || '새 아이템')
-    formData.append('main_category', 'etc')
-    formData.append('category', 'etc')
-    formData.append('is_favorite', false)
-
-    const response = await api.post('/api/items/', formData, {
-      headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 60000
-    })
-
-    if (response.data.success) {
-      showToast('아이템이 등록되었습니다!', 'success')
-      currentAnalysisFile.value = null  // 저장 후 버튼 숨김
-      // 사용자 아이템 목록 갱신
-      fetchUserItems()
-    } else {
-      showToast(response.data.message || '저장에 실패했습니다.', 'error')
-    }
-  } catch (error) {
-    console.error('아이템 저장 실패:', error)
-    showToast('저장 중 오류가 발생했습니다.', 'error')
-  } finally {
-    isSaving.value = false
-  }
+  // 파일은 sessionStorage에 저장 불가 -> 별도 처리 필요
+  // 일단 이미지 미리보기만 전달하고, 업로드 페이지에서 다시 선택하도록 안내
+  router.push('/items/upload')
 }
 
 const fetchFortuneData = async () => {
