@@ -142,7 +142,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
@@ -150,6 +150,7 @@ import api from '@/services/api'
 
 const router = useRouter()
 const authStore = useAuthStore()
+const fromItemCheck = ref(false)
 
 const uploadArea = ref(null)
 const fileInput = ref(null)
@@ -245,6 +246,30 @@ const handleDrop = (e) => {
     reader.readAsDataURL(file)
   }
 }
+
+// ItemCheck에서 넘어온 데이터 처리
+onMounted(() => {
+  const itemCheckData = sessionStorage.getItem('itemCheckData')
+  if (itemCheckData) {
+    try {
+      const data = JSON.parse(itemCheckData)
+      sessionStorage.removeItem('itemCheckData')
+      fromItemCheck.value = true
+
+      // AI가 감지한 아이템 이름 설정
+      if (data.itemName && data.itemName !== '분석 중...' && data.itemName !== '알 수 없음') {
+        formData.value.item_name = data.itemName
+      }
+
+      // 이미지 미리보기 설정 (base64)
+      if (data.imagePreview) {
+        imagePreview.value = data.imagePreview
+      }
+    } catch (e) {
+      console.error('ItemCheck 데이터 파싱 실패:', e)
+    }
+  }
+})
 
 const handleSubmit = async () => {
   // 소분류 검증
