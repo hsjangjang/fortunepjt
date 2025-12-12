@@ -18,10 +18,29 @@ class ItemAnalyzer:
     """아이템 이미지 분석 클래스 (색상 + AI 분석)"""
     
     def __init__(self):
-        # 한국어 색상 이름 매핑
+        # 한국어 색상 이름 매핑 (colors.js와 동일)
+        self.color_map = {
+            '검은색': '#1f2937',
+            '흰색': '#f3f4f6',
+            '회색': '#6B7280',
+            '빨간색': '#EF4444',
+            '분홍색': '#F472B6',
+            '주황색': '#F59E0B',
+            '노란색': '#FCD34D',
+            '금색': '#FFD700',
+            '초록색': '#10B981',
+            '파란색': '#3B82F6',
+            '하늘색': '#38BDF8',
+            '남색': '#1E3A8A',
+            '보라색': '#8B5CF6',
+            '갈색': '#92400E',
+            '베이지색': '#E7E5E4',
+        }
+
+        # 기존 호환성용 (영문 → 한글)
         self.color_names = {
             'red': '빨간색',
-            'orange': '주황색', 
+            'orange': '주황색',
             'yellow': '노란색',
             'green': '초록색',
             'lightgreen': '연두색',
@@ -163,55 +182,21 @@ class ItemAnalyzer:
             prompt = """
             이 이미지에서 **주인공 물체(메인 아이템)**만 분석해주세요.
 
-            ⚠️ **매우 중요 - 배경 무시 규칙**:
-            - 테이블, 책상, 바닥, 천, 종이 등 물체가 놓인 표면의 색상은 절대 분석하지 마세요
-            - 나무 테이블의 갈색/노란색, 흰 책상, 검은 배경 등은 모두 무시
-            - 그림자, 반사광도 물체 색상이 아닙니다
-            - 오직 "손에 들 수 있는 물체" 자체의 색상만 분석하세요
+            ⚠️ **배경 무시**: 테이블, 책상, 바닥 등 표면 색상은 무시. 물체 자체만 분석.
 
-            다음 정보를 JSON 형식으로 제공해주세요:
+            JSON 형식으로 응답:
 
-            1. item_name: 물체의 구체적인 이름 (한글로, 2-4글자)
-               - 예시: '마우스', '향수', '지갑', '키링', '인형', '반지', '팔찌', '목걸이', '이어폰', '립스틱', '볼펜', '텀블러' 등
-               - 테이블, 책상, 바닥은 아이템이 아닙니다!
+            1. item_name: 물체 이름 (한글 2-4글자)
+            2. primary_color_hex: 물체의 주요 색상 HEX 코드 (예: "#38BDF8")
+               - 배경색이 아닌 물체 자체의 가장 넓은 면적 색상
+            3. secondary_color_hex: 보조 색상 HEX 코드 (단색이면 null)
+            4. tags: [아이템종류, 운세(애정운/금전운/직장운/건강운/학업운), 느낌]
+            5. fortune_scores: {"love": 0-100, "money": 0-100, "work": 0-100, "health": 0-100, "study": 0-100}
 
-            2. primary_color: 물체 자체의 **가장 넓은 면적을 차지하는** 주요 색상 (한글로)
-               - **반드시 아래 15가지 중 하나만 선택**:
-                 '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색'
-               - ⚠️ 배경(테이블, 바닥, 천)의 색상은 절대 선택하지 마세요!
-               - 금속 반지/팔찌/목걸이가 금빛이면 '금색', 은빛이면 '회색'(은색)
-               - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로 분류
+            예시:
+            {"item_name": "텀블러", "primary_color_hex": "#38BDF8", "secondary_color_hex": null, "tags": ["텀블러", "건강운", "심플함"], "fortune_scores": {"love": 30, "money": 40, "work": 50, "health": 70, "study": 40}}
 
-            3. secondary_colors: 보조 색상 배열
-               - **단색 물체는 반드시 빈 배열 []**
-               - 물체에 두 가지 이상 색이 있을 때만 추가
-               - 로고, 스티칭, 지퍼, 단추 등 작은 부분은 무시
-               - **확실하지 않으면 빈 배열 []로 응답**
-
-            4. tags: 해시태그 3개
-               - 첫 번째: 아이템 종류
-               - 두 번째: **반드시** '애정운', '금전운', '직장운', '건강운', '학업운' 중 하나
-               - 세 번째: 아이템 느낌 (예: '고급스러움', '심플함', '귀여움')
-
-            5. fortune_scores: 운세 강화 점수 (0~100)
-               - love, money, work, health, study
-               - 지갑/금속악세서리 → money 높음
-               - 향수/반지/꽃 → love 높음
-               - 마우스/명함/볼펜 → work 높음
-
-            **응답 규칙**:
-            - 반드시 유효한 JSON만 응답
-            - 마크다운 코드 블록(```) 절대 금지
-
-            예시 (나무 테이블 위의 금색 반지):
-            {
-              "item_name": "반지",
-              "primary_color": "금색",
-              "secondary_colors": [],
-              "tags": ["반지", "금전운", "고급스러움"],
-              "fortune_scores": {"love": 70, "money": 85, "work": 40, "health": 10, "study": 10}
-            }
-            (나무 테이블의 노란색/갈색은 무시하고 반지의 금색만 분석)
+            JSON만 응답. 마크다운 금지.
             """
 
             # Gemini API 요청 데이터 구성
@@ -296,33 +281,41 @@ class ItemAnalyzer:
             # item_name을 category로도 저장 (하위 호환성)
             if 'item_name' in ai_result and 'category' not in ai_result:
                 ai_result['category'] = ai_result['item_name']
-            
-            # 색상 정보를 표준 형식으로 변환
+
+            # 색상 정보를 표준 형식으로 변환 (HEX → 가장 가까운 한글 색상명)
             colors = []
-            if ai_result.get('primary_color'):
-                primary_color_name = ai_result['primary_color']
-                # AI가 한글로 응답하므로 그대로 사용
+            primary_hex = ai_result.get('primary_color_hex')
+            if primary_hex:
+                # HEX 코드를 가장 가까운 한글 색상명으로 매핑
+                korean_name, matched_hex = self._find_closest_color(primary_hex)
+                rgb = self._hex_to_rgb(primary_hex)
                 colors.append({
                     'name': 'primary',
-                    'korean_name': primary_color_name,  # 한글 색상명 (AI가 직접 한글로 제공)
-                    'hex': self._color_name_to_hex(primary_color_name),  # 매칭용
-                    'rgb': (128, 128, 128),
+                    'korean_name': korean_name,
+                    'hex': matched_hex,  # 매핑된 표준 hex
+                    'original_hex': primary_hex,  # AI가 감지한 원본 hex
+                    'rgb': rgb,
                     'percentage': 80.0
                 })
+                # ai_result에도 한글 색상명 추가 (하위 호환성)
+                ai_result['primary_color'] = korean_name
 
-            # 보조 색상 (있을 때만 추가, 최대 1개만)
-            secondary_colors = ai_result.get('secondary_colors', [])
-            if secondary_colors:  # 빈 배열이 아닐 때만
-                # 첫 번째 색상만 사용 (AI가 너무 많이 추가하는 경향이 있음)
-                for idx, sec_color in enumerate(secondary_colors[:1]):  # 최대 1개만!
-                    if sec_color:  # 빈 문자열 체크
-                        colors.append({
-                            'name': f'secondary_{idx}',
-                            'korean_name': sec_color,  # 한글 색상명 (AI가 직접 한글로 제공)
-                            'hex': self._color_name_to_hex(sec_color),
-                            'rgb': (100, 100, 100),
-                            'percentage': 10.0
-                        })
+            # 보조 색상 처리
+            secondary_hex = ai_result.get('secondary_color_hex')
+            if secondary_hex:
+                korean_name, matched_hex = self._find_closest_color(secondary_hex)
+                rgb = self._hex_to_rgb(secondary_hex)
+                colors.append({
+                    'name': 'secondary_0',
+                    'korean_name': korean_name,
+                    'hex': matched_hex,
+                    'original_hex': secondary_hex,
+                    'rgb': rgb,
+                    'percentage': 10.0
+                })
+                ai_result['secondary_colors'] = [korean_name]
+            else:
+                ai_result['secondary_colors'] = []
             
             print("[DEBUG] AI 분석 성공!")
             return {
@@ -456,7 +449,36 @@ class ItemAnalyzer:
         # 기본값 (회색)
         print(f"[WARNING] 알 수 없는 색상: {color_name}, 회색으로 표시")
         return '#808080'
-    
+
+    def _hex_to_rgb(self, hex_color):
+        """HEX를 RGB 튜플로 변환"""
+        hex_color = hex_color.lstrip('#')
+        return tuple(int(hex_color[i:i+2], 16) for i in (0, 2, 4))
+
+    def _color_distance(self, hex1, hex2):
+        """두 HEX 색상 간의 유클리드 거리 계산"""
+        rgb1 = self._hex_to_rgb(hex1)
+        rgb2 = self._hex_to_rgb(hex2)
+        return ((rgb1[0] - rgb2[0]) ** 2 +
+                (rgb1[1] - rgb2[1]) ** 2 +
+                (rgb1[2] - rgb2[2]) ** 2) ** 0.5
+
+    def _find_closest_color(self, hex_color):
+        """주어진 HEX에 가장 가까운 한글 색상명 찾기 (colors.js와 동일한 로직)"""
+        min_distance = float('inf')
+        closest_color = '회색'  # 기본값
+        closest_hex = '#6B7280'
+
+        for color_name, color_hex in self.color_map.items():
+            distance = self._color_distance(hex_color, color_hex)
+            if distance < min_distance:
+                min_distance = distance
+                closest_color = color_name
+                closest_hex = color_hex
+
+        print(f"[DEBUG] HEX {hex_color} → 가장 가까운 색상: {closest_color} ({closest_hex}), 거리: {min_distance:.2f}")
+        return closest_color, closest_hex
+
     def analyze_image(self, image_path):
         """이미지 분석 메인 함수"""
         try:
