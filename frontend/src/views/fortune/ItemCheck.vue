@@ -347,8 +347,12 @@ const analyzeItem = async (file, imageData) => {
 
       if (colors.length > 0) {
         itemColor.value = colors[0].hex
-        const result = calculateLuckScore(detectedItem.value, colors[0].korean_name)
+        const result = calculateLuckScore(detectedItem.value, colors[0].korean_name, colors)
         animateLuckScore(result.score)
+        // 가장 매칭된 아이템 색상으로 업데이트
+        if (result.bestItemHex) {
+          itemColor.value = result.bestItemHex
+        }
         updateMatchDescription(result.score, detectedItem.value, result.matchedColor)
       }
     } else {
@@ -412,8 +416,12 @@ const selectExistingItem = (item) => {
 
   if (colors.length > 0) {
     itemColor.value = colors[0].hex
-    const result = calculateLuckScore(aiItemName, colors[0].korean_name)
+    const result = calculateLuckScore(aiItemName, colors[0].korean_name, colors)
     animateLuckScore(result.score)
+    // 가장 매칭된 아이템 색상으로 업데이트
+    if (result.bestItemHex) {
+      itemColor.value = result.bestItemHex
+    }
     updateMatchDescription(result.score, aiItemName, result.matchedColor)
   }
 }
@@ -457,112 +465,79 @@ const calculateItemSimilarity = (item1, item2) => {
   return maxSimilarity
 }
 
-// 행운 점수 계산 (아이템 유사도 기반 + 색상 추가점)
-const calculateLuckScore = (item, color) => {
-  let baseScore = 30   // 기본 점수 (낮춤)
-  let itemScore = 0    // 아이템 유사도 점수
-  let colorScore = 0   // 색상 매칭 점수
-
-  const luckyItemsList = [
-    { name: luckyItems.value.main, weight: 40 },        // 메인 아이템: 최대 40점
-    { name: luckyItems.value.zodiac, weight: 25 },      // 별자리 아이템: 최대 25점
-    { name: luckyItems.value.special, weight: 20 }      // 특별 아이템: 최대 20점
-  ].filter(i => i.name)
-
-  const itemLower = (item || '').toLowerCase().trim()
-
-  // 아이템 유사도 계산 (부분 일치, 유사 단어 등)
-  for (const luckyItem of luckyItemsList) {
-    const luckyLower = (luckyItem.name || '').toLowerCase().trim()
-
-    // 완전 일치
-    if (itemLower === luckyLower) {
-      itemScore = Math.max(itemScore, luckyItem.weight)
-      continue
-    }
-
-    // 포함 관계 (한쪽이 다른쪽을 포함)
-    if (itemLower.includes(luckyLower) || luckyLower.includes(itemLower)) {
-      itemScore = Math.max(itemScore, Math.floor(luckyItem.weight * 0.8))
-      continue
-    }
-
-    // 유사 카테고리 매칭 (키워드 기반)
-    const similarity = calculateItemSimilarity(itemLower, luckyLower)
-    if (similarity > 0) {
-      itemScore = Math.max(itemScore, Math.floor(luckyItem.weight * similarity))
-    }
-  }
-
-  // 색상 매칭 (최대 15점 추가)
+// 행운 점수 계산 (색상 유클리드 거리 기반 0-100점)
+const calculateLuckScore = (item, color, itemColors) => {
+  // 색상 점수를 유클리드 거리 기반 0-100으로 계산
   const luckyColorNames = luckyColorsWithHex.value.map(c => c.name)
-  let matchedColor = null
+  const colorResult = calculateColorMatchScore(itemColors || detectedColors.value, luckyColorNames)
 
-  if (color && luckyColorNames.length > 0) {
-    // 1. 정확히 일치하는 경우
-    if (luckyColorNames.includes(color)) {
-      colorScore = 15
-      matchedColor = color
-    } else {
-      // 2. 유사 색상 매칭 - 가장 가까운 행운색 찾기
-      const closestLuckyColor = findClosestLuckyColor(color, luckyColorNames)
-      if (closestLuckyColor) {
-        colorScore = 10  // 유사 색상은 10점
-        matchedColor = closestLuckyColor
+  return {
+    score: colorResult.score,
+    matchedColor: colorResult.matchedColor,
+    bestItemHex: colorResult.bestItemHex
+  }
+}
+
+// HEX를 RGB로 변환
+const hexToRgb = (hex) => {
+  if (!hex) return { r: 128, g: 128, b: 128 }
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 128, g: 128, b: 128 }
+}
+
+// 유클리드 거리 계산 (0 ~ 441.67 범위, sqrt(255^2 * 3))
+const euclideanDistance = (rgb1, rgb2) => {
+  return Math.sqrt(
+    Math.pow(rgb1.r - rgb2.r, 2) +
+    Math.pow(rgb1.g - rgb2.g, 2) +
+    Math.pow(rgb1.b - rgb2.b, 2)
+  )
+}
+
+// 유클리드 거리를 0-100 점수로 변환 (가까울수록 높은 점수)
+const distanceToScore = (distance) => {
+  const maxDistance = Math.sqrt(255 * 255 * 3) // 약 441.67
+  return Math.round(100 - (distance / maxDistance) * 100)
+}
+
+// 아이템의 모든 색상과 행운색들 간의 최대 유사도 점수 계산 (유클리드 거리 기반)
+const calculateColorMatchScore = (itemColors, luckyColorNames) => {
+  if (!itemColors || itemColors.length === 0) return { score: 0, matchedColor: null, bestItemHex: null }
+  if (!luckyColorNames || luckyColorNames.length === 0) return { score: 0, matchedColor: null, bestItemHex: null }
+
+  // 행운색 이름을 HEX로 변환
+  const luckyColorHexes = luckyColorNames.map(name => ({
+    name,
+    hex: colorMap[name] || '#808080'
+  }))
+
+  let maxScore = 0
+  let matchedColor = null
+  let bestItemHex = null
+
+  // 아이템 각 색상과 행운색들 간의 유클리드 거리 계산
+  for (const itemColor of itemColors) {
+    const itemHex = itemColor.hex || '#808080'
+    const itemRgb = hexToRgb(itemHex)
+
+    for (const luckyColor of luckyColorHexes) {
+      const luckyRgb = hexToRgb(luckyColor.hex)
+      const distance = euclideanDistance(itemRgb, luckyRgb)
+      const score = distanceToScore(distance)
+
+      if (score > maxScore) {
+        maxScore = score
+        matchedColor = luckyColor.name
+        bestItemHex = itemHex
       }
     }
   }
 
-  return { score: Math.min(100, baseScore + itemScore + colorScore), matchedColor }
-}
-
-// 색상 이름 -> RGB 매핑
-const colorToRGB = {
-  '빨간색': { r: 255, g: 0, b: 0 },
-  '주황색': { r: 255, g: 165, b: 0 },
-  '노란색': { r: 255, g: 255, b: 0 },
-  '초록색': { r: 0, g: 128, b: 0 },
-  '연두색': { r: 144, g: 238, b: 144 },
-  '하늘색': { r: 135, g: 206, b: 235 },
-  '파란색': { r: 0, g: 0, b: 255 },
-  '남색': { r: 0, g: 0, b: 128 },
-  '보라색': { r: 128, g: 0, b: 128 },
-  '자주색': { r: 128, g: 0, b: 128 },
-  '분홍색': { r: 255, g: 192, b: 203 },
-  '갈색': { r: 139, g: 69, b: 19 },
-  '베이지색': { r: 245, g: 222, b: 179 },
-  '검은색': { r: 0, g: 0, b: 0 },
-  '흰색': { r: 255, g: 255, b: 255 },
-  '회색': { r: 128, g: 128, b: 128 },
-  '금색': { r: 255, g: 215, b: 0 }
-}
-
-// 가장 가까운 행운색 찾기 (RGB 차이 기반)
-const findClosestLuckyColor = (itemColor, luckyColors) => {
-  const itemRGB = colorToRGB[itemColor]
-  if (!itemRGB || luckyColors.length === 0) {
-    return luckyColors[0] || null
-  }
-
-  let closestColor = luckyColors[0]
-  let minDiff = Infinity
-
-  for (const luckyColorName of luckyColors) {
-    const luckyRGB = colorToRGB[luckyColorName]
-    if (!luckyRGB) continue
-
-    // RGB 값의 차이 합계 계산
-    const diff = Math.abs(itemRGB.r - luckyRGB.r) +
-                 Math.abs(itemRGB.g - luckyRGB.g) +
-                 Math.abs(itemRGB.b - luckyRGB.b)
-
-    if (diff < minDiff) {
-      minDiff = diff
-      closestColor = luckyColorName
-    }
-  }
-
-  return closestColor
+  return { score: maxScore, matchedColor, bestItemHex }
 }
 
 const animateLuckScore = (targetScore) => {
