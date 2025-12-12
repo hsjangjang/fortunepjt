@@ -212,10 +212,6 @@ class ItemAnalyzer:
             (나무 테이블의 노란색/갈색은 무시하고 반지의 금색만 분석)
             """
 
-            # Gemini API URL 구성 (GMS gemini-2.0-flash 멀티모달 모델 사용)
-            gemini_url = f"{gemini_base_url}/models/gemini-2.0-flash:generateContent?key={api_key}"
-            print(f"[DEBUG] Gemini API URL: {gemini_url[:80]}...")
-
             # Gemini API 요청 데이터 구성
             request_data = {
                 "contents": [
@@ -237,17 +233,44 @@ class ItemAnalyzer:
                 }
             }
 
-            print("[DEBUG] Gemini 2.5 Flash Vision API 호출 시작")
-            response = requests.post(
-                gemini_url,
-                json=request_data,
-                headers={"Content-Type": "application/json"},
-                timeout=30
-            )
+            # API 엔드포인트 목록 (fallback 방식)
+            api_endpoints = [
+                # 1차: gemini.googleapis.com + gemini-2.0-flash
+                (gemini_base_url, "gemini-2.0-flash"),
+                # 2차 fallback: generativelanguage.googleapis.com + gemini-2.0-flash-exp-image-generation
+                ("https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta", "gemini-2.0-flash-exp-image-generation"),
+            ]
 
-            if response.status_code != 200:
-                print(f"[ERROR] Gemini API 오류: {response.status_code} - {response.text}")
-                raise ValueError(f"Gemini API error: {response.status_code}")
+            response = None
+            last_error = None
+
+            for base_url, model_name in api_endpoints:
+                gemini_url = f"{base_url}/models/{model_name}:generateContent?key={api_key}"
+                print(f"[DEBUG] Gemini API 시도: {model_name} @ {base_url[:50]}...")
+
+                try:
+                    response = requests.post(
+                        gemini_url,
+                        json=request_data,
+                        headers={"Content-Type": "application/json"},
+                        timeout=30
+                    )
+
+                    if response.status_code == 200:
+                        print(f"[DEBUG] 성공: {model_name}")
+                        break
+                    else:
+                        last_error = f"{response.status_code} - {response.text[:200]}"
+                        print(f"[WARN] {model_name} 실패: {last_error}")
+                        response = None
+                except Exception as e:
+                    last_error = str(e)
+                    print(f"[WARN] {model_name} 예외: {last_error}")
+                    response = None
+
+            if response is None or response.status_code != 200:
+                print(f"[ERROR] 모든 Gemini API 엔드포인트 실패: {last_error}")
+                raise ValueError(f"Gemini API error: {last_error}")
 
             result = response.json()
             response_text = result['candidates'][0]['content']['parts'][0]['text']
