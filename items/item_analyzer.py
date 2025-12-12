@@ -135,11 +135,11 @@ class ItemAnalyzer:
             if not api_key:
                 raise ValueError("GMS_API_KEY not configured")
 
-            # 이미지 리사이징 (413 에러 방지 - 최대 1MB)
+            # 이미지 리사이징 (GMS 프록시 body size 제한 회피)
             img = Image.open(image_path)
 
-            # 이미지가 너무 크면 리사이징
-            max_size = 1024  # 최대 1024px
+            # 이미지를 512px로 줄임 (GMS 프록시 제한 회피)
+            max_size = 512
             if img.width > max_size or img.height > max_size:
                 img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
 
@@ -147,11 +147,13 @@ class ItemAnalyzer:
             if img.mode in ('RGBA', 'P'):
                 img = img.convert('RGB')
 
-            # 메모리에 저장
+            # 메모리에 저장 (quality 60으로 용량 최소화)
             import io
             buffer = io.BytesIO()
-            img.save(buffer, format='JPEG', quality=85)
+            img.save(buffer, format='JPEG', quality=60)
             image_data = buffer.getvalue()
+
+            print(f"[DEBUG] 이미지 크기: {len(image_data)} bytes, {img.width}x{img.height}")
 
             base64_image = base64.b64encode(image_data).decode('utf-8')
 
