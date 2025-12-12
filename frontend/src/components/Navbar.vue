@@ -18,7 +18,7 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/fortune/item-check">
+              <router-link class="nav-link" to="/fortune/item-check" @click="handleItemCheckClick">
                 <Diamond class="me-1" :size="18" /> 행운템 분석
               </router-link>
             </li>
@@ -208,6 +208,13 @@ onUnmounted(() => {
   }
   document.removeEventListener('click', handleClickOutside)
 })
+
+// 행운템 분석 페이지 클릭 핸들러 - 같은 페이지면 새로고침
+const handleItemCheckClick = () => {
+  if (route.path === '/fortune/item-check') {
+    router.go(0)  // 페이지 새로고침
+  }
+}
 
 const handleLogout = async () => {
   // UI 상태 초기화
