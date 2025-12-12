@@ -180,23 +180,27 @@ class ItemAnalyzer:
             mime_type = 'image/jpeg'
 
             prompt = """
-            이 이미지에서 **주인공 물체(메인 아이템)**만 분석해주세요.
+            이미지에서 **전경의 메인 물체**만 분석하세요.
 
-            ⚠️ **배경 무시**: 테이블, 책상, 바닥 등 표면 색상은 무시. 물체 자체만 분석.
+            🚫 절대 분석 금지:
+            - 배경 (테이블, 책상, 바닥, 벽, 조명 등)
+            - 물체 아래/뒤 표면의 색상
+            - 그림자 색상
 
-            JSON 형식으로 응답:
+            ✅ 분석 대상:
+            - 손으로 들거나 사용하는 물체
+            - 이미지 중앙의 주인공 아이템
 
-            1. item_name: 물체 이름 (한글 2-4글자)
-            2. primary_color_hex: 물체의 주요 색상 HEX 코드 (예: "#38BDF8")
-               - 배경색이 아닌 물체 자체의 가장 넓은 면적 색상
-            3. secondary_color_hex: 보조 색상 HEX 코드 (단색이면 null)
-            4. tags: [아이템종류, 운세(애정운/금전운/직장운/건강운/학업운), 느낌]
+            JSON 응답:
+            1. item_name: 물체 이름 (한글)
+            2. primary_color_hex: 물체 본체의 HEX (배경 색 아님!)
+            3. secondary_color_hex: 보조색 HEX (없으면 null)
+            4. tags: [종류, 운세, 느낌]
             5. fortune_scores: {"love": 0-100, "money": 0-100, "work": 0-100, "health": 0-100, "study": 0-100}
 
-            예시:
-            {"item_name": "텀블러", "primary_color_hex": "#38BDF8", "secondary_color_hex": null, "tags": ["텀블러", "건강운", "심플함"], "fortune_scores": {"love": 30, "money": 40, "work": 50, "health": 70, "study": 40}}
+            예: {"item_name": "텀블러", "primary_color_hex": "#38BDF8", "secondary_color_hex": null, "tags": ["텀블러", "건강운", "심플함"], "fortune_scores": {"love": 30, "money": 40, "work": 50, "health": 70, "study": 40}}
 
-            JSON만 응답. 마크다운 금지.
+            JSON만 응답.
             """
 
             # Gemini API 요청 데이터 구성
