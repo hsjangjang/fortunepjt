@@ -235,9 +235,11 @@ class ItemAnalyzer:
 
             # API 엔드포인트 목록 (fallback 방식)
             api_endpoints = [
-                # 1차: gemini.googleapis.com + gemini-2.0-flash
+                # 1차: gemini-2.5-flash (이전에 작동하던 모델)
+                (gemini_base_url, "gemini-2.5-flash"),
+                # 2차: gemini-2.0-flash
                 (gemini_base_url, "gemini-2.0-flash"),
-                # 2차 fallback: generativelanguage.googleapis.com + gemini-2.0-flash-exp-image-generation
+                # 3차 fallback: generativelanguage + gemini-2.0-flash-exp
                 ("https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta", "gemini-2.0-flash-exp-image-generation"),
             ]
 
