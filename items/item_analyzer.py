@@ -160,17 +160,23 @@ class ItemAnalyzer:
             # MIME 타입은 항상 JPEG (리사이징 후 JPEG로 변환됨)
             mime_type = 'image/jpeg'
 
-            prompt = """이 이미지의 물체를 분석해 JSON으로 응답하세요.
+            prompt = """이미지의 물체를 분석해 JSON으로 응답.
 
 {
-  "item_name": "물체 이름(한글 2-4자)",
-  "primary_color": "주요색상(빨간색/주황색/노란색/초록색/파란색/보라색/분홍색/갈색/베이지색/회색/검은색/흰색/남색/하늘색/금색 중 하나)",
+  "item_name": "물체이름(한글2-4자)",
+  "primary_color": "색상",
   "secondary_colors": [],
-  "tags": ["아이템종류", "운세종류", "느낌"],
+  "tags": ["종류", "운세", "느낌"],
   "fortune_scores": {"love": 50, "money": 50, "work": 50, "health": 50, "study": 50}
 }
 
-배경색 무시, 물체만 분석. JSON만 응답."""
+색상 규칙:
+- 연한파랑/민트/청록 → 하늘색
+- 진한파랑 → 파란색
+- 짙은파랑 → 남색
+색상목록: 빨간색,주황색,노란색,초록색,파란색,보라색,분홍색,갈색,베이지색,회색,검은색,흰색,남색,하늘색,금색
+
+배경무시. JSON만."""
 
             # Gemini API 요청 데이터 구성
             request_data = {
