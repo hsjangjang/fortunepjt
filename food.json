@@ -360,14 +360,6 @@
     "desc": "태국식 볶음 쌀국수"
   },
   {
-    "id": 46,
-    "name_ko": "볶음우동",
-    "name_en": "Stir-fried Udon",
-    "color_category": "Brown",
-    "type": "Dish",
-    "desc": "야채와 함께 볶은 우동"
-  },
-  {
     "id": 47,
     "name_ko": "오므라이스",
     "name_en": "Omurice",
