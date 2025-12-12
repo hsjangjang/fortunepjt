@@ -10,6 +10,7 @@ import random
 import json
 import os
 from .utils import get_korean_address
+from .models import DailyRecommendation
 from config.weather_config import latlon_to_grid, get_weather_description, SKY_CODE, PTY_CODE
 
 
@@ -206,8 +207,27 @@ class OOTDRecommendationAPIView(APIView):
         # 운세 요약 (한줄)
         fortune_summary = fortune_data.get('overall_fortune', {}).get('summary', '')
 
-        # OOTD 추천 생성
-        outfit = self._generate_ootd(weather_data, lucky_colors)
+        # 오늘 날짜로 기존 추천이 있는지 확인
+        today = date.today()
+        existing_recommendation = DailyRecommendation.objects.filter(
+            user=request.user,
+            recommendation_date=today,
+            recommendation_type='OOTD'
+        ).first()
+
+        if existing_recommendation:
+            # 기존 추천이 있으면 DB에서 가져오기
+            outfit = existing_recommendation.recommendation_data
+        else:
+            # 새로 생성하고 DB에 저장
+            outfit = self._generate_ootd(weather_data, lucky_colors)
+            DailyRecommendation.objects.create(
+                user=request.user,
+                recommendation_date=today,
+                recommendation_type='OOTD',
+                recommendation_data=outfit,
+                weather_data=weather_data
+            )
 
         return Response({
             'success': True,
@@ -215,7 +235,7 @@ class OOTDRecommendationAPIView(APIView):
             'lucky_colors': lucky_colors,
             'fortune_summary': fortune_summary,
             'outfit': outfit,
-            'date': str(date.today())
+            'date': str(today)
         })
 
     def _get_weather_info(self, request):
@@ -577,49 +597,74 @@ class MenuRecommendationAPIView(APIView):
         # LLM으로 종합운 한줄 요약 생성 (유저ID 포함하여 캐시 분리)
         fortune_summary = summarize_fortune_with_llm(total_text, zodiac_sign, request.user.id)
 
-        # 음식 데이터 로드
-        all_foods = load_food_data()
-        matching_foods = self._get_food_by_color(lucky_color, all_foods)
+        # 오늘 날짜로 기존 추천이 있는지 확인
+        today = date.today()
+        existing_recommendation = DailyRecommendation.objects.filter(
+            user=request.user,
+            recommendation_date=today,
+            recommendation_type='MENU'
+        ).first()
 
-        # 추천 음식 선택
-        if len(matching_foods) >= 2:
-            recommended_list = random.sample(matching_foods, 2)
-        elif len(matching_foods) == 1:
-            recommended_list = matching_foods
+        if existing_recommendation:
+            # 기존 추천이 있으면 DB에서 가져오기
+            saved_data = existing_recommendation.recommendation_data
+            recommendations = saved_data.get('recommendations', [])
+            other_recommendations = saved_data.get('other_recommendations', [])
         else:
-            recommended_list = random.sample(all_foods, min(2, len(all_foods)))
+            # 새로 생성
+            all_foods = load_food_data()
+            matching_foods = self._get_food_by_color(lucky_color, all_foods)
 
-        # 추천 형식화
-        recommendations = []
-        for idx, food in enumerate(recommended_list, 1):
-            recommendations.append({
-                'rank': idx,
-                'color': lucky_color,
-                'menu': {
-                    'name': food.get('name_ko', ''),
-                    'category': food.get('type', '기타'),
-                    'icon': self._get_emoji_for_food(food),
-                    'desc': food.get('desc', f"행운의 {lucky_color} 에너지를 담은 음식입니다.")
-                },
-                'bg_gradient': self._get_gradient_for_color(lucky_color)
-            })
+            # 추천 음식 선택
+            if len(matching_foods) >= 2:
+                recommended_list = random.sample(matching_foods, 2)
+            elif len(matching_foods) == 1:
+                recommended_list = matching_foods
+            else:
+                recommended_list = random.sample(all_foods, min(2, len(all_foods)))
 
-        # 다른 추천
-        recommended_ids = [f.get('id') for f in recommended_list]
-        other_foods = [f for f in all_foods if f.get('id') not in recommended_ids]
-        other_list = random.sample(other_foods, min(6, len(other_foods))) if other_foods else []
+            # 추천 형식화
+            recommendations = []
+            for idx, food in enumerate(recommended_list, 1):
+                recommendations.append({
+                    'rank': idx,
+                    'color': lucky_color,
+                    'menu': {
+                        'name': food.get('name_ko', ''),
+                        'category': food.get('type', '기타'),
+                        'icon': self._get_emoji_for_food(food),
+                        'desc': food.get('desc', f"행운의 {lucky_color} 에너지를 담은 음식입니다.")
+                    },
+                    'bg_gradient': self._get_gradient_for_color(lucky_color)
+                })
 
-        other_recommendations = [
-            {
-                'color': self._get_korean_color(food.get('color_category', '')),
-                'menu': {
-                    'name': food.get('name_ko', ''),
-                    'category': food.get('type', '기타'),
-                    'icon': self._get_emoji_for_food(food),
+            # 다른 추천
+            recommended_ids = [f.get('id') for f in recommended_list]
+            other_foods = [f for f in all_foods if f.get('id') not in recommended_ids]
+            other_list = random.sample(other_foods, min(6, len(other_foods))) if other_foods else []
+
+            other_recommendations = [
+                {
+                    'color': self._get_korean_color(food.get('color_category', '')),
+                    'menu': {
+                        'name': food.get('name_ko', ''),
+                        'category': food.get('type', '기타'),
+                        'icon': self._get_emoji_for_food(food),
+                    }
                 }
-            }
-            for food in other_list
-        ]
+                for food in other_list
+            ]
+
+            # DB에 저장
+            DailyRecommendation.objects.create(
+                user=request.user,
+                recommendation_date=today,
+                recommendation_type='MENU',
+                recommendation_data={
+                    'recommendations': recommendations,
+                    'other_recommendations': other_recommendations
+                }
+            )
 
         return Response({
             'success': True,
@@ -630,7 +675,7 @@ class MenuRecommendationAPIView(APIView):
                 'lucky_colors': lucky_colors,
                 'fortune_summary': fortune_summary,
             },
-            'date': str(date.today())
+            'date': str(today)
         })
 
     def _get_food_by_color(self, lucky_color, foods):
