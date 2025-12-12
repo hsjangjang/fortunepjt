@@ -239,15 +239,11 @@ class FortuneCalculator:
             print("[DEBUG] 캐시된 운세 텍스트 사용")
             return cached_result
 
-        # GMS API 먼저 시도 (OpenAI 모델용 URL 사용)
-        gms_api_key = getattr(settings, 'GMS_API_KEY', '')
-        gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+        # OpenAI API 사용
+        openai_api_key = getattr(settings, 'OPENAI_API_KEY', '')
 
-        # Gemini API (백업)
-        gemini_api_key = settings.GEMINI_API_KEY
-
-        if not gms_api_key and not gemini_api_key:
-            print("[ERROR] API 키가 설정되지 않음 (GMS_API_KEY 또는 GEMINI_API_KEY)")
+        if not openai_api_key:
+            print("[ERROR] OPENAI_API_KEY가 설정되지 않음")
             return None
 
         max_retries = 1
@@ -322,52 +318,20 @@ class FortuneCalculator:
 }}}}
 """
 
-        # 1. GMS API (GPT-5-nano) 먼저 시도 - 1크레딧으로 효율적
-        if gms_api_key:
-            for attempt in range(max_retries + 1):
-                try:
-                    from openai import OpenAI
-                    client = OpenAI(api_key=gms_api_key, base_url=gms_api_base)
-
-                    print(f"[DEBUG] GMS GPT-5-nano 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
-                    response = client.chat.completions.create(
-                        model="gpt-5-nano",
-                        messages=[{"role": "user", "content": prompt}],
-                        max_completion_tokens=4000
-                    )
-
-                    text = response.choices[0].message.content.strip()
-                    if text.startswith('```json'):
-                        text = text[7:]
-                    if text.startswith('```'):
-                        text = text[3:]
-                    if text.endswith('```'):
-                        text = text[:-3]
-
-                    result = json.loads(text.strip())
-                    print("[DEBUG] GMS GPT-5-nano 운세 생성 성공!")
-
-                    # 결과 캐싱 (24시간)
-                    cache.set(cache_key, result, 60 * 60 * 24)
-                    return result
-
-                except Exception as e:
-                    print(f"[ERROR] GMS GPT-5-nano 운세 생성 오류 (시도: {attempt + 1}): {e}")
-                    if attempt < max_retries:
-                        time.sleep(retry_delay)
-                    continue
-
-        # 2. Gemini API 백업 시도
-        if gemini_api_key:
+        # OpenAI API (gpt-4o-mini) 사용
+        for attempt in range(max_retries + 1):
             try:
-                import google.generativeai as genai
-                genai.configure(api_key=gemini_api_key)
-                model = genai.GenerativeModel('gemini-2.0-flash')
+                from openai import OpenAI
+                client = OpenAI(api_key=openai_api_key)
 
-                print("[DEBUG] Gemini 운세 생성 요청 (백업)...")
-                response = model.generate_content(prompt)
+                print(f"[DEBUG] OpenAI gpt-4o-mini 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
+                response = client.chat.completions.create(
+                    model="gpt-4o-mini",
+                    messages=[{"role": "user", "content": prompt}],
+                    max_tokens=4000
+                )
 
-                text = response.text.strip()
+                text = response.choices[0].message.content.strip()
                 if text.startswith('```json'):
                     text = text[7:]
                 if text.startswith('```'):
@@ -376,16 +340,20 @@ class FortuneCalculator:
                     text = text[:-3]
 
                 result = json.loads(text.strip())
-                print("[DEBUG] Gemini 운세 생성 성공!")
+                print("[DEBUG] OpenAI gpt-4o-mini 운세 생성 성공!")
 
+                # 결과 캐싱 (24시간)
                 cache.set(cache_key, result, 60 * 60 * 24)
                 return result
 
             except Exception as e:
-                print(f"[ERROR] Gemini 운세 생성 오류: {e}")
+                print(f"[ERROR] OpenAI gpt-4o-mini 운세 생성 오류 (시도: {attempt + 1}): {e}")
+                if attempt < max_retries:
+                    time.sleep(retry_delay)
+                continue
 
-        # 모든 API 실패
-        print("[ERROR] 모든 LLM API 시도 실패, 동적 텍스트 생성으로 대체")
+        # API 실패
+        print("[ERROR] OpenAI API 시도 실패, 동적 텍스트 생성으로 대체")
         return None
     
     def _calculate_all_fortunes(self, birth_date: date, today: date, saju_data: Dict = None) -> Dict:
