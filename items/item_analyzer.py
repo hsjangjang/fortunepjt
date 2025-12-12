@@ -137,45 +137,51 @@ class ItemAnalyzer:
                     pass
 
     def analyze_image_with_ai(self, image_path):
-        """Gemini 2.5 Flash Vision API를 사용한 AI 이미지 분석 (GMS)"""
+        """Gemini Vision API를 사용한 AI 이미지 분석 (Google Cloud 직접 → GMS fallback)"""
         print(f"[DEBUG] AI 분석 시작: {image_path}")
         try:
             import requests
+            import io
             from django.conf import settings
 
-            # GMS API 설정 (Gemini 모델용 URL 사용)
-            api_key = getattr(settings, 'GMS_API_KEY', '')
-            # GMS Gemini URL: gemini.googleapis.com (NOT generativelanguage)
-            gemini_base_url = getattr(settings, 'GMS_GEMINI_BASE_URL', 'https://gms.ssafy.io/gmsapi/gemini.googleapis.com/v1beta')
+            # API 키 설정
+            # 1차: Google Cloud 직접 연결 (GEMINI_API_KEY)
+            # 2차: GMS 프록시 (GMS_API_KEY)
+            gemini_api_key = getattr(settings, 'GEMINI_API_KEY', '')
+            gms_api_key = getattr(settings, 'GMS_API_KEY', '')
 
-            print(f"[DEBUG] GMS API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
-            print(f"[DEBUG] GMS Gemini Base URL: {gemini_base_url}")
+            print(f"[DEBUG] Gemini API 키: {'있음' if gemini_api_key else '없음'}")
+            print(f"[DEBUG] GMS API 키: {'있음' if gms_api_key else '없음'}")
 
-            if not api_key:
-                raise ValueError("GMS_API_KEY not configured")
+            if not gemini_api_key and not gms_api_key:
+                raise ValueError("API 키가 설정되지 않음 (GEMINI_API_KEY 또는 GMS_API_KEY 필요)")
 
-            # 이미지 리사이징 (GMS 프록시 body size 제한 회피, 해상도 유지하면서 용량만 줄임)
+            # 이미지 로드
             img = Image.open(image_path)
-
-            # 최대 1024px로 리사이징 (색상 분석에 충분한 해상도)
-            max_size = 1024
-            if img.width > max_size or img.height > max_size:
-                img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
 
             # RGB로 변환 (RGBA인 경우)
             if img.mode in ('RGBA', 'P'):
                 img = img.convert('RGB')
 
-            # JPEG로 저장 (quality 85 - 품질 유지하면서 용량 줄임)
-            import io
-            buffer = io.BytesIO()
-            img.save(buffer, format='JPEG', quality=85)
-            image_data = buffer.getvalue()
+            # Google Cloud 직접 연결용 이미지 (리사이징 불필요, 고품질 유지)
+            buffer_full = io.BytesIO()
+            # 원본이 너무 크면 2048px로 제한 (Google Cloud도 20MB 제한 있음)
+            if img.width > 2048 or img.height > 2048:
+                img_full = img.copy()
+                img_full.thumbnail((2048, 2048), Image.Resampling.LANCZOS)
+                img_full.save(buffer_full, format='JPEG', quality=90)
+            else:
+                img.save(buffer_full, format='JPEG', quality=90)
+            image_data_full = buffer_full.getvalue()
 
-            print(f"[DEBUG] 이미지 크기: {len(image_data)} bytes, {img.width}x{img.height}")
+            # GMS용 이미지 (작게 리사이징 - 프록시 제한 회피)
+            img_small = img.copy()
+            img_small.thumbnail((512, 512), Image.Resampling.LANCZOS)
+            buffer_small = io.BytesIO()
+            img_small.save(buffer_small, format='JPEG', quality=60)
+            image_data_small = buffer_small.getvalue()
 
-            base64_image = base64.b64encode(image_data).decode('utf-8')
-            mime_type = 'image/jpeg'
+            print(f"[DEBUG] 이미지 크기 - 원본: {len(image_data_full)} bytes, GMS용: {len(image_data_small)} bytes")
 
             prompt = """
             이미지에서 **전경의 메인 물체**만 분석하세요.
@@ -201,66 +207,77 @@ class ItemAnalyzer:
             JSON만 응답.
             """
 
-            # Gemini API 요청 데이터 구성
-            request_data = {
-                "contents": [
-                    {
-                        "parts": [
-                            {"text": prompt},
-                            {
-                                "inline_data": {
-                                    "mime_type": mime_type,
-                                    "data": base64_image
-                                }
-                            }
-                        ]
-                    }
-                ],
-                "generationConfig": {
-                    "temperature": 0.4,
-                    "maxOutputTokens": 1000
-                }
-            }
+            # API 엔드포인트 목록 (우선순위: Google Cloud 직접 → GMS fallback)
+            api_endpoints = []
 
-            # API 엔드포인트 목록 (fallback 방식)
-            api_endpoints = [
-                # 1차: gemini-2.5-flash (이전에 작동하던 모델)
-                (gemini_base_url, "gemini-2.5-flash"),
-                # 2차: gemini-2.0-flash
-                (gemini_base_url, "gemini-2.0-flash"),
-                # 3차 fallback: generativelanguage + gemini-2.0-flash-exp
-                ("https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta", "gemini-2.0-flash-exp-image-generation"),
-            ]
+            # 1차: Google Cloud 직접 연결 (GEMINI_API_KEY가 있을 때)
+            if gemini_api_key:
+                api_endpoints.append({
+                    'name': 'Google Cloud Direct',
+                    'url': 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent',
+                    'api_key': gemini_api_key,
+                    'image_data': image_data_full,  # 고품질 이미지 사용
+                })
+
+            # 2차: GMS 프록시 (fallback)
+            if gms_api_key:
+                gms_base = 'https://gms.ssafy.io/gmsapi/gemini.googleapis.com/v1beta'
+                api_endpoints.extend([
+                    {
+                        'name': 'GMS gemini-2.0-flash',
+                        'url': f'{gms_base}/models/gemini-2.0-flash:generateContent',
+                        'api_key': gms_api_key,
+                        'image_data': image_data_small,  # 작은 이미지 사용
+                    },
+                    {
+                        'name': 'GMS gemini-2.5-flash',
+                        'url': f'{gms_base}/models/gemini-2.5-flash:generateContent',
+                        'api_key': gms_api_key,
+                        'image_data': image_data_small,
+                    },
+                ])
 
             response = None
             last_error = None
 
-            for base_url, model_name in api_endpoints:
-                gemini_url = f"{base_url}/models/{model_name}:generateContent?key={api_key}"
-                print(f"[DEBUG] Gemini API 시도: {model_name} @ {base_url[:50]}...")
+            for endpoint in api_endpoints:
+                base64_image = base64.b64encode(endpoint['image_data']).decode('utf-8')
+
+                request_data = {
+                    "contents": [{
+                        "parts": [
+                            {"text": prompt},
+                            {"inline_data": {"mime_type": "image/jpeg", "data": base64_image}}
+                        ]
+                    }],
+                    "generationConfig": {"temperature": 0.4, "maxOutputTokens": 1000}
+                }
+
+                full_url = f"{endpoint['url']}?key={endpoint['api_key']}"
+                print(f"[DEBUG] API 시도: {endpoint['name']}")
 
                 try:
                     response = requests.post(
-                        gemini_url,
+                        full_url,
                         json=request_data,
                         headers={"Content-Type": "application/json"},
                         timeout=30
                     )
 
                     if response.status_code == 200:
-                        print(f"[DEBUG] 성공: {model_name}")
+                        print(f"[DEBUG] 성공: {endpoint['name']}")
                         break
                     else:
                         last_error = f"{response.status_code} - {response.text[:200]}"
-                        print(f"[WARN] {model_name} 실패: {last_error}")
+                        print(f"[WARN] {endpoint['name']} 실패: {last_error}")
                         response = None
                 except Exception as e:
                     last_error = str(e)
-                    print(f"[WARN] {model_name} 예외: {last_error}")
+                    print(f"[WARN] {endpoint['name']} 예외: {last_error}")
                     response = None
 
             if response is None or response.status_code != 200:
-                print(f"[ERROR] 모든 Gemini API 엔드포인트 실패: {last_error}")
+                print(f"[ERROR] 모든 API 엔드포인트 실패: {last_error}")
                 raise ValueError(f"Gemini API error: {last_error}")
 
             result = response.json()

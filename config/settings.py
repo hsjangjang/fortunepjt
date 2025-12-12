@@ -316,7 +316,10 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Fortune Life <noreply
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
 OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-3.5-turbo')
 
-# GMS (Gen AI Management System) API
+# Google Cloud Gemini API (직접 연결 - 우선 사용)
+GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
+
+# GMS (Gen AI Management System) API (fallback)
 GMS_API_KEY = config('GMS_API_KEY', default='')  # GMS API 키
 # OpenAI 모델용 (gpt-4o-mini, gpt-5-nano 등)
 GMS_OPENAI_BASE_URL = config('GMS_OPENAI_BASE_URL', default='https://gms.ssafy.io/gmsapi/api.openai.com/v1')
