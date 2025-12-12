@@ -24,9 +24,12 @@ class ItemListAPIView(APIView):
         if favorite_only == 'true':
             items = items.filter(is_favorite=True)
 
+        # 유저별 순번 계산 (최신순이므로 역순)
+        total_count = items.count()
         items_data = [
             {
                 'id': item.id,
+                'user_order': total_count - idx,  # 유저별 순번 (최신이 가장 큰 번호)
                 'item_name': item.item_name,
                 'main_category': item.main_category,
                 'sub_categories': item.sub_categories,
@@ -37,7 +40,7 @@ class ItemListAPIView(APIView):
                 'is_favorite': item.is_favorite,
                 'created_at': item.created_at.isoformat()
             }
-            for item in items
+            for idx, item in enumerate(items)
         ]
 
         return Response({
@@ -116,10 +119,17 @@ class ItemDetailAPIView(APIView):
                 'error': '아이템을 찾을 수 없습니다.'
             }, status=status.HTTP_404_NOT_FOUND)
 
+        # 유저별 순번 계산 (등록순 기준)
+        user_order = UserItem.objects.filter(
+            user=request.user,
+            created_at__lte=item.created_at
+        ).count()
+
         return Response({
             'success': True,
             'item': {
                 'id': item.id,
+                'user_order': user_order,  # 유저별 순번
                 'item_name': item.item_name,
                 'main_category': item.main_category,
                 'sub_categories': item.sub_categories,

@@ -368,34 +368,53 @@ class ItemAnalyzer:
         return english_to_korean.get(english_lower, english_name)
 
     def _color_name_to_hex(self, color_name):
-        """색상 이름을 HEX로 변환 (대략적)"""
+        """색상 이름을 HEX로 변환 (프론트엔드 colorMap과 동기화)"""
         color_name_lower = color_name.lower()
-        
+
+        # 프론트엔드 colors.js의 colorMap과 동일하게 매핑
         color_map = {
-            # 기본 색상
-            '빨간색': '#FF0000', '빨강': '#FF0000', '레드': '#FF0000', '적색': '#FF0000',
-            '주황색': '#FFA500', '오렌지': '#FFA500', '주황': '#FFA500',
-            '노란색': '#FFD700', '노랑': '#FFD700', '옐로우': '#FFD700', '황색': '#FFD700',
-            '귤색': '#FF8C00', '밝은 귤색': '#FFA54F', '진한 주황색': '#FF8C00',
-            '초록색': '#00FF00', '초록': '#00FF00', '그린': '#00FF00', '녹색': '#00FF00',
-            '연두색': '#90EE90', '민트': '#98FF98', '민트 그린': '#98FF98', '연두': '#90EE90',
-            '파란색': '#0000FF', '파랑': '#0000FF', '블루': '#0000FF', '청색': '#0000FF',
-            '네이비': '#000080', '네이비 블루': '#000080', '남색': '#000080', '감청색': '#000080',
-            '하늘색': '#87CEEB', '스카이블루': '#87CEEB', '하늘': '#87CEEB', '연한 파란색': '#ADD8E6',
-            '보라색': '#800080', '보라': '#800080', '퍼플': '#800080', '자주색': '#8B008B', '자주': '#8B008B',
-            '핑크': '#FFC0CB', '분홍색': '#FFC0CB', '분홍': '#FFC0CB', '연분홍': '#FFB6C1',
-            '파스텔 핑크': '#FFB6C1', '연한 분홍색': '#FFB6C1',
-            '갈색': '#8B4513', '브라운': '#8B4513', '갈색': '#8B4513', '짙은 갈색': '#654321',
-            '베이지': '#F5DEB3', '베이지색': '#F5DEB3', '살구색': '#FFCC99', '살구': '#FFCC99',
-            '아이보리': '#FFFFF0', '크림색': '#FFFDD0',
-            '회색': '#808080', '그레이': '#808080', '차콜': '#36454F', '은색': '#C0C0C0',
-            '차콜 그레이': '#36454F', '짙은 회색': '#696969', '연한 회색': '#D3D3D3',
-            '검은색': '#000000', '검정': '#000000', '블랙': '#000000', '흑색': '#000000',
-            '흰색': '#FFFFFF', '하양': '#FFFFFF', '화이트': '#FFFFFF', '백색': '#FFFFFF',
-            '금색': '#FFD700', '골드': '#FFD700',
-            '은색': '#C0C0C0', '실버': '#C0C0C0',
-            '산호색': '#FF7F50', '산호': '#FF7F50', '코랄': '#FF7F50',
-            '진한 노란색': '#FFA500', '진노란색': '#FFA500', '겨자색': '#FFDB58',
+            # 검은색 계열
+            '검은색': '#1f2937', '검정': '#1f2937', '검정색': '#1f2937', '블랙': '#1f2937', '흑색': '#1f2937',
+            # 흰색 계열
+            '흰색': '#f3f4f6', '하양': '#f3f4f6', '하얀색': '#f3f4f6', '화이트': '#f3f4f6', '백색': '#f3f4f6',
+            # 회색 계열
+            '회색': '#6B7280', '그레이': '#6B7280', '그래이': '#6B7280',
+            '차콜': '#36454F', '차콜 그레이': '#36454F', '짙은 회색': '#36454F',
+            # 빨간색 계열
+            '빨간색': '#EF4444', '빨강': '#EF4444', '레드': '#EF4444', '적색': '#EF4444',
+            '진한 빨간색': '#B91C1C', '다크레드': '#B91C1C',
+            '와인': '#722F37', '버건디': '#800020', '마룬': '#800000',
+            '코랄': '#FF7F50', '산호색': '#FF7F50', '산호': '#FF7F50', '살몬': '#FA8072',
+            # 분홍색 계열
+            '분홍색': '#F472B6', '분홍': '#F472B6', '핑크': '#F472B6',
+            '연분홍': '#F472B6', '파스텔 핑크': '#F472B6', '연한 분홍색': '#F472B6',
+            # 주황색 계열
+            '주황색': '#F59E0B', '주황': '#F59E0B', '오렌지': '#F59E0B',
+            '귤색': '#F59E0B', '밝은 귤색': '#F59E0B', '진한 주황색': '#F59E0B',
+            # 노란색 계열
+            '노란색': '#FCD34D', '노랑': '#FCD34D', '옐로우': '#FCD34D', '황색': '#FCD34D',
+            '진한 노란색': '#F59E0B', '진노란색': '#F59E0B', '겨자색': '#FCD34D',
+            '금색': '#FFD700', '금': '#FFD700', '골드': '#FFD700', '황금색': '#FFD700',
+            # 초록색 계열
+            '초록색': '#10B981', '초록': '#10B981', '녹색': '#10B981', '그린': '#10B981',
+            '연두색': '#84CC16', '연두': '#84CC16',
+            '민트': '#98FF98', '민트색': '#98FF98', '민트 그린': '#98FF98',
+            '카키': '#8B8B00', '올리브': '#808000',
+            # 파란색 계열
+            '파란색': '#3B82F6', '파랑': '#3B82F6', '블루': '#3B82F6', '청색': '#3B82F6',
+            '하늘색': '#38BDF8', '스카이블루': '#38BDF8', '하늘': '#38BDF8', '연한 파란색': '#38BDF8',
+            '남색': '#1E3A8A', '네이비': '#1E3A8A', '네이비 블루': '#1E3A8A', '감청색': '#1E3A8A',
+            '터콰이즈': '#40E0D0', '청록': '#008B8B', '청록색': '#008B8B',
+            # 보라색 계열
+            '보라색': '#8B5CF6', '보라': '#8B5CF6', '퍼플': '#8B5CF6',
+            '자주색': '#8B5CF6', '자주': '#8B5CF6',
+            '연보라색': '#DA70D6', '연보라': '#E6E6FA', '라벤더': '#E6E6FA',
+            # 갈색 계열
+            '갈색': '#92400E', '브라운': '#92400E', '짙은 갈색': '#92400E',
+            '베이지': '#E7E5E4', '베이지색': '#E7E5E4',
+            '아이보리': '#FFFFF0', '크림색': '#FFFDD0', '살구색': '#FFCC99', '살구': '#FFCC99',
+            # 은색
+            '은색': '#C0C0C0', '은': '#C0C0C0', '실버': '#C0C0C0',
         }
         
         # 정확한 매칭
@@ -408,33 +427,41 @@ class ItemAnalyzer:
             if key in color_name_lower or color_name_lower in key:
                 return hex_val
         
-        # 키워드 기반 매칭
-        if '노란' in color_name_lower or '노랑' in color_name_lower or '옐로' in color_name_lower or '황' in color_name_lower:
+        # 키워드 기반 매칭 (프론트엔드 colorMap과 동기화된 HEX 값 사용)
+        if '노란' in color_name_lower or '노랑' in color_name_lower or '옐로' in color_name_lower:
+            return '#FCD34D'
+        elif '황' in color_name_lower or '금' in color_name_lower or '골드' in color_name_lower:
             return '#FFD700'
         elif '초록' in color_name_lower or '녹' in color_name_lower or '그린' in color_name_lower:
-            return '#00FF00'
-        elif '파란' in color_name_lower or '파랑' in color_name_lower or '청' in color_name_lower or '블루' in color_name_lower:
-            return '#0000FF'
+            return '#10B981'
+        elif '하늘' in color_name_lower or '스카이' in color_name_lower:
+            return '#38BDF8'
+        elif '파란' in color_name_lower or '파랑' in color_name_lower or '블루' in color_name_lower:
+            return '#3B82F6'
+        elif '남' in color_name_lower or '네이비' in color_name_lower:
+            return '#1E3A8A'
         elif '빨간' in color_name_lower or '빨강' in color_name_lower or '적' in color_name_lower or '레드' in color_name_lower:
-            return '#FF0000'
+            return '#EF4444'
         elif '검은' in color_name_lower or '검정' in color_name_lower or '흑' in color_name_lower or '블랙' in color_name_lower:
-            return '#000000'
+            return '#1f2937'
         elif '흰' in color_name_lower or '하얀' in color_name_lower or '백' in color_name_lower or '화이트' in color_name_lower:
-            return '#FFFFFF'
-        elif '회색' in color_name_lower or '그레이' in color_name_lower or '회' in color_name_lower:
-            return '#808080'
+            return '#f3f4f6'
+        elif '회색' in color_name_lower or '그레이' in color_name_lower:
+            return '#6B7280'
         elif '갈색' in color_name_lower or '브라운' in color_name_lower:
-            return '#8B4513'
+            return '#92400E'
         elif '보라' in color_name_lower or '퍼플' in color_name_lower or '자주' in color_name_lower:
-            return '#800080'
+            return '#8B5CF6'
         elif '핑크' in color_name_lower or '분홍' in color_name_lower:
-            return '#FFC0CB'
+            return '#F472B6'
         elif '주황' in color_name_lower or '오렌지' in color_name_lower:
-            return '#FFA500'
-        
+            return '#F59E0B'
+        elif '베이지' in color_name_lower:
+            return '#E7E5E4'
+
         # 기본값 (회색)
         print(f"[WARNING] 알 수 없는 색상: {color_name}, 회색으로 표시")
-        return '#808080'
+        return '#6B7280'
     
     def analyze_image(self, image_path):
         """이미지 분석 메인 함수"""

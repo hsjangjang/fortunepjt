@@ -7,6 +7,7 @@
           <h1 class="page-title">
             <i class="fas fa-search text-primary"></i>
             아이템 상세 분석
+            <span v-if="item && item.user_order" class="item-number">#{{ item.user_order }}</span>
           </h1>
           <p class="page-subtitle">AI가 분석한 아이템의 상세 정보입니다</p>
         </div>
@@ -389,6 +390,17 @@ onMounted(() => {
 </script>
 
 <style scoped>
+/* 아이템 번호 */
+.item-number {
+  font-size: 0.7em;
+  color: #a78bfa;
+  background: rgba(124, 58, 237, 0.2);
+  padding: 0.2em 0.5em;
+  border-radius: 8px;
+  margin-left: 0.5rem;
+  vertical-align: middle;
+}
+
 /* 아이템 이미지 섹션 */
 .item-image-container {
   width: 100%;
