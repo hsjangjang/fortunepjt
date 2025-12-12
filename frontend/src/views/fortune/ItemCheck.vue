@@ -149,13 +149,17 @@
                 </div>
 
                 <div class="d-flex flex-column flex-sm-row justify-content-center gap-3 mt-4">
-                  <button class="btn btn-primary btn-lg rounded-pill px-4" @click="resetUpload">
-                    <i class="fas fa-redo me-2"></i> 다시 측정
+                  <button
+                    class="btn btn-primary btn-lg rounded-pill px-4"
+                    :disabled="isAnalyzing"
+                    @click="resetUpload"
+                  >
+                    <i class="fas fa-redo me-2"></i> 다른 아이템 측정
                   </button>
                   <button
                     v-if="canSaveItem"
                     class="btn btn-outline-light btn-lg rounded-pill px-4"
-                    :disabled="isRegistering"
+                    :disabled="isRegistering || isAnalyzing"
                     @click="registerAsMyItem"
                   >
                     <span v-if="isRegistering">
@@ -253,6 +257,7 @@ const userItems = ref([])
 const currentAnalysisFile = ref(null)  // 분석한 원본 파일 저장
 const isFromExistingItem = ref(false)  // 기존 아이템에서 선택한 경우
 const isRegistering = ref(false)  // 등록 중 상태
+const isAnalyzing = ref(false)  // 분석 중 상태
 const analysisResult = ref(null)  // AI 분석 결과 저장
 const luckyItems = ref({
   main: '미니 키링',
@@ -327,6 +332,7 @@ const analyzeItem = async (file, imageData) => {
   showResult.value = true
   currentAnalysisFile.value = file  // 원본 파일 저장
   isFromExistingItem.value = false  // 새로 업로드한 아이템
+  isAnalyzing.value = true  // 분석 중 상태 설정
   // 분석 시작 시 이전 결과 초기화
   detectedItem.value = '분석 중...'
   detectedColors.value = []
@@ -335,6 +341,7 @@ const analyzeItem = async (file, imageData) => {
   luckScore.value = 0
   matchTitle.value = '분석 중...'
   matchDescription.value = '아이템을 분석하고 있습니다.'
+  analysisResult.value = null  // 분석 결과 초기화
 
   const formData = new FormData()
   formData.append('image', file)
@@ -372,6 +379,7 @@ const analyzeItem = async (file, imageData) => {
         }
         updateMatchDescription(result.score, detectedItem.value, result.matchedColor)
       }
+      isAnalyzing.value = false  // 분석 완료
     } else {
       showToast(data.message || '분석에 실패했습니다.', 'error')
       resetUpload()
@@ -609,6 +617,8 @@ const resetUpload = () => {
   displayLuckScore.value = 0
   currentAnalysisFile.value = null
   isFromExistingItem.value = false
+  isAnalyzing.value = false  // 분석 상태 초기화
+  analysisResult.value = null  // 분석 결과 초기화
   if (cameraInput.value) cameraInput.value.value = ''
   if (galleryInput.value) galleryInput.value.value = ''
 }
