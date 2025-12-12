@@ -51,6 +51,8 @@ class ItemListAPIView(APIView):
 
     def post(self, request):
         """아이템 생성"""
+        import json
+
         image = request.FILES.get('image')
         if not image:
             return Response({
@@ -59,24 +61,47 @@ class ItemListAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 이미지 분석 (업로드 파일 직접 처리 - 임시 파일 관리 내장)
-            from .item_analyzer import ImageColorAnalyzer
-            analyzer = ImageColorAnalyzer()
-            analysis_result = analyzer.analyze_from_file_or_upload(image)
+            # 이미 분석된 데이터가 있는지 확인 (행운템 분석에서 넘어온 경우)
+            pre_analyzed = request.data.get('pre_analyzed') == 'true'
 
-            # 아이템 생성
-            item = UserItem.objects.create(
-                user=request.user,
-                image=image,
-                item_name=request.data.get('item_name', '새 아이템'),
-                main_category=request.data.get('main_category', 'etc'),
-                sub_categories=request.data.getlist('sub_categories', []),
-            )
+            if pre_analyzed:
+                # 이미 분석된 결과 사용 (재분석 스킵)
+                try:
+                    dominant_colors = json.loads(request.data.get('dominant_colors', '[]'))
+                    ai_analysis = json.loads(request.data.get('ai_analysis', '{}'))
+                except json.JSONDecodeError:
+                    dominant_colors = []
+                    ai_analysis = {}
 
-            if analysis_result.get('success'):
-                item.dominant_colors = analysis_result['colors']
-                item.ai_analysis_result = analysis_result.get('ai_analysis', {})
-                item.save()
+                # 아이템 생성
+                item = UserItem.objects.create(
+                    user=request.user,
+                    image=image,
+                    item_name=request.data.get('item_name', '새 아이템'),
+                    main_category=request.data.get('main_category', 'etc'),
+                    sub_categories=request.data.getlist('sub_categories', []),
+                    dominant_colors=dominant_colors,
+                    ai_analysis_result=ai_analysis
+                )
+            else:
+                # 새로 분석 수행
+                from .item_analyzer import ImageColorAnalyzer
+                analyzer = ImageColorAnalyzer()
+                analysis_result = analyzer.analyze_from_file_or_upload(image)
+
+                # 아이템 생성
+                item = UserItem.objects.create(
+                    user=request.user,
+                    image=image,
+                    item_name=request.data.get('item_name', '새 아이템'),
+                    main_category=request.data.get('main_category', 'etc'),
+                    sub_categories=request.data.getlist('sub_categories', []),
+                )
+
+                if analysis_result.get('success'):
+                    item.dominant_colors = analysis_result['colors']
+                    item.ai_analysis_result = analysis_result.get('ai_analysis', {})
+                    item.save()
 
             return Response({
                 'success': True,

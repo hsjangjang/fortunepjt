@@ -247,6 +247,21 @@ const handleDrop = (e) => {
   }
 }
 
+// base64를 File 객체로 변환하는 함수
+const base64ToFile = (base64String, filename) => {
+  // base64 데이터에서 mime type과 데이터 부분 분리
+  const arr = base64String.split(',')
+  const mimeMatch = arr[0].match(/:(.*?);/)
+  const mime = mimeMatch ? mimeMatch[1] : 'image/jpeg'
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}
+
 // ItemCheck에서 넘어온 데이터 처리
 onMounted(() => {
   const itemCheckData = sessionStorage.getItem('itemCheckData')
@@ -261,9 +276,13 @@ onMounted(() => {
         formData.value.item_name = data.itemName
       }
 
-      // 이미지 미리보기 설정 (base64)
+      // 이미지 미리보기 설정 및 File 객체 생성 (base64)
       if (data.imagePreview) {
         imagePreview.value = data.imagePreview
+        // base64를 File 객체로 변환하여 formData에 설정
+        const file = base64ToFile(data.imagePreview, `item_${Date.now()}.jpg`)
+        formData.value.image = file
+        fileName.value = `선택된 파일: ${file.name}`
       }
     } catch (e) {
       console.error('ItemCheck 데이터 파싱 실패:', e)
@@ -272,6 +291,12 @@ onMounted(() => {
 })
 
 const handleSubmit = async () => {
+  // 이미지 필수 체크
+  if (!formData.value.image) {
+    alert('이미지를 선택해주세요.')
+    return
+  }
+
   // 소분류 검증
   if (formData.value.main_category &&
       formData.value.main_category !== 'etc' &&

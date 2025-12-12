@@ -155,10 +155,15 @@
                   <button
                     v-if="canSaveItem"
                     class="btn btn-outline-light btn-lg rounded-pill px-4"
-                    @click="goToUploadPage"
+                    :disabled="isRegistering"
+                    @click="registerAsMyItem"
                   >
-                    <i class="fas fa-plus me-2"></i>
-                    내 아이템으로 등록
+                    <span v-if="isRegistering">
+                      <i class="fas fa-spinner fa-spin me-2"></i> 등록 중...
+                    </span>
+                    <span v-else>
+                      <i class="fas fa-plus me-2"></i> 등록하기
+                    </span>
                   </button>
                 </div>
               </div>
@@ -247,6 +252,8 @@ const matchDescription = ref('아이템을 분석하고 있습니다.')
 const userItems = ref([])
 const currentAnalysisFile = ref(null)  // 분석한 원본 파일 저장
 const isFromExistingItem = ref(false)  // 기존 아이템에서 선택한 경우
+const isRegistering = ref(false)  // 등록 중 상태
+const analysisResult = ref(null)  // AI 분석 결과 저장
 const luckyItems = ref({
   main: '미니 키링',
   zodiac: '실버 키링',
@@ -260,9 +267,10 @@ const luckProgressOffset = computed(() => {
 })
 
 // 저장 가능 여부 (새로 업로드한 아이템만 저장 가능)
+// 파일이 없어도 이미지 미리보기(base64)가 있으면 저장 가능
 const canSaveItem = computed(() => {
   return showResult.value &&
-         currentAnalysisFile.value !== null &&
+         (currentAnalysisFile.value !== null || itemPreview.value) &&
          !isFromExistingItem.value &&
          authStore.isAuthenticated
 })
@@ -347,6 +355,12 @@ const analyzeItem = async (file, imageData) => {
 
       detectedItem.value = data.suggested_name || data.item_name || '알 수 없음'
       detectedColors.value = colors.slice(0, 3)
+
+      // AI 분석 결과 저장 (등록 시 사용)
+      analysisResult.value = {
+        colors: colors,
+        ai_analysis: analysis.ai_analysis || {}
+      }
 
       if (colors.length > 0) {
         itemColor.value = colors[0].hex
@@ -599,21 +613,46 @@ const resetUpload = () => {
   if (galleryInput.value) galleryInput.value.value = ''
 }
 
-// 아이템 등록 페이지로 이동 (분석 데이터 전달)
-const goToUploadPage = () => {
-  if (!currentAnalysisFile.value) return
-
-  // 분석 데이터를 sessionStorage에 저장
-  const uploadData = {
-    itemName: detectedItem.value,
-    colors: detectedColors.value,
-    imagePreview: itemPreview.value
+// 내 아이템으로 바로 등록 (분석 결과 그대로 사용)
+const registerAsMyItem = async () => {
+  if (!currentAnalysisFile.value) {
+    showToast('등록할 이미지가 없습니다.', 'error')
+    return
   }
-  sessionStorage.setItem('itemCheckData', JSON.stringify(uploadData))
 
-  // 파일은 sessionStorage에 저장 불가 -> 별도 처리 필요
-  // 일단 이미지 미리보기만 전달하고, 업로드 페이지에서 다시 선택하도록 안내
-  router.push('/items/upload')
+  isRegistering.value = true
+
+  try {
+    const formData = new FormData()
+    formData.append('image', currentAnalysisFile.value)
+    formData.append('item_name', detectedItem.value || '새 아이템')
+    formData.append('main_category', 'etc')  // 기본 카테고리
+
+    // 이미 분석된 색상과 AI 분석 결과를 함께 전송
+    if (analysisResult.value) {
+      formData.append('pre_analyzed', 'true')
+      formData.append('dominant_colors', JSON.stringify(analysisResult.value.colors || []))
+      formData.append('ai_analysis', JSON.stringify(analysisResult.value.ai_analysis || {}))
+    }
+
+    const response = await api.post('/api/items/', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      timeout: 30000
+    })
+
+    if (response.data.success) {
+      showToast('아이템이 등록되었습니다!', 'success')
+      // 내 아이템 목록으로 이동
+      router.push('/items')
+    } else {
+      showToast(response.data.error || '등록에 실패했습니다.', 'error')
+    }
+  } catch (error) {
+    console.error('아이템 등록 실패:', error)
+    showToast('등록 중 오류가 발생했습니다.', 'error')
+  } finally {
+    isRegistering.value = false
+  }
 }
 
 const fetchFortuneData = async () => {
