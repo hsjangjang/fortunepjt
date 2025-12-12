@@ -520,14 +520,6 @@
     "desc": "담백한 돼지 국밥"
   },
   {
-    "id": 67,
-    "name_ko": "설렁탕",
-    "name_en": "Seolleongtang",
-    "color_category": "White",
-    "type": "Dish",
-    "desc": "진하고 뽀얀 사골 국물"
-  },
-  {
     "id": 68,
     "name_ko": "곰탕",
     "name_en": "Gomtang",
