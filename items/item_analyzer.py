@@ -126,7 +126,8 @@ class ItemAnalyzer:
 
             # GMS API 설정 (Gemini 모델용 URL 사용)
             api_key = getattr(settings, 'GMS_API_KEY', '')
-            gemini_base_url = getattr(settings, 'GMS_GEMINI_BASE_URL', 'https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com/v1beta')
+            # GMS Gemini URL: gemini.googleapis.com (NOT generativelanguage)
+            gemini_base_url = getattr(settings, 'GMS_GEMINI_BASE_URL', 'https://gms.ssafy.io/gmsapi/gemini.googleapis.com/v1beta')
 
             print(f"[DEBUG] GMS API 키 확인: {api_key[:10]}..." if api_key else "[DEBUG] API 키 없음!")
             print(f"[DEBUG] GMS Gemini Base URL: {gemini_base_url}")
@@ -204,8 +205,8 @@ class ItemAnalyzer:
             (나무 테이블의 노란색/갈색은 무시하고 반지의 금색만 분석)
             """
 
-            # Gemini API URL 구성 (GMS에서 제공하는 모델명 사용)
-            gemini_url = f"{gemini_base_url}/models/gemini-2.0-flash-exp-image-generation:generateContent?key={api_key}"
+            # Gemini API URL 구성 (GMS gemini-2.0-flash 멀티모달 모델 사용)
+            gemini_url = f"{gemini_base_url}/models/gemini-2.0-flash:generateContent?key={api_key}"
             print(f"[DEBUG] Gemini API URL: {gemini_url[:80]}...")
 
             # Gemini API 요청 데이터 구성
@@ -306,7 +307,7 @@ class ItemAnalyzer:
 
             # API 할당량 초과 에러 확인
             if '429' in error_str or 'quota' in error_str.lower() or 'rate' in error_str.lower():
-                print("[ERROR] Gemini API 할당량 초과 - Pillow fallback 없이 에러 반환")
+                print("[ERROR] Gemini API 할당량 초과")
                 return {
                     'success': False,
                     'error': 'API 할당량 초과',
@@ -315,8 +316,14 @@ class ItemAnalyzer:
                     'colors': []
                 }
 
-            # 기타 에러는 Pillow fallback
-            return self.analyze_image(image_path)
+            # 기타 에러도 그대로 반환 (Pillow fallback 제거)
+            return {
+                'success': False,
+                'error': error_str,
+                'error_type': 'ai_analysis_failed',
+                'message': f'AI 분석 실패: {error_str}',
+                'colors': []
+            }
     
     def _english_to_korean_color(self, english_name):
         """영문 색상명을 한글로 변환"""
