@@ -1,0 +1,398 @@
+[
+  {
+    "id": 1,
+    "category": "상의",
+    "name": "민소매",
+    "description": "시원하고 여성스러운 여름 스타일",
+    "min_temp": 28,
+    "max_temp": 40,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 2,
+    "category": "상의",
+    "name": "반팔 티셔츠",
+    "description": "편안한 일상복",
+    "min_temp": 23,
+    "max_temp": 35,
+    "weather_conditions": ["맑음", "흐림", "비"]
+  },
+  {
+    "id": 3,
+    "category": "상의",
+    "name": "크롭티",
+    "description": "트렌디한 여름 스타일",
+    "min_temp": 25,
+    "max_temp": 35,
+    "weather_conditions": ["맑음"]
+  },
+  {
+    "id": 4,
+    "category": "상의",
+    "name": "린넨 셔츠",
+    "description": "통기성 좋은 여름 블라우스",
+    "min_temp": 25,
+    "max_temp": 35,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 5,
+    "category": "상의",
+    "name": "얇은 긴팔 티",
+    "description": "자외선 차단과 시원함",
+    "min_temp": 20,
+    "max_temp": 28,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 6,
+    "category": "상의",
+    "name": "얇은 니트",
+    "description": "선선한 날씨에 적합",
+    "min_temp": 15,
+    "max_temp": 22,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 7,
+    "category": "상의",
+    "name": "셔츠",
+    "description": "우아하고 단정한 스타일",
+    "min_temp": 15,
+    "max_temp": 25,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 8,
+    "category": "상의",
+    "name": "맨투맨",
+    "description": "편안하고 캐주얼한 스타일",
+    "min_temp": 12,
+    "max_temp": 20,
+    "weather_conditions": ["맑음", "흐림", "비"]
+  },
+  {
+    "id": 9,
+    "category": "상의",
+    "name": "후드티",
+    "description": "활동적이고 따뜻한 느낌",
+    "min_temp": 5,
+    "max_temp": 18,
+    "weather_conditions": ["맑음", "흐림", "비"]
+  },
+  {
+    "id": 10,
+    "category": "상의",
+    "name": "니트",
+    "description": "따뜻하고 부드러운 느낌",
+    "min_temp": 5,
+    "max_temp": 15,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 11,
+    "category": "상의",
+    "name": "두꺼운 니트",
+    "description": "따뜻하고 포근한 느낌",
+    "min_temp": -5,
+    "max_temp": 10,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 12,
+    "category": "상의",
+    "name": "터틀넥",
+    "description": "목까지 따뜻한 겨울 필수템",
+    "min_temp": -10,
+    "max_temp": 5,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 13,
+    "category": "상의",
+    "name": "기모 맨투맨",
+    "description": "보온성 뛰어난 겨울 상의",
+    "min_temp": -5,
+    "max_temp": 10,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 14,
+    "category": "하의",
+    "name": "반바지",
+    "description": "시원하고 활동적인 스타일",
+    "min_temp": 25,
+    "max_temp": 40,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 15,
+    "category": "하의",
+    "name": "치마",
+    "description": "여름철 시원한 스타일",
+    "min_temp": 25,
+    "max_temp": 35,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 16,
+    "category": "하의",
+    "name": "린넨 팬츠",
+    "description": "통기성 좋은 여름 바지",
+    "min_temp": 25,
+    "max_temp": 38,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 17,
+    "category": "하의",
+    "name": "면바지",
+    "description": "편안한 일상 바지",
+    "min_temp": 18,
+    "max_temp": 30,
+    "weather_conditions": ["맑음", "흐림", "비"]
+  },
+  {
+    "id": 18,
+    "category": "하의",
+    "name": "청바지",
+    "description": "사계절 활용 가능",
+    "min_temp": 10,
+    "max_temp": 28,
+    "weather_conditions": ["맑음", "흐림", "비"]
+  },
+  {
+    "id": 19,
+    "category": "하의",
+    "name": "슬랙스",
+    "description": "깔끔하고 단정한 스타일",
+    "min_temp": 10,
+    "max_temp": 28,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 20,
+    "category": "하의",
+    "name": "롱스커트",
+    "description": "우아하고 편안한 스타일",
+    "min_temp": 15,
+    "max_temp": 30,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 21,
+    "category": "하의",
+    "name": "와이드 팬츠",
+    "description": "편안하고 트렌디한 스타일",
+    "min_temp": 15,
+    "max_temp": 30,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 22,
+    "category": "하의",
+    "name": "레깅스",
+    "description": "활동적이고 편안한 스타일",
+    "min_temp": 5,
+    "max_temp": 25,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 23,
+    "category": "하의",
+    "name": "기모 레깅스",
+    "description": "따뜻한 겨울 레깅스",
+    "min_temp": -10,
+    "max_temp": 8,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 24,
+    "category": "하의",
+    "name": "기모 바지",
+    "description": "활동성과 보온성 모두",
+    "min_temp": -10,
+    "max_temp": 10,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 25,
+    "category": "하의",
+    "name": "코듀로이 팬츠",
+    "description": "따뜻하고 레트로한 스타일",
+    "min_temp": 0,
+    "max_temp": 15,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 26,
+    "category": "하의",
+    "name": "울 팬츠",
+    "description": "겨울용 따뜻한 바지",
+    "min_temp": -5,
+    "max_temp": 10,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 27,
+    "category": "아우터",
+    "name": "얇은 가디건",
+    "description": "가볍게 걸치기 좋은 아이템",
+    "min_temp": 18,
+    "max_temp": 25,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 28,
+    "category": "아우터",
+    "name": "바람막이",
+    "description": "바람 차단에 효과적",
+    "min_temp": 12,
+    "max_temp": 22,
+    "weather_conditions": ["맑음", "흐림", "비"]
+  },
+  {
+    "id": 29,
+    "category": "아우터",
+    "name": "청자켓",
+    "description": "캐주얼하고 활용도 높은 아이템",
+    "min_temp": 12,
+    "max_temp": 20,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 30,
+    "category": "아우터",
+    "name": "가죽자켓",
+    "description": "세련되고 시크한 스타일",
+    "min_temp": 8,
+    "max_temp": 18,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 31,
+    "category": "아우터",
+    "name": "트렌치코트",
+    "description": "클래식하고 고급스러운 스타일",
+    "min_temp": 8,
+    "max_temp": 18,
+    "weather_conditions": ["맑음", "흐림", "비"]
+  },
+  {
+    "id": 32,
+    "category": "아우터",
+    "name": "블레이저",
+    "description": "단정하고 포멀한 스타일",
+    "min_temp": 12,
+    "max_temp": 22,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 33,
+    "category": "아우터",
+    "name": "코트",
+    "description": "겨울철 필수 아우터",
+    "min_temp": -5,
+    "max_temp": 10,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 34,
+    "category": "아우터",
+    "name": "패딩",
+    "description": "보온성 뛰어난 겨울 아우터",
+    "min_temp": -15,
+    "max_temp": 5,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 35,
+    "category": "아우터",
+    "name": "롱패딩",
+    "description": "강추위에 필수 아이템",
+    "min_temp": -20,
+    "max_temp": 0,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 36,
+    "category": "아우터",
+    "name": "숏패딩",
+    "description": "활동성 좋은 겨울 아우터",
+    "min_temp": -10,
+    "max_temp": 5,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 37,
+    "category": "아우터",
+    "name": "무스탕",
+    "description": "따뜻하고 세련된 스타일",
+    "min_temp": -10,
+    "max_temp": 5,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 38,
+    "category": "아우터",
+    "name": "플리스 자켓",
+    "description": "가볍고 보온성 좋은 아우터",
+    "min_temp": 0,
+    "max_temp": 12,
+    "weather_conditions": ["맑음", "흐림"]
+  },
+  {
+    "id": 39,
+    "category": "아우터",
+    "name": "레인코트",
+    "description": "비 오는 날 필수 아이템",
+    "min_temp": 10,
+    "max_temp": 25,
+    "weather_conditions": ["비"]
+  },
+  {
+    "id": 40,
+    "category": "액세서리",
+    "name": "머플러",
+    "description": "목을 따뜻하게 감싸주는 아이템",
+    "min_temp": -15,
+    "max_temp": 5,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 41,
+    "category": "액세서리",
+    "name": "장갑",
+    "description": "손을 따뜻하게 보호",
+    "min_temp": -15,
+    "max_temp": 5,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 42,
+    "category": "액세서리",
+    "name": "비니",
+    "description": "머리와 귀를 따뜻하게",
+    "min_temp": -15,
+    "max_temp": 2,
+    "weather_conditions": ["맑음", "흐림", "눈"]
+  },
+  {
+    "id": 43,
+    "category": "액세서리",
+    "name": "모자",
+    "description": "자외선 차단 및 스타일링",
+    "min_temp": 20,
+    "max_temp": 40,
+    "weather_conditions": ["맑음"]
+  },
+  {
+    "id": 44,
+    "category": "액세서리",
+    "name": "우산",
+    "description": "비 오는 날 필수",
+    "min_temp": -10,
+    "max_temp": 55,
+    "weather_conditions": ["비"]
+  }
+]

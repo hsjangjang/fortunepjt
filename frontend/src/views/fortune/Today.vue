@@ -520,9 +520,10 @@ onMounted(async () => {
     }
 
     if (fortune.value) {
-      // 미성년자 체크
-      if (authStore.user?.birth_date) {
-        const birthDate = new Date(authStore.user.birth_date)
+      // 미성년자 체크 (로그인 사용자: authStore, 비로그인: fortune.birth_date)
+      const birthDateStr = authStore.user?.birth_date || fortune.value.birth_date
+      if (birthDateStr) {
+        const birthDate = new Date(birthDateStr)
         const todayDate = new Date()
         const age = todayDate.getFullYear() - birthDate.getFullYear()
         isMinor.value = age < 19

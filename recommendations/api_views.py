@@ -83,19 +83,28 @@ def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int =
         return fallback
 
 
-def load_ootd_data():
-    """ootd.json 파일 로드"""
-    possible_paths = [
-        os.path.join(settings.BASE_DIR, 'ootd.json'),
-        os.path.join(settings.BASE_DIR, 'data', 'ootd.json'),
-    ]
-    for json_path in possible_paths:
-        if os.path.exists(json_path):
-            try:
-                with open(json_path, 'r', encoding='utf-8') as f:
-                    return json.load(f)
-            except Exception:
-                pass
+def load_ootd_data(gender=None):
+    """ootd.json 파일 로드 (성별에 따라 다른 파일)"""
+    # 성별에 따른 파일 선택
+    if gender == 'M':
+        filenames = ['ootd_male.json', 'ootd.json']
+    elif gender == 'F':
+        filenames = ['ootd_female.json', 'ootd.json']
+    else:
+        filenames = ['ootd.json']
+
+    for filename in filenames:
+        possible_paths = [
+            os.path.join(settings.BASE_DIR, filename),
+            os.path.join(settings.BASE_DIR, 'data', filename),
+        ]
+        for json_path in possible_paths:
+            if os.path.exists(json_path):
+                try:
+                    with open(json_path, 'r', encoding='utf-8') as f:
+                        return json.load(f)
+                except Exception:
+                    pass
     return []
 
 
@@ -115,9 +124,9 @@ def load_food_data():
     return []
 
 
-def get_clothes_by_temp_and_category(temp, category, weather_condition="맑음"):
-    """온도와 카테고리에 맞는 옷 필터링"""
-    ootd_data = load_ootd_data()
+def get_clothes_by_temp_and_category(temp, category, weather_condition="맑음", gender=None):
+    """온도와 카테고리에 맞는 옷 필터링 (성별 반영)"""
+    ootd_data = load_ootd_data(gender)
     matching_clothes = []
     for item in ootd_data:
         if item.get('category') != category:
@@ -215,12 +224,15 @@ class OOTDRecommendationAPIView(APIView):
             recommendation_type='OOTD'
         ).first()
 
+        # 사용자 성별 가져오기
+        user_gender = getattr(request.user, 'gender', None)
+
         if existing_recommendation:
             # 기존 추천이 있으면 DB에서 가져오기
             outfit = existing_recommendation.recommendation_data
         else:
-            # 새로 생성하고 DB에 저장
-            outfit = self._generate_ootd(weather_data, lucky_colors)
+            # 새로 생성하고 DB에 저장 (성별 반영)
+            outfit = self._generate_ootd(weather_data, lucky_colors, user_gender)
             DailyRecommendation.objects.create(
                 user=request.user,
                 recommendation_date=today,
@@ -469,8 +481,8 @@ class OOTDRecommendationAPIView(APIView):
                 'hourly': []
             }
 
-    def _generate_ootd(self, weather, lucky_colors):
-        """OOTD 추천 생성"""
+    def _generate_ootd(self, weather, lucky_colors, gender=None):
+        """OOTD 추천 생성 (성별 반영)"""
         current_temp = weather.get('temp', 15)
         description = weather.get('description', '맑음')
 
@@ -483,11 +495,11 @@ class OOTDRecommendationAPIView(APIView):
         else:
             weather_condition = '맑음'
 
-        # 온도에 맞는 옷 가져오기
-        tops = get_clothes_by_temp_and_category(current_temp, '상의', weather_condition)
-        bottoms = get_clothes_by_temp_and_category(current_temp, '하의', weather_condition)
-        outers = get_clothes_by_temp_and_category(current_temp, '아우터', weather_condition)
-        accessories = get_clothes_by_temp_and_category(current_temp, '액세서리', weather_condition)
+        # 온도에 맞는 옷 가져오기 (성별 반영)
+        tops = get_clothes_by_temp_and_category(current_temp, '상의', weather_condition, gender)
+        bottoms = get_clothes_by_temp_and_category(current_temp, '하의', weather_condition, gender)
+        outers = get_clothes_by_temp_and_category(current_temp, '아우터', weather_condition, gender)
+        accessories = get_clothes_by_temp_and_category(current_temp, '액세서리', weather_condition, gender)
 
         # 행운색 변환
         lucky_color_variants = []
