@@ -1052,25 +1052,10 @@ onMounted(async () => {
   color: #2dd4bf;
 }
 
-/* 오늘 해당하는 구간 하이라이트 (주간/월간 운세용) */
-.fortune-text :deep(.fortune-list li.today-highlight) {
-  background: rgba(167, 139, 250, 0.15);
-  border-radius: 8px;
-  padding: 0.8rem 1rem 0.8rem 2rem;
-  margin-left: -0.5rem;
-  margin-right: -0.5rem;
-  border-left: 3px solid #a78bfa;
-}
-
-.fortune-text :deep(.fortune-list li.today-highlight)::before {
-  color: #a78bfa;
-  font-weight: bold;
-  left: 0.5rem;
-}
-
+/* 오늘 해당하는 구간 (주간/월간 운세용) - 볼드만 적용 */
 .fortune-text :deep(.fortune-list li.today-highlight strong) {
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .lotto-numbers {

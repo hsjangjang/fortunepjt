@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
+import apiClient from '@/config/api'
 
 // 동적 import 실패 시 페이지 새로고침 (배포 후 캐시 문제 해결)
 const lazyLoad = (importFn) => {
@@ -241,55 +242,81 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // ===== Django 운세 체크 로직 =====
-  // Django: fortune_data가 필요한 페이지에서 세션 확인 후 리다이렉트
+  // 운세 필요한 페이지: daily/weekly/monthly 3개 모두 있어야 통과
   if (to.meta.requiresFortune) {
     console.log('[Router Guard] 운세 필요한 페이지')
 
-    // 로컬 시간 기준 오늘 날짜
-    const now = new Date()
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-    let hasFortune = false
+    let hasAllFortunes = false
 
-    // 비로그인 사용자: Store 데이터 먼저 확인 (API 호출 없이)
-    if (!authStore.isAuthenticated) {
-      console.log('[Router Guard] 비로그인 사용자 Store 체크:')
-      console.log('[Router Guard] - fortuneData:', fortuneStore.fortuneData)
-      console.log('[Router Guard] - fortuneDate:', fortuneStore.fortuneDate)
-      console.log('[Router Guard] - today:', today)
-      console.log('[Router Guard] - 날짜 일치:', fortuneStore.fortuneDate === today)
+    if (authStore.isAuthenticated) {
+      // 로그인 사용자: API로 3개 모두 체크
+      try {
+        const [dailyRes, weeklyRes, monthlyRes] = await Promise.all([
+          apiClient.get('/api/fortune/today/'),
+          apiClient.get('/api/fortune/weekly/'),
+          apiClient.get('/api/fortune/monthly/')
+        ])
 
-      // Store에 오늘 날짜의 운세가 있으면 통과
-      if (fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
-        console.log('[Router Guard] 비로그인 - Store에 오늘 운세 있음 → 통과')
-        hasFortune = true
-      } else {
-        console.log('[Router Guard] 비로그인 - Store에 운세 없음 → 리다이렉트')
-        hasFortune = false
+        const hasDaily = dailyRes.data.success && dailyRes.data.fortune
+        const hasWeekly = weeklyRes.data.success && weeklyRes.data.fortune
+        const hasMonthly = monthlyRes.data.success && monthlyRes.data.fortune
+
+        console.log('[Router Guard] 로그인 사용자 - daily:', hasDaily, 'weekly:', hasWeekly, 'monthly:', hasMonthly)
+
+        hasAllFortunes = hasDaily && hasWeekly && hasMonthly
+      } catch (error) {
+        console.error('[Router Guard] 운세 체크 에러:', error)
+        hasAllFortunes = false
       }
     } else {
-      // 로그인 사용자: API 호출로 확인
-      hasFortune = await fortuneStore.checkTodayFortune()
+      // 비로그인 사용자: Store 체크
+      const now = new Date()
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
+      // Store에 오늘 날짜의 운세가 있으면 통과 (비로그인은 daily만 체크)
+      if (fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
+        console.log('[Router Guard] 비로그인 - Store에 오늘 운세 있음')
+        hasAllFortunes = true
+      } else {
+        console.log('[Router Guard] 비로그인 - Store에 운세 없음')
+        hasAllFortunes = false
+      }
     }
 
-    console.log('[Router Guard] 운세 체크 완료')
-    console.log('[Router Guard] hasFortune:', hasFortune)
+    console.log('[Router Guard] hasAllFortunes:', hasAllFortunes)
 
-    // 오늘의 운세가 없으면
-    if (!hasFortune) {
-      // 로그인 사용자: 로딩 페이지로 (원래 가려던 페이지 정보 전달)
+    // 운세가 하나라도 없으면 Loading 페이지로
+    if (!hasAllFortunes) {
       if (authStore.isAuthenticated) {
         console.log('[Router Guard] 로그인 사용자 → 운세 없음 → 로딩 페이지로')
         next({ name: 'fortune-loading', query: { redirect: to.fullPath }, replace: true })
         return
       } else {
-        // 비로그인 사용자: 계산 페이지로 (원래 가려던 페이지 정보 전달)
-        console.log('[Router Guard] 비로그인 사용자 → 운세 없음 → 계산 페이지로')
-        next({ name: 'fortune-calculate', query: { redirect: to.fullPath }, replace: true })
+        // 비로그인 사용자: formData 있으면 로딩, 없으면 계산 페이지
+        const formInfo = fortuneStore.formData || {}
+        if (formInfo.birth_date && formInfo.gender) {
+          console.log('[Router Guard] 비로그인 + formData 있음 → 로딩 페이지로')
+          next({
+            name: 'fortune-loading',
+            query: {
+              redirect: to.fullPath,
+              birth_date: formInfo.birth_date,
+              gender: formInfo.gender,
+              birth_time: formInfo.birth_time || '',
+              chinese_name: formInfo.chinese_name || '',
+              mbti: formInfo.mbti || ''
+            },
+            replace: true
+          })
+        } else {
+          console.log('[Router Guard] 비로그인 + formData 없음 → 계산 페이지로')
+          next({ name: 'fortune-calculate', query: { redirect: to.fullPath }, replace: true })
+        }
         return
       }
     }
 
-    console.log('[Router Guard] 운세 있음 → 통과')
+    console.log('[Router Guard] 운세 모두 있음 → 통과')
   }
 
   console.log('[Router Guard] 통과')
