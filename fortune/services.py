@@ -285,74 +285,92 @@ class FortuneCalculator:
         # 기간별 설정
         if period_type == 'weekly':
             period_title = '이번 주의 운세'
-            period_word = '이번 주'
-            period_unit = '한 주'
-            item_period = '이번 주'
-            timing_guide = """각 운세 항목을 시간대별로 구분하여 작성하세요:
-- summary: 이번 주 전체 요약 (1문장)
-- early_week: 평일 초반(월~화)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
-- late_week: 평일 후반(수~금)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
-- weekend: 주말(토~일)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
-- advice: 이번 주 조언 (1문장)
 
-중요: 각 시간대(early_week, late_week, weekend)는 서로 다른 구체적인 운세 내용이어야 합니다!"""
+            prompt = f"""당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '{period_title}'를 작성해주세요.
 
-            output_format = """{{{{
-    "total": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "money": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "love": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "study": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "work": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "health": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "scores": {{"total": 점수, "money": 점수, "love": 점수, "study": 점수, "work": 점수, "health": 점수}},
-    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
-}}}}"""
+[사용자 정보]
+- 생년월일: {birth_date}
+- 성별: {'남성' if gender == 'M' else '여성'}
+- 별자리: {zodiac}
+- 띠: {chinese_zodiac}
+{mbti_info}
+{lucky_item_info}
+- 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시
+- 현재 날짜: {today}
+
+[중요 - 반드시 지켜야 할 JSON 구조]
+각 운세 항목(total, money, love, study, work, health)은 반드시 아래 5개 필드를 가진 객체여야 합니다:
+- "summary": 이번 주 전체 요약 (1문장)
+- "early_week": 월요일~화요일 운세 (1문장, 다른 시간대와 완전히 다른 내용)
+- "late_week": 수요일~금요일 운세 (1문장, 다른 시간대와 완전히 다른 내용)
+- "weekend": 토요일~일요일 운세 (1문장, 다른 시간대와 완전히 다른 내용)
+- "advice": 이번 주 조언 (1문장)
+
+[작성 가이드]
+1. 말투: "~합니다", "~입니다" 체의 정중한 문체
+2. 점수: 50~100점 사이 정수
+3. 행운의 아이템:
+   - '{lucky_item_name}' 설명: 2문장
+   - '{zodiac_item_name}' 설명: 2문장
+
+반드시 아래 JSON 구조로 출력하세요:
+""" + """{
+    "total": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
+    "money": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
+    "love": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
+    "study": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
+    "work": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
+    "health": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
+    "scores": {"total": 85, "money": 80, "love": 75, "study": 90, "work": 85, "health": 80},
+    "lucky_item": {"description": "...", "zodiac_description": "..."}
+}"""
 
         elif period_type == 'monthly':
             period_title = '이번 달의 운세'
-            period_word = '이번 달'
-            period_unit = '한 달'
-            item_period = '이번 달'
-            timing_guide = """각 운세 항목을 시간대별로 구분하여 작성하세요:
-- summary: 이번 달 전체 요약 (1문장)
-- early_month: 월초(1~10일)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
-- mid_month: 월중(11~20일)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
-- late_month: 월말(21일~)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
-- advice: 이번 달 조언 (1문장)
 
-중요: 각 시간대(early_month, mid_month, late_month)는 서로 다른 구체적인 운세 내용이어야 합니다!"""
+            prompt = f"""당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '{period_title}'를 작성해주세요.
 
-            output_format = """{{{{
-    "total": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "money": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "love": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "study": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "work": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "health": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "scores": {{"total": 점수, "money": 점수, "love": 점수, "study": 점수, "work": 점수, "health": 점수}},
-    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
-}}}}"""
+[사용자 정보]
+- 생년월일: {birth_date}
+- 성별: {'남성' if gender == 'M' else '여성'}
+- 별자리: {zodiac}
+- 띠: {chinese_zodiac}
+{mbti_info}
+{lucky_item_info}
+- 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시
+- 현재 날짜: {today}
+
+[중요 - 반드시 지켜야 할 JSON 구조]
+각 운세 항목(total, money, love, study, work, health)은 반드시 아래 5개 필드를 가진 객체여야 합니다:
+- "summary": 이번 달 전체 요약 (1문장)
+- "early_month": 1일~10일 운세 (1문장, 다른 시간대와 완전히 다른 내용)
+- "mid_month": 11일~20일 운세 (1문장, 다른 시간대와 완전히 다른 내용)
+- "late_month": 21일~말일 운세 (1문장, 다른 시간대와 완전히 다른 내용)
+- "advice": 이번 달 조언 (1문장)
+
+[작성 가이드]
+1. 말투: "~합니다", "~입니다" 체의 정중한 문체
+2. 점수: 50~100점 사이 정수
+3. 행운의 아이템:
+   - '{lucky_item_name}' 설명: 2문장
+   - '{zodiac_item_name}' 설명: 2문장
+
+반드시 아래 JSON 구조로 출력하세요:
+""" + """{
+    "total": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
+    "money": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
+    "love": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
+    "study": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
+    "work": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
+    "health": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
+    "scores": {"total": 85, "money": 80, "love": 75, "study": 90, "work": 85, "health": 80},
+    "lucky_item": {"description": "...", "zodiac_description": "..."}
+}"""
 
         else:  # daily
             period_title = '오늘의 운세'
-            period_word = '오늘'
-            period_unit = '하루'
-            item_period = '오늘'
-            timing_guide = """- 구체적인 시간 표현 사용 가능: "오전", "오후", "저녁" 등
-- 각 항목당 5문장으로 작성"""
 
-            output_format = """{{{{
-    "total": "총운 내용 (5문장)...",
-    "money": "재물운 내용 (5문장)...",
-    "love": "애정운 내용 (5문장)...",
-    "study": "학업운 내용 (5문장)...",
-    "work": "직장운 내용 (5문장)...",
-    "health": "건강운 내용 (5문장)...",
-    "scores": {{"total": 점수, "money": 점수, "love": 점수, "study": 점수, "work": 점수, "health": 점수}},
-    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
-}}}}"""
-
-        prompt = f"""당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '{period_title}'를 작성해주세요.
+            prompt = f"""당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '{period_title}'를 작성해주세요.
 
 [사용자 정보]
 - 생년월일: {birth_date}
@@ -366,16 +384,24 @@ class FortuneCalculator:
 
 [작성 가이드]
 1. 말투: "~합니다", "~입니다" 체의 정중한 문체
-2. {timing_guide}
-3. 점수: 50~100점 사이, 내용과 일치하게
+2. 각 운세 항목당 5문장으로 작성 (오전/오후/저녁 시간대 활용)
+3. 점수: 50~100점 사이 정수
 4. 행운의 아이템:
-   - '{lucky_item_name}' 설명: 2문장 (아이템 이름 포함 필수)
-   - '{zodiac_item_name}' 설명: 2문장 (아이템 이름 포함 필수)
+   - '{lucky_item_name}' 설명: 2문장
+   - '{zodiac_item_name}' 설명: 2문장
 
-[출력 형식]
-반드시 아래 JSON 형식으로만 출력하세요 (마크다운 없이 순수 JSON만):
-{output_format}
-"""
+반드시 아래 JSON 구조로 출력하세요:
+""" + """{
+    "total": "총운 내용 5문장...",
+    "money": "재물운 내용 5문장...",
+    "love": "애정운 내용 5문장...",
+    "study": "학업운 내용 5문장...",
+    "work": "직장운 내용 5문장...",
+    "health": "건강운 내용 5문장...",
+    "scores": {"total": 85, "money": 80, "love": 75, "study": 90, "work": 85, "health": 80},
+    "lucky_item": {"description": "...", "zodiac_description": "..."}
+}"""
+
         return prompt
 
     def _generate_fortune_text_with_llm(
