@@ -520,7 +520,7 @@
     "desc": "담백한 돼지 국밥"
   },
   {
-    "id": 68,
+    "id": 67,
     "name_ko": "곰탕",
     "name_en": "Gomtang",
     "color_category": "White",
@@ -528,7 +528,7 @@
     "desc": "깊은 맛의 소뼈 국물"
   },
   {
-    "id": 69,
+    "id": 68,
     "name_ko": "해장국",
     "name_en": "Hangover Soup",
     "color_category": "Red",
@@ -536,7 +536,7 @@
     "desc": "속풀이 해장 국물"
   },
   {
-    "id": 70,
+    "id": 69,
     "name_ko": "아이스크림",
     "name_en": "Ice Cream",
     "color_category": "Multi",
@@ -544,7 +544,7 @@
     "desc": "달콤하고 시원한 디저트"
   },
   {
-    "id": 71,
+    "id": 70,
     "name_ko": "팥빙수",
     "name_en": "Patbingsu",
     "color_category": "Red",
@@ -552,7 +552,7 @@
     "desc": "여름 대표 빙수"
   },
   {
-    "id": 72,
+    "id": 71,
     "name_ko": "케이크",
     "name_en": "Cake",
     "color_category": "White",
@@ -560,7 +560,7 @@
     "desc": "달콤한 생크림 케이크"
   },
   {
-    "id": 73,
+    "id": 72,
     "name_ko": "와플",
     "name_en": "Waffle",
     "color_category": "Brown",
@@ -568,7 +568,7 @@
     "desc": "바삭하고 달콤한 와플"
   },
   {
-    "id": 74,
+    "id": 73,
     "name_ko": "아메리카노",
     "name_en": "Americano",
     "color_category": "Brown",
@@ -576,7 +576,7 @@
     "desc": "깔끔한 에스프레소 커피"
   },
   {
-    "id": 75,
+    "id": 74,
     "name_ko": "카페라떼",
     "name_en": "Cafe Latte",
     "color_category": "Brown",
