@@ -260,6 +260,7 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { getColorMatchScore, colorMap } from '@/utils/colors'
 import { getFortuneBoostScore, fortuneKeywords } from '@/utils/similarity'
+import { getMaxSimilarityWithLuckyItems, similarityToScore } from '@/utils/itemSimilarity'
 import { useFortuneStore } from '@/stores/fortune'
 
 const route = useRoute()
@@ -372,49 +373,8 @@ const distanceToScore = (distance) => {
   }
 }
 
-// 아이템 유사도 계산 (카테고리/키워드 기반)
-const calculateItemSimilarity = (item1, item2) => {
-  if (!item1 || !item2) return 0
-
-  const categoryKeywords = {
-    '액세서리': ['목걸이', '반지', '팔찌', '귀걸이', '펜던트', '브레이슬릿', '키링', '열쇠고리'],
-    '가방류': ['가방', '백', '파우치', '지갑', '캐리어', '토트', '클러치'],
-    '전자기기': ['이어폰', '헤드폰', '시계', '카메라', '태블릿', '폰'],
-    '패션소품': ['스카프', '모자', '선글라스', '안경', '벨트', '장갑'],
-    '필기구': ['펜', '만년필', '다이어리', '노트'],
-    '음료용품': ['텀블러', '머그컵', '컵', '보틀'],
-    '화장품': ['향수', '립스틱', '파운데이션', '마스카라', '아이라이너', '미니향수']
-  }
-
-  let maxSimilarity = 0
-
-  for (const [, keywords] of Object.entries(categoryKeywords)) {
-    const item1Match = keywords.some(kw => item1.includes(kw))
-    const item2Match = keywords.some(kw => item2.includes(kw))
-
-    if (item1Match && item2Match) {
-      maxSimilarity = Math.max(maxSimilarity, 0.5)
-    }
-  }
-
-  // 공통 단어 체크 (2글자 이상)
-  const words1 = item1.split(/[\s,_-]+/)
-  const words2 = item2.split(/[\s,_-]+/)
-
-  for (const w1 of words1) {
-    for (const w2 of words2) {
-      if (w1.length >= 2 && w2.length >= 2) {
-        if (w1.includes(w2) || w2.includes(w1)) {
-          maxSimilarity = Math.max(maxSimilarity, 0.6)
-        }
-      }
-    }
-  }
-
-  return maxSimilarity
-}
-
-// 아이템 색상과 행운색 매칭 계산 (+ 아이템 유사도 반영)
+// 아이템 색상과 행운색 매칭 계산 (색상 40% + 아이템 유사도 60%)
+// FastText(cc.ko.300) 기반 의미적 유사도 사용
 const colorMatchResult = computed(() => {
   if (!item.value?.dominant_colors || !fortuneStore.luckyColors?.length) {
     return { score: 0, matchedColor: null, bestItemHex: '#808080' }
@@ -450,8 +410,8 @@ const colorMatchResult = computed(() => {
     }
   }
 
-  // 아이템 유사도 계산 (행운 아이템들과 비교)
-  let maxItemSimilarity = 0
+  // 아이템 유사도 계산 (FastText 기반 코사인 유사도)
+  let itemScore = 0
   const luckyItem = fortuneStore.luckyItem
   if (luckyItem && item.value?.item_name) {
     const luckyItemList = [
@@ -460,18 +420,12 @@ const colorMatchResult = computed(() => {
       luckyItem.today_special
     ].filter(Boolean)
 
-    for (const luckyItemName of luckyItemList) {
-      const similarity = calculateItemSimilarity(item.value.item_name, luckyItemName)
-      maxItemSimilarity = Math.max(maxItemSimilarity, similarity)
-    }
+    const { similarity } = getMaxSimilarityWithLuckyItems(item.value.item_name, luckyItemList)
+    itemScore = similarityToScore(similarity)
   }
 
-  // 최종 점수: 아이템 유사도가 있으면 보너스 적용
-  let finalScore = maxColorScore
-  if (maxItemSimilarity >= 0.5) {
-    const itemBonus = Math.round(maxItemSimilarity * 40)
-    finalScore = Math.min(100, Math.round(maxColorScore * 0.7 + itemBonus))
-  }
+  // 최종 점수: 색상 40% + 아이템 유사도 60%
+  const finalScore = Math.min(100, Math.round(maxColorScore * 0.4 + itemScore * 0.6))
 
   return { score: finalScore, matchedColor, bestItemHex }
 })

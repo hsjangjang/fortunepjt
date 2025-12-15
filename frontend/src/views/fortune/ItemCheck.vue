@@ -247,6 +247,7 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
 import { colorMap, getTextColor } from '@/utils/colors'
+import { getMaxSimilarityWithLuckyItems, similarityToScore } from '@/utils/itemSimilarity'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -537,78 +538,32 @@ const selectExistingItem = (item) => {
   }
 }
 
-// 아이템 유사도 계산 (카테고리/키워드 기반)
-const calculateItemSimilarity = (item1, item2) => {
-  const categoryKeywords = {
-    '액세서리': ['목걸이', '반지', '팔찌', '귀걸이', '펜던트', '브레이슬릿', '키링', '열쇠고리'],
-    '가방류': ['가방', '백', '파우치', '지갑', '캐리어', '토트', '클러치'],
-    '전자기기': ['이어폰', '헤드폰', '시계', '카메라', '태블릿', '폰'],
-    '패션소품': ['스카프', '모자', '선글라스', '안경', '벨트', '장갑'],
-    '필기구': ['펜', '만년필', '다이어리', '노트'],
-    '음료용품': ['텀블러', '머그컵', '컵', '보틀']
-  }
-
-  let maxSimilarity = 0
-
-  for (const [, keywords] of Object.entries(categoryKeywords)) {
-    const item1Match = keywords.some(kw => item1.includes(kw))
-    const item2Match = keywords.some(kw => item2.includes(kw))
-
-    if (item1Match && item2Match) {
-      maxSimilarity = Math.max(maxSimilarity, 0.5)
-    }
-  }
-
-  // 공통 단어 체크 (2글자 이상)
-  const words1 = item1.split(/[\s,_-]+/)
-  const words2 = item2.split(/[\s,_-]+/)
-
-  for (const w1 of words1) {
-    for (const w2 of words2) {
-      if (w1.length >= 2 && w2.length >= 2) {
-        if (w1.includes(w2) || w2.includes(w1)) {
-          maxSimilarity = Math.max(maxSimilarity, 0.6)
-        }
-      }
-    }
-  }
-
-  return maxSimilarity
-}
-
-// 행운 점수 계산 (색상 + 아이템 유사도 반영)
+// 행운 점수 계산 (색상 40% + 아이템 유사도 60%)
+// FastText(cc.ko.300) 기반 의미적 유사도 사용
 const calculateLuckScore = (item, color, itemColors) => {
   // 1. 색상 점수 계산 (0-100)
   const luckyColorNames = luckyColorsWithHex.value.map(c => c.name)
   const colorResult = calculateColorMatchScore(itemColors || detectedColors.value, luckyColorNames)
   const colorScore = colorResult.score
 
-  // 2. 아이템 유사도 계산 (행운 아이템들과 비교)
-  let maxItemSimilarity = 0
+  // 2. 아이템 유사도 계산 (FastText 기반 코사인 유사도)
   const luckyItemList = [
     luckyItems.value.main,
     luckyItems.value.zodiac,
     luckyItems.value.special
   ].filter(Boolean)
 
-  for (const luckyItem of luckyItemList) {
-    const similarity = calculateItemSimilarity(item, luckyItem)
-    maxItemSimilarity = Math.max(maxItemSimilarity, similarity)
-  }
+  const { similarity } = getMaxSimilarityWithLuckyItems(item, luckyItemList)
+  const itemScore = similarityToScore(similarity)
 
-  // 3. 최종 점수: 색상 70% + 아이템 유사도 30%
-  // 아이템 유사도가 0.5 이상이면 보너스 점수 추가
-  let finalScore = colorScore
-  if (maxItemSimilarity >= 0.5) {
-    // 아이템이 비슷하면 색상 점수에 최대 20점 보너스
-    const itemBonus = Math.round(maxItemSimilarity * 40)
-    finalScore = Math.min(100, Math.round(colorScore * 0.7 + itemBonus))
-  }
+  // 3. 최종 점수: 색상 40% + 아이템 유사도 60%
+  const finalScore = Math.round(colorScore * 0.4 + itemScore * 0.6)
 
   return {
-    score: finalScore,
+    score: Math.min(100, finalScore),
     matchedColor: colorResult.matchedColor,
-    bestItemHex: colorResult.bestItemHex
+    bestItemHex: colorResult.bestItemHex,
+    itemSimilarity: similarity
   }
 }
 
