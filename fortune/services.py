@@ -453,7 +453,8 @@ class FortuneCalculator:
                         {"role": "system", "content": system_msg},
                         {"role": "user", "content": prompt}
                     ],
-                    max_tokens=4000
+                    max_tokens=4000,
+                    response_format={"type": "json_object"}
                 )
 
                 text = response.choices[0].message.content.strip()
