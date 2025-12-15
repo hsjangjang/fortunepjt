@@ -11,13 +11,18 @@
 - Frontend
   - Today.vue에서 이름 변경, 주간/월간 탭 추가, 오늘 날짜 볼드 처리 (`Fortune.vue`)
   - 로딩 페이지 문구 변경 (`Loading.vue`)
-  - 행운 지수 계산 로직 수정 - 색상 + 아이템 유사도 (`ItemCheck.vue`)
+  - FastText 기반 아이템 유사도 시스템 구현 (꼬맨틀/Semantle-ko 방식)
+    - 행운 점수 계산 로직 변경: 색상 40% + 아이템 유사도 60% (`ItemCheck.vue`, `Detail.vue`)
+    - FastText (cc.ko.300) 코사인 유사도 기반 아이템 매칭 유틸리티 (`utils/itemSimilarity.js`)
   - 행운 지수 바로 표시, UI 수정 (`Detail.vue`)
   - "오늘의 운세" → "운세 확인하기" (`Navbar.vue`)
   - Fortune.vue 라우팅 변경 (`router/index.js`)
   - 주간/월간 운세 스토어 추가 (`fortune.js`)
 - Data
   - food.json id 1칸씩 당김
+  - FastText 사전 계산 유사도 매트릭스 추가 (88개 키워드, 1168개 유사도 쌍) (`data/itemSimilarity.json`)
+- Scripts
+  - FastText 유사도 매트릭스 생성 스크립트 (`scripts/generate_similarity_matrix.py`)
 - etc
   - README.md 업데이트 및 UPDATE.md 추가
 
