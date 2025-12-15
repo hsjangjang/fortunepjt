@@ -147,6 +147,17 @@
                       오늘은 <router-link :to="`/items/${recommendedItem.id}`" class="recommend-link">{{ recommendedItem.item_name }}</router-link>을(를) 사용해보는 건 어떨까요?
                     </p>
                   </div>
+
+                  <!-- 추천할 좋은 아이템이 없을 때 새 아이템 등록 유도 -->
+                  <div v-else-if="luckScore < 70 && noGoodItemAvailable" class="recommend-section no-item mt-3">
+                    <p class="recommend-text">
+                      <i class="fas fa-box-open text-info me-1"></i>
+                      등록해주신 아이템 중 오늘 행운을 확실히 가져다줄만한 아이템이 없어요.
+                    </p>
+                    <router-link to="/items/upload" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
+                      <i class="fas fa-plus me-1"></i> 새 아이템 등록하기
+                    </router-link>
+                  </div>
                 </div>
 
                 <!-- 주요 색상 -->
@@ -524,24 +535,24 @@ const matchMessageClass = computed(() => {
   return 'match-low'
 })
 
-// 다른 아이템 중 행운색과 가장 잘 맞는 것 추천
+// 다른 아이템 중 행운색과 가장 잘 맞는 것 추천 (80점 이상만)
 const recommendedItem = computed(() => {
   if (luckScore.value >= 70) return null
   if (!userItems.value.length) return null
 
   const currentItemId = item.value?.id
   let bestItem = null
-  let bestScore = luckScore.value
+  let bestScore = 0
+
+  const luckyColorNames = fortuneStore.luckyColors || []
+  const luckyColorHexes = luckyColorNames.map(name => ({
+    name,
+    hex: colorMap[name] || '#808080'
+  }))
 
   for (const otherItem of userItems.value) {
     if (otherItem.id === currentItemId) continue
     if (!otherItem.dominant_colors?.length) continue
-
-    const luckyColorNames = fortuneStore.luckyColors || []
-    const luckyColorHexes = luckyColorNames.map(name => ({
-      name,
-      hex: colorMap[name] || '#808080'
-    }))
 
     let maxScore = 0
     for (const itemColor of otherItem.dominant_colors) {
@@ -560,7 +571,46 @@ const recommendedItem = computed(() => {
     }
   }
 
+  // 80점 이상인 아이템만 추천
+  if (bestScore < 80) return null
   return bestItem
+})
+
+// 추천할 좋은 아이템이 없는 경우 (모든 아이템이 80점 미만)
+const noGoodItemAvailable = computed(() => {
+  if (luckScore.value >= 70) return false
+
+  const currentItemId = item.value?.id
+  const luckyColorNames = fortuneStore.luckyColors || []
+  if (!luckyColorNames.length) return false
+
+  const luckyColorHexes = luckyColorNames.map(name => ({
+    name,
+    hex: colorMap[name] || '#808080'
+  }))
+
+  // 아이템이 없거나, 있어도 80점 이상인 게 없으면 true
+  if (!userItems.value.length) return true
+
+  for (const otherItem of userItems.value) {
+    if (otherItem.id === currentItemId) continue
+    if (!otherItem.dominant_colors?.length) continue
+
+    let maxScore = 0
+    for (const itemColor of otherItem.dominant_colors) {
+      const itemRgb = hexToRgb(itemColor.hex)
+      for (const luckyColor of luckyColorHexes) {
+        const luckyRgb = hexToRgb(luckyColor.hex)
+        const distance = euclideanDistance(itemRgb, luckyRgb)
+        const score = distanceToScore(distance)
+        if (score > maxScore) maxScore = score
+      }
+    }
+
+    if (maxScore >= 80) return false
+  }
+
+  return true
 })
 
 // 유저 아이템 목록 가져오기 (추천용)
@@ -1021,5 +1071,10 @@ onMounted(() => {
   .recommend-text {
     font-size: 0.85rem;
   }
+}
+
+.recommend-section.no-item {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 </style>

@@ -125,12 +125,23 @@
                   <p class="text-white opacity-90 mb-0">{{ matchDescription }}</p>
                 </div>
 
-                <!-- 점수 낮을 때 운세 확인 유도 -->
-                <div v-if="luckScore < 70 && luckyItems.main" class="recommend-section mt-3">
+                <!-- 점수 낮을 때 더 좋은 아이템 추천 -->
+                <div v-if="luckScore < 70 && recommendedItem" class="recommend-section mt-3">
                   <p class="recommend-text">
                     <i class="fas fa-lightbulb text-warning me-1"></i>
-                    오늘은 <router-link to="/fortune" class="recommend-link">{{ luckyItems.main }}</router-link>을(를) 사용해보는 건 어떨까요?
+                    오늘은 <router-link :to="`/items/${recommendedItem.id}`" class="recommend-link">{{ recommendedItem.item_name }}</router-link>을(를) 사용해보는 건 어떨까요?
                   </p>
+                </div>
+
+                <!-- 추천할 좋은 아이템이 없을 때 새 아이템 등록 유도 -->
+                <div v-else-if="luckScore < 70 && noGoodItemAvailable" class="recommend-section no-item mt-3">
+                  <p class="recommend-text">
+                    <i class="fas fa-box-open text-info me-1"></i>
+                    등록해주신 아이템 중 오늘 행운을 확실히 가져다줄만한 아이템이 없어요.
+                  </p>
+                  <router-link to="/items/upload" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
+                    <i class="fas fa-plus me-1"></i> 새 아이템 등록하기
+                  </router-link>
                 </div>
 
                 <!-- Today's Lucky Item Reference -->
@@ -286,6 +297,73 @@ const canSaveItem = computed(() => {
          (currentAnalysisFile.value !== null || itemPreview.value) &&
          !isFromExistingItem.value &&
          authStore.isAuthenticated
+})
+
+// 내 아이템 중 행운 점수가 가장 높은 아이템 추천
+const recommendedItem = computed(() => {
+  if (luckScore.value >= 70) return null
+  if (!userItems.value.length) return null
+  if (!luckyColorsWithHex.value.length) return null
+
+  let bestItem = null
+  let bestScore = 0
+
+  for (const otherItem of userItems.value) {
+    if (!otherItem.dominant_colors?.length) continue
+
+    // 색상 점수 계산
+    let maxScore = 0
+    for (const itemColor of otherItem.dominant_colors) {
+      const itemHex = itemColor.hex || '#808080'
+      const itemRgb = hexToRgb(itemHex)
+
+      for (const luckyColor of luckyColorsWithHex.value) {
+        const luckyRgb = hexToRgb(luckyColor.hex)
+        const distance = euclideanDistance(itemRgb, luckyRgb)
+        const score = distanceToScore(distance)
+        if (score > maxScore) maxScore = score
+      }
+    }
+
+    if (maxScore > bestScore) {
+      bestScore = maxScore
+      bestItem = otherItem
+    }
+  }
+
+  // 80점 이상인 아이템만 추천
+  if (bestScore < 80) return null
+  return bestItem
+})
+
+// 추천할 좋은 아이템이 없는 경우 (모든 아이템이 80점 미만)
+const noGoodItemAvailable = computed(() => {
+  if (luckScore.value >= 70) return false
+  if (!luckyColorsWithHex.value.length) return false
+
+  // 아이템이 없거나, 있어도 80점 이상인 게 없으면 true
+  if (!userItems.value.length) return true
+
+  for (const otherItem of userItems.value) {
+    if (!otherItem.dominant_colors?.length) continue
+
+    let maxScore = 0
+    for (const itemColor of otherItem.dominant_colors) {
+      const itemHex = itemColor.hex || '#808080'
+      const itemRgb = hexToRgb(itemHex)
+
+      for (const luckyColor of luckyColorsWithHex.value) {
+        const luckyRgb = hexToRgb(luckyColor.hex)
+        const distance = euclideanDistance(itemRgb, luckyRgb)
+        const score = distanceToScore(distance)
+        if (score > maxScore) maxScore = score
+      }
+    }
+
+    if (maxScore >= 80) return false
+  }
+
+  return true
 })
 
 
@@ -1013,5 +1091,10 @@ onMounted(() => {
 .recommend-link:hover {
   text-decoration: underline;
   color: #c4b5fd;
+}
+
+.recommend-section.no-item {
+  background: rgba(59, 130, 246, 0.1);
+  border-color: rgba(59, 130, 246, 0.3);
 }
 </style>
