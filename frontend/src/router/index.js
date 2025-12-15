@@ -28,7 +28,7 @@ const DeleteAccount = lazyLoad(() => import('@/views/auth/DeleteAccount.vue'))
 // Fortune
 const FortuneCalculate = lazyLoad(() => import('@/views/fortune/Calculate.vue'))
 const FortuneLoading = lazyLoad(() => import('@/views/fortune/Loading.vue'))
-const TodayFortune = lazyLoad(() => import('@/views/fortune/Today.vue'))
+const Fortune = lazyLoad(() => import('@/views/fortune/Fortune.vue'))
 const FortuneDetail = lazyLoad(() => import('@/views/fortune/Detail.vue'))
 const ItemCheck = lazyLoad(() => import('@/views/fortune/ItemCheck.vue'))
 
@@ -87,8 +87,20 @@ const router = createRouter({
     {
       path: '/fortune/today',
       name: 'fortune-today',
-      component: TodayFortune,
+      component: Fortune,
       meta: { title: '오늘의 운세', requiresFortune: true }
+    },
+    {
+      path: '/fortune/weekly',
+      name: 'fortune-weekly',
+      component: Fortune,
+      meta: { title: '이 주의 운세', requiresFortune: true }
+    },
+    {
+      path: '/fortune/monthly',
+      name: 'fortune-monthly',
+      component: Fortune,
+      meta: { title: '이 달의 운세', requiresFortune: true }
     },
     {
       path: '/fortune/detail',

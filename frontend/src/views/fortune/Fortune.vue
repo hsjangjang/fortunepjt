@@ -15,7 +15,7 @@
         <div class="period-selector mb-4">
           <div class="btn-group-period d-flex justify-content-center gap-2">
             <button
-              class="btn-period"
+              class="btn-period btn-daily"
               :class="{ active: selectedPeriod === 'daily' }"
               @click="changePeriod('daily')"
               :disabled="isLoadingPeriod"
@@ -23,7 +23,7 @@
               <i class="fas fa-sun me-1"></i> 오늘의 운세
             </button>
             <button
-              class="btn-period"
+              class="btn-period btn-weekly"
               :class="{ active: selectedPeriod === 'weekly' }"
               @click="changePeriod('weekly')"
               :disabled="isLoadingPeriod"
@@ -31,7 +31,7 @@
               <i class="fas fa-calendar-week me-1"></i> 이 주의 운세
             </button>
             <button
-              class="btn-period"
+              class="btn-period btn-monthly"
               :class="{ active: selectedPeriod === 'monthly' }"
               @click="changePeriod('monthly')"
               :disabled="isLoadingPeriod"
@@ -344,8 +344,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
@@ -353,6 +353,7 @@ import apiClient from '@/config/api'
 import { getColorHex } from '@/utils/colors'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 const fortuneStore = useFortuneStore()
 const fortune = ref(null)
@@ -362,7 +363,16 @@ const isLoading = ref(true)
 const isLoadingPeriod = ref(false)
 const showMainItemDesc = ref(false)
 const showZodiacItemDesc = ref(false)
-const selectedPeriod = ref('daily')  // 'daily', 'weekly', 'monthly'
+
+// URL 경로에서 기간 결정
+const getPeriodFromRoute = () => {
+  const path = route.path
+  if (path.includes('/weekly')) return 'weekly'
+  if (path.includes('/monthly')) return 'monthly'
+  return 'daily'
+}
+
+const selectedPeriod = ref(getPeriodFromRoute())
 
 // 기간별 제목
 const periodTitle = computed(() => {
@@ -552,7 +562,16 @@ const animateBar = (container) => {
 const changePeriod = async (period) => {
   if (selectedPeriod.value === period) return
 
-  selectedPeriod.value = period
+  // URL 변경 (페이지 이동)
+  let routePath = '/fortune/today'
+  if (period === 'weekly') routePath = '/fortune/weekly'
+  if (period === 'monthly') routePath = '/fortune/monthly'
+
+  router.push(routePath)
+}
+
+// 실제 운세 데이터 로드 함수
+const loadFortuneData = async (period) => {
   isLoadingPeriod.value = true
 
   try {
@@ -575,7 +594,20 @@ const changePeriod = async (period) => {
     } else if (response.data.need_calculate) {
       // 캐시 없음 - POST로 생성 요청
       console.log(`[Today] ${period} 운세 생성 필요`)
-      response = await apiClient.post(endpoint)
+
+      // 비로그인 사용자의 경우 birth_date와 gender를 전달해야 함
+      let postData = {}
+      if (!authStore.isAuthenticated && fortuneStore.formData) {
+        postData = {
+          birth_date: fortuneStore.formData.birth_date,
+          gender: fortuneStore.formData.gender,
+          birth_time: fortuneStore.formData.birth_time || '',
+          chinese_name: fortuneStore.formData.chinese_name || '',
+          mbti: fortuneStore.formData.mbti || ''
+        }
+      }
+
+      response = await apiClient.post(endpoint, postData)
 
       if (response.data.success && response.data.fortune) {
         fortune.value = response.data.fortune
@@ -598,69 +630,93 @@ const changePeriod = async (period) => {
   }
 }
 
+// 라우트 변경 감지
+watch(() => route.path, (newPath) => {
+  const newPeriod = getPeriodFromRoute()
+  if (selectedPeriod.value !== newPeriod) {
+    selectedPeriod.value = newPeriod
+    loadFortuneData(newPeriod)
+  }
+})
+
+// 미성년자 체크 및 애니메이션 시작
+const setupFortuneUI = () => {
+  if (fortune.value) {
+    // 미성년자 체크 (로그인 사용자: authStore, 비로그인: fortune.birth_date)
+    const birthDateStr = authStore.user?.birth_date || fortune.value.birth_date
+    if (birthDateStr) {
+      const birthDate = new Date(birthDateStr)
+      const todayDate = new Date()
+      const age = todayDate.getFullYear() - birthDate.getFullYear()
+      isMinor.value = age < 19
+    }
+
+    // 애니메이션 시작
+    setTimeout(() => {
+      animateScore()
+
+      // 활성 탭의 bar 애니메이션
+      const activeTabPane = document.querySelector('.tab-pane.active')
+      if (activeTabPane) {
+        const bar = activeTabPane.querySelector('.sub-score-bar')
+        if (bar) animateBar(bar)
+      }
+
+      // 탭 변경 이벤트 리스너
+      const tabEls = document.querySelectorAll('a[data-bs-toggle="tab"]')
+      tabEls.forEach(tabEl => {
+        tabEl.addEventListener('shown.bs.tab', function (event) {
+          const targetId = event.target.getAttribute('href')
+          const targetPane = document.querySelector(targetId)
+          if (targetPane) {
+            const bar = targetPane.querySelector('.sub-score-bar')
+            if (bar) animateBar(bar)
+          }
+        })
+      })
+    }, 100)
+  }
+}
+
 onMounted(async () => {
-  // Django 세션과 동기화된 운세 데이터 가져오기
+  // URL 경로에서 현재 기간 확인
+  const currentPeriod = getPeriodFromRoute()
+  selectedPeriod.value = currentPeriod
+
   try {
     isLoading.value = true
     // 로컬 시간 기준 오늘 날짜
     const now = new Date()
     const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
-    // 1. 비로그인 사용자: Fortune Store에 이미 데이터가 있으면 사용
-    if (!authStore.isAuthenticated && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
-      console.log('[Today] Fortune Store에서 운세 로드 (비로그인)')
-      fortune.value = fortuneStore.fortuneData
-    } else {
-      // 2. 로그인 사용자 또는 Store에 데이터 없음: API 호출
-      console.log('[Today] API에서 운세 로드')
-      const response = await apiClient.get('/api/fortune/today/')
-
-      if (response.data.success && response.data.fortune) {
-        fortune.value = response.data.fortune
-
-        // Fortune Store에도 저장 (action 사용으로 반응성 유지)
-        fortuneStore.setFortune(response.data.fortune, today)
-      } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
-        // 비로그인 + API 실패 + Store에 데이터 있음 → Store 데이터 사용
-        console.log('[Today] API 실패, Fortune Store 데이터 사용')
+    // daily인 경우에만 Store 캐시 사용 (weekly/monthly는 항상 API 호출)
+    if (currentPeriod === 'daily') {
+      // 1. 비로그인 사용자: Fortune Store에 이미 데이터가 있으면 사용
+      if (!authStore.isAuthenticated && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
+        console.log('[Today] Fortune Store에서 운세 로드 (비로그인)')
         fortune.value = fortuneStore.fortuneData
-      }
-    }
+        setupFortuneUI()
+      } else {
+        // 2. 로그인 사용자 또는 Store에 데이터 없음: API 호출
+        console.log('[Today] API에서 운세 로드')
+        const response = await apiClient.get('/api/fortune/today/')
 
-    if (fortune.value) {
-      // 미성년자 체크 (로그인 사용자: authStore, 비로그인: fortune.birth_date)
-      const birthDateStr = authStore.user?.birth_date || fortune.value.birth_date
-      if (birthDateStr) {
-        const birthDate = new Date(birthDateStr)
-        const todayDate = new Date()
-        const age = todayDate.getFullYear() - birthDate.getFullYear()
-        isMinor.value = age < 19
-      }
+        if (response.data.success && response.data.fortune) {
+          fortune.value = response.data.fortune
 
-      // 애니메이션 시작
-      setTimeout(() => {
-        animateScore()
-
-        // 활성 탭의 bar 애니메이션
-        const activeTabPane = document.querySelector('.tab-pane.active')
-        if (activeTabPane) {
-          const bar = activeTabPane.querySelector('.sub-score-bar')
-          if (bar) animateBar(bar)
+          // Fortune Store에도 저장 (action 사용으로 반응성 유지)
+          fortuneStore.setFortune(response.data.fortune, today)
+        } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
+          // 비로그인 + API 실패 + Store에 데이터 있음 → Store 데이터 사용
+          console.log('[Today] API 실패, Fortune Store 데이터 사용')
+          fortune.value = fortuneStore.fortuneData
         }
-
-        // 탭 변경 이벤트 리스너
-        const tabEls = document.querySelectorAll('a[data-bs-toggle="tab"]')
-        tabEls.forEach(tabEl => {
-          tabEl.addEventListener('shown.bs.tab', function (event) {
-            const targetId = event.target.getAttribute('href')
-            const targetPane = document.querySelector(targetId)
-            if (targetPane) {
-              const bar = targetPane.querySelector('.sub-score-bar')
-              if (bar) animateBar(bar)
-            }
-          })
-        })
-      }, 100)
+        setupFortuneUI()
+      }
+    } else {
+      // weekly 또는 monthly: loadFortuneData 사용
+      await loadFortuneData(currentPeriod)
+      setupFortuneUI()
     }
   } catch (error) {
     console.error('Failed to fetch fortune:', error)
@@ -697,13 +753,48 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-.btn-period:hover:not(:disabled) {
+/* 오늘의 운세 버튼 - 노란색/주황색 (태양) */
+.btn-daily {
+  border-color: rgba(251, 191, 36, 0.3);
+}
+.btn-daily:hover:not(:disabled) {
+  background: rgba(251, 191, 36, 0.2);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: white;
+}
+.btn-daily.active {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(251, 191, 36, 0.4));
+  border-color: #fbbf24;
+  color: white;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+}
+
+/* 이 주의 운세 버튼 - 파란색 (달력) */
+.btn-weekly {
+  border-color: rgba(96, 165, 250, 0.3);
+}
+.btn-weekly:hover:not(:disabled) {
+  background: rgba(96, 165, 250, 0.2);
+  border-color: rgba(96, 165, 250, 0.5);
+  color: white;
+}
+.btn-weekly.active {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(96, 165, 250, 0.4));
+  border-color: #60a5fa;
+  color: white;
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+}
+
+/* 이 달의 운세 버튼 - 보라색 (달) */
+.btn-monthly {
+  border-color: rgba(167, 139, 250, 0.3);
+}
+.btn-monthly:hover:not(:disabled) {
   background: rgba(167, 139, 250, 0.2);
   border-color: rgba(167, 139, 250, 0.5);
   color: white;
 }
-
-.btn-period.active {
+.btn-monthly.active {
   background: linear-gradient(135deg, rgba(124, 58, 237, 0.4), rgba(167, 139, 250, 0.4));
   border-color: #a78bfa;
   color: white;

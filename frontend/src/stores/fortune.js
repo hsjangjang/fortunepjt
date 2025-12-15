@@ -7,6 +7,8 @@ export const useFortuneStore = defineStore('fortune', () => {
   const fortuneData = ref(null)
   const fortuneDate = ref(null)
   const loading = ref(false)
+  // 비로그인 사용자의 폼 데이터 (weekly/monthly 생성시 필요)
+  const formData = ref(null)
 
   // 로컬 시간 기준 오늘 날짜 (YYYY-MM-DD)
   const getLocalToday = () => {
@@ -156,10 +158,21 @@ export const useFortuneStore = defineStore('fortune', () => {
   /**
    * 운세 데이터 직접 설정 (Loading.vue에서 사용)
    */
-  function setFortune(fortune, date) {
+  function setFortune(fortune, date, form = null) {
     fortuneData.value = fortune
     fortuneDate.value = date
+    if (form) {
+      formData.value = form
+    }
     console.log('[Fortune Store] 운세 데이터 설정:', date)
+  }
+
+  /**
+   * 폼 데이터만 설정 (Loading.vue에서 사용)
+   */
+  function setFormData(form) {
+    formData.value = form
+    console.log('[Fortune Store] 폼 데이터 설정:', form)
   }
 
   return {
@@ -167,6 +180,7 @@ export const useFortuneStore = defineStore('fortune', () => {
     fortuneData,
     fortuneDate,
     loading,
+    formData,
 
     // Getters
     hasTodayFortune,
@@ -180,6 +194,7 @@ export const useFortuneStore = defineStore('fortune', () => {
     calculateFortune,
     resetFortune,
     clearFortune,
-    setFortune
+    setFortune,
+    setFormData
   }
 })

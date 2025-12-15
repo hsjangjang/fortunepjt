@@ -113,7 +113,26 @@ async function calculateFortune() {
       // 로컬 시간 기준 오늘 날짜
       const now = new Date()
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-      fortuneStore.setFortune(data.fortune, today)
+
+      // 비로그인 사용자의 경우 formData도 저장 (weekly/monthly 생성시 필요)
+      if (!authStore.isAuthenticated) {
+        const birthDate = route.query.birth_date
+        const gender = route.query.gender
+        const birthTime = route.query.birth_time
+        const chineseName = route.query.chinese_name
+        const mbti = route.query.mbti
+
+        const formDataToSave = {
+          birth_date: birthDate,
+          gender: gender,
+          birth_time: birthTime || '',
+          chinese_name: chineseName || '',
+          mbti: mbti || ''
+        }
+        fortuneStore.setFortune(data.fortune, today, formDataToSave)
+      } else {
+        fortuneStore.setFortune(data.fortune, today)
+      }
 
       console.log('[FortuneLoading] Fortune Store에 저장 완료:', today)
 
