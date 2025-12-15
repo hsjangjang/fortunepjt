@@ -6,7 +6,7 @@
 
 ## 🎯 핵심 기능
 
-- 🎨 **AI 운세 계산**: Google Gemini 기반 사주, 별자리, MBTI 종합 분석
+- 🎨 **AI 운세 계산**: OpenAI (GMS) 기반 사주, 별자리, MBTI 종합 분석
 - 👔 **OOTD 추천**: 날씨와 운세를 고려한 맞춤형 코디 제안
 - 🍽️ **메뉴 추천**: 운세에 맞는 음식 추천
 - 📸 **아이템 색상 분석**: AI 이미지 분석으로 행운색 매칭도 계산
@@ -17,7 +17,7 @@
 |------|-----|----------|------|
 | 운세 텍스트 생성 | OpenAI (GMS) | `gpt-4o-mini` | 운세 상세 텍스트 AI 생성 |
 | 운세 요약 | OpenAI (GMS) | `gpt-5-nano` | 종합운 한줄 요약 |
-| 아이템 색상 분석 | Google Gemini | `gemini-pro-vision` | 이미지에서 색상/카테고리 추출 |
+| 아이템 색상 분석 | Google Gemini | `gemini-2.5-flash` | 이미지에서 색상/카테고리 추출 |
 | 날씨 정보 | 기상청 단기예보 | VilageFcstInfoService 2.0 | OOTD 추천용 기온/날씨 |
 | 위치 → 주소 변환 | Kakao 로컬 | coord2address | 위경도를 한글 주소로 변환 |
 

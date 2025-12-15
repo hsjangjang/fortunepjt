@@ -133,42 +133,9 @@ class ItemAnalyzer:
             genai.configure(api_key=api_key)
             print("[DEBUG] Gemini 설정 완료")
             
-            # 사용 가능한 모델 목록 확인
-            vision_model = None
-            try:
-                print("[DEBUG] 사용 가능한 모델 목록 확인 중...")
-                available_models = []
-                for m in genai.list_models():
-                    if 'generateContent' in m.supported_generation_methods:
-                        available_models.append(m.name)
-                        print(f"[DEBUG] - {m.name}")
-                
-                # 1순위: flash 모델 (무료)
-                for model_name in available_models:
-                    if 'flash' in model_name.lower() and 'image' not in model_name.lower():
-                        vision_model = model_name
-                        print(f"[DEBUG] Flash 모델 발견: {vision_model}")
-                        break
-                
-                # 2순위: vision 모델
-                if not vision_model:
-                    for model_name in available_models:
-                        if 'vision' in model_name.lower():
-                            vision_model = model_name
-                            break
-                
-                # 3순위: 아무 모델
-                if not vision_model and available_models:
-                    vision_model = available_models[0]
-                    
-            except Exception as e:
-                print(f"[WARNING] 모델 목록 조회 실패, 기본 모델 사용 시도: {e}")
-                vision_model = 'gemini-pro-vision'
-
-            if not vision_model:
-                raise ValueError("사용 가능한 모델을 찾을 수 없습니다")
-            
-            print(f"[DEBUG] 선택된 모델: {vision_model}")
+            # gemini-2.5-flash 모델 사용
+            vision_model = 'gemini-2.5-flash'
+            print(f"[DEBUG] 사용 모델: {vision_model}")
             model = genai.GenerativeModel(vision_model)
             print("[DEBUG] 모델 초기화 완료")
             
