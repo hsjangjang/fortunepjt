@@ -297,7 +297,11 @@ class FortuneCalculator:
                         text = result[key][field].strip()
                         if not text.endswith('.'):
                             text += '.'
-                        parts.append(f"{prefix}{text}")
+                        # GPT가 이미 프리픽스를 포함했으면 붙이지 않음
+                        if prefix and text.startswith(prefix.strip()):
+                            parts.append(text)
+                        else:
+                            parts.append(f"{prefix}{text}")
 
                 result[key] = ' '.join(parts)
                 print(f"[DEBUG] 시간대별 운세 조합 ({period_type}/{key}): {result[key][:100]}...")
