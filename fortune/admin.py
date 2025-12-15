@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import DailyFortuneCache, FortuneBaseData, ColorMaster, MBTISpeechTemplate
+from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache, FortuneBaseData, ColorMaster, MBTISpeechTemplate
 
 @admin.register(DailyFortuneCache)
 class DailyFortuneCacheAdmin(admin.ModelAdmin):
@@ -20,7 +20,24 @@ class ColorMasterAdmin(admin.ModelAdmin):
     list_filter = ['color_category']
     search_fields = ['color_name', 'color_code']
 
+@admin.register(WeeklyFortuneCache)
+class WeeklyFortuneCacheAdmin(admin.ModelAdmin):
+    list_display = ['user', 'session_key', 'year', 'week_number', 'birth_date', 'created_at']
+    list_filter = ['year', 'week_number']
+    search_fields = ['user__username', 'session_key']
+    ordering = ['-year', '-week_number', '-created_at']
+
+
+@admin.register(MonthlyFortuneCache)
+class MonthlyFortuneCacheAdmin(admin.ModelAdmin):
+    list_display = ['user', 'session_key', 'year', 'month', 'birth_date', 'created_at']
+    list_filter = ['year', 'month']
+    search_fields = ['user__username', 'session_key']
+    ordering = ['-year', '-month', '-created_at']
+
+
 @admin.register(MBTISpeechTemplate)
 class MBTISpeechTemplateAdmin(admin.ModelAdmin):
     list_display = ['mbti_type', 'category', 'tone']
     list_filter = ['mbti_type', 'category', 'tone']
+    search_fields = ['mbti_type', 'template_text']
