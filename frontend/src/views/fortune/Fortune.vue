@@ -649,11 +649,14 @@ const loadFortuneData = async (period) => {
       // 캐시 없음 - Loading 페이지로 리다이렉트하여 모든 운세 생성
       console.log(`[Fortune] ${period} 운세 없음 → Loading 페이지로 이동`)
 
+      // 로딩 상태 유지 (리다이렉트 전까지)
+      isLoadingPeriod.value = true
+
       // 로그인 사용자는 바로 로딩 페이지로
       if (authStore.isAuthenticated) {
         router.replace({
           name: 'fortune-loading',
-          query: { redirect: route.fullPath }
+          query: { redirect: '/fortune/today' }
         })
         return
       }
@@ -669,7 +672,7 @@ const loadFortuneData = async (period) => {
         router.replace({
           name: 'fortune-loading',
           query: {
-            redirect: route.fullPath,
+            redirect: '/fortune/today',
             birth_date: birthDate,
             gender: gender,
             birth_time: formInfo.birth_time || fortuneInfo.birth_time || '',
@@ -681,7 +684,7 @@ const loadFortuneData = async (period) => {
         // formData도 없으면 계산 페이지로
         router.replace({
           name: 'fortune-calculate',
-          query: { redirect: route.fullPath }
+          query: { redirect: '/fortune/today' }
         })
       }
       return
@@ -706,10 +709,11 @@ const loadFortuneData = async (period) => {
       return
     }
   } finally {
-    isLoadingPeriod.value = false
-
-    // 애니메이션은 로딩 완료 후, nextTick에서 실행
+    // 운세가 있을 때만 로딩 상태 해제 (리다이렉트 시에는 유지)
     if (fortune.value) {
+      isLoadingPeriod.value = false
+
+      // 애니메이션은 로딩 완료 후, nextTick에서 실행
       await nextTick()
       setTimeout(() => {
         animateScore()
