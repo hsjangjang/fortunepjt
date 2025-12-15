@@ -14,7 +14,7 @@
           <template v-if="authStore.isAuthenticated">
             <li class="nav-item">
               <router-link class="nav-link" to="/fortune/today">
-                <Sparkles class="me-1" :size="18" /> 오늘의 운세
+                <Sparkles class="me-1" :size="18" /> 운세 확인하기
               </router-link>
             </li>
             <li class="nav-item">
