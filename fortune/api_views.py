@@ -624,7 +624,7 @@ class WeeklyFortuneAPIView(APIView):
         fortune_data = load_weekly_fortune_from_db(user, session_key, year, week)
 
         if not fortune_data:
-            # 주간 운세 계산 (주간용 시드 사용)
+            # 주간 운세 계산 (주간용 시드 사용 + 주간용 프롬프트)
             calculator = FortuneCalculator()
             fortune_data = calculator.calculate_fortune(
                 birth_date=birth_date,
@@ -634,11 +634,13 @@ class WeeklyFortuneAPIView(APIView):
                 mbti=mbti,
                 user_id=user.id if user else None,
                 session_key=session_key,
-                fortune_seed=f"weekly_{year}_{week}"  # 주간 시드
+                fortune_seed=f"weekly_{year}_{week}",  # 주간 시드
+                period_type='weekly'  # 주간 운세용 프롬프트 사용
             )
 
-            # 주간 운세 텍스트로 변환
-            fortune_data = self._convert_to_weekly_fortune(fortune_data, year, week)
+            # 주간 운세 메타데이터 추가
+            fortune_data['period_type'] = 'weekly'
+            fortune_data['period_label'] = f'{year}년 {week}주차'
 
             # DB에 저장
             save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date)
@@ -650,25 +652,6 @@ class WeeklyFortuneAPIView(APIView):
             'year': year,
             'week': week
         }, status=status.HTTP_200_OK)
-
-    def _convert_to_weekly_fortune(self, fortune_data, year, week):
-        """일일 운세를 주간 운세 형태로 변환"""
-        fortune_texts = fortune_data.get('fortune_texts', {})
-
-        # 주간 운세 텍스트 변환 (오늘 -> 이번 주)
-        weekly_texts = {}
-        for key, text in fortune_texts.items():
-            if text:
-                weekly_text = text.replace('오늘', '이번 주').replace('하루', '한 주')
-                weekly_text = weekly_text.replace('오전에', '주 초에').replace('오후에', '주 후반에')
-                weekly_texts[key] = weekly_text
-            else:
-                weekly_texts[key] = text
-
-        fortune_data['fortune_texts'] = weekly_texts
-        fortune_data['period_type'] = 'weekly'
-        fortune_data['period_label'] = f'{year}년 {week}주차'
-        return fortune_data
 
 
 class MonthlyFortuneAPIView(APIView):
@@ -760,7 +743,7 @@ class MonthlyFortuneAPIView(APIView):
         fortune_data = load_monthly_fortune_from_db(user, session_key, year, month)
 
         if not fortune_data:
-            # 월간 운세 계산 (월간용 시드 사용)
+            # 월간 운세 계산 (월간용 시드 사용 + 월간용 프롬프트)
             calculator = FortuneCalculator()
             fortune_data = calculator.calculate_fortune(
                 birth_date=birth_date,
@@ -770,11 +753,13 @@ class MonthlyFortuneAPIView(APIView):
                 mbti=mbti,
                 user_id=user.id if user else None,
                 session_key=session_key,
-                fortune_seed=f"monthly_{year}_{month}"  # 월간 시드
+                fortune_seed=f"monthly_{year}_{month}",  # 월간 시드
+                period_type='monthly'  # 월간 운세용 프롬프트 사용
             )
 
-            # 월간 운세 텍스트로 변환
-            fortune_data = self._convert_to_monthly_fortune(fortune_data, year, month)
+            # 월간 운세 메타데이터 추가
+            fortune_data['period_type'] = 'monthly'
+            fortune_data['period_label'] = f'{year}년 {month}월'
 
             # DB에 저장
             save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date)
@@ -786,22 +771,3 @@ class MonthlyFortuneAPIView(APIView):
             'year': year,
             'month': month
         }, status=status.HTTP_200_OK)
-
-    def _convert_to_monthly_fortune(self, fortune_data, year, month):
-        """일일 운세를 월간 운세 형태로 변환"""
-        fortune_texts = fortune_data.get('fortune_texts', {})
-
-        # 월간 운세 텍스트 변환 (오늘 -> 이번 달)
-        monthly_texts = {}
-        for key, text in fortune_texts.items():
-            if text:
-                monthly_text = text.replace('오늘', '이번 달').replace('하루', '한 달')
-                monthly_text = monthly_text.replace('오전에', '월초에').replace('오후에', '월말에')
-                monthly_texts[key] = monthly_text
-            else:
-                monthly_texts[key] = text
-
-        fortune_data['fortune_texts'] = monthly_texts
-        fortune_data['period_type'] = 'monthly'
-        fortune_data['period_label'] = f'{year}년 {month}월'
-        return fortune_data

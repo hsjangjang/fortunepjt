@@ -105,7 +105,8 @@ class FortuneCalculator:
         calendar_type: str = 'solar',  # 양력/음력 구분 (기본값: 양력)
         user_id: Optional[int] = None,  # 로그인 사용자 ID (로또 번호용)
         session_key: Optional[str] = None,  # 세션 키 (비로그인 사용자 로또 번호용)
-        fortune_seed: Optional[str] = None  # 주간/월간 운세용 시드 (weekly_2024_51, monthly_2024_12 등)
+        fortune_seed: Optional[str] = None,  # 주간/월간 운세용 시드 (weekly_2024_51, monthly_2024_12 등)
+        period_type: str = 'daily'  # 운세 기간 유형: 'daily', 'weekly', 'monthly'
     ) -> Dict:
         """
         운세 계산 메인 함수
@@ -171,7 +172,7 @@ class FortuneCalculator:
         # 상세 운세 텍스트 생성 (LLM 시도 후 실패시 기존 로직)
         fortune_texts = self._generate_fortune_text_with_llm(
             birth_date, gender, saju_data, zodiac_sign, chinese_zodiac, fortune_scores, mbti,
-            lucky_item['main'], lucky_item['zodiac']
+            lucky_item['main'], lucky_item['zodiac'], period_type
         )
 
         if fortune_texts:
@@ -200,7 +201,7 @@ class FortuneCalculator:
             pass
         else:
             print("[DEBUG] LLM 생성 실패, 기존 로직 사용")
-            fortune_texts = self._generate_fortune_texts(fortune_scores, zodiac_sign, chinese_zodiac)
+            fortune_texts = self._generate_fortune_texts(fortune_scores, zodiac_sign, chinese_zodiac, period_type)
         
         return {
             'fortune_score': fortune_scores['total'],
@@ -221,45 +222,57 @@ class FortuneCalculator:
             'mbti': mbti  # 결과에 MBTI 포함
         }
 
-    def _generate_fortune_text_with_llm(
+    def _build_fortune_prompt(
         self,
         birth_date: date,
         gender: str,
-        saju: Dict,
         zodiac: str,
         chinese_zodiac: str,
-        scores: Dict,
-        mbti: Optional[str] = None,
-        lucky_item_name: Optional[str] = None,
-        zodiac_item_name: Optional[str] = None
-    ) -> Optional[Dict]:
-        """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
-        import time
+        mbti_info: str,
+        lucky_item_info: str,
+        saju: Dict,
+        lucky_item_name: str,
+        zodiac_item_name: str,
+        period_type: str = 'daily'
+    ) -> str:
+        """기간 유형에 따른 운세 프롬프트 생성"""
+        today = date.today()
 
-        # 캐시 키 생성
-        cache_key = f"fortune_text_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}"
-        cached_result = cache.get(cache_key)
-
-        if cached_result:
-            print("[DEBUG] 캐시된 운세 텍스트 사용")
-            return cached_result
-
-        # OpenAI API 사용
-        openai_api_key = getattr(settings, 'OPENAI_API_KEY', '')
-
-        if not openai_api_key:
-            print("[ERROR] OPENAI_API_KEY가 설정되지 않음")
-            return None
-
-        max_retries = 1
-        retry_delay = 2  # 재시도 간 딜레이 (초)
-
-        mbti_info = f"- MBTI: {mbti}" if mbti else "- MBTI: 정보 없음"
-        lucky_item_info = f"- 운세 기반 행운 아이템: {lucky_item_name}" if lucky_item_name else ""
-        zodiac_item_info = f"- 별자리 행운 아이템: {zodiac_item_name}" if zodiac_item_name else ""
+        # 기간별 설정
+        if period_type == 'weekly':
+            period_title = '이번 주의 운세'
+            period_word = '이번 주'
+            period_unit = '한 주'
+            time_examples = '주 초반, 주 중반, 주 후반'
+            timing_guide = """
+   - **절대 사용 금지**: "오전 9시", "오후 3시", "저녁 7시" 등 구체적인 시간 표현
+   - **사용 권장**: "주 초반", "주 중반", "주 후반", "주말 무렵", "평일에", "휴일에" 등 주간 단위 표현
+   - **절대 사용 금지**: "오늘", "내일", "어제" 등 일일 단위 표현
+   - **사용 권장**: "이번 주", "한 주 동안", "주간 내내" 등 주간 단위 표현"""
+            item_period = '이번 주'
+        elif period_type == 'monthly':
+            period_title = '이번 달의 운세'
+            period_word = '이번 달'
+            period_unit = '한 달'
+            time_examples = '월초, 월중반, 월말'
+            timing_guide = """
+   - **절대 사용 금지**: "오전 9시", "오후 3시", "저녁 7시" 등 구체적인 시간 표현
+   - **절대 사용 금지**: "오늘", "내일", "이번 주" 등 단기 시간 표현
+   - **사용 권장**: "월초", "월중반", "월말", "달의 전반부", "달의 후반부" 등 월간 단위 표현
+   - **사용 권장**: "이번 달", "한 달 동안", "월간 내내" 등 월간 단위 표현"""
+            item_period = '이번 달'
+        else:  # daily
+            period_title = '오늘의 운세'
+            period_word = '오늘'
+            period_unit = '하루'
+            time_examples = '오전, 오후, 저녁'
+            timing_guide = """
+   - 구체적인 시간 표현 사용 가능: "오전 10시", "오후 3시", "저녁 7시" 등
+   - "오늘", "내일", "하루" 등 일일 단위 표현 사용"""
+            item_period = '오늘'
 
         prompt = f"""
-당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '네이버 운세' 스타일의 오늘의 운세를 작성하고, 각 운세의 점수를 매겨주세요.
+당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '네이버 운세' 스타일의 {period_title}를 작성하고, 각 운세의 점수를 매겨주세요.
 
 [사용자 정보]
 - 생년월일: {birth_date}
@@ -269,7 +282,7 @@ class FortuneCalculator:
 {mbti_info}
 {lucky_item_info}
 - 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시 (간지)
-- 오늘 날짜: {date.today()}
+- 현재 날짜: {today}
 
 [작성 가이드]
 1. **말투**: "~합니다", "~입니다" 체의 정중하고 부드러운 문체 (네이버 운세 스타일)
@@ -277,7 +290,9 @@ class FortuneCalculator:
    - 각 항목당 **정확히 5문장**으로 작성해주세요.
    - 각 문장은 마침표(.)로 끝나야 합니다.
    - 3문장 이하로 작성하면 안 됩니다! 반드시 5문장을 채워주세요.
-3. **점수 매기기 (중요)**:
+3. **시간 표현 가이드 (매우 중요)**:{timing_guide}
+   - 시간대 예시: {time_examples}
+4. **점수 매기기 (중요)**:
    - 각 운세의 내용을 먼저 작성한 후, 그 내용에 맞는 점수를 50~100점 사이에서 매겨주세요.
    - 점수와 텍스트의 톤이 일치해야 합니다:
      * 90-100점: 매우 좋은 운세, 적극적으로 행동 권장
@@ -285,19 +300,19 @@ class FortuneCalculator:
      * 60-74점: 보통 운세, 신중함 권장, 약간의 주의 필요
      * 50-59점: 다소 어려운 운세, 조심스러운 접근 권장
    - **운세 텍스트가 좋으면 점수도 높게, 주의가 필요한 내용이면 점수도 낮게** 매겨주세요.
-4. **점수 언급 금지**: 텍스트 내에서 "90점", "85점" 등 숫자를 직접 언급하지 마세요.
-5. **MBTI 반영 방식**:
+5. **점수 언급 금지**: 텍스트 내에서 "90점", "85점" 등 숫자를 직접 언급하지 마세요.
+6. **MBTI 반영 방식**:
    - "MBTI가 ~라서" 같은 말은 하지 마세요.
    - 사용자의 MBTI 성향에 맞는 조언을 자연스럽게 녹여내세요.
-6. **행운의 아이템 설명 (중요)**:
+7. **행운의 아이템 설명 (중요)**:
    - 운세 기반 아이템 '{lucky_item_name}' 설명: 2문장 (60~80자)
      * 반드시 '{lucky_item_name}'이라는 단어를 설명에 포함해주세요!
-     * 예: "{lucky_item_name}은(는) 오늘 당신에게 좋은 기운을 전해줍니다. 특히 대인관계에서 긍정적인 에너지를 발산합니다."
+     * 예: "{lucky_item_name}은(는) {item_period} 당신에게 좋은 기운을 전해줍니다. 특히 대인관계에서 긍정적인 에너지를 발산합니다."
    - 별자리({zodiac}) 아이템 '{zodiac_item_name}' 설명: 2문장 (60~80자)
      * 반드시 '{zodiac_item_name}'이라는 단어를 설명에 포함해주세요!
-     * 예: "{zodiac_item_name}은(는) {zodiac}인 당신에게 특별한 행운을 가져다줍니다. 오늘 하루 긍정적인 변화가 찾아올 것입니다."
+     * 예: "{zodiac_item_name}은(는) {zodiac}인 당신에게 특별한 행운을 가져다줍니다. {period_unit} 동안 긍정적인 변화가 찾아올 것입니다."
    - **두 설명의 길이를 비슷하게 맞춰주세요 (차이 10자 이내)**
-7. **총운 점수**: 재물운, 애정운, 학업운, 직장운, 건강운 점수의 평균을 반올림하여 총운 점수로 사용해주세요.
+8. **총운 점수**: 재물운, 애정운, 학업운, 직장운, 건강운 점수의 평균을 반올림하여 총운 점수로 사용해주세요.
 
 [출력 형식]
 반드시 아래 JSON 형식으로만 출력하세요 (마크다운 코드 블록 없이 순수 JSON만):
@@ -322,6 +337,51 @@ class FortuneCalculator:
     }}}}
 }}}}
 """
+        return prompt
+
+    def _generate_fortune_text_with_llm(
+        self,
+        birth_date: date,
+        gender: str,
+        saju: Dict,
+        zodiac: str,
+        chinese_zodiac: str,
+        scores: Dict,
+        mbti: Optional[str] = None,
+        lucky_item_name: Optional[str] = None,
+        zodiac_item_name: Optional[str] = None,
+        period_type: str = 'daily'  # 'daily', 'weekly', 'monthly'
+    ) -> Optional[Dict]:
+        """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
+        import time
+
+        # 캐시 키 생성 (period_type 포함)
+        cache_key = f"fortune_text_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
+        cached_result = cache.get(cache_key)
+
+        if cached_result:
+            print("[DEBUG] 캐시된 운세 텍스트 사용")
+            return cached_result
+
+        # OpenAI API 사용
+        openai_api_key = getattr(settings, 'OPENAI_API_KEY', '')
+
+        if not openai_api_key:
+            print("[ERROR] OPENAI_API_KEY가 설정되지 않음")
+            return None
+
+        max_retries = 1
+        retry_delay = 2  # 재시도 간 딜레이 (초)
+
+        mbti_info = f"- MBTI: {mbti}" if mbti else "- MBTI: 정보 없음"
+        lucky_item_info = f"- 운세 기반 행운 아이템: {lucky_item_name}" if lucky_item_name else ""
+        zodiac_item_info = f"- 별자리 행운 아이템: {zodiac_item_name}" if zodiac_item_name else ""
+
+        # 기간별 프롬프트 설정
+        prompt = self._build_fortune_prompt(
+            birth_date, gender, zodiac, chinese_zodiac, mbti_info, lucky_item_info,
+            saju, lucky_item_name, zodiac_item_name, period_type
+        )
 
         # OpenAI API (gpt-4o-mini) 사용
         for attempt in range(max_retries + 1):
@@ -433,16 +493,34 @@ class FortuneCalculator:
             'health': health,
         }
     
-    def _generate_fortune_texts(self, scores: Dict, zodiac_sign: str, chinese_zodiac: str) -> Dict:
+    def _generate_fortune_texts(self, scores: Dict, zodiac_sign: str, chinese_zodiac: str, period_type: str = 'daily') -> Dict:
         """LLM 실패 시 동적 운세 텍스트 생성 - 날짜/점수 기반 변형"""
         today = date.today()
         day_seed = today.toordinal() + hash(zodiac_sign) % 100  # 날짜+별자리 기반 시드
         random.seed(day_seed)
 
-        # 시간대 변형 (매일 다르게)
-        morning_hours = random.choice(["오전 9시", "오전 10시", "오전 11시", "아침 일찍"])
-        afternoon_hours = random.choice(["오후 2시", "오후 3시", "오후 4시", "점심 이후"])
-        evening_hours = random.choice(["저녁 6시", "저녁 7시", "저녁 8시", "저녁 무렵"])
+        # 기간별 시간 표현 설정
+        if period_type == 'weekly':
+            # 주간 운세용 시간 표현
+            morning_hours = random.choice(["주 초반", "이번 주 초", "주간 전반부", "평일 초반"])
+            afternoon_hours = random.choice(["주 중반", "수요일 무렵", "주간 중반부", "평일 중반"])
+            evening_hours = random.choice(["주 후반", "금요일 무렵", "주말 전", "이번 주 말"])
+            period_word = "이번 주"
+            period_unit = "한 주"
+        elif period_type == 'monthly':
+            # 월간 운세용 시간 표현
+            morning_hours = random.choice(["월초", "이번 달 초", "달의 전반부", "초순"])
+            afternoon_hours = random.choice(["월중반", "달의 중반", "중순 무렵", "보름 무렵"])
+            evening_hours = random.choice(["월말", "이번 달 말", "달의 후반부", "하순"])
+            period_word = "이번 달"
+            period_unit = "한 달"
+        else:
+            # 일일 운세용 시간 표현 (기존)
+            morning_hours = random.choice(["오전 9시", "오전 10시", "오전 11시", "아침 일찍"])
+            afternoon_hours = random.choice(["오후 2시", "오후 3시", "오후 4시", "점심 이후"])
+            evening_hours = random.choice(["저녁 6시", "저녁 7시", "저녁 8시", "저녁 무렵"])
+            period_word = "오늘"
+            period_unit = "하루"
 
         # 조언 키워드 변형
         action_words_positive = random.choice(["적극적으로", "자신감 있게", "주도적으로", "과감하게"])
@@ -588,6 +666,14 @@ class FortuneCalculator:
             texts['health'] = random.choice(health_mid)
         else:
             texts['health'] = random.choice(health_low)
+
+        # 주간/월간 운세인 경우 텍스트 치환
+        if period_type != 'daily':
+            for key in texts:
+                if texts[key]:
+                    # "오늘" -> period_word, "하루" -> period_unit 치환
+                    texts[key] = texts[key].replace('오늘', period_word).replace('하루', period_unit)
+                    texts[key] = texts[key].replace('내일', f'{period_word} 이후')
 
         # 랜덤 시드 리셋 (다른 곳에 영향 안 주도록)
         random.seed()

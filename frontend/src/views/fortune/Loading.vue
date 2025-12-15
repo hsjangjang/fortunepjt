@@ -24,7 +24,9 @@ const loadingTexts = [
   '별자리를 분석하고 있습니다',
   '사주팔자를 계산하고 있습니다',
   '행운의 색상을 찾고 있습니다',
-  '오늘의 운세를 정리하고 있습니다'
+  '오늘의 운세를 정리하고 있습니다',
+  '이번 주 운세를 생성하고 있습니다',
+  '이번 달 운세를 생성하고 있습니다'
 ]
 
 const currentText = ref(loadingTexts[0])
@@ -115,6 +117,7 @@ async function calculateFortune() {
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
       // 비로그인 사용자의 경우 formData도 저장 (weekly/monthly 생성시 필요)
+      let formDataForWeeklyMonthly = null
       if (!authStore.isAuthenticated) {
         const birthDate = route.query.birth_date
         const gender = route.query.gender
@@ -122,19 +125,22 @@ async function calculateFortune() {
         const chineseName = route.query.chinese_name
         const mbti = route.query.mbti
 
-        const formDataToSave = {
+        formDataForWeeklyMonthly = {
           birth_date: birthDate,
           gender: gender,
           birth_time: birthTime || '',
           chinese_name: chineseName || '',
           mbti: mbti || ''
         }
-        fortuneStore.setFortune(data.fortune, today, formDataToSave)
+        fortuneStore.setFortune(data.fortune, today, formDataForWeeklyMonthly)
       } else {
         fortuneStore.setFortune(data.fortune, today)
       }
 
-      console.log('[FortuneLoading] Fortune Store에 저장 완료:', today)
+      console.log('[FortuneLoading] 일일 운세 저장 완료:', today)
+
+      // 주간/월간 운세도 함께 생성 (백그라운드)
+      await generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
 
       // 계산 완료 - 원래 가려던 페이지 또는 결과 페이지로 이동
       if (textInterval) clearInterval(textInterval)
@@ -156,6 +162,44 @@ async function calculateFortune() {
   } catch (error) {
     console.error('Fortune calculation error:', error)
     showError(error.response?.data?.error || '서버와 통신 중 오류가 발생했습니다.')
+  }
+}
+
+async function generateWeeklyAndMonthlyFortunes(formData) {
+  // 주간 운세 생성
+  try {
+    currentText.value = '이번 주 운세를 생성하고 있습니다...'
+    console.log('[FortuneLoading] 주간 운세 생성 시작')
+
+    if (authStore.isAuthenticated) {
+      // 로그인 사용자
+      await apiClient.post('/api/fortune/weekly/')
+    } else if (formData) {
+      // 비로그인 사용자
+      await apiClient.post('/api/fortune/weekly/', formData)
+    }
+    console.log('[FortuneLoading] 주간 운세 생성 완료')
+  } catch (error) {
+    console.error('[FortuneLoading] 주간 운세 생성 실패:', error)
+    // 주간 운세 실패해도 계속 진행
+  }
+
+  // 월간 운세 생성
+  try {
+    currentText.value = '이번 달 운세를 생성하고 있습니다...'
+    console.log('[FortuneLoading] 월간 운세 생성 시작')
+
+    if (authStore.isAuthenticated) {
+      // 로그인 사용자
+      await apiClient.post('/api/fortune/monthly/')
+    } else if (formData) {
+      // 비로그인 사용자
+      await apiClient.post('/api/fortune/monthly/', formData)
+    }
+    console.log('[FortuneLoading] 월간 운세 생성 완료')
+  } catch (error) {
+    console.error('[FortuneLoading] 월간 운세 생성 실패:', error)
+    // 월간 운세 실패해도 계속 진행
   }
 }
 
