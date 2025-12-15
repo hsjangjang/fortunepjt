@@ -104,7 +104,8 @@ class FortuneCalculator:
         mbti: Optional[str] = None,  # MBTI 추가
         calendar_type: str = 'solar',  # 양력/음력 구분 (기본값: 양력)
         user_id: Optional[int] = None,  # 로그인 사용자 ID (로또 번호용)
-        session_key: Optional[str] = None  # 세션 키 (비로그인 사용자 로또 번호용)
+        session_key: Optional[str] = None,  # 세션 키 (비로그인 사용자 로또 번호용)
+        fortune_seed: Optional[str] = None  # 주간/월간 운세용 시드 (weekly_2024_51, monthly_2024_12 등)
     ) -> Dict:
         """
         운세 계산 메인 함수
@@ -123,7 +124,11 @@ class FortuneCalculator:
         today = date.today()
 
         # 고유 시드 생성 (날짜 + 생년월일로 매일 같은 운세 보장)
-        seed_string = f"{today.isoformat()}-{birth_date.isoformat()}-{gender}"
+        # fortune_seed가 제공되면 주간/월간 운세용으로 사용
+        if fortune_seed:
+            seed_string = f"{fortune_seed}-{birth_date.isoformat()}-{gender}"
+        else:
+            seed_string = f"{today.isoformat()}-{birth_date.isoformat()}-{gender}"
         seed = int(hashlib.md5(seed_string.encode()).hexdigest(), 16)
         random.seed(seed)
 
