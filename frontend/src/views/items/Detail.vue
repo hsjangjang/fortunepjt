@@ -337,10 +337,28 @@ const euclideanDistance = (rgb1, rgb2) => {
   )
 }
 
-// 거리를 점수로 변환 (0-100)
+// 거리를 점수로 변환 (0-100) - 더 엄격한 비선형 계산
 const distanceToScore = (distance) => {
-  const maxDistance = Math.sqrt(255 * 255 * 3)
-  return Math.round(100 - (distance / maxDistance) * 100)
+  const maxDistance = Math.sqrt(255 * 255 * 3) // ~441.67
+
+  // 거리 임계값 설정 (더 엄격하게)
+  // 거리 0-50: 90-100점 (거의 같은 색)
+  // 거리 50-100: 70-90점 (비슷한 색)
+  // 거리 100-150: 50-70점 (약간 다른 색)
+  // 거리 150-200: 30-50점 (다른 색)
+  // 거리 200+: 0-30점 (완전히 다른 색)
+
+  if (distance <= 50) {
+    return Math.round(90 + (50 - distance) / 50 * 10)
+  } else if (distance <= 100) {
+    return Math.round(70 + (100 - distance) / 50 * 20)
+  } else if (distance <= 150) {
+    return Math.round(50 + (150 - distance) / 50 * 20)
+  } else if (distance <= 200) {
+    return Math.round(30 + (200 - distance) / 50 * 20)
+  } else {
+    return Math.round(Math.max(0, 30 - (distance - 200) / (maxDistance - 200) * 30))
+  }
 }
 
 // 아이템 색상과 행운색 매칭 계산
