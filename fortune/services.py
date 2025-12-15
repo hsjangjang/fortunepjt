@@ -222,6 +222,50 @@ class FortuneCalculator:
             'mbti': mbti  # 결과에 MBTI 포함
         }
 
+    def _combine_period_fortune_text(self, result: Dict, period_type: str) -> Dict:
+        """주간/월간 운세: 시간대별 개별 필드를 하나의 텍스트로 조합"""
+        fortune_keys = ['total', 'money', 'love', 'study', 'work', 'health']
+
+        if period_type == 'weekly':
+            fields = [
+                ('summary', ''),
+                ('early_week', '평일 초(월~화)에는 '),
+                ('late_week', '평일 말(수~금)에는 '),
+                ('weekend', '주말(토~일)에는 '),
+                ('advice', '')
+            ]
+        else:  # monthly
+            fields = [
+                ('summary', ''),
+                ('early_month', '월초(1~10일)에는 '),
+                ('mid_month', '월중(11~20일)에는 '),
+                ('late_month', '월말(21일~)에는 '),
+                ('advice', '')
+            ]
+
+        for key in fortune_keys:
+            if key not in result:
+                continue
+
+            # 이미 문자열이면 (기존 형식) 스킵
+            if isinstance(result[key], str):
+                continue
+
+            # 객체 형식이면 조합
+            if isinstance(result[key], dict):
+                parts = []
+                for field, prefix in fields:
+                    if field in result[key] and result[key][field]:
+                        text = result[key][field].strip()
+                        if not text.endswith('.'):
+                            text += '.'
+                        parts.append(f"{prefix}{text}")
+
+                result[key] = ' '.join(parts)
+                print(f"[DEBUG] 시간대별 운세 조합 ({period_type}/{key}): {result[key][:100]}...")
+
+        return result
+
     def _build_fortune_prompt(
         self,
         birth_date: date,
@@ -243,54 +287,72 @@ class FortuneCalculator:
             period_title = '이번 주의 운세'
             period_word = '이번 주'
             period_unit = '한 주'
-            time_examples = '평일 초(월~화), 평일 말(수~금), 주말(토~일)'
-            timing_guide = """
-【필수 형식 - 반드시 이 형식대로 작성】
-
-각 항목(total, money, love, study, work, health)은 정확히 5문장으로 구성:
-1번째 문장: 이번 주 전체 요약
-2번째 문장: "평일 초(월~화)에는 " 로 시작 (이 7글자로 반드시 시작!)
-3번째 문장: "평일 말(수~금)에는 " 로 시작 (이 8글자로 반드시 시작!)
-4번째 문장: "주말(토~일)에는 " 로 시작 (이 8글자로 반드시 시작!)
-5번째 문장: 조언으로 마무리
-
-예시:
-"이번 주 재물운은 안정적인 흐름을 보입니다. 평일 초(월~화)에는 예상치 못한 지출에 주의하세요. 평일 말(수~금)에는 투자보다 저축을 우선하는 것이 좋습니다. 주말(토~일)에는 소소한 행운이 찾아올 수 있습니다. 계획적인 소비가 {period_unit} 재정 안정의 열쇠입니다."
-
-금지어: 오전, 오후, 저녁, 점심, 오늘, 내일, 길일, 구체적 시간"""
             item_period = '이번 주'
+            timing_guide = """각 운세 항목을 시간대별로 구분하여 작성하세요:
+- summary: 이번 주 전체 요약 (1문장)
+- early_week: 평일 초반(월~화)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
+- late_week: 평일 후반(수~금)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
+- weekend: 주말(토~일)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
+- advice: 이번 주 조언 (1문장)
+
+중요: 각 시간대(early_week, late_week, weekend)는 서로 다른 구체적인 운세 내용이어야 합니다!"""
+
+            output_format = """{{{{
+    "total": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "money": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "love": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "study": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "work": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "health": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "scores": {{"total": 점수, "money": 점수, "love": 점수, "study": 점수, "work": 점수, "health": 점수}},
+    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+}}}}"""
+
         elif period_type == 'monthly':
             period_title = '이번 달의 운세'
             period_word = '이번 달'
             period_unit = '한 달'
-            time_examples = '월초(1~10일), 월중(11~20일), 월말(21일~)'
-            timing_guide = """
-【필수 형식 - 반드시 이 형식대로 작성】
-
-각 항목(total, money, love, study, work, health)은 정확히 5문장으로 구성:
-1번째 문장: 이번 달 전체 요약
-2번째 문장: "월초(1~10일)에는 " 로 시작 (이 10글자로 반드시 시작!)
-3번째 문장: "월중(11~20일)에는 " 로 시작 (이 11글자로 반드시 시작!)
-4번째 문장: "월말(21일~)에는 " 로 시작 (이 9글자로 반드시 시작!)
-5번째 문장: 조언으로 마무리
-
-예시:
-"이번 달 재물운은 변화의 기운이 감지됩니다. 월초(1~10일)에는 새로운 수입원이 생길 수 있습니다. 월중(11~20일)에는 지출을 줄이고 절약에 집중하세요. 월말(21일~)에는 투자 기회가 찾아올 수 있습니다. 한 달 동안 꾸준히 관리하면 좋은 결과를 얻습니다."
-
-금지어: 오전, 오후, 저녁, 이번 주, 오늘, 내일, 길일, 구체적 시간"""
             item_period = '이번 달'
+            timing_guide = """각 운세 항목을 시간대별로 구분하여 작성하세요:
+- summary: 이번 달 전체 요약 (1문장)
+- early_month: 월초(1~10일)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
+- mid_month: 월중(11~20일)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
+- late_month: 월말(21일~)의 운세 (1문장, 구체적이고 다른 시간대와 다른 내용)
+- advice: 이번 달 조언 (1문장)
+
+중요: 각 시간대(early_month, mid_month, late_month)는 서로 다른 구체적인 운세 내용이어야 합니다!"""
+
+            output_format = """{{{{
+    "total": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "money": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "love": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "study": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "work": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "health": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "scores": {{"total": 점수, "money": 점수, "love": 점수, "study": 점수, "work": 점수, "health": 점수}},
+    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+}}}}"""
+
         else:  # daily
             period_title = '오늘의 운세'
             period_word = '오늘'
             period_unit = '하루'
-            time_examples = '오전, 오후, 저녁'
-            timing_guide = """
-   - 구체적인 시간 표현 사용 가능: "오전 10시", "오후 3시", "저녁 7시" 등
-   - "오늘", "내일", "하루", "길일" 등 일일 단위 표현 사용 가능"""
             item_period = '오늘'
+            timing_guide = """- 구체적인 시간 표현 사용 가능: "오전", "오후", "저녁" 등
+- 각 항목당 5문장으로 작성"""
 
-        prompt = f"""
-당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '네이버 운세' 스타일의 {period_title}를 작성하고, 각 운세의 점수를 매겨주세요.
+            output_format = """{{{{
+    "total": "총운 내용 (5문장)...",
+    "money": "재물운 내용 (5문장)...",
+    "love": "애정운 내용 (5문장)...",
+    "study": "학업운 내용 (5문장)...",
+    "work": "직장운 내용 (5문장)...",
+    "health": "건강운 내용 (5문장)...",
+    "scores": {{"total": 점수, "money": 점수, "love": 점수, "study": 점수, "work": 점수, "health": 점수}},
+    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+}}}}"""
+
+        prompt = f"""당신은 전문 운세 상담가입니다. 아래 사용자의 정보를 바탕으로 '{period_title}'를 작성해주세요.
 
 [사용자 정보]
 - 생년월일: {birth_date}
@@ -299,61 +361,20 @@ class FortuneCalculator:
 - 띠: {chinese_zodiac}
 {mbti_info}
 {lucky_item_info}
-- 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시 (간지)
+- 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시
 - 현재 날짜: {today}
 
 [작성 가이드]
-1. **말투**: "~합니다", "~입니다" 체의 정중하고 부드러운 문체 (네이버 운세 스타일)
-2. **길이 (매우 중요)**:
-   - 각 항목당 **정확히 5문장**으로 작성해주세요.
-   - 각 문장은 마침표(.)로 끝나야 합니다.
-   - 3문장 이하로 작성하면 안 됩니다! 반드시 5문장을 채워주세요.
-3. **시간 표현 가이드 (매우 중요)**:{timing_guide}
-   - 시간대 예시: {time_examples}
-4. **점수 매기기 (중요)**:
-   - 각 운세의 내용을 먼저 작성한 후, 그 내용에 맞는 점수를 50~100점 사이에서 매겨주세요.
-   - 점수와 텍스트의 톤이 일치해야 합니다:
-     * 90-100점: 매우 좋은 운세, 적극적으로 행동 권장
-     * 75-89점: 좋은 운세, 긍정적인 기운
-     * 60-74점: 보통 운세, 신중함 권장, 약간의 주의 필요
-     * 50-59점: 다소 어려운 운세, 조심스러운 접근 권장
-   - **운세 텍스트가 좋으면 점수도 높게, 주의가 필요한 내용이면 점수도 낮게** 매겨주세요.
-5. **점수 언급 금지**: 텍스트 내에서 "90점", "85점" 등 숫자를 직접 언급하지 마세요.
-6. **MBTI 반영 방식**:
-   - "MBTI가 ~라서" 같은 말은 하지 마세요.
-   - 사용자의 MBTI 성향에 맞는 조언을 자연스럽게 녹여내세요.
-7. **행운의 아이템 설명 (중요)**:
-   - 운세 기반 아이템 '{lucky_item_name}' 설명: 2문장 (60~80자)
-     * 반드시 '{lucky_item_name}'이라는 단어를 설명에 포함해주세요!
-     * 예: "{lucky_item_name}은(는) {item_period} 당신에게 좋은 기운을 전해줍니다. 특히 대인관계에서 긍정적인 에너지를 발산합니다."
-   - 별자리({zodiac}) 아이템 '{zodiac_item_name}' 설명: 2문장 (60~80자)
-     * 반드시 '{zodiac_item_name}'이라는 단어를 설명에 포함해주세요!
-     * 예: "{zodiac_item_name}은(는) {zodiac}인 당신에게 특별한 행운을 가져다줍니다. {period_unit} 동안 긍정적인 변화가 찾아올 것입니다."
-   - **두 설명의 길이를 비슷하게 맞춰주세요 (차이 10자 이내)**
-8. **총운 점수**: 재물운, 애정운, 학업운, 직장운, 건강운 점수의 평균을 반올림하여 총운 점수로 사용해주세요.
+1. 말투: "~합니다", "~입니다" 체의 정중한 문체
+2. {timing_guide}
+3. 점수: 50~100점 사이, 내용과 일치하게
+4. 행운의 아이템:
+   - '{lucky_item_name}' 설명: 2문장 (아이템 이름 포함 필수)
+   - '{zodiac_item_name}' 설명: 2문장 (아이템 이름 포함 필수)
 
 [출력 형식]
-반드시 아래 JSON 형식으로만 출력하세요 (마크다운 코드 블록 없이 순수 JSON만):
-{{{{
-    "total": "총운 내용...",
-    "money": "재물운 내용...",
-    "love": "애정운 내용...",
-    "study": "학업운 내용...",
-    "work": "직장운 내용...",
-    "health": "건강운 내용...",
-    "scores": {{{{
-        "total": 총운점수,
-        "money": 재물운점수,
-        "love": 애정운점수,
-        "study": 학업운점수,
-        "work": 직장운점수,
-        "health": 건강운점수
-    }}}},
-    "lucky_item": {{{{
-        "description": "{lucky_item_name}은(는)... (2문장, 60~80자, 아이템 이름 포함 필수)",
-        "zodiac_description": "{zodiac_item_name}은(는)... (2문장, 60~80자, 아이템 이름 포함 필수)"
-    }}}}
-}}}}
+반드시 아래 JSON 형식으로만 출력하세요 (마크다운 없이 순수 JSON만):
+{output_format}
 """
         return prompt
 
@@ -373,8 +394,8 @@ class FortuneCalculator:
         """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
         import time
 
-        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v3 추가)
-        cache_key = f"fortune_text_v3_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
+        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v4: 시간대별 개별 필드)
+        cache_key = f"fortune_text_v4_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
         cached_result = cache.get(cache_key)
 
         if cached_result:
@@ -445,6 +466,10 @@ class FortuneCalculator:
 
                 result = json.loads(text.strip())
                 print("[DEBUG] OpenAI gpt-4o-mini 운세 생성 성공!")
+
+                # 주간/월간 운세: 시간대별 개별 필드를 하나의 텍스트로 조합
+                if period_type in ['weekly', 'monthly']:
+                    result = self._combine_period_fortune_text(result, period_type)
 
                 # 결과 캐싱 (24시간)
                 cache.set(cache_key, result, 60 * 60 * 24)
