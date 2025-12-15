@@ -141,7 +141,7 @@
                   </div>
 
                   <!-- 색상 안 맞을 때 다른 아이템 추천 -->
-                  <div v-if="luckScore < 50 && recommendedItem" class="recommend-section mt-3">
+                  <div v-if="luckScore < 70 && recommendedItem" class="recommend-section mt-3">
                     <p class="recommend-text">
                       <i class="fas fa-lightbulb text-warning me-1"></i>
                       오늘은 <router-link :to="`/items/${recommendedItem.id}`" class="recommend-link">{{ recommendedItem.item_name }}</router-link>을(를) 사용해보는 건 어떨까요?
@@ -526,7 +526,7 @@ const matchMessageClass = computed(() => {
 
 // 다른 아이템 중 행운색과 가장 잘 맞는 것 추천
 const recommendedItem = computed(() => {
-  if (luckScore.value >= 50) return null
+  if (luckScore.value >= 70) return null
   if (!userItems.value.length) return null
 
   const currentItemId = item.value?.id

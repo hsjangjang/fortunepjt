@@ -125,6 +125,14 @@
                   <p class="text-white opacity-90 mb-0">{{ matchDescription }}</p>
                 </div>
 
+                <!-- 점수 낮을 때 운세 확인 유도 -->
+                <div v-if="luckScore < 70 && luckyItems.main" class="recommend-section mt-3">
+                  <p class="recommend-text">
+                    <i class="fas fa-lightbulb text-warning me-1"></i>
+                    오늘은 <router-link to="/fortune" class="recommend-link">{{ luckyItems.main }}</router-link>을(를) 사용해보는 건 어떨까요?
+                  </p>
+                </div>
+
                 <!-- Today's Lucky Item Reference -->
                 <div class="info-box info-primary mt-4">
                   <h6 class="text-white mb-3"><i class="fas fa-star text-warning me-2"></i> 오늘의 행운 아이템</h6>
@@ -979,5 +987,31 @@ onMounted(() => {
 /* 오늘의 행운색 라벨 스타일 */
 .lucky-color-label {
   font-size: 0.875rem;
+}
+
+/* 아이템 추천 섹션 */
+.recommend-section {
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.recommend-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.recommend-link {
+  color: #a78bfa;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.recommend-link:hover {
+  text-decoration: underline;
+  color: #c4b5fd;
 }
 </style>
