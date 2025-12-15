@@ -344,7 +344,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
@@ -573,6 +573,7 @@ const changePeriod = async (period) => {
 // 실제 운세 데이터 로드 함수
 const loadFortuneData = async (period) => {
   isLoadingPeriod.value = true
+  fortune.value = null // 기존 데이터 초기화
 
   try {
     let response
@@ -586,52 +587,69 @@ const loadFortuneData = async (period) => {
       endpoint = '/api/fortune/monthly/'
     }
 
+    console.log(`[Fortune] ${period} 운세 로드 시작, endpoint: ${endpoint}`)
+
     // 먼저 GET으로 캐시 확인
     response = await apiClient.get(endpoint)
+    console.log(`[Fortune] GET 응답:`, response.data)
 
     if (response.data.success && response.data.fortune) {
       fortune.value = response.data.fortune
+      console.log(`[Fortune] 캐시에서 ${period} 운세 로드 완료`)
     } else if (response.data.need_calculate) {
       // 캐시 없음 - POST로 생성 요청
-      console.log(`[Today] ${period} 운세 생성 필요`)
+      console.log(`[Fortune] ${period} 운세 생성 필요, 캐시 없음`)
 
       // 비로그인 사용자의 경우 birth_date와 gender를 전달해야 함
       let postData = {}
-      if (!authStore.isAuthenticated && fortuneStore.formData) {
+      if (!authStore.isAuthenticated) {
+        // fortuneStore.formData 또는 fortuneStore.fortuneData에서 정보 가져오기
+        const formInfo = fortuneStore.formData || {}
+        const fortuneInfo = fortuneStore.fortuneData || {}
+
         postData = {
-          birth_date: fortuneStore.formData.birth_date,
-          gender: fortuneStore.formData.gender,
-          birth_time: fortuneStore.formData.birth_time || '',
-          chinese_name: fortuneStore.formData.chinese_name || '',
-          mbti: fortuneStore.formData.mbti || ''
+          birth_date: formInfo.birth_date || fortuneInfo.birth_date,
+          gender: formInfo.gender || fortuneInfo.gender || 'M',
+          birth_time: formInfo.birth_time || fortuneInfo.birth_time || '',
+          chinese_name: formInfo.chinese_name || fortuneInfo.chinese_name || '',
+          mbti: formInfo.mbti || fortuneInfo.mbti || ''
         }
+        console.log(`[Fortune] 비로그인 사용자 POST 데이터:`, postData)
       }
 
       response = await apiClient.post(endpoint, postData)
+      console.log(`[Fortune] POST 응답:`, response.data)
 
       if (response.data.success && response.data.fortune) {
         fortune.value = response.data.fortune
+        console.log(`[Fortune] ${period} 운세 생성 완료`)
+      } else {
+        console.error(`[Fortune] ${period} 운세 생성 실패:`, response.data)
       }
     }
-
-    // 애니메이션 재시작
-    setTimeout(() => {
-      animateScore()
-      const activeTabPane = document.querySelector('.tab-pane.active')
-      if (activeTabPane) {
-        const bar = activeTabPane.querySelector('.sub-score-bar')
-        if (bar) animateBar(bar)
-      }
-    }, 100)
   } catch (error) {
-    console.error(`Failed to fetch ${period} fortune:`, error)
+    console.error(`[Fortune] ${period} 운세 로드 실패:`, error)
+    console.error(`[Fortune] 에러 응답:`, error.response?.data)
   } finally {
     isLoadingPeriod.value = false
+
+    // 애니메이션은 로딩 완료 후, nextTick에서 실행
+    if (fortune.value) {
+      await nextTick()
+      setTimeout(() => {
+        animateScore()
+        const activeTabPane = document.querySelector('.tab-pane.active')
+        if (activeTabPane) {
+          const bar = activeTabPane.querySelector('.sub-score-bar')
+          if (bar) animateBar(bar)
+        }
+      }, 200)
+    }
   }
 }
 
 // 라우트 변경 감지
-watch(() => route.path, (newPath) => {
+watch(() => route.path, () => {
   const newPeriod = getPeriodFromRoute()
   if (selectedPeriod.value !== newPeriod) {
     selectedPeriod.value = newPeriod
@@ -715,8 +733,8 @@ onMounted(async () => {
       }
     } else {
       // weekly 또는 monthly: loadFortuneData 사용
+      // loadFortuneData 내부에서 애니메이션 처리하므로 setupFortuneUI 호출 불필요
       await loadFortuneData(currentPeriod)
-      setupFortuneUI()
     }
   } catch (error) {
     console.error('Failed to fetch fortune:', error)
