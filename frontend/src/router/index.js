@@ -269,16 +269,23 @@ router.beforeEach(async (to, from, next) => {
         hasAllFortunes = false
       }
     } else {
-      // 비로그인 사용자: Store 체크
-      const now = new Date()
-      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+      // 비로그인 사용자도 API로 3개 모두 체크
+      try {
+        const [dailyRes, weeklyRes, monthlyRes] = await Promise.all([
+          apiClient.get('/api/fortune/today/'),
+          apiClient.get('/api/fortune/weekly/'),
+          apiClient.get('/api/fortune/monthly/')
+        ])
 
-      // Store에 오늘 날짜의 운세가 있으면 통과 (비로그인은 daily만 체크)
-      if (fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
-        console.log('[Router Guard] 비로그인 - Store에 오늘 운세 있음')
-        hasAllFortunes = true
-      } else {
-        console.log('[Router Guard] 비로그인 - Store에 운세 없음')
+        const hasDaily = dailyRes.data.success && dailyRes.data.fortune
+        const hasWeekly = weeklyRes.data.success && weeklyRes.data.fortune
+        const hasMonthly = monthlyRes.data.success && monthlyRes.data.fortune
+
+        console.log('[Router Guard] 비로그인 사용자 - daily:', hasDaily, 'weekly:', hasWeekly, 'monthly:', hasMonthly)
+
+        hasAllFortunes = hasDaily && hasWeekly && hasMonthly
+      } catch (error) {
+        console.error('[Router Guard] 비로그인 운세 체크 에러:', error)
         hasAllFortunes = false
       }
     }

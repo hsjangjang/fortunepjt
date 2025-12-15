@@ -326,8 +326,8 @@
             </div>
       </div>
 
-      <!-- No Fortune Yet -->
-      <div v-if="!fortune" class="card-base card-lg">
+      <!-- No Fortune Yet (로딩 중이 아닐 때만 표시) -->
+      <div v-if="!fortune && !isLoadingPeriod && !isLoading" class="card-base card-lg">
         <div class="empty-state">
           <i class="fas fa-question-circle empty-icon"></i>
           <h3 class="empty-title">운세 정보가 없습니다</h3>
