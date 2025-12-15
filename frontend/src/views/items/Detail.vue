@@ -7,7 +7,7 @@
           <h1 class="page-title">
             <i class="fas fa-search text-primary"></i>
             아이템 상세 분석
-            <span v-if="item && item.user_order" class="item-number">#{{ item.user_order }}</span>
+            <span v-if="item && item.user_order" class="item-number"></span>
           </h1>
           <p class="page-subtitle">AI가 분석한 아이템의 상세 정보입니다</p>
         </div>
@@ -99,13 +99,54 @@
                   </div>
                 </div>
 
-                <!-- 행운도 측정 버튼 (운세 있을 때만) -->
-                <div v-else class="alert mb-4 text-center" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.15), rgba(59, 130, 246, 0.15)); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px;">
-                  <h6 class="mb-2"><i class="fas fa-magic text-primary me-2"></i>오늘의 행운도 측정</h6>
-                  <small class="text-muted d-block mb-3">오늘의 행운과 얼마나 맞는지 확인하세요</small>
-                  <button class="btn btn-primary rounded-pill px-4" @click="checkLuck">
-                    <i class="fas fa-star me-1"></i> 행운 체크
-                  </button>
+                <!-- 행운 지수 표시 (운세 있을 때만) -->
+                <div v-else class="luck-score-section mb-4">
+                  <h6 class="text-center mb-3"><i class="fas fa-magic text-primary me-2"></i>오늘의 행운 지수</h6>
+
+                  <!-- 행운 지수 원형 -->
+                  <div class="text-center mb-3">
+                    <div class="luck-score-circle mx-auto">
+                      <svg width="120" height="120">
+                        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"></circle>
+                        <circle cx="60" cy="60" r="50" fill="none" :stroke="luckScoreColor"
+                                stroke-width="12" stroke-dasharray="314" :stroke-dashoffset="luckProgressOffset"
+                                style="transition: stroke-dashoffset 1s ease-out; transform: rotate(-90deg); transform-origin: center;"></circle>
+                      </svg>
+                      <div class="luck-score-text">
+                        <span class="luck-score-number">{{ luckScore }}</span>
+                        <span class="luck-score-label">점</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 색상 비교 -->
+                  <div class="color-compare-section">
+                    <div class="color-compare-item">
+                      <span class="color-label">아이템 색상</span>
+                      <div class="color-circle" :style="`background: ${bestItemColor};`"></div>
+                    </div>
+                    <div class="color-compare-arrow">
+                      <i class="fas fa-arrows-alt-h"></i>
+                    </div>
+                    <div class="color-compare-item">
+                      <span class="color-label">오늘의 행운색</span>
+                      <div class="color-circle" :style="`background: ${matchedLuckyColor};`"></div>
+                    </div>
+                  </div>
+
+                  <!-- 매치 메시지 -->
+                  <div class="match-message mt-3" :class="matchMessageClass">
+                    <span class="match-icon">{{ matchIcon }}</span>
+                    <span class="match-text">{{ matchMessage }}</span>
+                  </div>
+
+                  <!-- 색상 안 맞을 때 다른 아이템 추천 -->
+                  <div v-if="luckScore < 50 && recommendedItem" class="recommend-section mt-3">
+                    <p class="recommend-text">
+                      <i class="fas fa-lightbulb text-warning me-1"></i>
+                      오늘은 <router-link :to="`/items/${recommendedItem.id}`" class="recommend-link">{{ recommendedItem.item_name }}</router-link>을(를) 사용해보는 건 어떨까요?
+                    </p>
+                  </div>
                 </div>
 
                 <!-- 주요 색상 -->
@@ -206,7 +247,7 @@ import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { getColorMatchScore } from '@/utils/colors'
+import { getColorMatchScore, colorMap } from '@/utils/colors'
 import { getFortuneBoostScore, fortuneKeywords } from '@/utils/similarity'
 import { useFortuneStore } from '@/stores/fortune'
 
@@ -220,6 +261,7 @@ const editForm = ref({
   item_name: '',
   main_category: ''
 })
+const userItems = ref([]) // 다른 아이템 추천용
 
 // 카테고리 한글 매핑
 const categoryDisplayMap = {
@@ -271,6 +313,179 @@ const getPrimaryFortuneColor = () => {
   if (!primaryFortuneTag.value) return '#a78bfa'
   const cat = fortuneCategories.find(c => c.label === primaryFortuneTag.value)
   return cat?.color || '#a78bfa'
+}
+
+// ===== 행운 지수 계산 로직 =====
+
+// HEX를 RGB로 변환
+const hexToRgb = (hex) => {
+  if (!hex) return { r: 128, g: 128, b: 128 }
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : { r: 128, g: 128, b: 128 }
+}
+
+// 유클리드 거리 계산
+const euclideanDistance = (rgb1, rgb2) => {
+  return Math.sqrt(
+    Math.pow(rgb1.r - rgb2.r, 2) +
+    Math.pow(rgb1.g - rgb2.g, 2) +
+    Math.pow(rgb1.b - rgb2.b, 2)
+  )
+}
+
+// 거리를 점수로 변환 (0-100)
+const distanceToScore = (distance) => {
+  const maxDistance = Math.sqrt(255 * 255 * 3)
+  return Math.round(100 - (distance / maxDistance) * 100)
+}
+
+// 아이템 색상과 행운색 매칭 계산
+const colorMatchResult = computed(() => {
+  if (!item.value?.dominant_colors || !fortuneStore.luckyColors?.length) {
+    return { score: 0, matchedColor: null, bestItemHex: '#808080' }
+  }
+
+  const itemColors = item.value.dominant_colors
+  const luckyColorNames = fortuneStore.luckyColors
+
+  // 행운색 이름을 HEX로 변환
+  const luckyColorHexes = luckyColorNames.map(name => ({
+    name,
+    hex: colorMap[name] || '#808080'
+  }))
+
+  let maxScore = 0
+  let matchedColor = null
+  let bestItemHex = itemColors[0]?.hex || '#808080'
+
+  for (const itemColor of itemColors) {
+    const itemHex = itemColor.hex || '#808080'
+    const itemRgb = hexToRgb(itemHex)
+
+    for (const luckyColor of luckyColorHexes) {
+      const luckyRgb = hexToRgb(luckyColor.hex)
+      const distance = euclideanDistance(itemRgb, luckyRgb)
+      const score = distanceToScore(distance)
+
+      if (score > maxScore) {
+        maxScore = score
+        matchedColor = luckyColor.name
+        bestItemHex = itemHex
+      }
+    }
+  }
+
+  return { score: maxScore, matchedColor, bestItemHex }
+})
+
+// 행운 지수
+const luckScore = computed(() => colorMatchResult.value.score)
+
+// 행운 지수 원형 프로그레스 오프셋
+const luckProgressOffset = computed(() => {
+  const circumference = 2 * Math.PI * 50
+  return circumference - (luckScore.value / 100 * circumference)
+})
+
+// 행운 지수 색상 (점수에 따라)
+const luckScoreColor = computed(() => {
+  const score = luckScore.value
+  if (score >= 70) return '#10b981' // 녹색
+  if (score >= 50) return '#3b82f6' // 파란색
+  if (score >= 35) return '#f59e0b' // 주황색
+  return '#ef4444' // 빨간색
+})
+
+// 아이템 색상 (가장 매칭되는)
+const bestItemColor = computed(() => colorMatchResult.value.bestItemHex)
+
+// 매칭된 행운색
+const matchedLuckyColor = computed(() => {
+  const matched = colorMatchResult.value.matchedColor
+  return matched ? (colorMap[matched] || '#808080') : '#808080'
+})
+
+// 매치 메시지
+const matchMessage = computed(() => {
+  const score = luckScore.value
+  if (score >= 85) return '완벽한 매치! 최고의 행운이 함께합니다'
+  if (score >= 70) return '훌륭해요! 오늘의 행운과 잘 어울립니다'
+  if (score >= 55) return '좋은 선택이에요'
+  if (score >= 45) return '무난한 선택입니다'
+  if (score >= 35) return '오늘의 행운색과는 거리가 있어요'
+  return '다른 아이템을 추천드려요'
+})
+
+// 매치 아이콘
+const matchIcon = computed(() => {
+  const score = luckScore.value
+  if (score >= 85) return '🎉'
+  if (score >= 70) return '✨'
+  if (score >= 55) return '👍'
+  if (score >= 45) return '😐'
+  if (score >= 35) return '🤔'
+  return '💫'
+})
+
+// 매치 메시지 클래스
+const matchMessageClass = computed(() => {
+  const score = luckScore.value
+  if (score >= 70) return 'match-good'
+  if (score >= 50) return 'match-normal'
+  return 'match-low'
+})
+
+// 다른 아이템 중 행운색과 가장 잘 맞는 것 추천
+const recommendedItem = computed(() => {
+  if (luckScore.value >= 50) return null
+  if (!userItems.value.length) return null
+
+  const currentItemId = item.value?.id
+  let bestItem = null
+  let bestScore = luckScore.value
+
+  for (const otherItem of userItems.value) {
+    if (otherItem.id === currentItemId) continue
+    if (!otherItem.dominant_colors?.length) continue
+
+    const luckyColorNames = fortuneStore.luckyColors || []
+    const luckyColorHexes = luckyColorNames.map(name => ({
+      name,
+      hex: colorMap[name] || '#808080'
+    }))
+
+    let maxScore = 0
+    for (const itemColor of otherItem.dominant_colors) {
+      const itemRgb = hexToRgb(itemColor.hex)
+      for (const luckyColor of luckyColorHexes) {
+        const luckyRgb = hexToRgb(luckyColor.hex)
+        const distance = euclideanDistance(itemRgb, luckyRgb)
+        const score = distanceToScore(distance)
+        if (score > maxScore) maxScore = score
+      }
+    }
+
+    if (maxScore > bestScore) {
+      bestScore = maxScore
+      bestItem = otherItem
+    }
+  }
+
+  return bestItem
+})
+
+// 유저 아이템 목록 가져오기 (추천용)
+const fetchUserItems = async () => {
+  try {
+    const response = await api.get('/api/items/')
+    userItems.value = response.data.items || []
+  } catch (error) {
+    console.error('아이템 목록 가져오기 실패:', error)
+  }
 }
 
 const fetchItemDetail = async () => {
@@ -340,19 +555,6 @@ const saveEdit = async () => {
   }
 }
 
-// 행운도 측정 페이지로 이동
-const checkLuck = () => {
-  // 아이템 정보를 sessionStorage에 저장하고 행운 체크 페이지로 이동
-  sessionStorage.setItem('checkLuckItem', JSON.stringify({
-    id: item.value.id,
-    item_name: item.value.item_name,
-    image: item.value.image,
-    dominant_colors: item.value.dominant_colors,
-    ai_analysis: item.value.ai_analysis_result || item.value.ai_analysis
-  }))
-  router.push('/fortune/item-check')
-}
-
 const handleDelete = async () => {
   if (!confirm('정말 이 아이템을 삭제하시겠습니까?')) {
     return
@@ -386,6 +588,7 @@ const formatDate = (dateString) => {
 
 onMounted(() => {
   fetchItemDetail()
+  fetchUserItems()
 })
 </script>
 
@@ -526,6 +729,131 @@ onMounted(() => {
   margin-bottom: 0;
 }
 
+/* 행운 지수 섹션 */
+.luck-score-section {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.luck-score-circle {
+  position: relative;
+  width: 120px;
+  height: 120px;
+}
+
+.luck-score-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+.luck-score-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.luck-score-label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: 2px;
+}
+
+/* 색상 비교 섹션 */
+.color-compare-section {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.color-compare-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.color-label {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.color-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.color-compare-arrow {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 1.2rem;
+  margin-top: 1.2rem;
+}
+
+/* 매치 메시지 */
+.match-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  font-size: 0.95rem;
+}
+
+.match-message.match-good {
+  background: rgba(16, 185, 129, 0.15);
+  color: #6ee7b7;
+}
+
+.match-message.match-normal {
+  background: rgba(59, 130, 246, 0.15);
+  color: #93c5fd;
+}
+
+.match-message.match-low {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fcd34d;
+}
+
+.match-icon {
+  font-size: 1.2rem;
+}
+
+/* 아이템 추천 섹션 */
+.recommend-section {
+  background: rgba(124, 58, 237, 0.1);
+  border: 1px solid rgba(124, 58, 237, 0.3);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  text-align: center;
+}
+
+.recommend-text {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.recommend-link {
+  color: #a78bfa;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.recommend-link:hover {
+  text-decoration: underline;
+  color: #c4b5fd;
+}
+
 /* 모바일 반응형 */
 @media (max-width: 767.98px) {
   .fortune-boost-section {
@@ -559,6 +887,53 @@ onMounted(() => {
   }
 
   .fortune-prompt-desc {
+    font-size: 0.85rem;
+  }
+
+  /* 행운 지수 섹션 모바일 */
+  .luck-score-section {
+    padding: 1rem;
+  }
+
+  .luck-score-circle {
+    width: 100px;
+    height: 100px;
+  }
+
+  .luck-score-circle svg {
+    width: 100px;
+    height: 100px;
+  }
+
+  .luck-score-circle svg circle {
+    cx: 50;
+    cy: 50;
+    r: 42;
+  }
+
+  .luck-score-number {
+    font-size: 1.6rem;
+  }
+
+  .color-compare-section {
+    gap: 0.75rem;
+  }
+
+  .color-circle {
+    width: 32px;
+    height: 32px;
+  }
+
+  .color-label {
+    font-size: 0.8rem;
+  }
+
+  .match-message {
+    font-size: 0.85rem;
+    padding: 0.6rem 0.8rem;
+  }
+
+  .recommend-text {
     font-size: 0.85rem;
   }
 }
