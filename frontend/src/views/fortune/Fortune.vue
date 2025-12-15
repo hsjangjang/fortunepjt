@@ -242,7 +242,11 @@
                     <div class="mb-2">
                       <span class="badge" style="background: #a78bfa; color: white;">운세 기반</span>
                     </div>
-                    <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.emoji || '🎁' }}</span>
+                    <img v-if="getLuckyItemImage(fortune.lucky_item?.main)"
+                         :src="getLuckyItemImage(fortune.lucky_item?.main)"
+                         :alt="fortune.lucky_item?.main"
+                         class="lucky-item-img d-block mb-3 mx-auto">
+                    <span v-else class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.emoji || '🎁' }}</span>
                     <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item?.main || '행운 아이템' }}</h5>
                     <div class="item-desc-toggle" :class="{ 'show': showMainItemDesc }">
                       <p class="text-white opacity-75 small mb-0" v-html="formatDescription(fortune.lucky_item?.description || '', fortune.lucky_item?.main)"></p>
@@ -260,7 +264,11 @@
                     <div class="mb-2">
                       <span class="badge" style="background: #a78bfa; color: white;">{{ fortune.zodiac_sign }} 추천</span>
                     </div>
-                    <span class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.zodiac_emoji || '⭐' }}</span>
+                    <img v-if="getLuckyItemImage(fortune.lucky_item?.zodiac)"
+                         :src="getLuckyItemImage(fortune.lucky_item?.zodiac)"
+                         :alt="fortune.lucky_item?.zodiac"
+                         class="lucky-item-img d-block mb-3 mx-auto">
+                    <span v-else class="lucky-item-icon d-block mb-3">{{ fortune.lucky_item?.zodiac_emoji || '⭐' }}</span>
                     <h5 class="text-white fw-bold mb-2" style="word-break: keep-all;">{{ fortune.lucky_item?.zodiac || '별자리 아이템' }}</h5>
                     <div class="item-desc-toggle" :class="{ 'show': showZodiacItemDesc }">
                       <p class="text-white opacity-75 small mb-0" v-html="formatDescription(fortune.lucky_item?.zodiac_description || '', fortune.lucky_item?.zodiac)"></p>
@@ -405,6 +413,88 @@ import sagittariusIcon from '@/assets/zodiac/sagittarius.png'
 import capricornIcon from '@/assets/zodiac/capricorn.png'
 import aquariusIcon from '@/assets/zodiac/aquarius.png'
 import piscesIcon from '@/assets/zodiac/pisces.png'
+
+// 행운 아이템 이미지 매핑
+import perfumeImg from '@/assets/images/lucky_items/perfume.png'
+import cardCaseImg from '@/assets/images/lucky_items/card_case.png'
+import watchImg from '@/assets/images/lucky_items/watch.png'
+import miniKeyringImg from '@/assets/images/lucky_items/mini_keyring.png'
+import scarfImg from '@/assets/images/lucky_items/scarf.png'
+import penImg from '@/assets/images/lucky_items/pen.png'
+import handkerchiefImg from '@/assets/images/lucky_items/handkerchief.png'
+import diaryImg from '@/assets/images/lucky_items/diary.png'
+import walletImg from '@/assets/images/lucky_items/wallet.png'
+import bookmarkImg from '@/assets/images/lucky_items/bookmark.png'
+import mirrorImg from '@/assets/images/lucky_items/mirror.png'
+import tumblerImg from '@/assets/images/lucky_items/tumbler.png'
+import memoImg from '@/assets/images/lucky_items/memo.png'
+import hairpinImg from '@/assets/images/lucky_items/hairpin.png'
+import lipbalmImg from '@/assets/images/lucky_items/lipbalm.png'
+import miniPouchImg from '@/assets/images/lucky_items/mini_pouch.png'
+import braceletImg from '@/assets/images/lucky_items/bracelet.png'
+import ringImg from '@/assets/images/lucky_items/ring.png'
+import sunglassesImg from '@/assets/images/lucky_items/sunglasses.png'
+import earringsImg from '@/assets/images/lucky_items/earrings.png'
+import noteImg from '@/assets/images/lucky_items/note.png'
+import keyImg from '@/assets/images/lucky_items/key.png'
+import pencaseImg from '@/assets/images/lucky_items/pencase.png'
+import beltImg from '@/assets/images/lucky_items/belt.png'
+import earphoneCaseImg from '@/assets/images/lucky_items/earphone_case.png'
+import faceRollerImg from '@/assets/images/lucky_items/face_roller.png'
+import necklaceImg from '@/assets/images/lucky_items/necklace.png'
+import badgeImg from '@/assets/images/lucky_items/badge.png'
+import bagImg from '@/assets/images/lucky_items/bag.png'
+import photoAlbumImg from '@/assets/images/lucky_items/photo_album.png'
+
+// 아이템명 → 이미지 매핑
+const luckyItemImages = {
+  '향수': perfumeImg,
+  '미니 향수': perfumeImg,
+  '카드케이스': cardCaseImg,
+  '시계': watchImg,
+  '손목시계': watchImg,
+  '열쇠고리': miniKeyringImg,
+  '미니 키링': miniKeyringImg,
+  '동전 키링': miniKeyringImg,
+  '스카프': scarfImg,
+  '머플러': scarfImg,
+  '펜': penImg,
+  '볼펜': penImg,
+  '손수건': handkerchiefImg,
+  '다이어리': diaryImg,
+  '지갑': walletImg,
+  '명함지갑': walletImg,
+  '카드지갑': walletImg,
+  '책갈피': bookmarkImg,
+  '북마크': bookmarkImg,
+  '손거울': mirrorImg,
+  '텀블러': tumblerImg,
+  '메모지': memoImg,
+  '메모장': memoImg,
+  '헤어핀': hairpinImg,
+  '립밤': lipbalmImg,
+  '미니 파우치': miniPouchImg,
+  '팔찌': braceletImg,
+  '반지': ringImg,
+  '선글라스': sunglassesImg,
+  '귀걸이': earringsImg,
+  '노트': noteImg,
+  '열쇠': keyImg,
+  '펜케이스': pencaseImg,
+  '벨트': beltImg,
+  '이어폰 케이스': earphoneCaseImg,
+  '페이스 롤러': faceRollerImg,
+  '목걸이': necklaceImg,
+  '뱃지': badgeImg,
+  '가방': bagImg,
+  '사진 앨범': photoAlbumImg
+}
+
+// 아이템 이미지 가져오기
+const getLuckyItemImage = (itemName) => {
+  if (!itemName) return null
+  return luckyItemImages[itemName] || null
+}
 
 const zodiacIcons = {
   '양자리': ariesIcon,
@@ -1077,6 +1167,13 @@ onMounted(async () => {
   filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
+.lucky-item-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+}
+
 .lucky-item-card {
   transition: transform 0.3s, box-shadow 0.3s;
 }
@@ -1276,6 +1373,12 @@ onMounted(async () => {
 
   .lucky-item-card .lucky-item-icon {
     font-size: 2rem;
+    margin-bottom: 0.5rem !important;
+  }
+
+  .lucky-item-card .lucky-item-img {
+    width: 50px;
+    height: 50px;
     margin-bottom: 0.5rem !important;
   }
 

@@ -27,7 +27,12 @@
   - menu.vue 데이터와 다른 이미지 삭제 (`Menu.vue`)
 
 ### 김유림
+- Backend
+  - 별자리별 아이템 3~4개로 확장, 날짜별 순환 표시 (`fortune/services.py`)
+  - 유사 아이템 통합 (머플러→스카프, 펜던트→목걸이 등)
 - Frontend
+  - 행운 아이템 이모지를 PNG 이미지로 교체 (`Fortune.vue`)
+  - 행운 아이템 이미지 30개 추가 (`assets/images/lucky_items/`)
   - bottom_corduroy, bottom_fleece, outer_shearling 배경 수정 (`assets/images/ootd/`)
 
 ---
