@@ -490,14 +490,37 @@ const calculateItemSimilarity = (item1, item2) => {
   return maxSimilarity
 }
 
-// 행운 점수 계산 (색상 유클리드 거리 기반 0-100점)
+// 행운 점수 계산 (색상 + 아이템 유사도 반영)
 const calculateLuckScore = (item, color, itemColors) => {
-  // 색상 점수를 유클리드 거리 기반 0-100으로 계산
+  // 1. 색상 점수 계산 (0-100)
   const luckyColorNames = luckyColorsWithHex.value.map(c => c.name)
   const colorResult = calculateColorMatchScore(itemColors || detectedColors.value, luckyColorNames)
+  const colorScore = colorResult.score
+
+  // 2. 아이템 유사도 계산 (행운 아이템들과 비교)
+  let maxItemSimilarity = 0
+  const luckyItemList = [
+    luckyItems.value.main,
+    luckyItems.value.zodiac,
+    luckyItems.value.special
+  ].filter(Boolean)
+
+  for (const luckyItem of luckyItemList) {
+    const similarity = calculateItemSimilarity(item, luckyItem)
+    maxItemSimilarity = Math.max(maxItemSimilarity, similarity)
+  }
+
+  // 3. 최종 점수: 색상 70% + 아이템 유사도 30%
+  // 아이템 유사도가 0.5 이상이면 보너스 점수 추가
+  let finalScore = colorScore
+  if (maxItemSimilarity >= 0.5) {
+    // 아이템이 비슷하면 색상 점수에 최대 20점 보너스
+    const itemBonus = Math.round(maxItemSimilarity * 40)
+    finalScore = Math.min(100, Math.round(colorScore * 0.7 + itemBonus))
+  }
 
   return {
-    score: colorResult.score,
+    score: finalScore,
     matchedColor: colorResult.matchedColor,
     bestItemHex: colorResult.bestItemHex
   }
@@ -606,19 +629,23 @@ const updateMatchDescription = (score, item, matchedColor) => {
   // matchedColor는 실제로 행운색과 매칭된 경우에만 값이 있음
   const colorText = matchedColor ? `${matchedColor} 색상이 ` : ''
 
-  if (score >= 85) {
+  // 더 엄격한 기준
+  if (score >= 95) {
     matchTitle.value = '🎉 완벽한 매치!'
     matchDescription.value = `${item}이(가) 오늘의 행운 아이템과 완벽하게 일치합니다! 최고의 행운이 함께할 것입니다.`
-  } else if (score >= 70) {
+  } else if (score >= 90) {
     matchTitle.value = '✨ 훌륭한 매치!'
     matchDescription.value = `${item}이(가) 오늘의 행운과 잘 어울립니다. ${colorText}행운을 더해줄 것입니다.`
-  } else if (score >= 55) {
+  } else if (score >= 80) {
     matchTitle.value = '👍 좋은 매치'
-    matchDescription.value = `${item}이(가) 오늘의 운세와 어느 정도 어울립니다. 긍정적인 에너지를 느낄 수 있을 거예요.`
-  } else if (score >= 45) {
+    matchDescription.value = `${item}이(가) 오늘의 운세와 어울립니다. 긍정적인 에너지를 느낄 수 있을 거예요.`
+  } else if (score >= 70) {
+    matchTitle.value = '🙂 나쁘지 않은 선택'
+    matchDescription.value = `${item}은(는) 괜찮은 선택입니다. ${colorText ? colorText + '도움이 됩니다.' : ''}`
+  } else if (score >= 60) {
     matchTitle.value = '😐 무난한 선택'
     matchDescription.value = `${item}은(는) 평범한 선택입니다. 행운 아이템인 '${luckyItems.value.main || '추천 아이템'}'을 활용해보세요.`
-  } else if (score >= 35) {
+  } else if (score >= 50) {
     matchTitle.value = '🤔 아쉬운 매치'
     matchDescription.value = `오늘의 행운 아이템과는 거리가 있네요. '${luckyItems.value.main || '추천 아이템'}'이나 '${luckyItems.value.zodiac || '다른 아이템'}'을 고려해보세요.`
   } else {

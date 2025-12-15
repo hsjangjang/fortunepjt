@@ -361,7 +361,49 @@ const distanceToScore = (distance) => {
   }
 }
 
-// 아이템 색상과 행운색 매칭 계산
+// 아이템 유사도 계산 (카테고리/키워드 기반)
+const calculateItemSimilarity = (item1, item2) => {
+  if (!item1 || !item2) return 0
+
+  const categoryKeywords = {
+    '액세서리': ['목걸이', '반지', '팔찌', '귀걸이', '펜던트', '브레이슬릿', '키링', '열쇠고리'],
+    '가방류': ['가방', '백', '파우치', '지갑', '캐리어', '토트', '클러치'],
+    '전자기기': ['이어폰', '헤드폰', '시계', '카메라', '태블릿', '폰'],
+    '패션소품': ['스카프', '모자', '선글라스', '안경', '벨트', '장갑'],
+    '필기구': ['펜', '만년필', '다이어리', '노트'],
+    '음료용품': ['텀블러', '머그컵', '컵', '보틀'],
+    '화장품': ['향수', '립스틱', '파운데이션', '마스카라', '아이라이너', '미니향수']
+  }
+
+  let maxSimilarity = 0
+
+  for (const [, keywords] of Object.entries(categoryKeywords)) {
+    const item1Match = keywords.some(kw => item1.includes(kw))
+    const item2Match = keywords.some(kw => item2.includes(kw))
+
+    if (item1Match && item2Match) {
+      maxSimilarity = Math.max(maxSimilarity, 0.5)
+    }
+  }
+
+  // 공통 단어 체크 (2글자 이상)
+  const words1 = item1.split(/[\s,_-]+/)
+  const words2 = item2.split(/[\s,_-]+/)
+
+  for (const w1 of words1) {
+    for (const w2 of words2) {
+      if (w1.length >= 2 && w2.length >= 2) {
+        if (w1.includes(w2) || w2.includes(w1)) {
+          maxSimilarity = Math.max(maxSimilarity, 0.6)
+        }
+      }
+    }
+  }
+
+  return maxSimilarity
+}
+
+// 아이템 색상과 행운색 매칭 계산 (+ 아이템 유사도 반영)
 const colorMatchResult = computed(() => {
   if (!item.value?.dominant_colors || !fortuneStore.luckyColors?.length) {
     return { score: 0, matchedColor: null, bestItemHex: '#808080' }
@@ -376,7 +418,7 @@ const colorMatchResult = computed(() => {
     hex: colorMap[name] || '#808080'
   }))
 
-  let maxScore = 0
+  let maxColorScore = 0
   let matchedColor = null
   let bestItemHex = itemColors[0]?.hex || '#808080'
 
@@ -389,15 +431,38 @@ const colorMatchResult = computed(() => {
       const distance = euclideanDistance(itemRgb, luckyRgb)
       const score = distanceToScore(distance)
 
-      if (score > maxScore) {
-        maxScore = score
+      if (score > maxColorScore) {
+        maxColorScore = score
         matchedColor = luckyColor.name
         bestItemHex = itemHex
       }
     }
   }
 
-  return { score: maxScore, matchedColor, bestItemHex }
+  // 아이템 유사도 계산 (행운 아이템들과 비교)
+  let maxItemSimilarity = 0
+  const luckyItem = fortuneStore.luckyItem
+  if (luckyItem && item.value?.item_name) {
+    const luckyItemList = [
+      luckyItem.main,
+      luckyItem.zodiac,
+      luckyItem.today_special
+    ].filter(Boolean)
+
+    for (const luckyItemName of luckyItemList) {
+      const similarity = calculateItemSimilarity(item.value.item_name, luckyItemName)
+      maxItemSimilarity = Math.max(maxItemSimilarity, similarity)
+    }
+  }
+
+  // 최종 점수: 아이템 유사도가 있으면 보너스 적용
+  let finalScore = maxColorScore
+  if (maxItemSimilarity >= 0.5) {
+    const itemBonus = Math.round(maxItemSimilarity * 40)
+    finalScore = Math.min(100, Math.round(maxColorScore * 0.7 + itemBonus))
+  }
+
+  return { score: finalScore, matchedColor, bestItemHex }
 })
 
 // 행운 지수
@@ -427,25 +492,27 @@ const matchedLuckyColor = computed(() => {
   return matched ? (colorMap[matched] || '#808080') : '#808080'
 })
 
-// 매치 메시지
+// 매치 메시지 (더 엄격한 기준)
 const matchMessage = computed(() => {
   const score = luckScore.value
-  if (score >= 85) return '완벽한 매치! 최고의 행운이 함께합니다'
-  if (score >= 70) return '훌륭해요! 오늘의 행운과 잘 어울립니다'
-  if (score >= 55) return '좋은 선택이에요'
-  if (score >= 45) return '무난한 선택입니다'
-  if (score >= 35) return '오늘의 행운색과는 거리가 있어요'
+  if (score >= 95) return '완벽한 매치! 최고의 행운이 함께합니다'
+  if (score >= 90) return '훌륭해요! 오늘의 행운과 잘 어울립니다'
+  if (score >= 80) return '좋은 선택이에요'
+  if (score >= 70) return '나쁘지 않은 선택입니다'
+  if (score >= 60) return '무난한 선택입니다'
+  if (score >= 50) return '오늘의 운세와는 거리가 있어요'
   return '다른 아이템을 추천드려요'
 })
 
-// 매치 아이콘
+// 매치 아이콘 (더 엄격한 기준)
 const matchIcon = computed(() => {
   const score = luckScore.value
-  if (score >= 85) return '🎉'
-  if (score >= 70) return '✨'
-  if (score >= 55) return '👍'
-  if (score >= 45) return '😐'
-  if (score >= 35) return '🤔'
+  if (score >= 95) return '🎉'
+  if (score >= 90) return '✨'
+  if (score >= 80) return '👍'
+  if (score >= 70) return '🙂'
+  if (score >= 60) return '😐'
+  if (score >= 50) return '🤔'
   return '💫'
 })
 
