@@ -462,14 +462,63 @@ const formatDescription = (text, itemName) => {
   return result.replace(/([.!?])(\s+)/g, '$1<br>')
 }
 
-// 운세 텍스트 문장 단위로 리스트 형태로 변환 (색상 클래스 지원)
+// 오늘 날짜 기준으로 주간/월간에서 어떤 구간에 해당하는지 계산
+const getTodayPeriodIndex = () => {
+  const now = new Date()
+  const dayOfWeek = now.getDay() // 0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토
+  const dayOfMonth = now.getDate()
+
+  // 주간: 평일 초(월~화)=1, 평일 말(수~금)=2, 주말(토~일)=3
+  let weeklyIndex = 0
+  if (dayOfWeek === 1 || dayOfWeek === 2) {
+    weeklyIndex = 1 // 평일 초 (월~화) - 2번째 문장
+  } else if (dayOfWeek >= 3 && dayOfWeek <= 5) {
+    weeklyIndex = 2 // 평일 말 (수~금) - 3번째 문장
+  } else {
+    weeklyIndex = 3 // 주말 (토~일) - 4번째 문장
+  }
+
+  // 월간: 월초(1~10)=1, 월중(11~20)=2, 월말(21~)=3
+  let monthlyIndex = 0
+  if (dayOfMonth <= 10) {
+    monthlyIndex = 1 // 월초 - 2번째 문장
+  } else if (dayOfMonth <= 20) {
+    monthlyIndex = 2 // 월중 - 3번째 문장
+  } else {
+    monthlyIndex = 3 // 월말 - 4번째 문장
+  }
+
+  return { weeklyIndex, monthlyIndex }
+}
+
+// 운세 텍스트 문장 단위로 리스트 형태로 변환 (색상 클래스 지원 + 주간/월간 볼드 처리)
 const formatFortuneText = (text, colorClass = '') => {
   if (!text) return ''
   // 문장 단위로 분리 (마침표, 느낌표, 물음표 기준)
   const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim())
   if (sentences.length <= 1) return text
-  // ul 리스트로 변환
-  const listItems = sentences.map(s => `<li>${s.trim()}</li>`).join('')
+
+  const { weeklyIndex, monthlyIndex } = getTodayPeriodIndex()
+
+  // ul 리스트로 변환 (주간/월간인 경우 해당 문장 볼드 처리)
+  const listItems = sentences.map((s, index) => {
+    let isBold = false
+
+    // 주간 운세이고 해당 구간에 해당하면 볼드
+    if (selectedPeriod.value === 'weekly' && index === weeklyIndex) {
+      isBold = true
+    }
+    // 월간 운세이고 해당 구간에 해당하면 볼드
+    if (selectedPeriod.value === 'monthly' && index === monthlyIndex) {
+      isBold = true
+    }
+
+    if (isBold) {
+      return `<li class="today-highlight"><strong>${s.trim()}</strong></li>`
+    }
+    return `<li>${s.trim()}</li>`
+  }).join('')
+
   return `<ul class="fortune-list ${colorClass}">${listItems}</ul>`
 }
 
@@ -597,39 +646,65 @@ const loadFortuneData = async (period) => {
       fortune.value = response.data.fortune
       console.log(`[Fortune] 캐시에서 ${period} 운세 로드 완료`)
     } else if (response.data.need_calculate) {
-      // 캐시 없음 - POST로 생성 요청
-      console.log(`[Fortune] ${period} 운세 생성 필요, 캐시 없음`)
+      // 캐시 없음 - Loading 페이지로 리다이렉트하여 모든 운세 생성
+      console.log(`[Fortune] ${period} 운세 없음 → Loading 페이지로 이동`)
 
-      // 비로그인 사용자의 경우 birth_date와 gender를 전달해야 함
-      let postData = {}
-      if (!authStore.isAuthenticated) {
-        // fortuneStore.formData 또는 fortuneStore.fortuneData에서 정보 가져오기
-        const formInfo = fortuneStore.formData || {}
-        const fortuneInfo = fortuneStore.fortuneData || {}
-
-        postData = {
-          birth_date: formInfo.birth_date || fortuneInfo.birth_date,
-          gender: formInfo.gender || fortuneInfo.gender || 'M',
-          birth_time: formInfo.birth_time || fortuneInfo.birth_time || '',
-          chinese_name: formInfo.chinese_name || fortuneInfo.chinese_name || '',
-          mbti: formInfo.mbti || fortuneInfo.mbti || ''
-        }
-        console.log(`[Fortune] 비로그인 사용자 POST 데이터:`, postData)
+      // 로그인 사용자는 바로 로딩 페이지로
+      if (authStore.isAuthenticated) {
+        router.replace({
+          name: 'fortune-loading',
+          query: { redirect: route.fullPath }
+        })
+        return
       }
 
-      response = await apiClient.post(endpoint, postData)
-      console.log(`[Fortune] POST 응답:`, response.data)
+      // 비로그인 사용자는 formData가 있어야 로딩 페이지로 갈 수 있음
+      const formInfo = fortuneStore.formData || {}
+      const fortuneInfo = fortuneStore.fortuneData || {}
+      const birthDate = formInfo.birth_date || fortuneInfo.birth_date
+      const gender = formInfo.gender || fortuneInfo.gender
 
-      if (response.data.success && response.data.fortune) {
-        fortune.value = response.data.fortune
-        console.log(`[Fortune] ${period} 운세 생성 완료`)
+      if (birthDate && gender) {
+        // formData가 있으면 로딩 페이지로 (쿼리 파라미터로 전달)
+        router.replace({
+          name: 'fortune-loading',
+          query: {
+            redirect: route.fullPath,
+            birth_date: birthDate,
+            gender: gender,
+            birth_time: formInfo.birth_time || fortuneInfo.birth_time || '',
+            chinese_name: formInfo.chinese_name || fortuneInfo.chinese_name || '',
+            mbti: formInfo.mbti || fortuneInfo.mbti || ''
+          }
+        })
       } else {
-        console.error(`[Fortune] ${period} 운세 생성 실패:`, response.data)
+        // formData도 없으면 계산 페이지로
+        router.replace({
+          name: 'fortune-calculate',
+          query: { redirect: route.fullPath }
+        })
       }
+      return
     }
   } catch (error) {
     console.error(`[Fortune] ${period} 운세 로드 실패:`, error)
     console.error(`[Fortune] 에러 응답:`, error.response?.data)
+
+    // 에러 발생 시에도 운세가 없으면 리다이렉트
+    if (!fortune.value) {
+      if (authStore.isAuthenticated) {
+        router.replace({
+          name: 'fortune-loading',
+          query: { redirect: route.fullPath }
+        })
+      } else {
+        router.replace({
+          name: 'fortune-calculate',
+          query: { redirect: route.fullPath }
+        })
+      }
+      return
+    }
   } finally {
     isLoadingPeriod.value = false
 
@@ -975,6 +1050,27 @@ onMounted(async () => {
 }
 .fortune-text :deep(.fortune-list.color-teal li)::before {
   color: #2dd4bf;
+}
+
+/* 오늘 해당하는 구간 하이라이트 (주간/월간 운세용) */
+.fortune-text :deep(.fortune-list li.today-highlight) {
+  background: rgba(167, 139, 250, 0.15);
+  border-radius: 8px;
+  padding: 0.8rem 1rem 0.8rem 2rem;
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+  border-left: 3px solid #a78bfa;
+}
+
+.fortune-text :deep(.fortune-list li.today-highlight)::before {
+  color: #a78bfa;
+  font-weight: bold;
+  left: 0.5rem;
+}
+
+.fortune-text :deep(.fortune-list li.today-highlight strong) {
+  color: #fff;
+  font-weight: 600;
 }
 
 .lotto-numbers {
