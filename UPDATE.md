@@ -113,108 +113,129 @@
 ## v1.2.0 (25.12.05)
 
 ### 장하선
-- `frontend/src/views/items/Detail.vue` - 행운아이템 점수 계산로직 추가
-- `frontend/src/views/items/List.vue` - 아이템 목록 카드 UI 개선
-- `frontend/src/utils/colors.js` - 행운색 점수 계산로직 개선
-- `ootd.json` - 후리스 중복 제거
+- Frontend
+  - 행운아이템 점수 계산로직 추가 (`Detail.vue`)
+  - 아이템 목록 카드 UI 개선 (`List.vue`)
+  - 행운색 점수 계산로직 개선 (`colors.js`)
+- Data
+  - 후리스 중복 제거 (`ootd.json`)
 
 ### 이수진
-- `frontend/src/assets/css/style.css` - 디자인 수정
+- Frontend
+  - 디자인 수정 (`style.css`)
 
 ### 김유림
-- `frontend/src/assets/images/ootd/` - ootd 이미지 대량 추가/수정 (50개 이상)
+- Frontend
+  - ootd 이미지 대량 추가/수정 - 50개 이상 (`assets/images/ootd/`)
 
 ---
 
 ## v1.1.0 (25.12.03)
 
 ### 장하선
-- `frontend/src/views/fortune/ItemCheck.vue` - 행운지수 원형 및 색상 비교 정렬 개선
-- `frontend/src/views/items/List.vue` - 아이템 목록 카드 UI 다크테마 적용, AI 분석 태그 표시
-- `frontend/src/utils/colors.js` - color mapping 통합 js 파일로 전환
-- `frontend/src/views/fortune/Today.vue` - 운세 텍스트 ul 형태로 수정
+- Frontend
+  - 행운지수 원형 및 색상 비교 정렬 개선 (`ItemCheck.vue`)
+  - 아이템 목록 카드 UI 다크테마 적용, AI 분석 태그 표시 (`List.vue`)
+  - color mapping 통합 js 파일로 전환 (`colors.js`)
+  - 운세 텍스트 ul 형태로 수정 (`Today.vue`)
 
 ### 이수진
-- `frontend/src/views/recommendations/Menu.vue` - 메뉴 UI 수정
+- Frontend
+  - 메뉴 UI 수정 (`Menu.vue`)
 
 ---
 
 ## v1.0.6 (25.12.02)
 
 ### 장하선
-- `frontend/src/views/recommendations/OOTD.vue` - 날씨 UI 수정, 시간별 예보 온도 그래프 추가
-- `recommendations/api_views.py` - 날씨 API 연동
+- Backend
+  - 날씨 API 연동 (`recommendations/api_views.py`)
+- Frontend
+  - 날씨 UI 수정, 시간별 예보 온도 그래프 추가 (`OOTD.vue`)
 
 ### 이수진
-- `frontend/src/views/recommendations/Menu.vue` - 메뉴 추천 페이지 UI
+- Frontend
+  - 메뉴 추천 페이지 UI (`Menu.vue`)
 
 ### 김유림
-- `frontend/src/views/fortune/Today.vue` - UI 전체 수정
-- `frontend/src/views/items/Detail.vue`, `List.vue` - UI 수정
-- `frontend/src/assets/zodiac/` - 별자리 아이콘 추가
+- Frontend
+  - UI 전체 수정 (`Today.vue`)
+  - UI 수정 (`Detail.vue`, `List.vue`)
+  - 별자리 아이콘 추가 (`assets/zodiac/`)
 
 ---
 
 ## v1.0.5 (25.12.01)
 
 ### 장하선
-- `frontend/src/views/fortune/ItemCheck.vue` - 아이템 이상현상 수정
-- `frontend/src/views/auth/DeleteAccount.vue` - 회원 탈퇴 기능 추가
-- `users/api_views.py` - 회원 탈퇴 시 정보 삭제
+- Backend
+  - 회원 탈퇴 시 정보 삭제 (`users/api_views.py`)
+- Frontend
+  - 아이템 이상현상 수정 (`ItemCheck.vue`)
+  - 회원 탈퇴 기능 추가 (`DeleteAccount.vue`)
 
 ### 이수진
-- `frontend/src/views/auth/Register.vue` - 비밀번호 요구사항 UI 변경
-- `frontend/src/views/auth/Login.vue` - 비밀번호 요구사항 UI 변경
+- Frontend
+  - 비밀번호 요구사항 UI 변경 (`Register.vue`, `Login.vue`)
 
 ### 김유림
-- `frontend/src/views/fortune/Today.vue` - 오늘의 운세 UI 수정
-- `frontend/src/views/recommendations/Menu.vue` - 메뉴 UI 수정
-- `frontend/src/components/Navbar.vue` - 네비바 문구 수정, '내 아이템' 메뉴 추가
+- Frontend
+  - 오늘의 운세 UI 수정 (`Today.vue`)
+  - 메뉴 UI 수정 (`Menu.vue`)
+  - 네비바 문구 수정, '내 아이템' 메뉴 추가 (`Navbar.vue`)
 
 ---
 
 ## v1.0.4 (25.11.30)
 
 ### 장하선
-- `config/settings.py` - S3 storage 설정
-- `items/admin.py` - 아이템 관리자 페이지
+- Backend
+  - S3 storage 설정 (`config/settings.py`)
+  - 아이템 관리자 페이지 (`items/admin.py`)
 
 ### 이수진
-- `frontend/src/views/items/List.vue` - AI 분석 태그 표시
+- Frontend
+  - AI 분석 태그 표시 (`List.vue`)
 
 ---
 
 ## v1.0.3 (25.11.28)
 
 ### 장하선
-- `items/api_views.py` - 아이템 업로드 S3 환경 수정
-- `items/item_analyzer.py` - 아이템 색상 분석 로직
-- `items/models.py` - 아이템 모델
+- Backend
+  - 아이템 업로드 S3 환경 수정 (`items/api_views.py`)
+  - 아이템 색상 분석 로직 (`items/item_analyzer.py`)
+  - 아이템 모델 (`items/models.py`)
 
 ### 이수진
-- `frontend/src/views/fortune/ItemCheck.vue` - 아이템 체크 페이지
+- Frontend
+  - 아이템 체크 페이지 (`ItemCheck.vue`)
 
 ---
 
 ## v1.0.2 (25.11.27)
 
 ### 장하선
-- `fortune/services.py` - 운세 계산 서비스
-- `fortune/api_views.py` - 운세 API
+- Backend
+  - 운세 계산 서비스 (`fortune/services.py`)
+  - 운세 API (`fortune/api_views.py`)
 
 ### 이수진
-- `frontend/src/views/fortune/Calculate.vue` - 운세 계산 페이지
+- Frontend
+  - 운세 계산 페이지 (`Calculate.vue`)
 
 ---
 
 ## v1.0.1 (25.11.26)
 
 ### 장하선
-- `config/` - Django 프로젝트 초기 설정
-- `users/` - 사용자 모델 및 인증
+- Backend
+  - Django 프로젝트 초기 설정 (`config/`)
+  - 사용자 모델 및 인증 (`users/`)
 
 ### 이수진
-- `frontend/` - Vue 프로젝트 초기 설정
+- Frontend
+  - Vue 프로젝트 초기 설정 (`frontend/`)
 
 ---
 
