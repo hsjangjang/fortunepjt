@@ -5,8 +5,105 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from datetime import date, datetime
 from .services import FortuneCalculator
 from .serializers import FortuneCalculateSerializer
-from .models import DailyFortuneCache
+from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache
 import json
+
+
+def get_current_week():
+    """현재 년도와 주차 반환 (ISO 주차 기준)"""
+    today = date.today()
+    iso_calendar = today.isocalendar()
+    return iso_calendar[0], iso_calendar[1]  # year, week
+
+
+def get_current_month():
+    """현재 년도와 월 반환"""
+    today = date.today()
+    return today.year, today.month
+
+
+def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date=None):
+    """주간 운세 데이터베이스에 저장"""
+    try:
+        if user and user.is_authenticated:
+            WeeklyFortuneCache.objects.filter(user=user, year=year, week_number=week).delete()
+            cache = WeeklyFortuneCache(user=user, year=year, week_number=week, session_key=session_key or '')
+        elif session_key:
+            WeeklyFortuneCache.objects.filter(session_key=session_key, year=year, week_number=week).delete()
+            cache = WeeklyFortuneCache(session_key=session_key, year=year, week_number=week)
+        else:
+            return False
+
+        cache.birth_date = birth_date
+        cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
+        cache.save()
+        print(f"[Weekly Cache] 저장 완료: user={user}, year={year}, week={week}")
+        return True
+    except Exception as e:
+        print(f"[Weekly Cache] 저장 실패: {e}")
+        return False
+
+
+def load_weekly_fortune_from_db(user, session_key, year, week):
+    """주간 운세 데이터베이스에서 로드"""
+    try:
+        if user and user.is_authenticated:
+            cache = WeeklyFortuneCache.objects.filter(user=user, year=year, week_number=week).first()
+        elif session_key:
+            cache = WeeklyFortuneCache.objects.filter(session_key=session_key, year=year, week_number=week).first()
+        else:
+            return None
+
+        if cache and cache.full_fortune_data:
+            fortune_data = json.loads(cache.full_fortune_data)
+            print(f"[Weekly Cache] 히트: user={user}, year={year}, week={week}")
+            return fortune_data
+        return None
+    except Exception as e:
+        print(f"[Weekly Cache] 로드 실패: {e}")
+        return None
+
+
+def save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date=None):
+    """월간 운세 데이터베이스에 저장"""
+    try:
+        if user and user.is_authenticated:
+            MonthlyFortuneCache.objects.filter(user=user, year=year, month=month).delete()
+            cache = MonthlyFortuneCache(user=user, year=year, month=month, session_key=session_key or '')
+        elif session_key:
+            MonthlyFortuneCache.objects.filter(session_key=session_key, year=year, month=month).delete()
+            cache = MonthlyFortuneCache(session_key=session_key, year=year, month=month)
+        else:
+            return False
+
+        cache.birth_date = birth_date
+        cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
+        cache.save()
+        print(f"[Monthly Cache] 저장 완료: user={user}, year={year}, month={month}")
+        return True
+    except Exception as e:
+        print(f"[Monthly Cache] 저장 실패: {e}")
+        return False
+
+
+def load_monthly_fortune_from_db(user, session_key, year, month):
+    """월간 운세 데이터베이스에서 로드"""
+    try:
+        if user and user.is_authenticated:
+            cache = MonthlyFortuneCache.objects.filter(user=user, year=year, month=month).first()
+        elif session_key:
+            cache = MonthlyFortuneCache.objects.filter(session_key=session_key, year=year, month=month).first()
+        else:
+            return None
+
+        if cache and cache.full_fortune_data:
+            fortune_data = json.loads(cache.full_fortune_data)
+            print(f"[Monthly Cache] 히트: user={user}, year={year}, month={month}")
+            return fortune_data
+        return None
+    except Exception as e:
+        print(f"[Monthly Cache] 로드 실패: {e}")
+        return None
 
 
 def save_fortune_to_db(user, session_key, fortune_date, fortune_data, birth_date=None, birth_time='', calendar_type='solar', chinese_name=''):
@@ -436,3 +533,275 @@ class ItemCheckAPIView(APIView):
             'fortune': fortune_data,
             'user_items': user_items
         }, status=status.HTTP_200_OK)
+
+
+class WeeklyFortuneAPIView(APIView):
+    """이 주의 운세 조회/생성 API"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        year, week = get_current_week()
+
+        # 세션 키 확보
+        if not request.session.session_key:
+            request.session.create()
+        session_key = request.session.session_key
+
+        user = request.user if request.user.is_authenticated else None
+
+        # 로그인 사용자 생년월일 체크
+        if user and not user.birth_date:
+            return Response({
+                'success': False,
+                'error': '생년월일 정보가 없습니다.',
+                'need_profile': True
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # DB 캐시 확인
+        fortune_data = load_weekly_fortune_from_db(user, session_key, year, week)
+
+        if fortune_data:
+            return Response({
+                'success': True,
+                'fortune': fortune_data,
+                'period_type': 'weekly',
+                'year': year,
+                'week': week
+            }, status=status.HTTP_200_OK)
+
+        # 캐시 없음 - 생성 필요
+        return Response({
+            'success': False,
+            'need_calculate': True,
+            'message': '이 주의 운세가 아직 생성되지 않았습니다.',
+            'period_type': 'weekly',
+            'year': year,
+            'week': week
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """주간 운세 생성"""
+        year, week = get_current_week()
+
+        # 세션 키 확보
+        if not request.session.session_key:
+            request.session.create()
+        session_key = request.session.session_key
+
+        user = request.user if request.user.is_authenticated else None
+
+        # 생년월일 확인
+        if user and user.is_authenticated:
+            if not user.birth_date:
+                return Response({
+                    'success': False,
+                    'error': '생년월일 정보가 없습니다.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            birth_date = user.birth_date
+            gender = user.gender
+            birth_time = getattr(user, 'birth_time', None)
+            chinese_name = getattr(user, 'chinese_name', None)
+            mbti = getattr(user, 'mbti', None)
+        else:
+            # 비로그인 사용자는 request.data에서 정보 받기
+            birth_date = request.data.get('birth_date')
+            gender = request.data.get('gender')
+            birth_time = request.data.get('birth_time')
+            chinese_name = request.data.get('chinese_name')
+            mbti = request.data.get('mbti')
+
+            if not birth_date or not gender:
+                return Response({
+                    'success': False,
+                    'error': '생년월일과 성별 정보가 필요합니다.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # 문자열을 date 객체로 변환
+            if isinstance(birth_date, str):
+                birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
+
+        # 이미 캐시가 있는지 확인
+        fortune_data = load_weekly_fortune_from_db(user, session_key, year, week)
+
+        if not fortune_data:
+            # 주간 운세 계산 (주간용 시드 사용)
+            calculator = FortuneCalculator()
+            fortune_data = calculator.calculate_fortune(
+                birth_date=birth_date,
+                gender=gender,
+                birth_time=birth_time,
+                chinese_name=chinese_name,
+                mbti=mbti,
+                user_id=user.id if user else None,
+                session_key=session_key,
+                fortune_seed=f"weekly_{year}_{week}"  # 주간 시드
+            )
+
+            # 주간 운세 텍스트로 변환
+            fortune_data = self._convert_to_weekly_fortune(fortune_data, year, week)
+
+            # DB에 저장
+            save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date)
+
+        return Response({
+            'success': True,
+            'fortune': fortune_data,
+            'period_type': 'weekly',
+            'year': year,
+            'week': week
+        }, status=status.HTTP_200_OK)
+
+    def _convert_to_weekly_fortune(self, fortune_data, year, week):
+        """일일 운세를 주간 운세 형태로 변환"""
+        fortune_texts = fortune_data.get('fortune_texts', {})
+
+        # 주간 운세 텍스트 변환 (오늘 -> 이번 주)
+        weekly_texts = {}
+        for key, text in fortune_texts.items():
+            if text:
+                weekly_text = text.replace('오늘', '이번 주').replace('하루', '한 주')
+                weekly_text = weekly_text.replace('오전에', '주 초에').replace('오후에', '주 후반에')
+                weekly_texts[key] = weekly_text
+            else:
+                weekly_texts[key] = text
+
+        fortune_data['fortune_texts'] = weekly_texts
+        fortune_data['period_type'] = 'weekly'
+        fortune_data['period_label'] = f'{year}년 {week}주차'
+        return fortune_data
+
+
+class MonthlyFortuneAPIView(APIView):
+    """이 달의 운세 조회/생성 API"""
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        year, month = get_current_month()
+
+        # 세션 키 확보
+        if not request.session.session_key:
+            request.session.create()
+        session_key = request.session.session_key
+
+        user = request.user if request.user.is_authenticated else None
+
+        # 로그인 사용자 생년월일 체크
+        if user and not user.birth_date:
+            return Response({
+                'success': False,
+                'error': '생년월일 정보가 없습니다.',
+                'need_profile': True
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # DB 캐시 확인
+        fortune_data = load_monthly_fortune_from_db(user, session_key, year, month)
+
+        if fortune_data:
+            return Response({
+                'success': True,
+                'fortune': fortune_data,
+                'period_type': 'monthly',
+                'year': year,
+                'month': month
+            }, status=status.HTTP_200_OK)
+
+        # 캐시 없음 - 생성 필요
+        return Response({
+            'success': False,
+            'need_calculate': True,
+            'message': '이 달의 운세가 아직 생성되지 않았습니다.',
+            'period_type': 'monthly',
+            'year': year,
+            'month': month
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        """월간 운세 생성"""
+        year, month = get_current_month()
+
+        # 세션 키 확보
+        if not request.session.session_key:
+            request.session.create()
+        session_key = request.session.session_key
+
+        user = request.user if request.user.is_authenticated else None
+
+        # 생년월일 확인
+        if user and user.is_authenticated:
+            if not user.birth_date:
+                return Response({
+                    'success': False,
+                    'error': '생년월일 정보가 없습니다.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+            birth_date = user.birth_date
+            gender = user.gender
+            birth_time = getattr(user, 'birth_time', None)
+            chinese_name = getattr(user, 'chinese_name', None)
+            mbti = getattr(user, 'mbti', None)
+        else:
+            # 비로그인 사용자는 request.data에서 정보 받기
+            birth_date = request.data.get('birth_date')
+            gender = request.data.get('gender')
+            birth_time = request.data.get('birth_time')
+            chinese_name = request.data.get('chinese_name')
+            mbti = request.data.get('mbti')
+
+            if not birth_date or not gender:
+                return Response({
+                    'success': False,
+                    'error': '생년월일과 성별 정보가 필요합니다.'
+                }, status=status.HTTP_400_BAD_REQUEST)
+
+            # 문자열을 date 객체로 변환
+            if isinstance(birth_date, str):
+                birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
+
+        # 이미 캐시가 있는지 확인
+        fortune_data = load_monthly_fortune_from_db(user, session_key, year, month)
+
+        if not fortune_data:
+            # 월간 운세 계산 (월간용 시드 사용)
+            calculator = FortuneCalculator()
+            fortune_data = calculator.calculate_fortune(
+                birth_date=birth_date,
+                gender=gender,
+                birth_time=birth_time,
+                chinese_name=chinese_name,
+                mbti=mbti,
+                user_id=user.id if user else None,
+                session_key=session_key,
+                fortune_seed=f"monthly_{year}_{month}"  # 월간 시드
+            )
+
+            # 월간 운세 텍스트로 변환
+            fortune_data = self._convert_to_monthly_fortune(fortune_data, year, month)
+
+            # DB에 저장
+            save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date)
+
+        return Response({
+            'success': True,
+            'fortune': fortune_data,
+            'period_type': 'monthly',
+            'year': year,
+            'month': month
+        }, status=status.HTTP_200_OK)
+
+    def _convert_to_monthly_fortune(self, fortune_data, year, month):
+        """일일 운세를 월간 운세 형태로 변환"""
+        fortune_texts = fortune_data.get('fortune_texts', {})
+
+        # 월간 운세 텍스트 변환 (오늘 -> 이번 달)
+        monthly_texts = {}
+        for key, text in fortune_texts.items():
+            if text:
+                monthly_text = text.replace('오늘', '이번 달').replace('하루', '한 달')
+                monthly_text = monthly_text.replace('오전에', '월초에').replace('오후에', '월말에')
+                monthly_texts[key] = monthly_text
+            else:
+                monthly_texts[key] = text
+
+        fortune_data['fortune_texts'] = monthly_texts
+        fortune_data['period_type'] = 'monthly'
+        fortune_data['period_label'] = f'{year}년 {month}월'
+        return fortune_data

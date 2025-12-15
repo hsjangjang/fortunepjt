@@ -6,12 +6,50 @@
         <div class="page-header">
           <h1 class="page-title">
             <i class="fas fa-crystal-ball" style="color: #a78bfa !important;"></i>
-            오늘의 운세
+            {{ periodTitle }}
           </h1>
-          <p class="page-subtitle">당신의 오늘을 빛낼 운세를 확인해보세요</p>
+          <p class="page-subtitle">{{ periodSubtitle }}</p>
         </div>
 
-      <div v-if="fortune" class="card-base card-lg section-spacing">
+        <!-- 기간 선택 버튼 -->
+        <div class="period-selector mb-4">
+          <div class="btn-group-period d-flex justify-content-center gap-2">
+            <button
+              class="btn-period"
+              :class="{ active: selectedPeriod === 'daily' }"
+              @click="changePeriod('daily')"
+              :disabled="isLoadingPeriod"
+            >
+              <i class="fas fa-sun me-1"></i> 오늘의 운세
+            </button>
+            <button
+              class="btn-period"
+              :class="{ active: selectedPeriod === 'weekly' }"
+              @click="changePeriod('weekly')"
+              :disabled="isLoadingPeriod"
+            >
+              <i class="fas fa-calendar-week me-1"></i> 이 주의 운세
+            </button>
+            <button
+              class="btn-period"
+              :class="{ active: selectedPeriod === 'monthly' }"
+              @click="changePeriod('monthly')"
+              :disabled="isLoadingPeriod"
+            >
+              <i class="fas fa-calendar-alt me-1"></i> 이 달의 운세
+            </button>
+          </div>
+        </div>
+
+        <!-- 로딩 상태 -->
+        <div v-if="isLoadingPeriod" class="text-center py-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+          <p class="text-white mt-3">{{ periodTitle }}를 불러오는 중...</p>
+        </div>
+
+      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing">
             <div class="fortune-circle">
               <svg width="220" height="220">
                 <defs>
@@ -48,7 +86,7 @@
       </div>
 
       <!-- Fortune Details Tabs -->
-      <div v-if="fortune" class="card-base card-lg section-spacing overflow-hidden">
+      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing overflow-hidden">
             <div class="card-header border-0 responsive-padding-header">
               <ul class="nav nav-pills fortune-tabs gap-2 mobile-grid-tabs justify-content-center" role="tablist">
                 <li class="nav-item">
@@ -155,7 +193,7 @@
       </div>
 
       <!-- Lucky Colors Section -->
-      <div v-if="fortune" class="card-base card-lg section-spacing">
+      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
@@ -189,7 +227,7 @@
       </div>
 
       <!-- Lucky Item Section -->
-      <div v-if="fortune" class="card-base card-lg section-spacing">
+      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
@@ -248,7 +286,7 @@
       </div>
 
       <!-- Lucky Numbers Section (성인만 표시) -->
-      <div v-if="fortune && !isMinor" class="card-base card-lg section-spacing">
+      <div v-if="fortune && !isMinor && !isLoadingPeriod" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-4 lotto-title">
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
@@ -269,7 +307,7 @@
       </div>
 
       <!-- Recommendations -->
-      <div v-if="fortune" class="card-grid cols-2 section-spacing">
+      <div v-if="fortune && !isLoadingPeriod" class="card-grid cols-2 section-spacing">
             <div class="card-base card-md card-interactive text-center">
                 <i class="fas fa-tshirt fa-3x mb-3" style="color: #a78bfa;"></i>
                 <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
@@ -306,7 +344,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
@@ -321,8 +359,28 @@ const fortune = ref(null)
 const displayScore = ref(0)
 const isMinor = ref(false)
 const isLoading = ref(true)
+const isLoadingPeriod = ref(false)
 const showMainItemDesc = ref(false)
 const showZodiacItemDesc = ref(false)
+const selectedPeriod = ref('daily')  // 'daily', 'weekly', 'monthly'
+
+// 기간별 제목
+const periodTitle = computed(() => {
+  switch (selectedPeriod.value) {
+    case 'weekly': return '이 주의 운세'
+    case 'monthly': return '이 달의 운세'
+    default: return '오늘의 운세'
+  }
+})
+
+// 기간별 부제목
+const periodSubtitle = computed(() => {
+  switch (selectedPeriod.value) {
+    case 'weekly': return '당신의 한 주를 빛낼 운세를 확인해보세요'
+    case 'monthly': return '당신의 한 달을 빛낼 운세를 확인해보세요'
+    default: return '당신의 오늘을 빛낼 운세를 확인해보세요'
+  }
+})
 
 // 별자리 이미지 아이콘 매핑
 import ariesIcon from '@/assets/zodiac/aries.png'
@@ -490,6 +548,56 @@ const animateBar = (container) => {
   }
 }
 
+// 기간 변경 함수
+const changePeriod = async (period) => {
+  if (selectedPeriod.value === period) return
+
+  selectedPeriod.value = period
+  isLoadingPeriod.value = true
+
+  try {
+    let response
+    let endpoint = ''
+
+    if (period === 'daily') {
+      endpoint = '/api/fortune/today/'
+    } else if (period === 'weekly') {
+      endpoint = '/api/fortune/weekly/'
+    } else if (period === 'monthly') {
+      endpoint = '/api/fortune/monthly/'
+    }
+
+    // 먼저 GET으로 캐시 확인
+    response = await apiClient.get(endpoint)
+
+    if (response.data.success && response.data.fortune) {
+      fortune.value = response.data.fortune
+    } else if (response.data.need_calculate) {
+      // 캐시 없음 - POST로 생성 요청
+      console.log(`[Today] ${period} 운세 생성 필요`)
+      response = await apiClient.post(endpoint)
+
+      if (response.data.success && response.data.fortune) {
+        fortune.value = response.data.fortune
+      }
+    }
+
+    // 애니메이션 재시작
+    setTimeout(() => {
+      animateScore()
+      const activeTabPane = document.querySelector('.tab-pane.active')
+      if (activeTabPane) {
+        const bar = activeTabPane.querySelector('.sub-score-bar')
+        if (bar) animateBar(bar)
+      }
+    }, 100)
+  } catch (error) {
+    console.error(`Failed to fetch ${period} fortune:`, error)
+  } finally {
+    isLoadingPeriod.value = false
+  }
+}
+
 onMounted(async () => {
   // Django 세션과 동기화된 운세 데이터 가져오기
   try {
@@ -568,6 +676,45 @@ onMounted(async () => {
 </script>
 
 <style scoped>
+/* 기간 선택 버튼 스타일 */
+.period-selector {
+  margin-bottom: 1.5rem;
+}
+
+.btn-group-period {
+  flex-wrap: wrap;
+}
+
+.btn-period {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(167, 139, 250, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.btn-period:hover:not(:disabled) {
+  background: rgba(167, 139, 250, 0.2);
+  border-color: rgba(167, 139, 250, 0.5);
+  color: white;
+}
+
+.btn-period.active {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.4), rgba(167, 139, 250, 0.4));
+  border-color: #a78bfa;
+  color: white;
+  box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+}
+
+.btn-period:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 /* 별자리/띠 배지 동일 높이 */
 .zodiac-badge {
   min-height: 48px;
@@ -864,6 +1011,18 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
+  /* 모바일 기간 선택 버튼 */
+  .btn-group-period {
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+
+  .btn-period {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+
   /* Percentage based padding for mobile */
   .responsive-padding {
     padding: 3% !important; /* Minimized padding */
@@ -871,7 +1030,7 @@ onMounted(async () => {
   .responsive-padding-header {
     padding: 3% !important;
   }
-  
+
   .glass-card {
     border-radius: 12px;
   }

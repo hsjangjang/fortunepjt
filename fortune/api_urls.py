@@ -10,6 +10,12 @@ urlpatterns = [
     # 오늘의 운세 조회 (캐시 확인만)
     path('today/', api_views.TodayFortuneAPIView.as_view(), name='today'),
 
+    # 이 주의 운세 조회/생성
+    path('weekly/', api_views.WeeklyFortuneAPIView.as_view(), name='weekly'),
+
+    # 이 달의 운세 조회/생성
+    path('monthly/', api_views.MonthlyFortuneAPIView.as_view(), name='monthly'),
+
     # 운세 생성 (로그인 사용자용 - 로딩 페이지에서 호출)
     path('generate/', api_views.GenerateFortuneAPIView.as_view(), name='generate'),
 

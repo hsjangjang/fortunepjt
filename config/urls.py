@@ -6,7 +6,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 from rest_framework import routers
-from core.views import home, api_root, vue_app
+from core.views import home, api_root
 
 router = routers.DefaultRouter()
 
@@ -21,8 +21,6 @@ urlpatterns = [
     path('api/recommendations/', include('recommendations.api_urls')),  # 추천 API
     path('api/items/', include('items.api_urls')),          # 아이템 API
 
-    # Vue SPA (모든 /vue/* 경로를 Vue 앱으로)
-    re_path(r'^vue/.*$', vue_app, name='vue-app'),
 ]
 
 # Development media files serving

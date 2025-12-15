@@ -1,29 +1,15 @@
-from django.shortcuts import render
 from django.http import JsonResponse
-from django.conf import settings
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from datetime import date
+
 
 def home(request):
-    """홈페이지 - 템플릿 렌더링"""
-    context = {
-        'today_fortune': None  # 로그인한 사용자의 오늘 운세
-    }
-
-    # 로그인한 사용자의 오늘 운세 가져오기 (추후 구현)
-    if request.user.is_authenticated:
-        # context['today_fortune'] = get_user_fortune(request.user)
-        pass
-
-    return render(request, 'index.html', context)
-
-def vue_app(request):
-    """Vue SPA 서빙"""
-    context = {
-        'debug': settings.DEBUG
-    }
-    return render(request, 'vue_app.html', context)
+    """Health check 및 API 루트"""
+    return JsonResponse({
+        "status": "ok",
+        "message": "Fortune Service API",
+        "api_root": "/api/"
+    })
 
 @api_view(['GET'])
 def api_root(request):

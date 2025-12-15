@@ -140,6 +140,100 @@ class DailyFortuneCache(models.Model):
         self.lucky_colors_json = json.dumps(value, ensure_ascii=False)
 
 
+class WeeklyFortuneCache(models.Model):
+    """주간 운세 캐시 - 일주일 동안 고정된 운세 저장"""
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name='사용자'
+    )
+    session_key = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='세션 키 (비회원용)'
+    )
+
+    # 주간 식별 (ISO 주차 기준: 년도-주차)
+    year = models.IntegerField(verbose_name='년도')
+    week_number = models.IntegerField(verbose_name='주차')
+
+    # 운세 계산 키
+    birth_date = models.DateField(
+        verbose_name='생년월일',
+        null=True,
+        blank=True,
+        db_index=True
+    )
+
+    # 전체 운세 데이터 (JSON)
+    full_fortune_data = models.TextField(
+        verbose_name='전체 운세 데이터 (JSON)',
+        blank=True,
+        default='{}'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'weekly_fortune_cache'
+        verbose_name = '주간 운세 캐시'
+        verbose_name_plural = '주간 운세 캐시'
+
+    def __str__(self):
+        identifier = self.user.username if self.user else self.session_key
+        return f"{identifier} - {self.year}년 {self.week_number}주차"
+
+
+class MonthlyFortuneCache(models.Model):
+    """월간 운세 캐시 - 한 달 동안 고정된 운세 저장"""
+
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name='사용자'
+    )
+    session_key = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name='세션 키 (비회원용)'
+    )
+
+    # 월간 식별
+    year = models.IntegerField(verbose_name='년도')
+    month = models.IntegerField(verbose_name='월')
+
+    # 운세 계산 키
+    birth_date = models.DateField(
+        verbose_name='생년월일',
+        null=True,
+        blank=True,
+        db_index=True
+    )
+
+    # 전체 운세 데이터 (JSON)
+    full_fortune_data = models.TextField(
+        verbose_name='전체 운세 데이터 (JSON)',
+        blank=True,
+        default='{}'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'monthly_fortune_cache'
+        verbose_name = '월간 운세 캐시'
+        verbose_name_plural = '월간 운세 캐시'
+
+    def __str__(self):
+        identifier = self.user.username if self.user else self.session_key
+        return f"{identifier} - {self.year}년 {self.month}월"
+
+
 class FortuneBaseData(models.Model):
     """운세 기본 데이터 (천간, 지지, 오행 등)"""
     
