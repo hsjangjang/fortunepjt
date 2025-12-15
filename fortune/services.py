@@ -8,8 +8,46 @@ import json
 from typing import Dict, List, Optional
 from django.core.cache import cache
 from django.conf import settings
+from django.core.mail import send_mail
 from .saju_calculator import SajuCalculator
 from .lunar_converter import lunar_to_solar
+
+
+def send_api_quota_alert(api_name: str, error_message: str):
+    """API 크레딧 소진 시 이메일 알림 발송"""
+    # 중복 알림 방지 (1시간에 1번만)
+    cache_key = f"api_quota_alert_{api_name}"
+    if cache.get(cache_key):
+        print(f"[API Alert] {api_name} 알림 이미 발송됨, 스킵")
+        return
+
+    try:
+        subject = f"[Fortune Life] {api_name} API 크레딧 소진 알림"
+        message = f"""안녕하세요,
+
+Fortune Life 서비스에서 {api_name} API 크레딧이 소진되었습니다.
+
+발생 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+API: {api_name}
+오류 메시지: {error_message}
+
+빠른 시일 내에 크레딧을 충전해 주세요.
+
+감사합니다.
+Fortune Life 시스템
+"""
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email='sinhyeongman634@gmail.com',
+            recipient_list=['99gktjs2937@naver.com'],
+            fail_silently=True,
+        )
+        # 1시간 동안 중복 알림 방지
+        cache.set(cache_key, True, 60 * 60)
+        print(f"[API Alert] {api_name} 크레딧 소진 알림 이메일 발송 완료")
+    except Exception as e:
+        print(f"[API Alert Error] 이메일 발송 실패: {e}")
 
 class FortuneCalculator:
     """운세 계산 클래스"""
@@ -428,11 +466,12 @@ class FortuneCalculator:
             print("[DEBUG] 캐시된 운세 텍스트 사용")
             return cached_result
 
-        # OpenAI API 사용
-        openai_api_key = getattr(settings, 'OPENAI_API_KEY', '')
+        # GMS API 사용 (OpenAI 크레딧 소진으로 GMS로 변경)
+        gms_api_key = getattr(settings, 'GMS_API_KEY', '')
+        gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
 
-        if not openai_api_key:
-            print("[ERROR] OPENAI_API_KEY가 설정되지 않음")
+        if not gms_api_key:
+            print("[ERROR] GMS_API_KEY가 설정되지 않음")
             return None
 
         max_retries = 1
@@ -466,13 +505,13 @@ class FortuneCalculator:
         else:
             system_msg = "당신은 일일 운세 전문가입니다. 오전/오후/저녁 시간대를 활용하여 운세를 작성하세요."
 
-        # OpenAI API (gpt-4o-mini) 사용
+        # GMS API (gpt-4o-mini) 사용
         for attempt in range(max_retries + 1):
             try:
                 from openai import OpenAI
-                client = OpenAI(api_key=openai_api_key)
+                client = OpenAI(api_key=gms_api_key, base_url=gms_api_base)
 
-                print(f"[DEBUG] OpenAI gpt-4o-mini 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
+                print(f"[DEBUG] GMS API gpt-4o-mini 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
                 response = client.chat.completions.create(
                     model="gpt-4o-mini",
                     messages=[
@@ -492,7 +531,7 @@ class FortuneCalculator:
                     text = text[:-3]
 
                 result = json.loads(text.strip())
-                print("[DEBUG] OpenAI gpt-4o-mini 운세 생성 성공!")
+                print("[DEBUG] GMS API gpt-4o-mini 운세 생성 성공!")
 
                 # 주간/월간 운세: 시간대별 개별 필드를 하나의 텍스트로 조합
                 if period_type in ['weekly', 'monthly']:
@@ -503,13 +542,19 @@ class FortuneCalculator:
                 return result
 
             except Exception as e:
-                print(f"[ERROR] OpenAI gpt-4o-mini 운세 생성 오류 (시도: {attempt + 1}): {e}")
+                error_str = str(e)
+                print(f"[ERROR] GMS API gpt-4o-mini 운세 생성 오류 (시도: {attempt + 1}): {e}")
+
+                # 크레딧 소진 에러 감지 시 이메일 알림
+                if 'insufficient_quota' in error_str or '429' in error_str or 'quota' in error_str.lower():
+                    send_api_quota_alert('GMS API (OpenAI gpt-4o-mini)', error_str)
+
                 if attempt < max_retries:
                     time.sleep(retry_delay)
                 continue
 
         # API 실패
-        print("[ERROR] OpenAI API 시도 실패, 동적 텍스트 생성으로 대체")
+        print("[ERROR] GMS API 시도 실패, 동적 텍스트 생성으로 대체")
         return None
     
     def _calculate_all_fortunes(self, birth_date: date, today: date, saju_data: Dict = None) -> Dict:
