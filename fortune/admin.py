@@ -1,6 +1,17 @@
 from django.contrib import admin
 from django.utils import timezone
+import pytz
 from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache, FortuneBaseData, ColorMaster, MBTISpeechTemplate
+
+
+def format_datetime_kst(dt):
+    """UTC datetime을 KST로 변환하여 초 단위까지 표시"""
+    if not dt:
+        return '-'
+    kst = pytz.timezone('Asia/Seoul')
+    local_time = dt.astimezone(kst)
+    return local_time.strftime('%Y-%m-%d %H:%M:%S')
+
 
 @admin.register(DailyFortuneCache)
 class DailyFortuneCacheAdmin(admin.ModelAdmin):
@@ -12,16 +23,10 @@ class DailyFortuneCacheAdmin(admin.ModelAdmin):
 
     def created_at_display(self, obj):
         """생성일시를 초 단위까지 표시 (KST)"""
-        if obj.created_at:
-            # UTC를 KST로 변환
-            from django.utils import timezone
-            import pytz
-            kst = pytz.timezone('Asia/Seoul')
-            local_time = obj.created_at.astimezone(kst)
-            return local_time.strftime('%Y-%m-%d %H:%M:%S')
-        return '-'
+        return format_datetime_kst(obj.created_at)
     created_at_display.short_description = '생성일시 (KST)'
     created_at_display.admin_order_field = 'created_at'
+
 
 @admin.register(FortuneBaseData)
 class FortuneBaseDataAdmin(admin.ModelAdmin):
@@ -29,11 +34,13 @@ class FortuneBaseDataAdmin(admin.ModelAdmin):
     list_filter = ['category']
     search_fields = ['name_ko', 'name_cn', 'code']
 
+
 @admin.register(ColorMaster)
 class ColorMasterAdmin(admin.ModelAdmin):
     list_display = ['color_name', 'color_code', 'color_category']
     list_filter = ['color_category']
     search_fields = ['color_name', 'color_code']
+
 
 @admin.register(WeeklyFortuneCache)
 class WeeklyFortuneCacheAdmin(admin.ModelAdmin):
@@ -44,14 +51,7 @@ class WeeklyFortuneCacheAdmin(admin.ModelAdmin):
 
     def created_at_display(self, obj):
         """생성일시를 초 단위까지 표시 (KST)"""
-        if obj.created_at:
-            # UTC를 KST로 변환
-            from django.utils import timezone
-            import pytz
-            kst = pytz.timezone('Asia/Seoul')
-            local_time = obj.created_at.astimezone(kst)
-            return local_time.strftime('%Y-%m-%d %H:%M:%S')
-        return '-'
+        return format_datetime_kst(obj.created_at)
     created_at_display.short_description = '생성일시 (KST)'
     created_at_display.admin_order_field = 'created_at'
 
@@ -65,14 +65,7 @@ class MonthlyFortuneCacheAdmin(admin.ModelAdmin):
 
     def created_at_display(self, obj):
         """생성일시를 초 단위까지 표시 (KST)"""
-        if obj.created_at:
-            # UTC를 KST로 변환
-            from django.utils import timezone
-            import pytz
-            kst = pytz.timezone('Asia/Seoul')
-            local_time = obj.created_at.astimezone(kst)
-            return local_time.strftime('%Y-%m-%d %H:%M:%S')
-        return '-'
+        return format_datetime_kst(obj.created_at)
     created_at_display.short_description = '생성일시 (KST)'
     created_at_display.admin_order_field = 'created_at'
 
