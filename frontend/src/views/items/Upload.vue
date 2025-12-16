@@ -21,22 +21,31 @@
                   ref="uploadArea"
                   class="upload-area border rounded text-center"
                   :class="imagePreview ? 'p-3' : 'p-5'"
-                  style="border-style: dashed !important; cursor: pointer;"
-                  @click="triggerFileInput"
-                  @dragenter.prevent="handleDragEnter"
-                  @dragover.prevent="handleDragOver"
-                  @dragleave.prevent="handleDragLeave"
-                  @drop.prevent="handleDrop"
+                  style="border-style: dashed !important;"
                 >
                   <!-- 이미지 미리보기 -->
-                  <div v-if="imagePreview" class="preview-container">
+                  <div v-if="imagePreview" class="preview-container" @click="triggerFileInput" style="cursor: pointer;">
                     <img :src="imagePreview" alt="미리보기" class="preview-image">
                     <p class="text-primary small mt-2 mb-0">클릭하여 다른 이미지 선택</p>
                   </div>
                   <!-- 기본 업로드 안내 -->
                   <div v-else>
                     <i class="fas fa-cloud-upload-alt fa-3x text-muted mb-3"></i>
-                    <p class="text-muted mb-0">이미지를 드래그하거나 클릭하여 업로드</p>
+                    <p class="text-muted mb-3">아이템 사진을 업로드하세요</p>
+                    <p class="small text-muted">JPG, PNG 파일 (최대 10MB)</p>
+
+                    <!-- 카메라/갤러리 선택 버튼 -->
+                    <div class="d-flex gap-2 justify-content-center mt-3">
+                      <button type="button" class="btn btn-primary" @click="openCamera">
+                        <i class="fas fa-camera"></i> 카메라로 촬영
+                      </button>
+                      <button type="button" class="btn btn-outline-primary" @click="openGallery">
+                        <i class="fas fa-image"></i> 갤러리에서 선택
+                      </button>
+                    </div>
+
+                    <!-- 드래그 앤 드롭 안내 (데스크톱용) -->
+                    <p class="text-muted small mt-3 mb-0 d-none d-md-block">또는 이미지를 드래그하여 업로드</p>
                   </div>
                   <input
                     ref="fileInput"
@@ -44,6 +53,14 @@
                     class="form-control d-none"
                     accept="image/*"
                     required
+                    @change="handleFileChange"
+                  >
+                  <input
+                    ref="cameraInput"
+                    type="file"
+                    class="form-control d-none"
+                    accept="image/*"
+                    capture="environment"
                     @change="handleFileChange"
                   >
                 </div>
@@ -154,6 +171,7 @@ const fromItemCheck = ref(false)
 
 const uploadArea = ref(null)
 const fileInput = ref(null)
+const cameraInput = ref(null)
 const fileName = ref('')
 const imagePreview = ref(null)
 const isUploading = ref(false)
@@ -192,6 +210,14 @@ watch(() => formData.value.main_category, () => {
 })
 
 const triggerFileInput = () => {
+  fileInput.value.click()
+}
+
+const openCamera = () => {
+  cameraInput.value.click()
+}
+
+const openGallery = () => {
   fileInput.value.click()
 }
 

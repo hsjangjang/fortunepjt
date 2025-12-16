@@ -137,10 +137,10 @@
                 <div v-else-if="luckScore < 70 && noGoodItemAvailable" class="recommend-section no-item mt-3">
                   <p class="recommend-text">
                     <i class="fas fa-box-open text-info me-1"></i>
-                    등록해주신 아이템 중 오늘 행운을 확실히 가져다줄만한 아이템이 없어요.
+                    오늘 당신에게 행운을 불러와줄만한 아이템이 아직 등록되지 않은 것 같아요. 당신이 가진 다른 아이템이 행운을 불러와줄지 확인해볼까요?
                   </p>
                   <router-link to="/items/upload" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
-                    <i class="fas fa-plus me-1"></i> 새 아이템 등록하기
+                    <i class="fas fa-plus me-1"></i> 아이템 등록하기
                   </router-link>
                 </div>
 
@@ -300,7 +300,7 @@ const canSaveItem = computed(() => {
          authStore.isAuthenticated
 })
 
-// 내 아이템 중 행운 점수가 가장 높은 아이템 추천
+// 내 아이템 중 행운 점수가 가장 높은 아이템 추천 (현재 분석 중인 아이템 제외)
 const recommendedItem = computed(() => {
   if (luckScore.value >= 70) return null
   if (!userItems.value.length) return null
@@ -309,11 +309,20 @@ const recommendedItem = computed(() => {
   let bestItem = null
   let bestScore = 0
 
+  // 행운 아이템 목록
+  const luckyItemList = [
+    luckyItems.value.main,
+    luckyItems.value.zodiac,
+    luckyItems.value.special
+  ].filter(Boolean)
+
   for (const otherItem of userItems.value) {
+    // 현재 분석 중인 아이템과 같은 아이템은 제외
+    if (detectedItem.value && otherItem.item_name === detectedItem.value) continue
     if (!otherItem.dominant_colors?.length) continue
 
-    // 색상 점수 계산
-    let maxScore = 0
+    // 1. 색상 점수 계산 (0-40점)
+    let maxColorScore = 0
     for (const itemColor of otherItem.dominant_colors) {
       const itemHex = itemColor.hex || '#808080'
       const itemRgb = hexToRgb(itemHex)
@@ -321,13 +330,24 @@ const recommendedItem = computed(() => {
       for (const luckyColor of luckyColorsWithHex.value) {
         const luckyRgb = hexToRgb(luckyColor.hex)
         const distance = euclideanDistance(itemRgb, luckyRgb)
-        const score = distanceToScore(distance)
-        if (score > maxScore) maxScore = score
+        const colorScore = distanceToScore(distance)
+        if (colorScore > maxColorScore) maxColorScore = colorScore
       }
     }
+    const finalColorScore = Math.round(maxColorScore * 0.4)
 
-    if (maxScore > bestScore) {
-      bestScore = maxScore
+    // 2. 아이템 유사도 점수 계산 (0-40점)
+    const aiAnalysis = otherItem.ai_analysis || {}
+    const aiItemName = aiAnalysis.item_name || otherItem.item_name
+    const { similarity } = getMaxSimilarityWithLuckyItems(aiItemName, luckyItemList)
+    const itemScoreRaw = similarityToScore(similarity)
+    const finalItemScore = Math.round(itemScoreRaw * 0.4)
+
+    // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
+    const totalScore = 20 + finalItemScore + finalColorScore
+
+    if (totalScore > bestScore) {
+      bestScore = totalScore
       bestItem = otherItem
     }
   }
@@ -345,10 +365,20 @@ const noGoodItemAvailable = computed(() => {
   // 아이템이 없거나, 있어도 80점 이상인 게 없으면 true
   if (!userItems.value.length) return true
 
+  // 행운 아이템 목록
+  const luckyItemList = [
+    luckyItems.value.main,
+    luckyItems.value.zodiac,
+    luckyItems.value.special
+  ].filter(Boolean)
+
   for (const otherItem of userItems.value) {
+    // 현재 분석 중인 아이템과 같은 아이템은 제외
+    if (detectedItem.value && otherItem.item_name === detectedItem.value) continue
     if (!otherItem.dominant_colors?.length) continue
 
-    let maxScore = 0
+    // 1. 색상 점수 계산 (0-40점)
+    let maxColorScore = 0
     for (const itemColor of otherItem.dominant_colors) {
       const itemHex = itemColor.hex || '#808080'
       const itemRgb = hexToRgb(itemHex)
@@ -356,12 +386,23 @@ const noGoodItemAvailable = computed(() => {
       for (const luckyColor of luckyColorsWithHex.value) {
         const luckyRgb = hexToRgb(luckyColor.hex)
         const distance = euclideanDistance(itemRgb, luckyRgb)
-        const score = distanceToScore(distance)
-        if (score > maxScore) maxScore = score
+        const colorScore = distanceToScore(distance)
+        if (colorScore > maxColorScore) maxColorScore = colorScore
       }
     }
+    const finalColorScore = Math.round(maxColorScore * 0.4)
 
-    if (maxScore >= 80) return false
+    // 2. 아이템 유사도 점수 계산 (0-40점)
+    const aiAnalysis = otherItem.ai_analysis || {}
+    const aiItemName = aiAnalysis.item_name || otherItem.item_name
+    const { similarity } = getMaxSimilarityWithLuckyItems(aiItemName, luckyItemList)
+    const itemScoreRaw = similarityToScore(similarity)
+    const finalItemScore = Math.round(itemScoreRaw * 0.4)
+
+    // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
+    const totalScore = 20 + finalItemScore + finalColorScore
+
+    if (totalScore >= 80) return false
   }
 
   return true
@@ -538,15 +579,15 @@ const selectExistingItem = (item) => {
   }
 }
 
-// 행운 점수 계산 (색상 40% + 아이템 유사도 60%)
+// 행운 점수 계산 (기본 20점 + 아이템 유사도 40점 만점 + 색상 40점 만점)
 // FastText(cc.ko.300) 기반 의미적 유사도 사용
 const calculateLuckScore = (item, color, itemColors) => {
-  // 1. 색상 점수 계산 (0-100)
+  // 1. 색상 점수 계산 (0-40점)
   const luckyColorNames = luckyColorsWithHex.value.map(c => c.name)
   const colorResult = calculateColorMatchScore(itemColors || detectedColors.value, luckyColorNames)
-  const colorScore = colorResult.score
+  const colorScore = Math.round(colorResult.score * 0.4) // 100점 만점을 40점 만점으로 변환
 
-  // 2. 아이템 유사도 계산 (FastText 기반 코사인 유사도)
+  // 2. 아이템 유사도 계산 (0-40점) - FastText 기반 코사인 유사도
   const luckyItemList = [
     luckyItems.value.main,
     luckyItems.value.zodiac,
@@ -554,10 +595,12 @@ const calculateLuckScore = (item, color, itemColors) => {
   ].filter(Boolean)
 
   const { similarity } = getMaxSimilarityWithLuckyItems(item, luckyItemList)
-  const itemScore = similarityToScore(similarity)
+  const itemScoreRaw = similarityToScore(similarity) // 0-100점
+  const itemScore = Math.round(itemScoreRaw * 0.4) // 40점 만점으로 변환
 
-  // 3. 최종 점수: 색상 40% + 아이템 유사도 60%
-  const finalScore = Math.round(colorScore * 0.4 + itemScore * 0.6)
+  // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
+  const baseScore = 20
+  const finalScore = baseScore + itemScore + colorScore
 
   return {
     score: Math.min(100, finalScore),

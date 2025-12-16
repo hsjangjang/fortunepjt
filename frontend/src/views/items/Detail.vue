@@ -152,10 +152,10 @@
                   <div v-else-if="luckScore < 70 && noGoodItemAvailable" class="recommend-section no-item mt-3">
                     <p class="recommend-text">
                       <i class="fas fa-box-open text-info me-1"></i>
-                      등록해주신 아이템 중 오늘 행운을 확실히 가져다줄만한 아이템이 없어요.
+                      오늘 당신에게 행운을 불러와줄만한 아이템이 아직 등록되지 않은 것 같아요. 당신이 가진 다른 아이템이 행운을 불러와줄지 확인해볼까요?
                     </p>
                     <router-link to="/items/upload" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
-                      <i class="fas fa-plus me-1"></i> 새 아이템 등록하기
+                      <i class="fas fa-plus me-1"></i> 아이템 등록하기
                     </router-link>
                   </div>
                 </div>
@@ -373,7 +373,7 @@ const distanceToScore = (distance) => {
   }
 }
 
-// 아이템 색상과 행운색 매칭 계산 (색상 40% + 아이템 유사도 60%)
+// 아이템 색상과 행운색 매칭 계산 (기본 20점 + 아이템 40점 + 색상 40점)
 // FastText(cc.ko.300) 기반 의미적 유사도 사용
 const colorMatchResult = computed(() => {
   if (!item.value?.dominant_colors || !fortuneStore.luckyColors?.length) {
@@ -424,8 +424,11 @@ const colorMatchResult = computed(() => {
     itemScore = similarityToScore(similarity)
   }
 
-  // 최종 점수: 색상 40% + 아이템 유사도 60%
-  const finalScore = Math.min(100, Math.round(maxColorScore * 0.4 + itemScore * 0.6))
+  // 최종 점수: 기본 20점 + 아이템 40점 만점 + 색상 40점 만점
+  const baseScore = 20
+  const colorScore = Math.round(maxColorScore * 0.4) // 100점을 40점 만점으로
+  const itemScoreFinal = Math.round(itemScore * 0.4) // 100점을 40점 만점으로
+  const finalScore = Math.min(100, baseScore + itemScoreFinal + colorScore)
 
   return { score: finalScore, matchedColor, bestItemHex }
 })
@@ -489,7 +492,7 @@ const matchMessageClass = computed(() => {
   return 'match-low'
 })
 
-// 다른 아이템 중 행운색과 가장 잘 맞는 것 추천 (80점 이상만)
+// 다른 아이템 중 행운색과 가장 잘 맞는 것 추천 (80점 이상만, 기본 20점 + 아이템 40점 + 색상 40점)
 const recommendedItem = computed(() => {
   if (luckScore.value >= 70) return null
   if (!userItems.value.length) return null
@@ -504,23 +507,43 @@ const recommendedItem = computed(() => {
     hex: colorMap[name] || '#808080'
   }))
 
+  // 행운 아이템 목록
+  const luckyItem = fortuneStore.luckyItem || {}
+  const luckyItemList = [
+    luckyItem.main,
+    luckyItem.zodiac,
+    luckyItem.today_special
+  ].filter(Boolean)
+
   for (const otherItem of userItems.value) {
     if (otherItem.id === currentItemId) continue
     if (!otherItem.dominant_colors?.length) continue
 
-    let maxScore = 0
+    // 1. 색상 점수 계산 (0-40점)
+    let maxColorScore = 0
     for (const itemColor of otherItem.dominant_colors) {
       const itemRgb = hexToRgb(itemColor.hex)
       for (const luckyColor of luckyColorHexes) {
         const luckyRgb = hexToRgb(luckyColor.hex)
         const distance = euclideanDistance(itemRgb, luckyRgb)
-        const score = distanceToScore(distance)
-        if (score > maxScore) maxScore = score
+        const colorScore = distanceToScore(distance)
+        if (colorScore > maxColorScore) maxColorScore = colorScore
       }
     }
+    const finalColorScore = Math.round(maxColorScore * 0.4)
 
-    if (maxScore > bestScore) {
-      bestScore = maxScore
+    // 2. 아이템 유사도 점수 계산 (0-40점)
+    const aiAnalysis = otherItem.ai_analysis || {}
+    const aiItemName = aiAnalysis.item_name || otherItem.item_name
+    const { similarity } = getMaxSimilarityWithLuckyItems(aiItemName, luckyItemList)
+    const itemScoreRaw = similarityToScore(similarity)
+    const finalItemScore = Math.round(itemScoreRaw * 0.4)
+
+    // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
+    const totalScore = 20 + finalItemScore + finalColorScore
+
+    if (totalScore > bestScore) {
+      bestScore = totalScore
       bestItem = otherItem
     }
   }
@@ -543,6 +566,14 @@ const noGoodItemAvailable = computed(() => {
     hex: colorMap[name] || '#808080'
   }))
 
+  // 행운 아이템 목록
+  const luckyItem = fortuneStore.luckyItem || {}
+  const luckyItemList = [
+    luckyItem.main,
+    luckyItem.zodiac,
+    luckyItem.today_special
+  ].filter(Boolean)
+
   // 아이템이 없거나, 있어도 80점 이상인 게 없으면 true
   if (!userItems.value.length) return true
 
@@ -550,18 +581,30 @@ const noGoodItemAvailable = computed(() => {
     if (otherItem.id === currentItemId) continue
     if (!otherItem.dominant_colors?.length) continue
 
-    let maxScore = 0
+    // 1. 색상 점수 계산 (0-40점)
+    let maxColorScore = 0
     for (const itemColor of otherItem.dominant_colors) {
       const itemRgb = hexToRgb(itemColor.hex)
       for (const luckyColor of luckyColorHexes) {
         const luckyRgb = hexToRgb(luckyColor.hex)
         const distance = euclideanDistance(itemRgb, luckyRgb)
-        const score = distanceToScore(distance)
-        if (score > maxScore) maxScore = score
+        const colorScore = distanceToScore(distance)
+        if (colorScore > maxColorScore) maxColorScore = colorScore
       }
     }
+    const finalColorScore = Math.round(maxColorScore * 0.4)
 
-    if (maxScore >= 80) return false
+    // 2. 아이템 유사도 점수 계산 (0-40점)
+    const aiAnalysis = otherItem.ai_analysis || {}
+    const aiItemName = aiAnalysis.item_name || otherItem.item_name
+    const { similarity } = getMaxSimilarityWithLuckyItems(aiItemName, luckyItemList)
+    const itemScoreRaw = similarityToScore(similarity)
+    const finalItemScore = Math.round(itemScoreRaw * 0.4)
+
+    // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
+    const totalScore = 20 + finalItemScore + finalColorScore
+
+    if (totalScore >= 80) return false
   }
 
   return true
