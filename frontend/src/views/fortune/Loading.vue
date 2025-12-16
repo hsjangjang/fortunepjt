@@ -145,9 +145,9 @@ async function calculateFortune() {
 
       // redirect 쿼리가 있으면 해당 페이지로, 없으면 fortune/today로
       const redirectPath = route.query.redirect || '/fortune/today'
-      setTimeout(() => {
-        router.replace(redirectPath)
-      }, 500)
+
+      // 즉시 리다이렉트 (setTimeout 제거)
+      router.replace(redirectPath)
 
       // 주간/월간 운세는 백그라운드에서 생성 (리다이렉트 후 실행, await 없이)
       generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
