@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils import timezone
 from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache, FortuneBaseData, ColorMaster, MBTISpeechTemplate
 
 @admin.register(DailyFortuneCache)
@@ -10,11 +11,16 @@ class DailyFortuneCacheAdmin(admin.ModelAdmin):
     ordering = ['-created_at']
 
     def created_at_display(self, obj):
-        """생성일시를 초 단위까지 표시"""
+        """생성일시를 초 단위까지 표시 (KST)"""
         if obj.created_at:
-            return obj.created_at.strftime('%Y년 %m월 %d일 %H:%M:%S')
+            # UTC를 KST로 변환
+            from django.utils import timezone
+            import pytz
+            kst = pytz.timezone('Asia/Seoul')
+            local_time = obj.created_at.astimezone(kst)
+            return local_time.strftime('%Y-%m-%d %H:%M:%S')
         return '-'
-    created_at_display.short_description = '생성일시'
+    created_at_display.short_description = '생성일시 (KST)'
     created_at_display.admin_order_field = 'created_at'
 
 @admin.register(FortuneBaseData)
@@ -37,11 +43,16 @@ class WeeklyFortuneCacheAdmin(admin.ModelAdmin):
     ordering = ['-year', '-week_number', '-created_at']
 
     def created_at_display(self, obj):
-        """생성일시를 초 단위까지 표시"""
+        """생성일시를 초 단위까지 표시 (KST)"""
         if obj.created_at:
-            return obj.created_at.strftime('%Y년 %m월 %d일 %H:%M:%S')
+            # UTC를 KST로 변환
+            from django.utils import timezone
+            import pytz
+            kst = pytz.timezone('Asia/Seoul')
+            local_time = obj.created_at.astimezone(kst)
+            return local_time.strftime('%Y-%m-%d %H:%M:%S')
         return '-'
-    created_at_display.short_description = '생성일시'
+    created_at_display.short_description = '생성일시 (KST)'
     created_at_display.admin_order_field = 'created_at'
 
 
@@ -53,11 +64,16 @@ class MonthlyFortuneCacheAdmin(admin.ModelAdmin):
     ordering = ['-year', '-month', '-created_at']
 
     def created_at_display(self, obj):
-        """생성일시를 초 단위까지 표시"""
+        """생성일시를 초 단위까지 표시 (KST)"""
         if obj.created_at:
-            return obj.created_at.strftime('%Y년 %m월 %d일 %H:%M:%S')
+            # UTC를 KST로 변환
+            from django.utils import timezone
+            import pytz
+            kst = pytz.timezone('Asia/Seoul')
+            local_time = obj.created_at.astimezone(kst)
+            return local_time.strftime('%Y-%m-%d %H:%M:%S')
         return '-'
-    created_at_display.short_description = '생성일시'
+    created_at_display.short_description = '생성일시 (KST)'
     created_at_display.admin_order_field = 'created_at'
 
 
