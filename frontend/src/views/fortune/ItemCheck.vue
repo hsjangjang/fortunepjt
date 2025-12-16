@@ -448,7 +448,11 @@ const analyzeItem = async (file, imageData) => {
       const colors = analysis.colors || []
 
       detectedItem.value = data.suggested_name || data.item_name || '알 수 없음'
-      detectedColors.value = colors.slice(0, 3)
+      // 색상 이름으로 colorMap에서 HEX 재매핑 (프론트엔드 통일)
+      detectedColors.value = colors.slice(0, 3).map(color => ({
+        ...color,
+        hex: colorMap[color.korean_name] || color.hex
+      }))
 
       // AI 분석 결과 저장 (등록 시 사용)
       analysisResult.value = {
@@ -524,7 +528,11 @@ const selectExistingItem = (item) => {
   detectedItem.value = aiItemName
 
   const colors = item.dominant_colors || []
-  detectedColors.value = colors.slice(0, 3)
+  // 색상 이름으로 colorMap에서 HEX 재매핑 (프론트엔드 통일)
+  detectedColors.value = colors.slice(0, 3).map(color => ({
+    ...color,
+    hex: colorMap[color.korean_name] || color.hex
+  }))
 
   if (colors.length > 0) {
     itemColor.value = colors[0].hex
