@@ -139,9 +139,6 @@ async function calculateFortune() {
 
       console.log('[FortuneLoading] 일일 운세 저장 완료:', today)
 
-      // 주간/월간 운세도 함께 생성 (백그라운드)
-      await generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
-
       // 계산 완료 - 원래 가려던 페이지 또는 결과 페이지로 이동
       if (textInterval) clearInterval(textInterval)
       currentText.value = '완료! 결과 페이지로 이동합니다...'
@@ -151,6 +148,9 @@ async function calculateFortune() {
       setTimeout(() => {
         router.replace(redirectPath)
       }, 500)
+
+      // 주간/월간 운세는 백그라운드에서 생성 (리다이렉트 후 실행, await 없이)
+      generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
     } else {
       // 에러 발생
       let errorMsg = data.error || '운세 계산 중 오류가 발생했습니다.'
