@@ -3,10 +3,19 @@ from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache, 
 
 @admin.register(DailyFortuneCache)
 class DailyFortuneCacheAdmin(admin.ModelAdmin):
-    list_display = ['user', 'session_key', 'fortune_date', 'fortune_score', 'lucky_color']
+    list_display = ['user', 'session_key', 'fortune_date', 'fortune_score', 'lucky_color', 'created_at_display', 'birth_date']
     list_filter = ['fortune_date', 'fortune_score']
     search_fields = ['user__username', 'session_key']
     date_hierarchy = 'fortune_date'
+    ordering = ['-created_at']
+
+    def created_at_display(self, obj):
+        """생성일시를 초 단위까지 표시"""
+        if obj.created_at:
+            return obj.created_at.strftime('%Y년 %m월 %d일 %H:%M:%S')
+        return '-'
+    created_at_display.short_description = '생성일시'
+    created_at_display.admin_order_field = 'created_at'
 
 @admin.register(FortuneBaseData)
 class FortuneBaseDataAdmin(admin.ModelAdmin):
@@ -22,18 +31,34 @@ class ColorMasterAdmin(admin.ModelAdmin):
 
 @admin.register(WeeklyFortuneCache)
 class WeeklyFortuneCacheAdmin(admin.ModelAdmin):
-    list_display = ['user', 'session_key', 'year', 'week_number', 'birth_date', 'created_at']
+    list_display = ['user', 'session_key', 'year', 'week_number', 'birth_date', 'created_at_display']
     list_filter = ['year', 'week_number']
     search_fields = ['user__username', 'session_key']
     ordering = ['-year', '-week_number', '-created_at']
 
+    def created_at_display(self, obj):
+        """생성일시를 초 단위까지 표시"""
+        if obj.created_at:
+            return obj.created_at.strftime('%Y년 %m월 %d일 %H:%M:%S')
+        return '-'
+    created_at_display.short_description = '생성일시'
+    created_at_display.admin_order_field = 'created_at'
+
 
 @admin.register(MonthlyFortuneCache)
 class MonthlyFortuneCacheAdmin(admin.ModelAdmin):
-    list_display = ['user', 'session_key', 'year', 'month', 'birth_date', 'created_at']
+    list_display = ['user', 'session_key', 'year', 'month', 'birth_date', 'created_at_display']
     list_filter = ['year', 'month']
     search_fields = ['user__username', 'session_key']
     ordering = ['-year', '-month', '-created_at']
+
+    def created_at_display(self, obj):
+        """생성일시를 초 단위까지 표시"""
+        if obj.created_at:
+            return obj.created_at.strftime('%Y년 %m월 %d일 %H:%M:%S')
+        return '-'
+    created_at_display.short_description = '생성일시'
+    created_at_display.admin_order_field = 'created_at'
 
 
 @admin.register(MBTISpeechTemplate)

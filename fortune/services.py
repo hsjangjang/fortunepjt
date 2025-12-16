@@ -319,7 +319,8 @@ class FortuneCalculator:
         saju: Dict,
         lucky_item_name: str,
         zodiac_item_name: str,
-        period_type: str = 'daily'
+        period_type: str = 'daily',
+        scores: Dict = None
     ) -> str:
         """기간 유형에 따른 운세 프롬프트 생성"""
         today = date.today()
@@ -350,22 +351,30 @@ class FortuneCalculator:
 
 [작성 가이드]
 1. 말투: "~합니다", "~입니다" 체의 정중한 문체
-2. 점수: 50~100점 사이 정수
+2. 점수는 아래 제공된 점수를 그대로 사용하세요
 3. 행운의 아이템:
    - '{lucky_item_name}' 설명: 2문장
    - '{zodiac_item_name}' 설명: 2문장
 
+[점수 정보 - 반드시 아래 점수를 그대로 사용]
+- 총운: {scores.get('total', 75) if scores else 75}점
+- 재물운: {scores.get('money', 75) if scores else 75}점
+- 애정운: {scores.get('love', 75) if scores else 75}점
+- 학업운: {scores.get('study', 75) if scores else 75}점
+- 직장운: {scores.get('work', 75) if scores else 75}점
+- 건강운: {scores.get('health', 75) if scores else 75}점
+
 반드시 아래 JSON 구조로 출력하세요:
-""" + """{
-    "total": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
-    "money": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
-    "love": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
-    "study": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
-    "work": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
-    "health": {"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."},
-    "scores": {"total": 85, "money": 80, "love": 75, "study": 90, "work": 85, "health": 80},
-    "lucky_item": {"description": "...", "zodiac_description": "..."}
-}"""
+""" + f"""{{
+    "total": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "money": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "love": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "study": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "work": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "health": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
+    "scores": {{"total": {scores.get('total', 75) if scores else 75}, "money": {scores.get('money', 75) if scores else 75}, "love": {scores.get('love', 75) if scores else 75}, "study": {scores.get('study', 75) if scores else 75}, "work": {scores.get('work', 75) if scores else 75}, "health": {scores.get('health', 75) if scores else 75}}},
+    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+}}"""
 
         elif period_type == 'monthly':
             period_title = '이번 달의 운세'
@@ -392,22 +401,30 @@ class FortuneCalculator:
 
 [작성 가이드]
 1. 말투: "~합니다", "~입니다" 체의 정중한 문체
-2. 점수: 50~100점 사이 정수
+2. 점수는 아래 제공된 점수를 그대로 사용하세요
 3. 행운의 아이템:
    - '{lucky_item_name}' 설명: 2문장
    - '{zodiac_item_name}' 설명: 2문장
 
+[점수 정보 - 반드시 아래 점수를 그대로 사용]
+- 총운: {scores.get('total', 75) if scores else 75}점
+- 재물운: {scores.get('money', 75) if scores else 75}점
+- 애정운: {scores.get('love', 75) if scores else 75}점
+- 학업운: {scores.get('study', 75) if scores else 75}점
+- 직장운: {scores.get('work', 75) if scores else 75}점
+- 건강운: {scores.get('health', 75) if scores else 75}점
+
 반드시 아래 JSON 구조로 출력하세요:
-""" + """{
-    "total": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
-    "money": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
-    "love": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
-    "study": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
-    "work": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
-    "health": {"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."},
-    "scores": {"total": 85, "money": 80, "love": 75, "study": 90, "work": 85, "health": 80},
-    "lucky_item": {"description": "...", "zodiac_description": "..."}
-}"""
+""" + f"""{{
+    "total": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "money": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "love": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "study": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "work": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "health": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
+    "scores": {{"total": {scores.get('total', 75) if scores else 75}, "money": {scores.get('money', 75) if scores else 75}, "love": {scores.get('love', 75) if scores else 75}, "study": {scores.get('study', 75) if scores else 75}, "work": {scores.get('work', 75) if scores else 75}, "health": {scores.get('health', 75) if scores else 75}}},
+    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+}}"""
 
         else:  # daily
             period_title = '오늘의 운세'
@@ -427,22 +444,30 @@ class FortuneCalculator:
 [작성 가이드]
 1. 말투: "~합니다", "~입니다" 체의 정중한 문체
 2. 각 운세 항목당 5문장으로 작성 (오전/오후/저녁 시간대 활용)
-3. 점수: 50~100점 사이 정수
+3. 점수는 아래 제공된 점수를 그대로 사용하세요
 4. 행운의 아이템:
    - '{lucky_item_name}' 설명: 2문장
    - '{zodiac_item_name}' 설명: 2문장
 
+[점수 정보 - 반드시 아래 점수를 그대로 사용]
+- 총운: {scores.get('total', 75) if scores else 75}점
+- 재물운: {scores.get('money', 75) if scores else 75}점
+- 애정운: {scores.get('love', 75) if scores else 75}점
+- 학업운: {scores.get('study', 75) if scores else 75}점
+- 직장운: {scores.get('work', 75) if scores else 75}점
+- 건강운: {scores.get('health', 75) if scores else 75}점
+
 반드시 아래 JSON 구조로 출력하세요:
-""" + """{
+""" + f"""{{
     "total": "총운 내용 5문장...",
     "money": "재물운 내용 5문장...",
     "love": "애정운 내용 5문장...",
     "study": "학업운 내용 5문장...",
     "work": "직장운 내용 5문장...",
     "health": "건강운 내용 5문장...",
-    "scores": {"total": 85, "money": 80, "love": 75, "study": 90, "work": 85, "health": 80},
-    "lucky_item": {"description": "...", "zodiac_description": "..."}
-}"""
+    "scores": {{"total": {scores.get('total', 75) if scores else 75}, "money": {scores.get('money', 75) if scores else 75}, "love": {scores.get('love', 75) if scores else 75}, "study": {scores.get('study', 75) if scores else 75}, "work": {scores.get('work', 75) if scores else 75}, "health": {scores.get('health', 75) if scores else 75}}},
+    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+}}"""
 
         return prompt
 
@@ -462,8 +487,8 @@ class FortuneCalculator:
         """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
         import time
 
-        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v4: 시간대별 개별 필드)
-        cache_key = f"fortune_text_v4_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
+        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v5: 실제 점수 기반)
+        cache_key = f"fortune_text_v5_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
         cached_result = cache.get(cache_key)
 
         if cached_result:
@@ -488,7 +513,7 @@ class FortuneCalculator:
         # 기간별 프롬프트 설정
         prompt = self._build_fortune_prompt(
             birth_date, gender, zodiac, chinese_zodiac, mbti_info, lucky_item_info,
-            saju, lucky_item_name, zodiac_item_name, period_type
+            saju, lucky_item_name, zodiac_item_name, period_type, scores
         )
 
         # 시스템 메시지 (형식 강제)

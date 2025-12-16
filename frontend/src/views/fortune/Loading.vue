@@ -145,12 +145,16 @@ async function calculateFortune() {
 
       // redirect 쿼리가 있으면 해당 페이지로, 없으면 fortune/today로
       const redirectPath = route.query.redirect || '/fortune/today'
+      console.log('[FortuneLoading] 리다이렉트 시작:', redirectPath)
 
-      // 즉시 리다이렉트 (setTimeout 제거)
+      // 주간/월간 운세는 리다이렉트 이후 백그라운드에서 생성 (setTimeout으로 완전히 분리)
+      setTimeout(() => {
+        generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
+      }, 100)
+
+      // 즉시 리다이렉트
       router.replace(redirectPath)
-
-      // 주간/월간 운세는 백그라운드에서 생성 (리다이렉트 후 실행, await 없이)
-      generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
+      console.log('[FortuneLoading] 리다이렉트 완료')
     } else {
       // 에러 발생
       let errorMsg = data.error || '운세 계산 중 오류가 발생했습니다.'
