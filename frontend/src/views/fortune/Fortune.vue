@@ -883,23 +883,26 @@ onMounted(async () => {
         console.log('[Today] Fortune Store에서 운세 로드 (비로그인)')
         fortune.value = fortuneStore.fortuneData
         setupFortuneUI()
-      } else {
-        // 2. 로그인 사용자 또는 Store에 데이터 없음: API 호출
-        console.log('[Today] API에서 운세 로드')
-        const response = await apiClient.get('/api/fortune/today/')
-
-        if (response.data.success && response.data.fortune) {
-          fortune.value = response.data.fortune
-
-          // Fortune Store에도 저장 (action 사용으로 반응성 유지)
-          fortuneStore.setFortune(response.data.fortune, today)
-        } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
-          // 비로그인 + API 실패 + Store에 데이터 있음 → Store 데이터 사용
-          console.log('[Today] API 실패, Fortune Store 데이터 사용')
-          fortune.value = fortuneStore.fortuneData
-        }
-        setupFortuneUI()
+        // Store에 데이터가 있으면 API 호출 생략 (return으로 조기 종료)
+        isLoading.value = false
+        return
       }
+
+      // 2. 로그인 사용자 또는 Store에 데이터 없음: API 호출
+      console.log('[Today] API에서 운세 로드')
+      const response = await apiClient.get('/api/fortune/today/')
+
+      if (response.data.success && response.data.fortune) {
+        fortune.value = response.data.fortune
+
+        // Fortune Store에도 저장 (action 사용으로 반응성 유지)
+        fortuneStore.setFortune(response.data.fortune, today)
+      } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
+        // 비로그인 + API 실패 + Store에 데이터 있음 → Store 데이터 사용
+        console.log('[Today] API 실패, Fortune Store 데이터 사용')
+        fortune.value = fortuneStore.fortuneData
+      }
+      setupFortuneUI()
     } else {
       // weekly 또는 monthly: loadFortuneData 사용
       // loadFortuneData 내부에서 애니메이션 처리하므로 setupFortuneUI 호출 불필요
