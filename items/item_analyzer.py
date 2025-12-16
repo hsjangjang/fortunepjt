@@ -378,8 +378,8 @@ class ItemAnalyzer:
             '연보라색': '#DA70D6', '연보라': '#E6E6FA', '라벤더': '#E6E6FA',
             # 갈색 계열
             '갈색': '#92400E', '브라운': '#92400E', '짙은 갈색': '#92400E',
-            '베이지': '#E7E5E4', '베이지색': '#E7E5E4',
-            '아이보리': '#FFFFF0', '크림색': '#FFFDD0', '살구색': '#FFCC99', '살구': '#FFCC99',
+            '베이지': '#f3f4f6', '베이지색': '#f3f4f6',
+            '아이보리': '#f3f4f6', '크림색': '#f3f4f6', '크림': '#f3f4f6', '살구색': '#FFCC99', '살구': '#FFCC99',
             # 은색
             '은색': '#C0C0C0', '은': '#C0C0C0', '실버': '#C0C0C0',
         }
@@ -423,8 +423,8 @@ class ItemAnalyzer:
             return '#F472B6'
         elif '주황' in color_name_lower or '오렌지' in color_name_lower:
             return '#F59E0B'
-        elif '베이지' in color_name_lower:
-            return '#E7E5E4'
+        elif '베이지' in color_name_lower or '아이보리' in color_name_lower or '크림' in color_name_lower:
+            return '#f3f4f6'
 
         # 기본값 (회색)
         print(f"[WARNING] 알 수 없는 색상: {color_name}, 회색으로 표시")
