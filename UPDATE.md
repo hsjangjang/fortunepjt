@@ -1,5 +1,17 @@
 # 📋 업데이트 내역
 
+## v1.7.2 (25.12.17)
+
+### 장하선
+- Backend
+  - 운세 점수 85점 고정 문제 해결 (`fortune/services.py`)
+    - LLM 프롬프트에서 점수 정보 완전 제거 (텍스트만 생성하도록 변경)
+    - 캐시 키 버전 v6 → v7 변경
+    - **해결 방법**: Django Admin에서 DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache 모두 삭제 필요
+    - 점수는 백엔드 `_calculate_all_fortunes`에서 사주/오행 기반으로 계산 (50~100점 범위)
+
+---
+
 ## v1.7.1 (25.12.17)
 
 ### 장하선
@@ -11,11 +23,9 @@
     - LLM 프롬프트 JSON 응답 예시에서 `scores` 필드 제거 (주간/월간/일간 모두)
     - 백엔드에서 LLM 응답의 `scores` 무시하도록 수정 (자체 계산 점수 사용)
     - 캐시 키 버전 v5 → v6 변경
-    - **현재 미해결**: 여전히 모든 운세가 85점으로 고정되는 문제 발생 중
 - Frontend
   - 비로그인 사용자 운세 로딩 페이지 리다이렉트 수정 (`Loading.vue`)
     - 주간/월간 운세 생성을 `setTimeout`으로 분리하여 리다이렉트 차단 방지
-    - **현재 미해결**: 무한 로딩 문제 여전히 발생 중
   - 비로그인 사용자 Fortune Store 캐시 사용 로직 추가 (`Fortune.vue`)
     - 일일 운세 Store 데이터 있으면 API 호출 생략하도록 early return 추가
   - 아이템 업로드 UI 개선 (`Upload.vue`)
