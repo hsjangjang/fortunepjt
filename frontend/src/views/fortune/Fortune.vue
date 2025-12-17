@@ -705,12 +705,40 @@ const loadFortuneData = async (period) => {
   const now = new Date()
   const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
 
-  // daily인 경우 Store 캐시 먼저 확인
+  // 현재 년도/주차/월 계산
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  // ISO 주차 계산
+  const startOfYear = new Date(year, 0, 1)
+  const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000))
+  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7)
+
+  // Store 캐시 먼저 확인 (daily, weekly, monthly 모두)
   if (period === 'daily' && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
     console.log('[Fortune] Store에서 daily 운세 로드')
     fortune.value = fortuneStore.fortuneData
     setupFortuneUI()
     return
+  }
+
+  if (period === 'weekly') {
+    const cachedWeekly = fortuneStore.getWeeklyFortune(year, week)
+    if (cachedWeekly) {
+      console.log('[Fortune] Store에서 weekly 운세 로드')
+      fortune.value = cachedWeekly
+      setupFortuneUI()
+      return
+    }
+  }
+
+  if (period === 'monthly') {
+    const cachedMonthly = fortuneStore.getMonthlyFortune(year, month)
+    if (cachedMonthly) {
+      console.log('[Fortune] Store에서 monthly 운세 로드')
+      fortune.value = cachedMonthly
+      setupFortuneUI()
+      return
+    }
   }
 
   try {
@@ -734,6 +762,13 @@ const loadFortuneData = async (period) => {
     if (response.data.success && response.data.fortune) {
       fortune.value = response.data.fortune
       console.log(`[Fortune] 캐시에서 ${period} 운세 로드 완료`)
+
+      // Store에 캐시 저장
+      if (period === 'weekly' && response.data.year && response.data.week) {
+        fortuneStore.setWeeklyFortune(response.data.fortune, response.data.year, response.data.week)
+      } else if (period === 'monthly' && response.data.year && response.data.month) {
+        fortuneStore.setMonthlyFortune(response.data.fortune, response.data.year, response.data.month)
+      }
     } else if (response.data.need_calculate) {
       // 캐시 없음 - 바로 POST로 생성 요청 (로딩 페이지 없이)
       console.log(`[Fortune] ${period} 운세 없음 → 바로 생성 요청`)
@@ -744,6 +779,13 @@ const loadFortuneData = async (period) => {
         if (postResponse.data.success && postResponse.data.fortune) {
           fortune.value = postResponse.data.fortune
           console.log(`[Fortune] ${period} 운세 생성 완료`)
+
+          // Store에 캐시 저장
+          if (period === 'weekly' && postResponse.data.year && postResponse.data.week) {
+            fortuneStore.setWeeklyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.week)
+          } else if (period === 'monthly' && postResponse.data.year && postResponse.data.month) {
+            fortuneStore.setMonthlyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.month)
+          }
         } else {
           // 생성 실패 시 로딩 페이지로
           router.replace({
@@ -772,14 +814,25 @@ const loadFortuneData = async (period) => {
         if (postResponse.data.success && postResponse.data.fortune) {
           fortune.value = postResponse.data.fortune
           console.log(`[Fortune] ${period} 운세 생성 완료 (비로그인)`)
+
+          // Store에 캐시 저장
+          if (period === 'weekly' && postResponse.data.year && postResponse.data.week) {
+            fortuneStore.setWeeklyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.week)
+          } else if (period === 'monthly' && postResponse.data.year && postResponse.data.month) {
+            fortuneStore.setMonthlyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.month)
+          }
         } else {
           console.error(`[Fortune] ${period} 운세 생성 실패`)
         }
       } else {
-        // formData도 없으면 계산 페이지로
+        // formData도 없으면 계산 페이지로 (현재 기간에 맞는 redirect 설정)
+        let redirectPath = '/fortune/today'
+        if (period === 'weekly') redirectPath = '/fortune/weekly'
+        if (period === 'monthly') redirectPath = '/fortune/monthly'
+
         router.replace({
           name: 'fortune-calculate',
-          query: { redirect: '/fortune/today' }
+          query: { redirect: redirectPath }
         })
       }
       return

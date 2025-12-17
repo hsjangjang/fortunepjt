@@ -10,6 +10,12 @@ export const useFortuneStore = defineStore('fortune', () => {
   // 비로그인 사용자의 폼 데이터 (weekly/monthly 생성시 필요)
   const formData = ref(null)
 
+  // 주간/월간 운세 캐시
+  const weeklyFortuneData = ref(null)
+  const weeklyFortuneKey = ref(null)  // "year_week" 형식 (예: "2025_51")
+  const monthlyFortuneData = ref(null)
+  const monthlyFortuneKey = ref(null)  // "year_month" 형식 (예: "2025_12")
+
   // 로컬 시간 기준 오늘 날짜 (YYYY-MM-DD)
   const getLocalToday = () => {
     const now = new Date()
@@ -175,12 +181,58 @@ export const useFortuneStore = defineStore('fortune', () => {
     console.log('[Fortune Store] 폼 데이터 설정:', form)
   }
 
+  /**
+   * 주간 운세 설정
+   */
+  function setWeeklyFortune(fortune, year, week) {
+    weeklyFortuneData.value = fortune
+    weeklyFortuneKey.value = `${year}_${week}`
+    console.log('[Fortune Store] 주간 운세 설정:', weeklyFortuneKey.value)
+  }
+
+  /**
+   * 주간 운세 가져오기 (캐시 히트 시 반환, 미스 시 null)
+   */
+  function getWeeklyFortune(year, week) {
+    const key = `${year}_${week}`
+    if (weeklyFortuneKey.value === key && weeklyFortuneData.value) {
+      console.log('[Fortune Store] 주간 운세 캐시 히트:', key)
+      return weeklyFortuneData.value
+    }
+    return null
+  }
+
+  /**
+   * 월간 운세 설정
+   */
+  function setMonthlyFortune(fortune, year, month) {
+    monthlyFortuneData.value = fortune
+    monthlyFortuneKey.value = `${year}_${month}`
+    console.log('[Fortune Store] 월간 운세 설정:', monthlyFortuneKey.value)
+  }
+
+  /**
+   * 월간 운세 가져오기 (캐시 히트 시 반환, 미스 시 null)
+   */
+  function getMonthlyFortune(year, month) {
+    const key = `${year}_${month}`
+    if (monthlyFortuneKey.value === key && monthlyFortuneData.value) {
+      console.log('[Fortune Store] 월간 운세 캐시 히트:', key)
+      return monthlyFortuneData.value
+    }
+    return null
+  }
+
   return {
     // State
     fortuneData,
     fortuneDate,
     loading,
     formData,
+    weeklyFortuneData,
+    weeklyFortuneKey,
+    monthlyFortuneData,
+    monthlyFortuneKey,
 
     // Getters
     hasTodayFortune,
@@ -195,6 +247,10 @@ export const useFortuneStore = defineStore('fortune', () => {
     resetFortune,
     clearFortune,
     setFortune,
-    setFormData
+    setFormData,
+    setWeeklyFortune,
+    getWeeklyFortune,
+    setMonthlyFortune,
+    getMonthlyFortune
   }
 })

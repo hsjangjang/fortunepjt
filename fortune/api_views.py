@@ -48,12 +48,22 @@ def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth
 def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
     """동일 조건(생년월일+성별+주차)의 주간 운세 캐시 찾기"""
     try:
+        # 1차: 정확히 일치하는 캐시 찾기
         cache = WeeklyFortuneCache.objects.filter(
             year=year,
             week_number=week,
             birth_date=birth_date,
             gender=gender or ''
         ).order_by('created_at').first()
+
+        # 2차: gender가 비어있는 기존 캐시도 찾기 (마이그레이션 전 데이터 호환)
+        if not cache and gender:
+            cache = WeeklyFortuneCache.objects.filter(
+                year=year,
+                week_number=week,
+                birth_date=birth_date,
+                gender=''
+            ).order_by('created_at').first()
 
         if cache and cache.full_fortune_data:
             fortune_data = json.loads(cache.full_fortune_data)
@@ -68,12 +78,22 @@ def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
 def find_same_condition_monthly_fortune(year, month, birth_date, gender=''):
     """동일 조건(생년월일+성별+월)의 월간 운세 캐시 찾기"""
     try:
+        # 1차: 정확히 일치하는 캐시 찾기
         cache = MonthlyFortuneCache.objects.filter(
             year=year,
             month=month,
             birth_date=birth_date,
             gender=gender or ''
         ).order_by('created_at').first()
+
+        # 2차: gender가 비어있는 기존 캐시도 찾기 (마이그레이션 전 데이터 호환)
+        if not cache and gender:
+            cache = MonthlyFortuneCache.objects.filter(
+                year=year,
+                month=month,
+                birth_date=birth_date,
+                gender=''
+            ).order_by('created_at').first()
 
         if cache and cache.full_fortune_data:
             fortune_data = json.loads(cache.full_fortune_data)

@@ -169,12 +169,22 @@ async function generateWeeklyAndMonthlyFortunes(formData) {
     currentText.value = '이번 주 운세를 생성하고 있습니다...'
     console.log('[FortuneLoading] 주간 운세 생성 시작')
 
+    let weeklyResponse
     if (authStore.isAuthenticated) {
       // 로그인 사용자
-      await apiClient.post('/api/fortune/weekly/')
+      weeklyResponse = await apiClient.post('/api/fortune/weekly/')
     } else if (formData) {
       // 비로그인 사용자
-      await apiClient.post('/api/fortune/weekly/', formData)
+      weeklyResponse = await apiClient.post('/api/fortune/weekly/', formData)
+    }
+
+    // Store에 캐시 저장
+    if (weeklyResponse?.data?.success && weeklyResponse.data.fortune) {
+      fortuneStore.setWeeklyFortune(
+        weeklyResponse.data.fortune,
+        weeklyResponse.data.year,
+        weeklyResponse.data.week
+      )
     }
     console.log('[FortuneLoading] 주간 운세 생성 완료')
   } catch (error) {
@@ -187,12 +197,22 @@ async function generateWeeklyAndMonthlyFortunes(formData) {
     currentText.value = '이번 달 운세를 생성하고 있습니다...'
     console.log('[FortuneLoading] 월간 운세 생성 시작')
 
+    let monthlyResponse
     if (authStore.isAuthenticated) {
       // 로그인 사용자
-      await apiClient.post('/api/fortune/monthly/')
+      monthlyResponse = await apiClient.post('/api/fortune/monthly/')
     } else if (formData) {
       // 비로그인 사용자
-      await apiClient.post('/api/fortune/monthly/', formData)
+      monthlyResponse = await apiClient.post('/api/fortune/monthly/', formData)
+    }
+
+    // Store에 캐시 저장
+    if (monthlyResponse?.data?.success && monthlyResponse.data.fortune) {
+      fortuneStore.setMonthlyFortune(
+        monthlyResponse.data.fortune,
+        monthlyResponse.data.year,
+        monthlyResponse.data.month
+      )
     }
     console.log('[FortuneLoading] 월간 운세 생성 완료')
   } catch (error) {
