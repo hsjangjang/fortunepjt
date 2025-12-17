@@ -260,7 +260,7 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { getColorMatchScore, colorMap } from '@/utils/colors'
 import { getFortuneBoostScore, fortuneKeywords } from '@/utils/similarity'
-import { calculateLuckScore, getScoreMessage, getScoreColor, calculateProgressOffset } from '@/utils/luckScore'
+import { calculateLuckScore, calculateLuckScoreAsync, getScoreMessage, getScoreColor, calculateProgressOffset } from '@/utils/luckScore'
 import { findBestLuckyItem, hasNoGoodItem, formatItemDate } from '@/utils/itemAnalysis'
 import { FORTUNE_CATEGORIES } from '@/utils/fortuneCategories'
 import { useFortuneStore } from '@/stores/fortune'
@@ -276,6 +276,8 @@ const editForm = ref({
   main_category: ''
 })
 const userItems = ref([]) // 다른 아이템 추천용
+const hybridScoreResult = ref(null) // 하이브리드 유사도 결과
+const isCalculatingScore = ref(false) // 점수 계산 중 상태
 
 // 카테고리 한글 매핑
 const categoryDisplayMap = {
@@ -331,8 +333,14 @@ const getLuckyItemList = () => {
   return [luckyItem.main, luckyItem.zodiac, luckyItem.today_special].filter(Boolean)
 }
 
-// 아이템 색상과 행운색 매칭 계산 (유틸리티 사용)
+// 아이템 색상과 행운색 매칭 계산 (하이브리드: FastText 즉시 + GMS Embedding 비동기)
 const colorMatchResult = computed(() => {
+  // 하이브리드 결과가 있으면 우선 사용
+  if (hybridScoreResult.value) {
+    return hybridScoreResult.value
+  }
+
+  // 없으면 FastText 동기 결과 (즉시 표시용)
   if (!item.value?.dominant_colors || !fortuneStore.luckyColors?.length) {
     return { score: 0, matchedColor: null, bestItemHex: '#808080' }
   }
@@ -344,6 +352,29 @@ const colorMatchResult = computed(() => {
     getLuckyItemList()
   )
 })
+
+// 하이브리드 유사도 계산 (비동기) - 더 높은 점수로 업데이트
+const calculateHybridScore = async () => {
+  if (!item.value?.dominant_colors || !fortuneStore.luckyColors?.length) return
+
+  isCalculatingScore.value = true
+  try {
+    const result = await calculateLuckScoreAsync(
+      item.value.item_name,
+      item.value.dominant_colors,
+      fortuneStore.luckyColors,
+      getLuckyItemList()
+    )
+    // 하이브리드 결과가 더 높으면 업데이트
+    if (!hybridScoreResult.value || result.score > hybridScoreResult.value.score) {
+      hybridScoreResult.value = result
+    }
+  } catch (error) {
+    console.warn('[Detail] Hybrid score calculation failed:', error)
+  } finally {
+    isCalculatingScore.value = false
+  }
+}
 
 // 행운 지수
 const luckScore = computed(() => colorMatchResult.value.score)
@@ -417,6 +448,10 @@ const fetchItemDetail = async () => {
       itemData.image = itemData.image_url
     }
     item.value = itemData
+
+    // 하이브리드 점수 계산 (비동기 - FastText 먼저 표시 후 GMS Embedding 결과로 업데이트)
+    hybridScoreResult.value = null // 이전 결과 초기화
+    calculateHybridScore()
   } catch (error) {
     console.error('아이템 상세 정보 가져오기 실패:', error)
     alert('아이템을 찾을 수 없습니다.')

@@ -2,10 +2,11 @@
  * 행운 점수 계산 유틸리티
  * - 색상 매칭 + 아이템 유사도 기반 종합 점수 계산
  * - 점수 구간별 메시지 및 아이콘 제공
+ * - 하이브리드 유사도 (FastText + GMS Embedding) 지원
  */
 
 import { calculateColorMatchScore } from './colorDistance'
-import { getMaxSimilarityWithLuckyItems, similarityToScore } from './itemSimilarity'
+import { getMaxSimilarityWithLuckyItems, getHybridSimilarity, similarityToScore } from './itemSimilarity'
 
 // 점수 가중치 상수
 const SCORE_WEIGHTS = {
@@ -34,7 +35,8 @@ const SCORE_COLORS = [
 ]
 
 /**
- * 행운 점수 계산 (기본 35점 + 색상 35점 + 아이템 유사도 30점)
+ * 행운 점수 계산 - 동기 버전 (FastText만 사용)
+ * 기본 35점 + 색상 35점 + 아이템 유사도 30점
  * @param {string} itemName - 아이템 이름
  * @param {Array<{hex: string}>} itemColors - 아이템 색상 배열
  * @param {string[]} luckyColorNames - 행운색 이름 배열
@@ -46,7 +48,7 @@ export const calculateLuckScore = (itemName, itemColors, luckyColorNames, luckyI
   const colorResult = calculateColorMatchScore(itemColors, luckyColorNames)
   const colorScore = Math.round(colorResult.score * SCORE_WEIGHTS.COLOR)
 
-  // 2. 아이템 유사도 계산 (0-30점)
+  // 2. 아이템 유사도 계산 (0-30점) - FastText
   const { similarity } = getMaxSimilarityWithLuckyItems(itemName, luckyItemList)
   const itemScoreRaw = similarityToScore(similarity)
   const itemScore = Math.round(itemScoreRaw * SCORE_WEIGHTS.ITEM)
@@ -60,7 +62,41 @@ export const calculateLuckScore = (itemName, itemColors, luckyColorNames, luckyI
     bestItemHex: colorResult.bestItemHex,
     itemSimilarity: similarity,
     colorScore,
-    itemScore
+    itemScore,
+    source: 'fasttext'
+  }
+}
+
+/**
+ * 행운 점수 계산 - 비동기 하이브리드 버전 (FastText + GMS Embedding)
+ * 두 방식 중 높은 유사도 점수를 사용
+ * @param {string} itemName - 아이템 이름
+ * @param {Array<{hex: string}>} itemColors - 아이템 색상 배열
+ * @param {string[]} luckyColorNames - 행운색 이름 배열
+ * @param {string[]} luckyItemList - 행운 아이템 이름 배열
+ * @returns {Promise<{score: number, matchedColor: string|null, bestItemHex: string|null, itemSimilarity: number, source: string}>}
+ */
+export const calculateLuckScoreAsync = async (itemName, itemColors, luckyColorNames, luckyItemList) => {
+  // 1. 색상 점수 계산 (0-35점) - 동기
+  const colorResult = calculateColorMatchScore(itemColors, luckyColorNames)
+  const colorScore = Math.round(colorResult.score * SCORE_WEIGHTS.COLOR)
+
+  // 2. 아이템 유사도 계산 (0-30점) - 하이브리드 (비동기)
+  const { similarity, source } = await getHybridSimilarity(itemName, luckyItemList)
+  const itemScoreRaw = similarityToScore(similarity)
+  const itemScore = Math.round(itemScoreRaw * SCORE_WEIGHTS.ITEM)
+
+  // 3. 최종 점수: 기본 35점 + 색상 35점 + 아이템 30점
+  const finalScore = Math.min(100, SCORE_WEIGHTS.BASE + itemScore + colorScore)
+
+  return {
+    score: finalScore,
+    matchedColor: colorResult.matchedColor,
+    bestItemHex: colorResult.bestItemHex,
+    itemSimilarity: similarity,
+    colorScore,
+    itemScore,
+    source  // 'fasttext' 또는 'embedding'
   }
 }
 

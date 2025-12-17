@@ -1,9 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import MultiPartParser, FormParser
+from django.conf import settings
 from .models import UserItem
+import requests
+import numpy as np
 
 
 class ItemListAPIView(APIView):
@@ -296,3 +299,104 @@ class ItemFavoriteAPIView(APIView):
                 'success': False,
                 'error': '아이템을 찾을 수 없습니다.'
             }, status=status.HTTP_404_NOT_FOUND)
+
+
+class ItemSimilarityAPIView(APIView):
+    """GMS Embedding API를 사용한 아이템 유사도 계산"""
+    permission_classes = [AllowAny]  # 비로그인 사용자도 사용 가능
+
+    def _get_embeddings(self, texts: list) -> dict:
+        """GMS API로 텍스트 임베딩 벡터 조회"""
+        gms_api_key = getattr(settings, 'GMS_API_KEY', '')
+        gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+
+        if not gms_api_key:
+            return {'success': False, 'error': 'GMS_API_KEY not configured'}
+
+        try:
+            response = requests.post(
+                f"{gms_api_base}/embeddings",
+                headers={
+                    'Authorization': f'Bearer {gms_api_key}',
+                    'Content-Type': 'application/json'
+                },
+                json={
+                    'model': 'text-embedding-3-small',
+                    'input': texts
+                },
+                timeout=10
+            )
+
+            if response.status_code != 200:
+                print(f"[ItemSimilarity] GMS API Error: {response.status_code} - {response.text}")
+                return {'success': False, 'error': f'API error: {response.status_code}'}
+
+            data = response.json()
+            embeddings = [item['embedding'] for item in data['data']]
+            return {'success': True, 'embeddings': embeddings}
+
+        except requests.exceptions.Timeout:
+            return {'success': False, 'error': 'API timeout'}
+        except Exception as e:
+            print(f"[ItemSimilarity] Error: {str(e)}")
+            return {'success': False, 'error': str(e)}
+
+    def _cosine_similarity(self, vec1: list, vec2: list) -> float:
+        """코사인 유사도 계산"""
+        a = np.array(vec1)
+        b = np.array(vec2)
+        return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
+
+    def post(self, request):
+        """아이템과 행운 아이템 간 유사도 계산"""
+        item_name = request.data.get('item_name', '')
+        lucky_items = request.data.get('lucky_items', [])
+
+        if not item_name:
+            return Response({
+                'success': False,
+                'error': 'item_name is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        if not lucky_items or not isinstance(lucky_items, list):
+            return Response({
+                'success': False,
+                'error': 'lucky_items array is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # 모든 텍스트를 한번에 임베딩 (API 호출 1회)
+        all_texts = [item_name] + lucky_items
+        result = self._get_embeddings(all_texts)
+
+        if not result['success']:
+            return Response({
+                'success': False,
+                'error': result.get('error', 'Embedding failed')
+            }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+        embeddings = result['embeddings']
+        item_embedding = embeddings[0]
+        lucky_embeddings = embeddings[1:]
+
+        # 각 행운 아이템과의 유사도 계산
+        similarities = []
+        max_similarity = 0
+        best_match = None
+
+        for i, lucky_item in enumerate(lucky_items):
+            similarity = self._cosine_similarity(item_embedding, lucky_embeddings[i])
+            similarities.append({
+                'item': lucky_item,
+                'similarity': round(similarity, 4)
+            })
+            if similarity > max_similarity:
+                max_similarity = similarity
+                best_match = lucky_item
+
+        return Response({
+            'success': True,
+            'item_name': item_name,
+            'max_similarity': round(max_similarity, 4),
+            'best_match': best_match,
+            'details': similarities
+        })
