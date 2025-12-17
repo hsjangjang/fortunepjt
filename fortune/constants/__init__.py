@@ -23,6 +23,7 @@ from .items import (
     MID_SCORE_ITEMS,
     LOW_SCORE_ITEMS,
     ZODIAC_ITEMS,
+    DEFAULT_ZODIAC_ITEM,
 )
 from .templates import (
     FORTUNE_TEMPLATES,
