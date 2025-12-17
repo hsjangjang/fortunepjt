@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.utils import timezone
+from django.utils.html import format_html
 import pytz
 from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache, FortuneBaseData, ColorMaster, MBTISpeechTemplate
 
@@ -10,7 +11,9 @@ def format_datetime_kst(dt):
         return '-'
     kst = pytz.timezone('Asia/Seoul')
     local_time = dt.astimezone(kst)
-    return local_time.strftime('%Y-%m-%d %H:%M:%S')
+    # format_html을 사용하여 Django의 자동 포맷팅을 우회
+    formatted = local_time.strftime('%Y-%m-%d %H:%M:%S')
+    return format_html('<span>{}</span>', formatted)
 
 
 @admin.register(DailyFortuneCache)
