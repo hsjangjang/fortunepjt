@@ -736,40 +736,46 @@ const loadFortuneData = async (period) => {
       fortune.value = response.data.fortune
       console.log(`[Fortune] 캐시에서 ${period} 운세 로드 완료`)
     } else if (response.data.need_calculate) {
-      // 캐시 없음 - Loading 페이지로 리다이렉트하여 모든 운세 생성
-      console.log(`[Fortune] ${period} 운세 없음 → Loading 페이지로 이동`)
+      // 캐시 없음 - 바로 POST로 생성 요청 (로딩 페이지 없이)
+      console.log(`[Fortune] ${period} 운세 없음 → 바로 생성 요청`)
 
-      // 로딩 상태 유지 (리다이렉트 전까지)
-      isLoadingPeriod.value = true
-
-      // 로그인 사용자는 바로 로딩 페이지로
+      // 로그인 사용자
       if (authStore.isAuthenticated) {
-        router.replace({
-          name: 'fortune-loading',
-          query: { redirect: '/fortune/today' }
-        })
+        const postResponse = await apiClient.post(endpoint)
+        if (postResponse.data.success && postResponse.data.fortune) {
+          fortune.value = postResponse.data.fortune
+          console.log(`[Fortune] ${period} 운세 생성 완료`)
+        } else {
+          // 생성 실패 시 로딩 페이지로
+          router.replace({
+            name: 'fortune-loading',
+            query: { redirect: '/fortune/today' }
+          })
+        }
         return
       }
 
-      // 비로그인 사용자는 formData가 있어야 로딩 페이지로 갈 수 있음
+      // 비로그인 사용자
       const formInfo = fortuneStore.formData || {}
       const fortuneInfo = fortuneStore.fortuneData || {}
       const birthDate = formInfo.birth_date || fortuneInfo.birth_date
       const gender = formInfo.gender || fortuneInfo.gender
 
       if (birthDate && gender) {
-        // formData가 있으면 로딩 페이지로 (쿼리 파라미터로 전달)
-        router.replace({
-          name: 'fortune-loading',
-          query: {
-            redirect: '/fortune/today',
-            birth_date: birthDate,
-            gender: gender,
-            birth_time: formInfo.birth_time || fortuneInfo.birth_time || '',
-            chinese_name: formInfo.chinese_name || fortuneInfo.chinese_name || '',
-            mbti: formInfo.mbti || fortuneInfo.mbti || ''
-          }
+        // formData로 바로 POST 요청
+        const postResponse = await apiClient.post(endpoint, {
+          birth_date: birthDate,
+          gender: gender,
+          birth_time: formInfo.birth_time || fortuneInfo.birth_time || '',
+          chinese_name: formInfo.chinese_name || fortuneInfo.chinese_name || '',
+          mbti: formInfo.mbti || fortuneInfo.mbti || ''
         })
+        if (postResponse.data.success && postResponse.data.fortune) {
+          fortune.value = postResponse.data.fortune
+          console.log(`[Fortune] ${period} 운세 생성 완료 (비로그인)`)
+        } else {
+          console.error(`[Fortune] ${period} 운세 생성 실패`)
+        }
       } else {
         // formData도 없으면 계산 페이지로
         router.replace({
