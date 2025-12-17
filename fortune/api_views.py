@@ -48,7 +48,9 @@ def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth
 def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
     """동일 조건(생년월일+성별+주차)의 주간 운세 캐시 찾기"""
     try:
-        # 1차: 정확히 일치하는 캐시 찾기
+        print(f"[Weekly Cache] 동일 조건 검색 시작: birth={birth_date}, gender={gender}, year={year}, week={week}")
+
+        # 1차: 정확히 일치하는 캐시 찾기 (birth_date + gender)
         cache = WeeklyFortuneCache.objects.filter(
             year=year,
             week_number=week,
@@ -64,11 +66,26 @@ def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
                 birth_date=birth_date,
                 gender=''
             ).order_by('created_at').first()
+            if cache:
+                print(f"[Weekly Cache] 2차 검색(gender='') 히트")
+
+        # 3차: birth_date만으로 검색 (기존에 birth_date 없이 저장된 캐시 대비)
+        if not cache and birth_date:
+            # 같은 주차에 아무 캐시나 있는지 확인 (디버그용)
+            any_cache = WeeklyFortuneCache.objects.filter(
+                year=year,
+                week_number=week
+            ).first()
+            if any_cache:
+                print(f"[Weekly Cache] 해당 주차에 캐시 존재하지만 조건 불일치: "
+                      f"cache.birth_date={any_cache.birth_date}, cache.gender={any_cache.gender}")
 
         if cache and cache.full_fortune_data:
             fortune_data = json.loads(cache.full_fortune_data)
             print(f"[Weekly Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, week={week}")
             return fortune_data
+
+        print(f"[Weekly Cache] 동일 조건 캐시 없음")
         return None
     except Exception as e:
         print(f"[Weekly Cache] 동일 조건 조회 실패: {e}")
@@ -78,7 +95,9 @@ def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
 def find_same_condition_monthly_fortune(year, month, birth_date, gender=''):
     """동일 조건(생년월일+성별+월)의 월간 운세 캐시 찾기"""
     try:
-        # 1차: 정확히 일치하는 캐시 찾기
+        print(f"[Monthly Cache] 동일 조건 검색 시작: birth={birth_date}, gender={gender}, year={year}, month={month}")
+
+        # 1차: 정확히 일치하는 캐시 찾기 (birth_date + gender)
         cache = MonthlyFortuneCache.objects.filter(
             year=year,
             month=month,
@@ -94,11 +113,26 @@ def find_same_condition_monthly_fortune(year, month, birth_date, gender=''):
                 birth_date=birth_date,
                 gender=''
             ).order_by('created_at').first()
+            if cache:
+                print(f"[Monthly Cache] 2차 검색(gender='') 히트")
+
+        # 3차: birth_date만으로 검색 (기존에 birth_date 없이 저장된 캐시 대비)
+        if not cache and birth_date:
+            # 같은 월에 아무 캐시나 있는지 확인 (디버그용)
+            any_cache = MonthlyFortuneCache.objects.filter(
+                year=year,
+                month=month
+            ).first()
+            if any_cache:
+                print(f"[Monthly Cache] 해당 월에 캐시 존재하지만 조건 불일치: "
+                      f"cache.birth_date={any_cache.birth_date}, cache.gender={any_cache.gender}")
 
         if cache and cache.full_fortune_data:
             fortune_data = json.loads(cache.full_fortune_data)
             print(f"[Monthly Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, month={month}")
             return fortune_data
+
+        print(f"[Monthly Cache] 동일 조건 캐시 없음")
         return None
     except Exception as e:
         print(f"[Monthly Cache] 동일 조건 조회 실패: {e}")
