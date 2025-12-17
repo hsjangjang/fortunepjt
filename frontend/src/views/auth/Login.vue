@@ -15,11 +15,10 @@
                   <input
                     type="text"
                     v-model="loginForm.username"
-                    @input="convertKoreanToEnglish"
+                    @input="filterUsername"
                     class="form-control text-white bg-dark border-secondary"
                     required
                     autofocus
-                    style="ime-mode: disabled;"
                   >
                 </div>
               </div>
@@ -99,47 +98,9 @@ const loginForm = ref({
   remember_me: false
 })
 
-const k2e = {
-  'ㅂ':'q','ㅈ':'w','ㄷ':'e','ㄱ':'r','ㅅ':'t',
-  'ㅛ':'y','ㅕ':'u','ㅑ':'i','ㅐ':'o','ㅔ':'p',
-  'ㅁ':'a','ㄴ':'s','ㅇ':'d','ㄹ':'f','ㅎ':'g',
-  'ㅗ':'h','ㅓ':'j','ㅏ':'k','ㅣ':'l',
-  'ㅋ':'z','ㅌ':'x','ㅊ':'c','ㅍ':'v','ㅠ':'b','ㅜ':'n','ㅡ':'m',
-  'ㅃ':'Q','ㅉ':'W','ㄸ':'E','ㄲ':'R','ㅆ':'T',
-  'ㅒ':'O','ㅖ':'P'
-}
-
-const convertKoreanToEnglish = (event) => {
-  const value = event.target.value
-
-  // 한글이 포함되어 있는지 확인
-  if (!/[ㄱ-ㅎ|ㅏ-ㅣ|가-힣]/.test(value)) {
-    // 한글이 없으면 영문/숫자/이메일 외 문자만 제거
-    const cleanValue = value.replace(/[^A-Za-z0-9@._-]/g, '')
-    if (value !== cleanValue) {
-      loginForm.value.username = cleanValue
-    }
-    return
-  }
-
-  // 한글이 있으면 변환 로직 실행
-  requestAnimationFrame(() => {
-    let newValue = ''
-    for (let i = 0; i < value.length; i++) {
-      const char = value[i]
-      if (k2e[char]) {
-        newValue += k2e[char]
-      } else {
-        newValue += char
-      }
-    }
-
-    newValue = newValue.replace(/[^A-Za-z0-9@._-]/g, '')
-
-    if (loginForm.value.username !== newValue) {
-      loginForm.value.username = newValue
-    }
-  })
+// 아이디 입력 필터 (영문, 숫자만 허용)
+const filterUsername = () => {
+  loginForm.value.username = loginForm.value.username.replace(/[^A-Za-z0-9]/g, '')
 }
 
 const handleLogin = async () => {
