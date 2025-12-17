@@ -17,16 +17,18 @@
                 <input
                   type="text"
                   v-model="form.username"
+                  @input="filterUsername"
                   class="form-control"
                   required
-                  placeholder="아이디를 입력하세요"
+                  placeholder="영문, 숫자만 입력 가능"
                   :class="{ 'is-valid': usernameChecked && usernameAvailable, 'is-invalid': usernameChecked && !usernameAvailable }"
                 >
                 <button type="button" class="btn btn-outline-light btn-sm flex-shrink-0" @click="checkUsername" :disabled="!form.username">
                   중복확인
                 </button>
               </div>
-              <small v-if="usernameChecked" :class="usernameAvailable ? 'text-success' : 'text-danger'">
+              <small class="text-white-50">영문, 숫자만 사용 가능합니다</small>
+              <small v-if="usernameChecked" :class="usernameAvailable ? 'text-success' : 'text-danger'" class="d-block">
                 {{ usernameMessage }}
               </small>
             </div>
@@ -258,6 +260,11 @@ const passwordValidation = computed(() => ({
   hasLetter: /[a-zA-Z]/.test(form.value.password),
   hasNumber: /[0-9]/.test(form.value.password)
 }))
+
+// 아이디 입력 필터 (영문, 숫자만 허용)
+const filterUsername = () => {
+  form.value.username = form.value.username.replace(/[^A-Za-z0-9]/g, '')
+}
 
 // 아이디 변경시 중복확인 초기화
 watch(() => form.value.username, () => {
