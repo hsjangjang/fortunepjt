@@ -1,6 +1,6 @@
 # 📋 업데이트 내역
 
-## v1.7.4 (25.12.18)
+## v1.8.0 (25.12.18)
 
 ### 장하선
 - Backend
@@ -50,6 +50,18 @@
   - FastText 아이템 유사도 매트릭스 스케일링 (`data/itemSimilarity.json`)
     - 원본 범위 (0.3~0.6826) → 새 범위 (0.4~0.9)로 Min-Max 스케일링
     - 유사도 차이를 더 명확하게 반영하도록 개선
+
+### 김유림
+- Frontend
+  - 로그인/회원가입 아이디 영문, 숫자만 입력 가능하도록 제한 (`Login.vue`, `Register.vue`)
+  - 비로그인 사용자 운세 체크 로직을 Store 기반으로 변경 (`router/index.js`)
+
+### 이수진
+- Frontend
+  - 프론트엔드에서 색상 HEX 값을 colorMap으로 재매핑 (`ItemCheck.vue`)
+  - 아이보리/크림/베이지 색상을 흰색(#f3f4f6)으로 통일 (`colors.js`)
+- Backend
+  - 아이템 분석 색상 매핑 통일 (`item_analyzer.py`)
 
 ---
 
