@@ -1,5 +1,25 @@
 # 📋 업데이트 내역
 
+## v1.7.3 (25.12.17)
+
+### 장하선
+- Backend
+  - 비로그인 사용자 주간/월간 운세 중복 생성 문제 디버깅 (`fortune/api_views.py`)
+    - `find_same_condition_weekly_fortune`, `find_same_condition_monthly_fortune` 함수에 상세 디버그 로그 추가
+    - 3차 검색 로직: 정확히 일치 → gender 빈값 fallback → 기존 캐시 조건 불일치 확인
+  - 주간/월간 운세 식별 키 생성 로직 추가 (`fortune/api_views.py`)
+    - POST 요청 시 birth_date, gender 기반 캐시 저장/조회 로직 개선
+- Frontend
+  - 비로그인 사용자 운세 체크 로직 Store 기반으로 변경 (`Fortune.vue`)
+    - 일간/주간/월간 운세 Store 캐시 확인 후 API 호출 생략
+  - 비로그인 사용자 주간/월간 운세 확인 시 로딩 페이지 리다이렉트 버그 수정 (`Fortune.vue`, `Loading.vue`)
+- Data
+  - FastText 아이템 유사도 매트릭스 스케일링 (`data/itemSimilarity.json`)
+    - 원본 범위 (0.3~0.6826) → 새 범위 (0.4~0.9)로 Min-Max 스케일링
+    - 유사도 차이를 더 명확하게 반영하도록 개선
+
+---
+
 ## v1.7.2 (25.12.17)
 
 ### 장하선
