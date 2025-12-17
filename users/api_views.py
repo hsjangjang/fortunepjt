@@ -6,11 +6,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
-from django.core.mail import send_mail
-from django.conf import settings
 from django.utils import timezone
 
 from .models import EmailVerificationCode
@@ -20,6 +18,10 @@ from .serializers import (
     UserSerializer,
     UserUpdateSerializer,
     PasswordChangeSerializer
+)
+from .utils import (
+    mask_email, send_fortune_email,
+    create_username_email, create_verification_email, create_temp_password_email
 )
 
 User = get_user_model()
@@ -199,34 +201,13 @@ class FindUsernameAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 이메일로 사용자 찾기 (대소문자 구분 없이)
             user = User.objects.get(email__iexact=email.strip())
-
-            # 이메일로 아이디 전송
-            send_mail(
-                subject='[Fortune Life] 아이디 찾기 안내',
-                message=f'''안녕하세요, {user.first_name}님.
-
-요청하신 아이디 정보를 안내해 드립니다.
-
-회원님의 아이디: {user.username}
-
-본인이 요청하지 않으셨다면 이 메일을 무시해주세요.
-
-감사합니다.
-Fortune Life 팀''',
-                from_email=settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@fortunelife.com',
-                recipient_list=[email],
-                fail_silently=False,
+            send_fortune_email(
+                '[Fortune Life] 아이디 찾기 안내',
+                create_username_email(user, email),
+                email
             )
-
-            # 이메일 일부 마스킹
-            email_parts = email.split('@')
-            if len(email_parts[0]) > 3:
-                masked_email = email_parts[0][:3] + '*' * (len(email_parts[0]) - 3) + '@' + email_parts[1]
-            else:
-                masked_email = email_parts[0][0] + '*' * (len(email_parts[0]) - 1) + '@' + email_parts[1]
-
+            masked_email = mask_email(email)
             return Response({
                 'success': True,
                 'message': f'{masked_email}로 아이디 정보를 전송했습니다.'
@@ -266,16 +247,10 @@ class SendPasswordResetCodeAPIView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # 아이디와 이메일로 사용자 찾기 (대소문자 구분 없이)
             user = User.objects.get(username=username, email__iexact=email.strip())
-
-            # 기존 인증코드 삭제
             EmailVerificationCode.objects.filter(username=username, email=email).delete()
 
-            # 6자리 인증코드 생성
             verification_code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
-
-            # 인증코드 저장 (5분 후 만료)
             EmailVerificationCode.objects.create(
                 email=email,
                 username=username,
@@ -283,32 +258,12 @@ class SendPasswordResetCodeAPIView(APIView):
                 expires_at=timezone.now() + timedelta(minutes=5)
             )
 
-            # 이메일로 인증코드 전송
-            send_mail(
-                subject='[Fortune Life] 비밀번호 찾기 인증코드',
-                message=f'''안녕하세요, {user.first_name or user.username}님.
-
-비밀번호 찾기 인증코드를 안내해 드립니다.
-
-인증코드: {verification_code}
-
-이 인증코드는 5분 후 만료됩니다.
-본인이 요청하지 않으셨다면 이 메일을 무시해주세요.
-
-감사합니다.
-Fortune Life 팀''',
-                from_email=settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@fortunelife.com',
-                recipient_list=[email],
-                fail_silently=False,
+            send_fortune_email(
+                '[Fortune Life] 비밀번호 찾기 인증코드',
+                create_verification_email(user, verification_code),
+                email
             )
-
-            # 이메일 일부 마스킹
-            email_parts = email.split('@')
-            if len(email_parts[0]) > 3:
-                masked_email = email_parts[0][:3] + '*' * (len(email_parts[0]) - 3) + '@' + email_parts[1]
-            else:
-                masked_email = email_parts[0][0] + '*' * (len(email_parts[0]) - 1) + '@' + email_parts[1]
-
+            masked_email = mask_email(email)
             return Response({
                 'success': True,
                 'message': f'{masked_email}로 인증코드를 전송했습니다.',
@@ -379,32 +334,12 @@ class VerifyCodeAndResetPasswordAPIView(APIView):
             # 인증코드 삭제
             verification.delete()
 
-            # 이메일로 임시 비밀번호 전송
-            send_mail(
-                subject='[Fortune Life] 임시 비밀번호 안내',
-                message=f'''안녕하세요, {user.first_name or user.username}님.
-
-인증이 완료되어 임시 비밀번호를 안내해 드립니다.
-
-임시 비밀번호: {temp_password}
-
-로그인 후 반드시 비밀번호를 변경해주세요.
-본인이 요청하지 않으셨다면 고객센터로 문의해주세요.
-
-감사합니다.
-Fortune Life 팀''',
-                from_email=settings.DEFAULT_FROM_EMAIL if hasattr(settings, 'DEFAULT_FROM_EMAIL') else 'noreply@fortunelife.com',
-                recipient_list=[email],
-                fail_silently=False,
+            send_fortune_email(
+                '[Fortune Life] 임시 비밀번호 안내',
+                create_temp_password_email(user, temp_password),
+                email
             )
-
-            # 이메일 일부 마스킹
-            email_parts = email.split('@')
-            if len(email_parts[0]) > 3:
-                masked_email = email_parts[0][:3] + '*' * (len(email_parts[0]) - 3) + '@' + email_parts[1]
-            else:
-                masked_email = email_parts[0][0] + '*' * (len(email_parts[0]) - 1) + '@' + email_parts[1]
-
+            masked_email = mask_email(email)
             return Response({
                 'success': True,
                 'message': f'{masked_email}로 임시 비밀번호를 전송했습니다.'

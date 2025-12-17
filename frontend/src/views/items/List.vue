@@ -178,28 +178,16 @@ import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
 import { getTextColor, getColorMatchScore } from '@/utils/colors'
 import { getFortuneBoostScore } from '@/utils/similarity'
+import { FORTUNE_CATEGORIES, getCategoryColor } from '@/utils/fortuneCategories'
 
 const authStore = useAuthStore()
 const items = ref([])
 const fortuneData = ref(null)
 const luckyColors = ref([])
-
-// 세부 운세 카테고리 (색상 매핑 포함)
-const fortuneCategories = [
-  { key: 'overall', label: '종합운', icon: 'fa-star', color: '#a78bfa' },
-  { key: 'love', label: '애정운', icon: 'fa-heart', color: '#f472b6' },
-  { key: 'money', label: '금전운', icon: 'fa-coins', color: '#facc15' },
-  { key: 'work', label: '직장운', icon: 'fa-briefcase', color: '#60a5fa' },
-  { key: 'health', label: '건강운', icon: 'fa-heartbeat', color: '#4ade80' },
-  { key: 'study', label: '학업운', icon: 'fa-book', color: '#38bdf8' }
-]
-
+const fortuneCategories = FORTUNE_CATEGORIES
 const selectedCategory = ref('overall')
 
-// 선택된 카테고리의 색상
-const selectedCategoryColor = computed(() => {
-  return fortuneCategories.find(c => c.key === selectedCategory.value)?.color || '#a78bfa'
-})
+const selectedCategoryColor = computed(() => getCategoryColor(selectedCategory.value))
 
 // 아이템별 운세 점수 계산 (유틸리티 사용)
 const getFortuneBoost = (item, category) => {

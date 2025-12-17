@@ -9,6 +9,10 @@ from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache
 import json
 
 
+# ============================================================
+# 기간 유틸리티 함수
+# ============================================================
+
 def get_current_week():
     """현재 년도와 주차 반환 (ISO 주차 기준)"""
     today = date.today()
@@ -22,15 +26,40 @@ def get_current_month():
     return today.year, today.month
 
 
-def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date=None, gender=''):
-    """주간 운세 데이터베이스에 저장"""
+# ============================================================
+# 일반화된 주간/월간 캐시 함수
+# ============================================================
+
+def _get_period_cache_model(period_type):
+    """기간 타입에 따른 캐시 모델 반환"""
+    return WeeklyFortuneCache if period_type == 'weekly' else MonthlyFortuneCache
+
+
+def _get_period_filter_field(period_type):
+    """기간 타입에 따른 필터 필드명 반환 (week_number 또는 month)"""
+    return 'week_number' if period_type == 'weekly' else 'month'
+
+
+def _get_period_label(period_type):
+    """기간 타입에 따른 로그 라벨 반환"""
+    return 'Weekly' if period_type == 'weekly' else 'Monthly'
+
+
+def save_period_fortune_to_db(period_type, user, session_key, year, period_value, fortune_data, birth_date=None, gender=''):
+    """주간/월간 운세 데이터베이스에 저장 (일반화)"""
     try:
+        CacheModel = _get_period_cache_model(period_type)
+        period_field = _get_period_filter_field(period_type)
+        label = _get_period_label(period_type)
+
+        filter_kwargs = {'year': year, period_field: period_value}
+
         if user and user.is_authenticated:
-            WeeklyFortuneCache.objects.filter(user=user, year=year, week_number=week).delete()
-            cache = WeeklyFortuneCache(user=user, year=year, week_number=week, session_key=session_key or '')
+            CacheModel.objects.filter(user=user, **filter_kwargs).delete()
+            cache = CacheModel(user=user, session_key=session_key or '', **filter_kwargs)
         elif session_key:
-            WeeklyFortuneCache.objects.filter(session_key=session_key, year=year, week_number=week).delete()
-            cache = WeeklyFortuneCache(session_key=session_key, year=year, week_number=week)
+            CacheModel.objects.filter(session_key=session_key, **filter_kwargs).delete()
+            cache = CacheModel(session_key=session_key, **filter_kwargs)
         else:
             return False
 
@@ -38,168 +67,104 @@ def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth
         cache.gender = gender or ''
         cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
         cache.save()
-        print(f"[Weekly Cache] 저장 완료: user={user}, year={year}, week={week}, birth={birth_date}, gender={gender}")
+        print(f"[{label} Cache] 저장 완료: user={user}, year={year}, {period_field}={period_value}, birth={birth_date}, gender={gender}")
         return True
     except Exception as e:
-        print(f"[Weekly Cache] 저장 실패: {e}")
+        label = _get_period_label(period_type)
+        print(f"[{label} Cache] 저장 실패: {e}")
         return False
 
 
-def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
-    """동일 조건(생년월일+성별+주차)의 주간 운세 캐시 찾기"""
+def find_same_condition_period_fortune(period_type, year, period_value, birth_date, gender=''):
+    """동일 조건(생년월일+성별+기간)의 캐시 찾기 (일반화)"""
     try:
-        print(f"[Weekly Cache] 동일 조건 검색 시작: birth={birth_date}, gender={gender}, year={year}, week={week}")
+        CacheModel = _get_period_cache_model(period_type)
+        period_field = _get_period_filter_field(period_type)
+        label = _get_period_label(period_type)
+
+        print(f"[{label} Cache] 동일 조건 검색 시작: birth={birth_date}, gender={gender}, year={year}, {period_field}={period_value}")
+
+        base_filter = {'year': year, period_field: period_value, 'birth_date': birth_date}
 
         # 1차: 정확히 일치하는 캐시 찾기 (birth_date + gender)
-        cache = WeeklyFortuneCache.objects.filter(
-            year=year,
-            week_number=week,
-            birth_date=birth_date,
-            gender=gender or ''
-        ).order_by('created_at').first()
+        cache = CacheModel.objects.filter(**base_filter, gender=gender or '').order_by('created_at').first()
 
         # 2차: gender가 비어있는 기존 캐시도 찾기 (마이그레이션 전 데이터 호환)
         if not cache and gender:
-            cache = WeeklyFortuneCache.objects.filter(
-                year=year,
-                week_number=week,
-                birth_date=birth_date,
-                gender=''
-            ).order_by('created_at').first()
+            cache = CacheModel.objects.filter(**base_filter, gender='').order_by('created_at').first()
             if cache:
-                print(f"[Weekly Cache] 2차 검색(gender='') 히트")
+                print(f"[{label} Cache] 2차 검색(gender='') 히트")
 
         # 3차: birth_date만으로 검색 (기존에 birth_date 없이 저장된 캐시 대비)
         if not cache and birth_date:
-            # 같은 주차에 아무 캐시나 있는지 확인 (디버그용)
-            any_cache = WeeklyFortuneCache.objects.filter(
-                year=year,
-                week_number=week
-            ).first()
+            any_cache = CacheModel.objects.filter(year=year, **{period_field: period_value}).first()
             if any_cache:
-                print(f"[Weekly Cache] 해당 주차에 캐시 존재하지만 조건 불일치: "
+                print(f"[{label} Cache] 해당 기간에 캐시 존재하지만 조건 불일치: "
                       f"cache.birth_date={any_cache.birth_date}, cache.gender={any_cache.gender}")
 
         if cache and cache.full_fortune_data:
             fortune_data = json.loads(cache.full_fortune_data)
-            print(f"[Weekly Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, week={week}")
+            print(f"[{label} Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, {period_field}={period_value}")
             return fortune_data
 
-        print(f"[Weekly Cache] 동일 조건 캐시 없음")
+        print(f"[{label} Cache] 동일 조건 캐시 없음")
         return None
     except Exception as e:
-        print(f"[Weekly Cache] 동일 조건 조회 실패: {e}")
+        label = _get_period_label(period_type)
+        print(f"[{label} Cache] 동일 조건 조회 실패: {e}")
         return None
 
 
-def find_same_condition_monthly_fortune(year, month, birth_date, gender=''):
-    """동일 조건(생년월일+성별+월)의 월간 운세 캐시 찾기"""
+def load_period_fortune_from_db(period_type, user, session_key, year, period_value):
+    """주간/월간 운세 데이터베이스에서 로드 (일반화)"""
     try:
-        print(f"[Monthly Cache] 동일 조건 검색 시작: birth={birth_date}, gender={gender}, year={year}, month={month}")
+        CacheModel = _get_period_cache_model(period_type)
+        period_field = _get_period_filter_field(period_type)
+        label = _get_period_label(period_type)
 
-        # 1차: 정확히 일치하는 캐시 찾기 (birth_date + gender)
-        cache = MonthlyFortuneCache.objects.filter(
-            year=year,
-            month=month,
-            birth_date=birth_date,
-            gender=gender or ''
-        ).order_by('created_at').first()
+        filter_kwargs = {'year': year, period_field: period_value}
 
-        # 2차: gender가 비어있는 기존 캐시도 찾기 (마이그레이션 전 데이터 호환)
-        if not cache and gender:
-            cache = MonthlyFortuneCache.objects.filter(
-                year=year,
-                month=month,
-                birth_date=birth_date,
-                gender=''
-            ).order_by('created_at').first()
-            if cache:
-                print(f"[Monthly Cache] 2차 검색(gender='') 히트")
-
-        # 3차: birth_date만으로 검색 (기존에 birth_date 없이 저장된 캐시 대비)
-        if not cache and birth_date:
-            # 같은 월에 아무 캐시나 있는지 확인 (디버그용)
-            any_cache = MonthlyFortuneCache.objects.filter(
-                year=year,
-                month=month
-            ).first()
-            if any_cache:
-                print(f"[Monthly Cache] 해당 월에 캐시 존재하지만 조건 불일치: "
-                      f"cache.birth_date={any_cache.birth_date}, cache.gender={any_cache.gender}")
-
-        if cache and cache.full_fortune_data:
-            fortune_data = json.loads(cache.full_fortune_data)
-            print(f"[Monthly Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, month={month}")
-            return fortune_data
-
-        print(f"[Monthly Cache] 동일 조건 캐시 없음")
-        return None
-    except Exception as e:
-        print(f"[Monthly Cache] 동일 조건 조회 실패: {e}")
-        return None
-
-
-def load_weekly_fortune_from_db(user, session_key, year, week):
-    """주간 운세 데이터베이스에서 로드"""
-    try:
         if user and user.is_authenticated:
-            cache = WeeklyFortuneCache.objects.filter(user=user, year=year, week_number=week).first()
+            cache = CacheModel.objects.filter(user=user, **filter_kwargs).first()
         elif session_key:
-            cache = WeeklyFortuneCache.objects.filter(session_key=session_key, year=year, week_number=week).first()
+            cache = CacheModel.objects.filter(session_key=session_key, **filter_kwargs).first()
         else:
             return None
 
         if cache and cache.full_fortune_data:
             fortune_data = json.loads(cache.full_fortune_data)
-            print(f"[Weekly Cache] 히트: user={user}, year={year}, week={week}")
+            print(f"[{label} Cache] 히트: user={user}, year={year}, {period_field}={period_value}")
             return fortune_data
         return None
     except Exception as e:
-        print(f"[Weekly Cache] 로드 실패: {e}")
+        label = _get_period_label(period_type)
+        print(f"[{label} Cache] 로드 실패: {e}")
         return None
+
+
+# 호환성을 위한 래퍼 함수 (기존 코드 호환)
+def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date=None, gender=''):
+    return save_period_fortune_to_db('weekly', user, session_key, year, week, fortune_data, birth_date, gender)
 
 
 def save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date=None, gender=''):
-    """월간 운세 데이터베이스에 저장"""
-    try:
-        if user and user.is_authenticated:
-            MonthlyFortuneCache.objects.filter(user=user, year=year, month=month).delete()
-            cache = MonthlyFortuneCache(user=user, year=year, month=month, session_key=session_key or '')
-        elif session_key:
-            MonthlyFortuneCache.objects.filter(session_key=session_key, year=year, month=month).delete()
-            cache = MonthlyFortuneCache(session_key=session_key, year=year, month=month)
-        else:
-            return False
+    return save_period_fortune_to_db('monthly', user, session_key, year, month, fortune_data, birth_date, gender)
 
-        cache.birth_date = birth_date
-        cache.gender = gender or ''
-        cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
-        cache.save()
-        print(f"[Monthly Cache] 저장 완료: user={user}, year={year}, month={month}, birth={birth_date}, gender={gender}")
-        return True
-    except Exception as e:
-        print(f"[Monthly Cache] 저장 실패: {e}")
-        return False
+
+def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
+    return find_same_condition_period_fortune('weekly', year, week, birth_date, gender)
+
+
+def find_same_condition_monthly_fortune(year, month, birth_date, gender=''):
+    return find_same_condition_period_fortune('monthly', year, month, birth_date, gender)
+
+
+def load_weekly_fortune_from_db(user, session_key, year, week):
+    return load_period_fortune_from_db('weekly', user, session_key, year, week)
 
 
 def load_monthly_fortune_from_db(user, session_key, year, month):
-    """월간 운세 데이터베이스에서 로드"""
-    try:
-        if user and user.is_authenticated:
-            cache = MonthlyFortuneCache.objects.filter(user=user, year=year, month=month).first()
-        elif session_key:
-            cache = MonthlyFortuneCache.objects.filter(session_key=session_key, year=year, month=month).first()
-        else:
-            return None
-
-        if cache and cache.full_fortune_data:
-            fortune_data = json.loads(cache.full_fortune_data)
-            print(f"[Monthly Cache] 히트: user={user}, year={year}, month={month}")
-            return fortune_data
-        return None
-    except Exception as e:
-        print(f"[Monthly Cache] 로드 실패: {e}")
-        return None
+    return load_period_fortune_from_db('monthly', user, session_key, year, month)
 
 
 def save_fortune_to_db(user, session_key, fortune_date, fortune_data, birth_date=None, birth_time='', calendar_type='solar', chinese_name=''):
@@ -631,247 +596,168 @@ class ItemCheckAPIView(APIView):
         }, status=status.HTTP_200_OK)
 
 
-class WeeklyFortuneAPIView(APIView):
+# ============================================================
+# 기간별 운세 API 베이스 클래스
+# ============================================================
+
+class BasePeriodFortuneAPIView(APIView):
+    """주간/월간 운세 공통 베이스 클래스"""
+    permission_classes = [AllowAny]
+    period_type = None  # 'weekly' 또는 'monthly' - 서브클래스에서 설정
+
+    def _get_period_info(self):
+        """현재 기간 정보 반환 - 서브클래스에서 구현"""
+        raise NotImplementedError
+
+    def _get_period_response_key(self):
+        """응답에 포함할 기간 키 (week 또는 month)"""
+        return 'week' if self.period_type == 'weekly' else 'month'
+
+    def _get_period_label(self, year, period_value):
+        """기간 라벨 생성"""
+        if self.period_type == 'weekly':
+            return f'{year}년 {period_value}주차'
+        return f'{year}년 {period_value}월'
+
+    def _get_message(self):
+        """캐시 없음 메시지"""
+        if self.period_type == 'weekly':
+            return '이 주의 운세가 아직 생성되지 않았습니다.'
+        return '이 달의 운세가 아직 생성되지 않았습니다.'
+
+    def _ensure_session(self, request):
+        """세션 키 확보"""
+        if not request.session.session_key:
+            request.session.create()
+        return request.session.session_key
+
+    def _extract_user_info(self, request):
+        """사용자 정보 추출 (로그인/비로그인 공통)"""
+        user = request.user if request.user.is_authenticated else None
+
+        if user and user.is_authenticated:
+            if not user.birth_date:
+                return None, None, {'error': '생년월일 정보가 없습니다.'}
+            return user, {
+                'birth_date': user.birth_date,
+                'gender': user.gender,
+                'birth_time': getattr(user, 'birth_time', None),
+                'chinese_name': getattr(user, 'chinese_name', None),
+                'mbti': getattr(user, 'mbti', None)
+            }, None
+
+        # 비로그인 사용자
+        birth_date = request.data.get('birth_date')
+        gender = request.data.get('gender')
+
+        if not birth_date or not gender:
+            return None, None, {'error': '생년월일과 성별 정보가 필요합니다.'}
+
+        if isinstance(birth_date, str):
+            birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
+
+        return None, {
+            'birth_date': birth_date,
+            'gender': gender,
+            'birth_time': request.data.get('birth_time'),
+            'chinese_name': request.data.get('chinese_name'),
+            'mbti': request.data.get('mbti')
+        }, None
+
+    def get(self, request):
+        year, period_value = self._get_period_info()
+        session_key = self._ensure_session(request)
+        user = request.user if request.user.is_authenticated else None
+        period_key = self._get_period_response_key()
+
+        # 로그인 사용자 생년월일 체크
+        if user and not user.birth_date:
+            return Response({
+                'success': False,
+                'error': '생년월일 정보가 없습니다.',
+                'need_profile': True
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # DB 캐시 확인
+        fortune_data = load_period_fortune_from_db(self.period_type, user, session_key, year, period_value)
+
+        if fortune_data:
+            return Response({
+                'success': True,
+                'fortune': fortune_data,
+                'period_type': self.period_type,
+                'year': year,
+                period_key: period_value
+            }, status=status.HTTP_200_OK)
+
+        return Response({
+            'success': False,
+            'need_calculate': True,
+            'message': self._get_message(),
+            'period_type': self.period_type,
+            'year': year,
+            period_key: period_value
+        }, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        year, period_value = self._get_period_info()
+        session_key = self._ensure_session(request)
+        period_key = self._get_period_response_key()
+
+        user, user_info, error = self._extract_user_info(request)
+        if error:
+            return Response({'success': False, **error}, status=status.HTTP_400_BAD_REQUEST)
+
+        birth_date = user_info['birth_date']
+        gender = user_info['gender']
+
+        # 1. 본인 캐시 확인
+        fortune_data = load_period_fortune_from_db(self.period_type, user, session_key, year, period_value)
+
+        if not fortune_data:
+            # 2. 동일 조건 캐시 확인
+            fortune_data = find_same_condition_period_fortune(self.period_type, year, period_value, birth_date, gender)
+
+        if not fortune_data:
+            # 3. 새로 생성
+            calculator = FortuneCalculator()
+            fortune_data = calculator.calculate_fortune(
+                birth_date=birth_date,
+                gender=gender,
+                birth_time=user_info['birth_time'],
+                chinese_name=user_info['chinese_name'],
+                mbti=user_info['mbti'],
+                user_id=user.id if user else None,
+                session_key=session_key,
+                fortune_seed=f"{self.period_type}_{year}_{period_value}",
+                period_type=self.period_type
+            )
+            fortune_data['period_type'] = self.period_type
+            fortune_data['period_label'] = self._get_period_label(year, period_value)
+
+        # DB에 저장
+        save_period_fortune_to_db(self.period_type, user, session_key, year, period_value, fortune_data, birth_date, gender)
+
+        return Response({
+            'success': True,
+            'fortune': fortune_data,
+            'period_type': self.period_type,
+            'year': year,
+            period_key: period_value
+        }, status=status.HTTP_200_OK)
+
+
+class WeeklyFortuneAPIView(BasePeriodFortuneAPIView):
     """이 주의 운세 조회/생성 API"""
-    permission_classes = [AllowAny]
+    period_type = 'weekly'
 
-    def get(self, request):
-        year, week = get_current_week()
-
-        # 세션 키 확보
-        if not request.session.session_key:
-            request.session.create()
-        session_key = request.session.session_key
-
-        user = request.user if request.user.is_authenticated else None
-
-        # 로그인 사용자 생년월일 체크
-        if user and not user.birth_date:
-            return Response({
-                'success': False,
-                'error': '생년월일 정보가 없습니다.',
-                'need_profile': True
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # DB 캐시 확인
-        fortune_data = load_weekly_fortune_from_db(user, session_key, year, week)
-
-        if fortune_data:
-            return Response({
-                'success': True,
-                'fortune': fortune_data,
-                'period_type': 'weekly',
-                'year': year,
-                'week': week
-            }, status=status.HTTP_200_OK)
-
-        # 캐시 없음 - 생성 필요
-        return Response({
-            'success': False,
-            'need_calculate': True,
-            'message': '이 주의 운세가 아직 생성되지 않았습니다.',
-            'period_type': 'weekly',
-            'year': year,
-            'week': week
-        }, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        """주간 운세 생성"""
-        year, week = get_current_week()
-
-        # 세션 키 확보
-        if not request.session.session_key:
-            request.session.create()
-        session_key = request.session.session_key
-
-        user = request.user if request.user.is_authenticated else None
-
-        # 생년월일 확인
-        if user and user.is_authenticated:
-            if not user.birth_date:
-                return Response({
-                    'success': False,
-                    'error': '생년월일 정보가 없습니다.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            birth_date = user.birth_date
-            gender = user.gender
-            birth_time = getattr(user, 'birth_time', None)
-            chinese_name = getattr(user, 'chinese_name', None)
-            mbti = getattr(user, 'mbti', None)
-        else:
-            # 비로그인 사용자는 request.data에서 정보 받기
-            birth_date = request.data.get('birth_date')
-            gender = request.data.get('gender')
-            birth_time = request.data.get('birth_time')
-            chinese_name = request.data.get('chinese_name')
-            mbti = request.data.get('mbti')
-
-            if not birth_date or not gender:
-                return Response({
-                    'success': False,
-                    'error': '생년월일과 성별 정보가 필요합니다.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # 문자열을 date 객체로 변환
-            if isinstance(birth_date, str):
-                birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
-
-        # 1. 본인 캐시 확인 (user/session 기반)
-        fortune_data = load_weekly_fortune_from_db(user, session_key, year, week)
-
-        if not fortune_data:
-            # 2. 동일 조건 캐시 확인 (생년월일+성별+주차)
-            fortune_data = find_same_condition_weekly_fortune(year, week, birth_date, gender)
-
-        if not fortune_data:
-            # 3. 캐시 없음 - 새로 생성
-            calculator = FortuneCalculator()
-            fortune_data = calculator.calculate_fortune(
-                birth_date=birth_date,
-                gender=gender,
-                birth_time=birth_time,
-                chinese_name=chinese_name,
-                mbti=mbti,
-                user_id=user.id if user else None,
-                session_key=session_key,
-                fortune_seed=f"weekly_{year}_{week}",  # 주간 시드
-                period_type='weekly'  # 주간 운세용 프롬프트 사용
-            )
-
-            # 주간 운세 메타데이터 추가
-            fortune_data['period_type'] = 'weekly'
-            fortune_data['period_label'] = f'{year}년 {week}주차'
-
-        # DB에 저장 (본인 캐시 생성/갱신 - 동일 조건에서 가져온 경우도 본인 캐시로 저장)
-        save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date, gender)
-
-        return Response({
-            'success': True,
-            'fortune': fortune_data,
-            'period_type': 'weekly',
-            'year': year,
-            'week': week
-        }, status=status.HTTP_200_OK)
+    def _get_period_info(self):
+        return get_current_week()
 
 
-class MonthlyFortuneAPIView(APIView):
+class MonthlyFortuneAPIView(BasePeriodFortuneAPIView):
     """이 달의 운세 조회/생성 API"""
-    permission_classes = [AllowAny]
+    period_type = 'monthly'
 
-    def get(self, request):
-        year, month = get_current_month()
-
-        # 세션 키 확보
-        if not request.session.session_key:
-            request.session.create()
-        session_key = request.session.session_key
-
-        user = request.user if request.user.is_authenticated else None
-
-        # 로그인 사용자 생년월일 체크
-        if user and not user.birth_date:
-            return Response({
-                'success': False,
-                'error': '생년월일 정보가 없습니다.',
-                'need_profile': True
-            }, status=status.HTTP_400_BAD_REQUEST)
-
-        # DB 캐시 확인
-        fortune_data = load_monthly_fortune_from_db(user, session_key, year, month)
-
-        if fortune_data:
-            return Response({
-                'success': True,
-                'fortune': fortune_data,
-                'period_type': 'monthly',
-                'year': year,
-                'month': month
-            }, status=status.HTTP_200_OK)
-
-        # 캐시 없음 - 생성 필요
-        return Response({
-            'success': False,
-            'need_calculate': True,
-            'message': '이 달의 운세가 아직 생성되지 않았습니다.',
-            'period_type': 'monthly',
-            'year': year,
-            'month': month
-        }, status=status.HTTP_200_OK)
-
-    def post(self, request):
-        """월간 운세 생성"""
-        year, month = get_current_month()
-
-        # 세션 키 확보
-        if not request.session.session_key:
-            request.session.create()
-        session_key = request.session.session_key
-
-        user = request.user if request.user.is_authenticated else None
-
-        # 생년월일 확인
-        if user and user.is_authenticated:
-            if not user.birth_date:
-                return Response({
-                    'success': False,
-                    'error': '생년월일 정보가 없습니다.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-            birth_date = user.birth_date
-            gender = user.gender
-            birth_time = getattr(user, 'birth_time', None)
-            chinese_name = getattr(user, 'chinese_name', None)
-            mbti = getattr(user, 'mbti', None)
-        else:
-            # 비로그인 사용자는 request.data에서 정보 받기
-            birth_date = request.data.get('birth_date')
-            gender = request.data.get('gender')
-            birth_time = request.data.get('birth_time')
-            chinese_name = request.data.get('chinese_name')
-            mbti = request.data.get('mbti')
-
-            if not birth_date or not gender:
-                return Response({
-                    'success': False,
-                    'error': '생년월일과 성별 정보가 필요합니다.'
-                }, status=status.HTTP_400_BAD_REQUEST)
-
-            # 문자열을 date 객체로 변환
-            if isinstance(birth_date, str):
-                birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
-
-        # 1. 본인 캐시 확인 (user/session 기반)
-        fortune_data = load_monthly_fortune_from_db(user, session_key, year, month)
-
-        if not fortune_data:
-            # 2. 동일 조건 캐시 확인 (생년월일+성별+월)
-            fortune_data = find_same_condition_monthly_fortune(year, month, birth_date, gender)
-
-        if not fortune_data:
-            # 3. 캐시 없음 - 새로 생성
-            calculator = FortuneCalculator()
-            fortune_data = calculator.calculate_fortune(
-                birth_date=birth_date,
-                gender=gender,
-                birth_time=birth_time,
-                chinese_name=chinese_name,
-                mbti=mbti,
-                user_id=user.id if user else None,
-                session_key=session_key,
-                fortune_seed=f"monthly_{year}_{month}",  # 월간 시드
-                period_type='monthly'  # 월간 운세용 프롬프트 사용
-            )
-
-            # 월간 운세 메타데이터 추가
-            fortune_data['period_type'] = 'monthly'
-            fortune_data['period_label'] = f'{year}년 {month}월'
-
-        # DB에 저장 (본인 캐시 생성/갱신 - 동일 조건에서 가져온 경우도 본인 캐시로 저장)
-        save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date, gender)
-
-        return Response({
-            'success': True,
-            'fortune': fortune_data,
-            'period_type': 'monthly',
-            'year': year,
-            'month': month
-        }, status=status.HTTP_200_OK)
+    def _get_period_info(self):
+        return get_current_month()

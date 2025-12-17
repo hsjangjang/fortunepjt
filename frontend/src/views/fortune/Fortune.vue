@@ -346,8 +346,24 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import apiClient from '@/config/api'
 import { getColorHex } from '@/utils/colors'
+import { getLuckyItemImage } from '@/utils/luckyItems'
+import { getZodiacIcon, getChineseZodiacEmoji } from '@/utils/zodiac'
+import {
+  getCachedFortune,
+  cacheFortune,
+  fetchFortune,
+  generateFortune,
+  generateFortuneWithForm,
+  formatFortuneText as baseFormatFortuneText,
+  formatDescription
+} from '@/utils/fortuneLoader'
+import {
+  animateScore as baseAnimateScore,
+  animateActiveTabBar,
+  setupTabAnimations,
+  getLottoBallStyle
+} from '@/utils/fortuneAnimations'
 
 const router = useRouter()
 const route = useRoute()
@@ -388,487 +404,118 @@ const periodSubtitle = computed(() => {
   }
 })
 
-// 별자리 이미지 아이콘 매핑
-import ariesIcon from '@/assets/zodiac/aries.png'
-import taurusIcon from '@/assets/zodiac/taurus.png'
-import geminiIcon from '@/assets/zodiac/gemini.png'
-import cancerIcon from '@/assets/zodiac/cancer.png'
-import leoIcon from '@/assets/zodiac/leo.png'
-import virgoIcon from '@/assets/zodiac/virgo.png'
-import libraIcon from '@/assets/zodiac/libra.png'
-import scorpioIcon from '@/assets/zodiac/scorpio.png'
-import sagittariusIcon from '@/assets/zodiac/sagittarius.png'
-import capricornIcon from '@/assets/zodiac/capricorn.png'
-import aquariusIcon from '@/assets/zodiac/aquarius.png'
-import piscesIcon from '@/assets/zodiac/pisces.png'
-
-// 행운 아이템 이미지 매핑
-import perfumeImg from '@/assets/images/lucky_items/perfume.png'
-import cardCaseImg from '@/assets/images/lucky_items/card_case.png'
-import watchImg from '@/assets/images/lucky_items/watch.png'
-import miniKeyringImg from '@/assets/images/lucky_items/mini_keyring.png'
-import scarfImg from '@/assets/images/lucky_items/scarf.png'
-import penImg from '@/assets/images/lucky_items/pen.png'
-import handkerchiefImg from '@/assets/images/lucky_items/handkerchief.png'
-import diaryImg from '@/assets/images/lucky_items/diary.png'
-import walletImg from '@/assets/images/lucky_items/wallet.png'
-import bookmarkImg from '@/assets/images/lucky_items/bookmark.png'
-import mirrorImg from '@/assets/images/lucky_items/mirror.png'
-import tumblerImg from '@/assets/images/lucky_items/tumbler.png'
-import memoImg from '@/assets/images/lucky_items/memo.png'
-import hairpinImg from '@/assets/images/lucky_items/hairpin.png'
-import lipbalmImg from '@/assets/images/lucky_items/lipbalm.png'
-import miniPouchImg from '@/assets/images/lucky_items/mini_pouch.png'
-import braceletImg from '@/assets/images/lucky_items/bracelet.png'
-import ringImg from '@/assets/images/lucky_items/ring.png'
-import sunglassesImg from '@/assets/images/lucky_items/sunglasses.png'
-import earringsImg from '@/assets/images/lucky_items/earrings.png'
-import noteImg from '@/assets/images/lucky_items/note.png'
-import keyImg from '@/assets/images/lucky_items/key.png'
-import pencaseImg from '@/assets/images/lucky_items/pencase.png'
-import beltImg from '@/assets/images/lucky_items/belt.png'
-import earphoneCaseImg from '@/assets/images/lucky_items/earphone_case.png'
-import faceRollerImg from '@/assets/images/lucky_items/face_roller.png'
-import necklaceImg from '@/assets/images/lucky_items/necklace.png'
-import badgeImg from '@/assets/images/lucky_items/badge.png'
-import bagImg from '@/assets/images/lucky_items/bag.png'
-import photoAlbumImg from '@/assets/images/lucky_items/photo_album.png'
-
-// 아이템명 → 이미지 매핑
-const luckyItemImages = {
-  '향수': perfumeImg,
-  '미니 향수': perfumeImg,
-  '카드케이스': cardCaseImg,
-  '시계': watchImg,
-  '손목시계': watchImg,
-  '열쇠고리': miniKeyringImg,
-  '미니 키링': miniKeyringImg,
-  '동전 키링': miniKeyringImg,
-  '스카프': scarfImg,
-  '머플러': scarfImg,
-  '펜': penImg,
-  '볼펜': penImg,
-  '손수건': handkerchiefImg,
-  '다이어리': diaryImg,
-  '지갑': walletImg,
-  '명함지갑': walletImg,
-  '카드지갑': walletImg,
-  '책갈피': bookmarkImg,
-  '북마크': bookmarkImg,
-  '손거울': mirrorImg,
-  '텀블러': tumblerImg,
-  '메모지': memoImg,
-  '메모장': memoImg,
-  '헤어핀': hairpinImg,
-  '립밤': lipbalmImg,
-  '미니 파우치': miniPouchImg,
-  '팔찌': braceletImg,
-  '반지': ringImg,
-  '선글라스': sunglassesImg,
-  '귀걸이': earringsImg,
-  '노트': noteImg,
-  '열쇠': keyImg,
-  '펜케이스': pencaseImg,
-  '벨트': beltImg,
-  '이어폰 케이스': earphoneCaseImg,
-  '페이스 롤러': faceRollerImg,
-  '목걸이': necklaceImg,
-  '뱃지': badgeImg,
-  '가방': bagImg,
-  '사진 앨범': photoAlbumImg
-}
-
-// 아이템 이미지 가져오기
-const getLuckyItemImage = (itemName) => {
-  if (!itemName) return null
-  return luckyItemImages[itemName] || null
-}
-
-const zodiacIcons = {
-  '양자리': ariesIcon,
-  '황소자리': taurusIcon,
-  '쌍둥이자리': geminiIcon,
-  '게자리': cancerIcon,
-  '사자자리': leoIcon,
-  '처녀자리': virgoIcon,
-  '천칭자리': libraIcon,
-  '전갈자리': scorpioIcon,
-  '사수자리': sagittariusIcon,
-  '염소자리': capricornIcon,
-  '물병자리': aquariusIcon,
-  '물고기자리': piscesIcon
-}
-
-// 별자리 아이콘 가져오기
-const getZodiacIcon = (zodiac) => {
-  if (!zodiac) return null
-  return zodiacIcons[zodiac] || null
-}
-
-// 십이지(띠) 이모지 매핑
-const chineseZodiacEmojis = {
-  '쥐띠': '🐭',
-  '소띠': '🐮',
-  '호랑이띠': '🐯',
-  '토끼띠': '🐰',
-  '용띠': '🐲',
-  '뱀띠': '🐍',
-  '말띠': '🐴',
-  '양띠': '🐑',
-  '원숭이띠': '🐵',
-  '닭띠': '🐔',
-  '개띠': '🐶',
-  '돼지띠': '🐷'
-}
-
-// 십이지 이모지 가져오기
-const getChineseZodiacEmoji = (zodiac) => {
-  if (!zodiac) return ''
-  return chineseZodiacEmojis[zodiac] || ''
-}
-
-// 문장 단위 줄바꿈 포맷팅 + 아이템명 굵게/밑줄 표시
-const formatDescription = (text, itemName) => {
-  if (!text) return ''
-  let result = text
-  // 아이템명을 굵게 + 밑줄 표시
-  if (itemName) {
-    const escapedName = itemName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-    result = result.replace(new RegExp(escapedName, 'g'), `<strong style="text-decoration: underline;">${itemName}</strong>`)
-  }
-  // 문장 끝(.!?)을 찾아서 줄바꿈 추가
-  return result.replace(/([.!?])(\s+)/g, '$1<br>')
-}
-
-// 오늘 날짜 기준으로 주간/월간에서 어떤 구간에 해당하는지 계산
-const getTodayPeriodIndex = () => {
-  const now = new Date()
-  const dayOfWeek = now.getDay() // 0=일, 1=월, 2=화, 3=수, 4=목, 5=금, 6=토
-  const dayOfMonth = now.getDate()
-
-  // 주간: 평일 초(월~화)=1, 평일 말(수~금)=2, 주말(토~일)=3
-  let weeklyIndex = 0
-  if (dayOfWeek === 1 || dayOfWeek === 2) {
-    weeklyIndex = 1 // 평일 초 (월~화) - 2번째 문장
-  } else if (dayOfWeek >= 3 && dayOfWeek <= 5) {
-    weeklyIndex = 2 // 평일 말 (수~금) - 3번째 문장
-  } else {
-    weeklyIndex = 3 // 주말 (토~일) - 4번째 문장
-  }
-
-  // 월간: 월초(1~10)=1, 월중(11~20)=2, 월말(21~)=3
-  let monthlyIndex = 0
-  if (dayOfMonth <= 10) {
-    monthlyIndex = 1 // 월초 - 2번째 문장
-  } else if (dayOfMonth <= 20) {
-    monthlyIndex = 2 // 월중 - 3번째 문장
-  } else {
-    monthlyIndex = 3 // 월말 - 4번째 문장
-  }
-
-  return { weeklyIndex, monthlyIndex }
-}
-
-// 운세 텍스트 문장 단위로 리스트 형태로 변환 (색상 클래스 지원 + 주간/월간 볼드 처리)
+// 운세 텍스트 포맷팅 (현재 선택된 기간 전달)
 const formatFortuneText = (text, colorClass = '') => {
-  if (!text) return ''
-  // 문장 단위로 분리 (마침표, 느낌표, 물음표 기준)
-  const sentences = text.split(/(?<=[.!?])\s+/).filter(s => s.trim())
-  if (sentences.length <= 1) return text
-
-  const { weeklyIndex, monthlyIndex } = getTodayPeriodIndex()
-
-  // ul 리스트로 변환 (주간/월간인 경우 해당 문장 볼드 처리)
-  const listItems = sentences.map((s, index) => {
-    let isBold = false
-
-    // 주간 운세이고 해당 구간에 해당하면 볼드
-    if (selectedPeriod.value === 'weekly' && index === weeklyIndex) {
-      isBold = true
-    }
-    // 월간 운세이고 해당 구간에 해당하면 볼드
-    if (selectedPeriod.value === 'monthly' && index === monthlyIndex) {
-      isBold = true
-    }
-
-    if (isBold) {
-      return `<li class="today-highlight"><strong>${s.trim()}</strong></li>`
-    }
-    return `<li>${s.trim()}</li>`
-  }).join('')
-
-  return `<ul class="fortune-list ${colorClass}">${listItems}</ul>`
+  return baseFormatFortuneText(text, colorClass, selectedPeriod.value)
 }
 
-
-// Django today.html의 로또볼 스타일과 동일
-const getLottoBallStyle = (number) => {
-  let background
-  if (number <= 10) background = 'linear-gradient(135deg, #fbbf24, #d97706)'
-  else if (number <= 20) background = 'linear-gradient(135deg, #60a5fa, #2563eb)'
-  else if (number <= 30) background = 'linear-gradient(135deg, #f87171, #dc2626)'
-  else if (number <= 40) background = 'linear-gradient(135deg, #34d399, #059669)'
-  else background = 'linear-gradient(135deg, #c084fc, #7c3aed)'
-
-  return `background: ${background};`
-}
-
-// Django today.html의 JavaScript와 동일한 애니메이션
-const easeOutCubic = (x) => {
-  return 1 - Math.pow(1 - x, 3)
-}
-
-const animateValue = (duration, onUpdate) => {
-  const startTime = performance.now()
-
-  const step = (currentTime) => {
-    const elapsed = currentTime - startTime
-    const progress = Math.min(elapsed / duration, 1)
-    const easedProgress = easeOutCubic(progress)
-
-    onUpdate(easedProgress)
-
-    if (progress < 1) {
-      requestAnimationFrame(step)
-    }
-  }
-
-  requestAnimationFrame(step)
-}
-
+// 애니메이션 래퍼 (displayScore ref 전달)
 const animateScore = () => {
-  const progressCircle = document.querySelector('.fortune-circle-progress')
-  const scoreElement = document.querySelector('.fortune-score-text .score')
-
-  if (progressCircle && scoreElement) {
-    let targetScore = parseInt(progressCircle.getAttribute('data-score'))
-    if (isNaN(targetScore)) targetScore = 0
-
-    const circumference = 2 * Math.PI * 100
-
-    progressCircle.style.transition = 'none'
-    progressCircle.style.strokeDasharray = circumference
-    progressCircle.style.strokeDashoffset = circumference
-    displayScore.value = 0
-
-    animateValue(1500, (progress) => {
-      const currentScore = targetScore * progress
-      const offset = circumference - (currentScore / 100 * circumference)
-
-      displayScore.value = Math.round(currentScore)
-      progressCircle.style.strokeDashoffset = offset
-    })
-  }
-}
-
-const animateBar = (container) => {
-  const fill = container.querySelector('.sub-score-fill')
-  const text = container.querySelector('.score-text')
-
-  if (fill && text) {
-    let targetScore = parseFloat(fill.getAttribute('data-target'))
-    if (isNaN(targetScore)) {
-      targetScore = parseFloat(fill.style.width) || 0
-      fill.setAttribute('data-target', targetScore)
-    }
-
-    fill.style.transition = 'none'
-    fill.style.width = '0%'
-    text.textContent = '0%'
-
-    animateValue(1000, (progress) => {
-      const currentScore = targetScore * progress
-
-      fill.style.width = `${currentScore}%`
-      text.textContent = `${Math.round(currentScore)}%`
-    })
-  }
+  baseAnimateScore({ setDisplayScore: (val) => { displayScore.value = val } })
 }
 
 // 기간 변경 함수
 const changePeriod = async (period) => {
   if (selectedPeriod.value === period) return
 
-  // URL 변경 (페이지 이동)
-  let routePath = '/fortune/today'
-  if (period === 'weekly') routePath = '/fortune/weekly'
-  if (period === 'monthly') routePath = '/fortune/monthly'
-
-  router.push(routePath)
+  const routePaths = { daily: '/fortune/today', weekly: '/fortune/weekly', monthly: '/fortune/monthly' }
+  router.push(routePaths[period])
 }
 
-// 실제 운세 데이터 로드 함수
+// 실제 운세 데이터 로드 함수 (유틸리티 사용)
 const loadFortuneData = async (period) => {
-  fortune.value = null // 기존 데이터 초기화
+  fortune.value = null
 
-  // 로컬 시간 기준 오늘 날짜
-  const now = new Date()
-  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-
-  // 현재 년도/주차/월 계산
-  const year = now.getFullYear()
-  const month = now.getMonth() + 1
-  // ISO 주차 계산
-  const startOfYear = new Date(year, 0, 1)
-  const days = Math.floor((now - startOfYear) / (24 * 60 * 60 * 1000))
-  const week = Math.ceil((days + startOfYear.getDay() + 1) / 7)
-
-  // Store 캐시 먼저 확인 (daily, weekly, monthly 모두)
-  if (period === 'daily' && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
-    console.log('[Fortune] Store에서 daily 운세 로드')
-    fortune.value = fortuneStore.fortuneData
+  // Store 캐시 먼저 확인
+  const cached = getCachedFortune(period, fortuneStore)
+  if (cached) {
+    fortune.value = cached
     setupFortuneUI()
     return
   }
 
-  if (period === 'weekly') {
-    const cachedWeekly = fortuneStore.getWeeklyFortune(year, week)
-    if (cachedWeekly) {
-      console.log('[Fortune] Store에서 weekly 운세 로드')
-      fortune.value = cachedWeekly
-      setupFortuneUI()
-      return
-    }
-  }
-
-  if (period === 'monthly') {
-    const cachedMonthly = fortuneStore.getMonthlyFortune(year, month)
-    if (cachedMonthly) {
-      console.log('[Fortune] Store에서 monthly 운세 로드')
-      fortune.value = cachedMonthly
-      setupFortuneUI()
-      return
-    }
-  }
-
   try {
-    let response
-    let endpoint = ''
+    // GET으로 캐시 확인
+    const response = await fetchFortune(period)
 
-    if (period === 'daily') {
-      endpoint = '/api/fortune/today/'
-    } else if (period === 'weekly') {
-      endpoint = '/api/fortune/weekly/'
-    } else if (period === 'monthly') {
-      endpoint = '/api/fortune/monthly/'
+    if (response.success && response.fortune) {
+      fortune.value = response.fortune
+      cacheFortune(period, fortuneStore, response.fortune, response)
+    } else if (response.need_calculate) {
+      // 운세 생성 필요
+      await generateAndCacheFortune(period)
+      return
     }
+  } catch (error) {
+    console.error(`[Fortune] ${period} 운세 로드 실패:`, error)
+    handleFortuneError()
+    return
+  } finally {
+    if (fortune.value) {
+      await nextTick()
+      setTimeout(() => {
+        animateScore()
+        animateActiveTabBar()
+      }, 200)
+    }
+  }
+}
 
-    console.log(`[Fortune] ${period} 운세 로드 시작, endpoint: ${endpoint}`)
+// 운세 생성 및 캐시 저장
+const generateAndCacheFortune = async (period) => {
+  const redirectPaths = { daily: '/fortune/today', weekly: '/fortune/weekly', monthly: '/fortune/monthly' }
 
-    // 먼저 GET으로 캐시 확인
-    response = await apiClient.get(endpoint)
-    console.log(`[Fortune] GET 응답:`, response.data)
-
-    if (response.data.success && response.data.fortune) {
-      fortune.value = response.data.fortune
-      console.log(`[Fortune] 캐시에서 ${period} 운세 로드 완료`)
-
-      // Store에 캐시 저장
-      if (period === 'weekly' && response.data.year && response.data.week) {
-        fortuneStore.setWeeklyFortune(response.data.fortune, response.data.year, response.data.week)
-      } else if (period === 'monthly' && response.data.year && response.data.month) {
-        fortuneStore.setMonthlyFortune(response.data.fortune, response.data.year, response.data.month)
+  if (authStore.isAuthenticated) {
+    // 로그인 사용자
+    try {
+      const response = await generateFortune(period)
+      if (response.success && response.fortune) {
+        fortune.value = response.fortune
+        cacheFortune(period, fortuneStore, response.fortune, response)
+        await nextTick()
+        setTimeout(() => { animateScore(); animateActiveTabBar() }, 200)
+      } else {
+        router.replace({ name: 'fortune-loading', query: { redirect: '/fortune/today' } })
       }
-    } else if (response.data.need_calculate) {
-      // 캐시 없음 - 바로 POST로 생성 요청 (로딩 페이지 없이)
-      console.log(`[Fortune] ${period} 운세 없음 → 바로 생성 요청`)
+    } catch {
+      router.replace({ name: 'fortune-loading', query: { redirect: '/fortune/today' } })
+    }
+  } else {
+    // 비로그인 사용자
+    const formInfo = fortuneStore.formData || {}
+    const fortuneInfo = fortuneStore.fortuneData || {}
+    const birthDate = formInfo.birth_date || fortuneInfo.birth_date
+    const gender = formInfo.gender || fortuneInfo.gender
 
-      // 로그인 사용자
-      if (authStore.isAuthenticated) {
-        const postResponse = await apiClient.post(endpoint)
-        if (postResponse.data.success && postResponse.data.fortune) {
-          fortune.value = postResponse.data.fortune
-          console.log(`[Fortune] ${period} 운세 생성 완료`)
-
-          // Store에 캐시 저장
-          if (period === 'weekly' && postResponse.data.year && postResponse.data.week) {
-            fortuneStore.setWeeklyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.week)
-          } else if (period === 'monthly' && postResponse.data.year && postResponse.data.month) {
-            fortuneStore.setMonthlyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.month)
-          }
-        } else {
-          // 생성 실패 시 로딩 페이지로
-          router.replace({
-            name: 'fortune-loading',
-            query: { redirect: '/fortune/today' }
-          })
-        }
-        return
-      }
-
-      // 비로그인 사용자
-      const formInfo = fortuneStore.formData || {}
-      const fortuneInfo = fortuneStore.fortuneData || {}
-      const birthDate = formInfo.birth_date || fortuneInfo.birth_date
-      const gender = formInfo.gender || fortuneInfo.gender
-
-      if (birthDate && gender) {
-        // formData로 바로 POST 요청
-        const postResponse = await apiClient.post(endpoint, {
+    if (birthDate && gender) {
+      try {
+        const response = await generateFortuneWithForm(period, {
           birth_date: birthDate,
           gender: gender,
           birth_time: formInfo.birth_time || fortuneInfo.birth_time || '',
           chinese_name: formInfo.chinese_name || fortuneInfo.chinese_name || '',
           mbti: formInfo.mbti || fortuneInfo.mbti || ''
         })
-        if (postResponse.data.success && postResponse.data.fortune) {
-          fortune.value = postResponse.data.fortune
-          console.log(`[Fortune] ${period} 운세 생성 완료 (비로그인)`)
-
-          // Store에 캐시 저장
-          if (period === 'weekly' && postResponse.data.year && postResponse.data.week) {
-            fortuneStore.setWeeklyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.week)
-          } else if (period === 'monthly' && postResponse.data.year && postResponse.data.month) {
-            fortuneStore.setMonthlyFortune(postResponse.data.fortune, postResponse.data.year, postResponse.data.month)
-          }
-        } else {
-          console.error(`[Fortune] ${period} 운세 생성 실패`)
+        if (response.success && response.fortune) {
+          fortune.value = response.fortune
+          cacheFortune(period, fortuneStore, response.fortune, response)
+          await nextTick()
+          setTimeout(() => { animateScore(); animateActiveTabBar() }, 200)
         }
-      } else {
-        // formData도 없으면 계산 페이지로 (현재 기간에 맞는 redirect 설정)
-        let redirectPath = '/fortune/today'
-        if (period === 'weekly') redirectPath = '/fortune/weekly'
-        if (period === 'monthly') redirectPath = '/fortune/monthly'
-
-        router.replace({
-          name: 'fortune-calculate',
-          query: { redirect: redirectPath }
-        })
+      } catch (error) {
+        console.error(`[Fortune] ${period} 운세 생성 실패 (비로그인):`, error)
       }
-      return
+    } else {
+      router.replace({ name: 'fortune-calculate', query: { redirect: redirectPaths[period] } })
     }
-  } catch (error) {
-    console.error(`[Fortune] ${period} 운세 로드 실패:`, error)
-    console.error(`[Fortune] 에러 응답:`, error.response?.data)
+  }
+}
 
-    // 에러 발생 시에도 운세가 없으면 리다이렉트
-    if (!fortune.value) {
-      if (authStore.isAuthenticated) {
-        router.replace({
-          name: 'fortune-loading',
-          query: { redirect: route.fullPath }
-        })
-      } else {
-        router.replace({
-          name: 'fortune-calculate',
-          query: { redirect: route.fullPath }
-        })
-      }
-      return
-    }
-  } finally {
-    // 애니메이션은 로딩 완료 후, nextTick에서 실행
-    if (fortune.value) {
-      await nextTick()
-      setTimeout(() => {
-        animateScore()
-        const activeTabPane = document.querySelector('.tab-pane.active')
-        if (activeTabPane) {
-          const bar = activeTabPane.querySelector('.sub-score-bar')
-          if (bar) animateBar(bar)
-        }
-      }, 200)
-    }
+// 에러 처리
+const handleFortuneError = () => {
+  if (!fortune.value) {
+    const redirectName = authStore.isAuthenticated ? 'fortune-loading' : 'fortune-calculate'
+    router.replace({ name: redirectName, query: { redirect: route.fullPath } })
   }
 }
 
@@ -881,94 +528,62 @@ watch(() => route.path, () => {
   }
 })
 
-// 미성년자 체크 및 애니메이션 시작
-const setupFortuneUI = () => {
-  if (fortune.value) {
-    // 미성년자 체크 (로그인 사용자: authStore, 비로그인: fortune.birth_date)
-    const birthDateStr = authStore.user?.birth_date || fortune.value.birth_date
-    if (birthDateStr) {
-      const birthDate = new Date(birthDateStr)
-      const todayDate = new Date()
-      const age = todayDate.getFullYear() - birthDate.getFullYear()
-      isMinor.value = age < 19
-    }
-
-    // 애니메이션 시작
-    setTimeout(() => {
-      animateScore()
-
-      // 활성 탭의 bar 애니메이션
-      const activeTabPane = document.querySelector('.tab-pane.active')
-      if (activeTabPane) {
-        const bar = activeTabPane.querySelector('.sub-score-bar')
-        if (bar) animateBar(bar)
-      }
-
-      // 탭 변경 이벤트 리스너
-      const tabEls = document.querySelectorAll('a[data-bs-toggle="tab"]')
-      tabEls.forEach(tabEl => {
-        tabEl.addEventListener('shown.bs.tab', function (event) {
-          const targetId = event.target.getAttribute('href')
-          const targetPane = document.querySelector(targetId)
-          if (targetPane) {
-            const bar = targetPane.querySelector('.sub-score-bar')
-            if (bar) animateBar(bar)
-          }
-        })
-      })
-    }, 100)
+// 미성년자 체크
+const checkMinorStatus = () => {
+  const birthDateStr = authStore.user?.birth_date || fortune.value?.birth_date
+  if (birthDateStr) {
+    const birthDate = new Date(birthDateStr)
+    const age = new Date().getFullYear() - birthDate.getFullYear()
+    isMinor.value = age < 19
   }
 }
 
+// UI 설정 및 애니메이션 시작
+const setupFortuneUI = () => {
+  if (!fortune.value) return
+
+  checkMinorStatus()
+
+  setTimeout(() => {
+    animateScore()
+    animateActiveTabBar()
+    setupTabAnimations()
+  }, 100)
+}
+
 onMounted(async () => {
-  // URL 경로에서 현재 기간 확인
   const currentPeriod = getPeriodFromRoute()
   selectedPeriod.value = currentPeriod
+  isLoading.value = true
 
   try {
-    isLoading.value = true
-    // 로컬 시간 기준 오늘 날짜
-    const now = new Date()
-    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-
-    // daily인 경우에만 Store 캐시 사용 (weekly/monthly는 항상 API 호출)
-    if (currentPeriod === 'daily') {
-      // 1. Fortune Store에 오늘 날짜 데이터가 있으면 먼저 사용 (로그인/비로그인 모두)
-      if (fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
-        console.log('[Today] Fortune Store에서 운세 로드')
-        fortune.value = fortuneStore.fortuneData
-        setupFortuneUI()
-        // Store에 데이터가 있으면 API 호출 생략 (return으로 조기 종료)
-        isLoading.value = false
-        return
-      }
-
-      // 2. Store에 데이터 없음: API 호출
-      console.log('[Today] API에서 운세 로드')
-      const response = await apiClient.get('/api/fortune/today/')
-
-      if (response.data.success && response.data.fortune) {
-        fortune.value = response.data.fortune
-
-        // Fortune Store에도 저장 (action 사용으로 반응성 유지)
-        fortuneStore.setFortune(response.data.fortune, today)
-      } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
-        // 비로그인 + API 실패 + Store에 데이터 있음 → Store 데이터 사용
-        console.log('[Today] API 실패, Fortune Store 데이터 사용')
-        fortune.value = fortuneStore.fortuneData
-      }
+    // 모든 기간에 대해 통합 로직 사용
+    const cached = getCachedFortune(currentPeriod, fortuneStore)
+    if (cached) {
+      fortune.value = cached
       setupFortuneUI()
-    } else {
-      // weekly 또는 monthly: loadFortuneData 사용
-      // loadFortuneData 내부에서 애니메이션 처리하므로 setupFortuneUI 호출 불필요
-      await loadFortuneData(currentPeriod)
+      return
+    }
+
+    // API 호출
+    const response = await fetchFortune(currentPeriod)
+
+    if (response.success && response.fortune) {
+      fortune.value = response.fortune
+      cacheFortune(currentPeriod, fortuneStore, response.fortune, response)
+      setupFortuneUI()
+    } else if (response.need_calculate) {
+      await generateAndCacheFortune(currentPeriod)
+    } else if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
+      // 비로그인 + API 실패 + Store에 데이터 있음
+      fortune.value = fortuneStore.fortuneData
+      setupFortuneUI()
     }
   } catch (error) {
     console.error('Failed to fetch fortune:', error)
-    // 비로그인 + Store에 데이터 있으면 사용
     if (!authStore.isAuthenticated && fortuneStore.fortuneData) {
-      console.log('[Today] API 에러, Fortune Store 데이터 사용')
       fortune.value = fortuneStore.fortuneData
+      setupFortuneUI()
     }
   } finally {
     isLoading.value = false
@@ -1106,6 +721,7 @@ onMounted(async () => {
   font-weight: 800;
   background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
   text-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
 }

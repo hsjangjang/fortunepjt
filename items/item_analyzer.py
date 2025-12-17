@@ -7,53 +7,24 @@
   - 운세별 점수 계산 (love, money, work, health, study)
 """
 from PIL import Image
-
 from collections import Counter
 import colorsys
 import json
 import os
 
+from .color_data import (
+    color_name_to_hex,
+    english_to_korean_color,
+    are_similar_colors,
+    ENGLISH_TO_KOREAN
+)
+
+
 class ItemAnalyzer:
     """아이템 이미지 분석 클래스 (색상 + AI 분석)"""
-    
-    def __init__(self):
-        # 한국어 색상 이름 매핑
-        self.color_names = {
-            'red': '빨간색',
-            'orange': '주황색', 
-            'yellow': '노란색',
-            'green': '초록색',
-            'lightgreen': '연두색',
-            'blue': '파란색',
-            'skyblue': '하늘색',
-            'navy': '남색',
-            'purple': '보라색',
-            'pink': '분홍색',
-            'brown': '갈색',
-            'beige': '베이지색',
-            'gray': '회색',
-            'black': '검은색',
-            'white': '흰색'
-        }
-        
-        # RGB 범위별 색상 분류
-        self.color_ranges = {
-            'red': [(180, 0, 0), (255, 100, 100)],
-            'orange': [(255, 140, 0), (255, 200, 100)],
-            'yellow': [(200, 200, 0), (255, 255, 150)],
-            'green': [(0, 100, 0), (100, 255, 100)],
-            'lightgreen': [(100, 200, 100), (200, 255, 200)],
-            'blue': [(0, 0, 100), (100, 100, 255)],
-            'skyblue': [(100, 150, 200), (200, 230, 255)],
-            'navy': [(0, 0, 50), (50, 50, 150)],
-            'purple': [(100, 0, 100), (200, 100, 200)],
-            'pink': [(200, 100, 150), (255, 200, 230)],
-            'brown': [(100, 50, 0), (180, 120, 80)],
-            'beige': [(200, 180, 150), (250, 230, 200)],
-            'gray': [(100, 100, 100), (200, 200, 200)],
-            'black': [(0, 0, 0), (50, 50, 50)],
-            'white': [(230, 230, 230), (255, 255, 255)]
-        }
+
+    # 한국어 색상 이름 매핑 (하위 호환성)
+    color_names = ENGLISH_TO_KOREAN
     
     def analyze_from_file_or_upload(self, image_source):
         """파일 경로 또는 업로드된 파일 객체에서 분석
@@ -306,129 +277,12 @@ class ItemAnalyzer:
             return self.analyze_image(image_path)
     
     def _english_to_korean_color(self, english_name):
-        """영문 색상명을 한글로 변환"""
-        english_lower = english_name.lower()
-
-        english_to_korean = {
-            'red': '빨간색',
-            'orange': '주황색',
-            'yellow': '노란색',
-            'green': '초록색',
-            'lightgreen': '연두색',
-            'blue': '파란색',
-            'skyblue': '하늘색',
-            'navy': '남색',
-            'purple': '보라색',
-            'pink': '분홍색',
-            'brown': '갈색',
-            'beige': '베이지색',
-            'gray': '회색',
-            'grey': '회색',
-            'black': '검은색',
-            'white': '흰색',
-            'gold': '금색',
-            'silver': '은색',
-            'tan': '베이지색',
-            'cream': '크림색'
-        }
-
-        return english_to_korean.get(english_lower, english_name)
+        """영문 색상명을 한글로 변환 (color_data.py 사용)"""
+        return english_to_korean_color(english_name)
 
     def _color_name_to_hex(self, color_name):
-        """색상 이름을 HEX로 변환 (프론트엔드 colorMap과 동기화)"""
-        color_name_lower = color_name.lower()
-
-        # 프론트엔드 colors.js의 colorMap과 동일하게 매핑
-        color_map = {
-            # 검은색 계열
-            '검은색': '#1f2937', '검정': '#1f2937', '검정색': '#1f2937', '블랙': '#1f2937', '흑색': '#1f2937',
-            # 흰색 계열
-            '흰색': '#f3f4f6', '하양': '#f3f4f6', '하얀색': '#f3f4f6', '화이트': '#f3f4f6', '백색': '#f3f4f6',
-            # 회색 계열
-            '회색': '#6B7280', '그레이': '#6B7280', '그래이': '#6B7280',
-            '차콜': '#36454F', '차콜 그레이': '#36454F', '짙은 회색': '#36454F',
-            # 빨간색 계열
-            '빨간색': '#EF4444', '빨강': '#EF4444', '레드': '#EF4444', '적색': '#EF4444',
-            '진한 빨간색': '#B91C1C', '다크레드': '#B91C1C',
-            '와인': '#722F37', '버건디': '#800020', '마룬': '#800000',
-            '코랄': '#FF7F50', '산호색': '#FF7F50', '산호': '#FF7F50', '살몬': '#FA8072',
-            # 분홍색 계열
-            '분홍색': '#F472B6', '분홍': '#F472B6', '핑크': '#F472B6',
-            '연분홍': '#F472B6', '파스텔 핑크': '#F472B6', '연한 분홍색': '#F472B6',
-            # 주황색 계열
-            '주황색': '#F59E0B', '주황': '#F59E0B', '오렌지': '#F59E0B',
-            '귤색': '#F59E0B', '밝은 귤색': '#F59E0B', '진한 주황색': '#F59E0B',
-            # 노란색 계열
-            '노란색': '#FCD34D', '노랑': '#FCD34D', '옐로우': '#FCD34D', '황색': '#FCD34D',
-            '진한 노란색': '#F59E0B', '진노란색': '#F59E0B', '겨자색': '#FCD34D',
-            '금색': '#FFD700', '금': '#FFD700', '골드': '#FFD700', '황금색': '#FFD700',
-            # 초록색 계열
-            '초록색': '#10B981', '초록': '#10B981', '녹색': '#10B981', '그린': '#10B981',
-            '연두색': '#84CC16', '연두': '#84CC16',
-            '민트': '#98FF98', '민트색': '#98FF98', '민트 그린': '#98FF98',
-            '카키': '#8B8B00', '올리브': '#808000',
-            # 파란색 계열
-            '파란색': '#3B82F6', '파랑': '#3B82F6', '블루': '#3B82F6', '청색': '#3B82F6',
-            '하늘색': '#38BDF8', '스카이블루': '#38BDF8', '하늘': '#38BDF8', '연한 파란색': '#38BDF8',
-            '남색': '#1E3A8A', '네이비': '#1E3A8A', '네이비 블루': '#1E3A8A', '감청색': '#1E3A8A',
-            '터콰이즈': '#40E0D0', '청록': '#008B8B', '청록색': '#008B8B',
-            # 보라색 계열
-            '보라색': '#8B5CF6', '보라': '#8B5CF6', '퍼플': '#8B5CF6',
-            '자주색': '#8B5CF6', '자주': '#8B5CF6',
-            '연보라색': '#DA70D6', '연보라': '#E6E6FA', '라벤더': '#E6E6FA',
-            # 갈색 계열
-            '갈색': '#92400E', '브라운': '#92400E', '짙은 갈색': '#92400E',
-            '베이지': '#f3f4f6', '베이지색': '#f3f4f6',
-            '아이보리': '#f3f4f6', '크림색': '#f3f4f6', '크림': '#f3f4f6', '살구색': '#FFCC99', '살구': '#FFCC99',
-            # 은색
-            '은색': '#C0C0C0', '은': '#C0C0C0', '실버': '#C0C0C0',
-        }
-        
-        # 정확한 매칭
-        for key, hex_val in color_map.items():
-            if color_name_lower == key:
-                return hex_val
-        
-        # 부분 매칭 (포함 관계)
-        for key, hex_val in color_map.items():
-            if key in color_name_lower or color_name_lower in key:
-                return hex_val
-        
-        # 키워드 기반 매칭 (프론트엔드 colorMap과 동기화된 HEX 값 사용)
-        if '노란' in color_name_lower or '노랑' in color_name_lower or '옐로' in color_name_lower:
-            return '#FCD34D'
-        elif '황' in color_name_lower or '금' in color_name_lower or '골드' in color_name_lower:
-            return '#FFD700'
-        elif '초록' in color_name_lower or '녹' in color_name_lower or '그린' in color_name_lower:
-            return '#10B981'
-        elif '하늘' in color_name_lower or '스카이' in color_name_lower:
-            return '#38BDF8'
-        elif '파란' in color_name_lower or '파랑' in color_name_lower or '블루' in color_name_lower:
-            return '#3B82F6'
-        elif '남' in color_name_lower or '네이비' in color_name_lower:
-            return '#1E3A8A'
-        elif '빨간' in color_name_lower or '빨강' in color_name_lower or '적' in color_name_lower or '레드' in color_name_lower:
-            return '#EF4444'
-        elif '검은' in color_name_lower or '검정' in color_name_lower or '흑' in color_name_lower or '블랙' in color_name_lower:
-            return '#1f2937'
-        elif '흰' in color_name_lower or '하얀' in color_name_lower or '백' in color_name_lower or '화이트' in color_name_lower:
-            return '#f3f4f6'
-        elif '회색' in color_name_lower or '그레이' in color_name_lower:
-            return '#6B7280'
-        elif '갈색' in color_name_lower or '브라운' in color_name_lower:
-            return '#92400E'
-        elif '보라' in color_name_lower or '퍼플' in color_name_lower or '자주' in color_name_lower:
-            return '#8B5CF6'
-        elif '핑크' in color_name_lower or '분홍' in color_name_lower:
-            return '#F472B6'
-        elif '주황' in color_name_lower or '오렌지' in color_name_lower:
-            return '#F59E0B'
-        elif '베이지' in color_name_lower or '아이보리' in color_name_lower or '크림' in color_name_lower:
-            return '#f3f4f6'
-
-        # 기본값 (회색)
-        print(f"[WARNING] 알 수 없는 색상: {color_name}, 회색으로 표시")
-        return '#6B7280'
+        """색상 이름을 HEX로 변환 (color_data.py 사용)"""
+        return color_name_to_hex(color_name)
     
     def analyze_image(self, image_path):
         """이미지 분석 메인 함수"""
@@ -609,21 +463,8 @@ class ItemAnalyzer:
         }
     
     def are_similar_colors(self, color1, color2):
-        """두 색상이 유사한지 확인"""
-        similar_groups = [
-            ['빨간색', '주황색', '분홍색'],
-            ['파란색', '하늘색', '남색'],
-            ['초록색', '연두색'],
-            ['노란색', '베이지색', '아이보리색'],
-            ['검은색', '회색', '차콜색'],
-            ['흰색', '아이보리색', '베이지색'],
-            ['보라색', '분홍색']
-        ]
-        
-        for group in similar_groups:
-            if color1 in group and color2 in group:
-                return True
-        return False
+        """두 색상이 유사한지 확인 (color_data.py 사용)"""
+        return are_similar_colors(color1, color2)
     
     def get_match_grade(self, score):
         """매칭 점수에 따른 등급"""

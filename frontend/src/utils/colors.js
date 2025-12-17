@@ -1,66 +1,23 @@
-// 공통 색상 매핑 (한글 + 영문 + 동의어)
-export const colorMap = {
-  // 검은색 계열
-  '검은색': '#1f2937', '검정': '#1f2937', '검정색': '#1f2937', '블랙': '#1f2937',
+/**
+ * 색상 유틸리티 (통합 export)
+ * colorMap.js와 colorDistance.js의 기능을 re-export
+ */
 
-  // 흰색 계열
-  '흰색': '#f3f4f6', '하양': '#f3f4f6', '하얀색': '#f3f4f6', '화이트': '#f3f4f6',
+// colorMap에서 기본 색상 데이터 re-export
+export { colorMap, RAINBOW_GRADIENT, isRainbowColor } from './colorMap'
 
-  // 회색 계열
-  '회색': '#6B7280', '그레이': '#6B7280', '그래이': '#6B7280',
-  '차콜': '#36454F',
+// colorDistance에서 계산 함수 re-export
+export { hexToRgb, euclideanDistance, distanceToScore, calculateColorMatchScore } from './colorDistance'
 
-  // 빨간색 계열
-  '빨간색': '#EF4444', '빨강': '#EF4444', '레드': '#EF4444',
-  '진한 빨간색': '#B91C1C', '다크레드': '#B91C1C',
-  '와인': '#722F37', '버건디': '#800020', '마룬': '#800000',
-  '코랄': '#FF7F50', '살몬': '#FA8072',
+import { calculateColorMatchScore } from './colorDistance'
 
-  // 분홍색 계열
-  '분홍색': '#F472B6', '분홍': '#F472B6', '핑크': '#F472B6',
-
-  // 주황색 계열
-  '주황색': '#F59E0B', '주황': '#F59E0B', '오렌지': '#F59E0B',
-
-  // 노란색 계열
-  '노란색': '#FCD34D', '노랑': '#FCD34D', '옐로우': '#FCD34D',
-  '금색': '#FFD700', '금': '#FFD700', '골드': '#FFD700', '황금색': '#FFD700',
-
-  // 초록색 계열
-  '초록색': '#10B981', '초록': '#10B981', '녹색': '#10B981', '그린': '#10B981',
-  '연두색': '#84CC16', '연두': '#84CC16',
-  '민트': '#98FF98', '민트색': '#98FF98',
-  '카키': '#8B8B00', '올리브': '#808000',
-
-  // 파란색 계열
-  '파란색': '#3B82F6', '파랑': '#3B82F6', '블루': '#3B82F6',
-  '하늘색': '#38BDF8', '스카이블루': '#38BDF8',
-  '남색': '#1E3A8A', '네이비': '#1E3A8A',
-  '터콰이즈': '#40E0D0', '청록': '#008B8B', '청록색': '#008B8B',
-
-  // 보라색 계열
-  '보라색': '#8B5CF6', '보라': '#8B5CF6', '퍼플': '#8B5CF6',
-  '연보라색': '#DA70D6', '연보라': '#E6E6FA', '라벤더': '#E6E6FA',
-
-  // 갈색 계열
-  '갈색': '#92400E', '브라운': '#92400E',
-  '베이지색': '#f3f4f6', '베이지': '#f3f4f6',
-  '아이보리': '#f3f4f6', '크림': '#f3f4f6',
-
-  // 은색
-  '은색': '#C0C0C0', '은': '#C0C0C0', '실버': '#C0C0C0',
-
-  // 기타 (다양 = 무지개 그라데이션용 플래그)
-  '다양': 'rainbow'
+// 기존 API 호환용: 아이템 색상과 행운색 배열 간의 최대 유사도 점수 (숫자만 반환)
+export const getColorMatchScore = (itemColors, luckyColorNames) => {
+  const result = calculateColorMatchScore(itemColors, luckyColorNames)
+  return result.score
 }
 
-// 무지개 그라데이션 CSS
-export const RAINBOW_GRADIENT = 'linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF)'
-
-// 색상이 '다양'(무지개)인지 확인
-export const isRainbowColor = (colorName) => {
-  return colorName === '다양' || colorMap[colorName] === 'rainbow'
-}
+import { colorMap, isRainbowColor, RAINBOW_GRADIENT } from './colorMap'
 
 // 색상 배경 스타일 반환 (다양이면 무지개 그라데이션)
 export const getColorBackground = (colorNameOrHex) => {
@@ -80,7 +37,7 @@ export const getColorHex = (colorName) => {
   return colorMap[colorName] || '#8B5CF6'
 }
 
-// 배경색에 따른 텍스트 색상 결정 (밝은 배경 → 어두운 글자)
+// 배경색에 따른 텍스트 색상 결정 (밝은 배경 -> 어두운 글자)
 export const getTextColor = (bgColor) => {
   if (!bgColor) return '#fff'
   const hex = bgColor.replace('#', '')
@@ -89,59 +46,4 @@ export const getTextColor = (bgColor) => {
   const b = parseInt(hex.substr(4, 2), 16)
   const brightness = (r * 299 + g * 587 + b * 114) / 1000
   return brightness > 128 ? '#1f2937' : '#fff'
-}
-
-// HEX 색상을 RGB 객체로 변환
-export const hexToRgb = (hex) => {
-  if (!hex) return { r: 128, g: 128, b: 128 }
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : { r: 128, g: 128, b: 128 }
-}
-
-// 두 색상 간의 유클리드 거리 계산 (0 ~ 441.67 범위)
-export const colorDistance = (hex1, hex2) => {
-  const rgb1 = hexToRgb(hex1)
-  const rgb2 = hexToRgb(hex2)
-  return Math.sqrt(
-    Math.pow(rgb1.r - rgb2.r, 2) +
-    Math.pow(rgb1.g - rgb2.g, 2) +
-    Math.pow(rgb1.b - rgb2.b, 2)
-  )
-}
-
-// 최대 유클리드 거리 (sqrt(255^2 * 3) ≈ 441.67)
-const MAX_EUCLIDEAN_DISTANCE = Math.sqrt(255 * 255 * 3)
-
-// 두 색상의 유사도 점수 계산 (0~100, 가까울수록 높은 점수, 유클리드 거리 기반)
-export const colorSimilarityScore = (hex1, hex2) => {
-  const distance = colorDistance(hex1, hex2)
-  return Math.max(0, Math.round(100 - (distance / MAX_EUCLIDEAN_DISTANCE) * 100))
-}
-
-// 아이템 색상과 행운색 배열 간의 최대 유사도 점수 계산 (유클리드 거리 기반)
-export const getColorMatchScore = (itemColors, luckyColorNames) => {
-  if (!itemColors || itemColors.length === 0) return 0
-  if (!luckyColorNames || luckyColorNames.length === 0) return 0
-
-  // 행운색 이름을 HEX로 변환
-  const luckyColorHexes = luckyColorNames.map(name => colorMap[name] || '#808080')
-
-  // 아이템 각 색상과 행운색들 간의 최소 유클리드 거리 계산
-  let minDistance = MAX_EUCLIDEAN_DISTANCE
-  for (const itemColor of itemColors) {
-    const itemHex = itemColor.hex || '#808080'
-    for (const luckyHex of luckyColorHexes) {
-      const distance = colorDistance(itemHex, luckyHex)
-      if (distance < minDistance) {
-        minDistance = distance
-      }
-    }
-  }
-
-  // 거리를 점수로 변환 (0~100)
-  return Math.max(0, Math.round(100 - (minDistance / MAX_EUCLIDEAN_DISTANCE) * 100))
 }

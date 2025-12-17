@@ -247,7 +247,14 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
 import { colorMap, getTextColor } from '@/utils/colors'
-import { getMaxSimilarityWithLuckyItems, similarityToScore } from '@/utils/itemSimilarity'
+import { calculateLuckScore as calcLuckScoreUtil, getScoreMessage, generateMatchDescription } from '@/utils/luckScore'
+import {
+  findBestLuckyItem,
+  hasNoGoodItem,
+  getAnalysisErrorMessage,
+  validateImageFile,
+  formatItemDate as formatDate
+} from '@/utils/itemAnalysis'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -300,119 +307,27 @@ const canSaveItem = computed(() => {
          authStore.isAuthenticated
 })
 
-// 내 아이템 중 행운 점수가 가장 높은 아이템 추천 (현재 분석 중인 아이템 제외)
+// 행운 아이템 목록 가져오기 헬퍼
+const getLuckyItemList = () => [
+  luckyItems.value.main,
+  luckyItems.value.zodiac,
+  luckyItems.value.special
+].filter(Boolean)
+
+// 내 아이템 중 행운 점수가 가장 높은 아이템 추천
 const recommendedItem = computed(() => {
   if (luckScore.value >= 70) return null
-  if (!userItems.value.length) return null
-  if (!luckyColorsWithHex.value.length) return null
-
-  let bestItem = null
-  let bestScore = 0
-
-  // 행운 아이템 목록
-  const luckyItemList = [
-    luckyItems.value.main,
-    luckyItems.value.zodiac,
-    luckyItems.value.special
-  ].filter(Boolean)
-
-  for (const otherItem of userItems.value) {
-    // 현재 분석 중인 아이템과 같은 아이템은 제외
-    if (detectedItem.value && otherItem.item_name === detectedItem.value) continue
-    if (!otherItem.dominant_colors?.length) continue
-
-    // 1. 색상 점수 계산 (0-40점)
-    let maxColorScore = 0
-    for (const itemColor of otherItem.dominant_colors) {
-      const itemHex = itemColor.hex || '#808080'
-      const itemRgb = hexToRgb(itemHex)
-
-      for (const luckyColor of luckyColorsWithHex.value) {
-        const luckyRgb = hexToRgb(luckyColor.hex)
-        const distance = euclideanDistance(itemRgb, luckyRgb)
-        const colorScore = distanceToScore(distance)
-        if (colorScore > maxColorScore) maxColorScore = colorScore
-      }
-    }
-    const finalColorScore = Math.round(maxColorScore * 0.4)
-
-    // 2. 아이템 유사도 점수 계산 (0-40점)
-    const aiAnalysis = otherItem.ai_analysis || {}
-    const aiItemName = aiAnalysis.item_name || otherItem.item_name
-    const { similarity } = getMaxSimilarityWithLuckyItems(aiItemName, luckyItemList)
-    const itemScoreRaw = similarityToScore(similarity)
-    const finalItemScore = Math.round(itemScoreRaw * 0.4)
-
-    // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
-    const totalScore = 20 + finalItemScore + finalColorScore
-
-    if (totalScore > bestScore) {
-      bestScore = totalScore
-      bestItem = otherItem
-    }
-  }
-
-  // 80점 이상인 아이템만 추천
-  if (bestScore < 80) return null
-  return bestItem
+  const luckyColorNames = luckyColorsWithHex.value.map(c => c.name)
+  return findBestLuckyItem(userItems.value, luckyColorNames, getLuckyItemList(), detectedItem.value)
 })
 
-// 추천할 좋은 아이템이 없는 경우 (모든 아이템이 80점 미만)
+// 추천할 좋은 아이템이 없는 경우
 const noGoodItemAvailable = computed(() => {
   if (luckScore.value >= 70) return false
-  if (!luckyColorsWithHex.value.length) return false
-
-  // 아이템이 없거나, 있어도 80점 이상인 게 없으면 true
-  if (!userItems.value.length) return true
-
-  // 행운 아이템 목록
-  const luckyItemList = [
-    luckyItems.value.main,
-    luckyItems.value.zodiac,
-    luckyItems.value.special
-  ].filter(Boolean)
-
-  for (const otherItem of userItems.value) {
-    // 현재 분석 중인 아이템과 같은 아이템은 제외
-    if (detectedItem.value && otherItem.item_name === detectedItem.value) continue
-    if (!otherItem.dominant_colors?.length) continue
-
-    // 1. 색상 점수 계산 (0-40점)
-    let maxColorScore = 0
-    for (const itemColor of otherItem.dominant_colors) {
-      const itemHex = itemColor.hex || '#808080'
-      const itemRgb = hexToRgb(itemHex)
-
-      for (const luckyColor of luckyColorsWithHex.value) {
-        const luckyRgb = hexToRgb(luckyColor.hex)
-        const distance = euclideanDistance(itemRgb, luckyRgb)
-        const colorScore = distanceToScore(distance)
-        if (colorScore > maxColorScore) maxColorScore = colorScore
-      }
-    }
-    const finalColorScore = Math.round(maxColorScore * 0.4)
-
-    // 2. 아이템 유사도 점수 계산 (0-40점)
-    const aiAnalysis = otherItem.ai_analysis || {}
-    const aiItemName = aiAnalysis.item_name || otherItem.item_name
-    const { similarity } = getMaxSimilarityWithLuckyItems(aiItemName, luckyItemList)
-    const itemScoreRaw = similarityToScore(similarity)
-    const finalItemScore = Math.round(itemScoreRaw * 0.4)
-
-    // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
-    const totalScore = 20 + finalItemScore + finalColorScore
-
-    if (totalScore >= 80) return false
-  }
-
-  return true
+  const luckyColorNames = luckyColorsWithHex.value.map(c => c.name)
+  return hasNoGoodItem(userItems.value, luckyColorNames, getLuckyItemList(), detectedItem.value)
 })
 
-
-const formatDate = (dateString) => {
-  const date = new Date(dateString)
-  return `${date.getFullYear()}.${String(date.getMonth() + 1).padStart(2, '0')}.${String(date.getDate()).padStart(2, '0')}`
-}
 
 const triggerCameraInput = () => {
   cameraInput.value.click()
@@ -438,13 +353,9 @@ const handleDrop = (event) => {
 }
 
 const handleFile = (file) => {
-  if (!file.type.startsWith('image/')) {
-    showToast('이미지 파일만 업로드 가능합니다.', 'error')
-    return
-  }
-
-  if (file.size > 10 * 1024 * 1024) {
-    showToast('파일 크기는 10MB 이하여야 합니다.', 'error')
+  const validation = validateImageFile(file)
+  if (!validation.valid) {
+    showToast(validation.error, 'error')
     return
   }
 
@@ -518,40 +429,7 @@ const analyzeItem = async (file, imageData) => {
     }
   } catch (error) {
     console.error('분석 실패:', error)
-    console.error('에러 상세:', {
-      message: error.message,
-      code: error.code,
-      response: error.response,
-      request: error.request ? 'exists' : 'none'
-    })
-
-    // 에러 타입에 따른 구체적인 메시지
-    let errorMessage = '분석 중 오류가 발생했습니다.'
-
-    if (error.response) {
-      const status = error.response.status
-      if (status === 413) {
-        errorMessage = '파일 용량이 너무 큽니다. 최대 10MB까지 업로드 가능합니다.'
-      } else if (status === 503) {
-        // API 할당량 초과
-        errorMessage = error.response.data?.message || 'AI 분석 서비스가 일시적으로 제한되었습니다. 잠시 후 다시 시도해주세요.'
-      } else if (status === 400) {
-        errorMessage = error.response.data?.message || '잘못된 요청입니다.'
-      } else if (status === 500) {
-        errorMessage = '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
-      } else {
-        errorMessage = `서버 오류 (${status})`
-      }
-    } else if (error.code === 'ECONNABORTED' || error.message?.includes('timeout')) {
-      errorMessage = '요청 시간이 초과되었습니다. 다시 시도해주세요.'
-    } else if (error.code === 'ERR_NETWORK' || error.message?.includes('Network Error')) {
-      // 413 에러가 Network Error로 올 수 있음 (nginx가 본문 없이 응답할 때)
-      errorMessage = '파일 업로드에 실패했습니다. 파일 크기를 확인해주세요. (최대 10MB)'
-    } else if (error.request) {
-      errorMessage = '서버 응답이 없습니다. 잠시 후 다시 시도해주세요.'
-    }
-
-    showToast(errorMessage, 'error')
+    showToast(getAnalysisErrorMessage(error), 'error')
     resetUpload()
   }
 }
@@ -587,115 +465,11 @@ const selectExistingItem = (item) => {
   }
 }
 
-// 행운 점수 계산 (기본 20점 + 아이템 유사도 40점 만점 + 색상 40점 만점)
-// FastText(cc.ko.300) 기반 의미적 유사도 사용
-const calculateLuckScore = (item, color, itemColors) => {
-  // 1. 색상 점수 계산 (0-40점)
+// 행운 점수 계산 (유틸리티 래퍼 - 로컬 상태 활용)
+const calculateLuckScore = (itemName, _color, itemColors) => {
   const luckyColorNames = luckyColorsWithHex.value.map(c => c.name)
-  const colorResult = calculateColorMatchScore(itemColors || detectedColors.value, luckyColorNames)
-  const colorScore = Math.round(colorResult.score * 0.4) // 100점 만점을 40점 만점으로 변환
-
-  // 2. 아이템 유사도 계산 (0-40점) - FastText 기반 코사인 유사도
-  const luckyItemList = [
-    luckyItems.value.main,
-    luckyItems.value.zodiac,
-    luckyItems.value.special
-  ].filter(Boolean)
-
-  const { similarity } = getMaxSimilarityWithLuckyItems(item, luckyItemList)
-  const itemScoreRaw = similarityToScore(similarity) // 0-100점
-  const itemScore = Math.round(itemScoreRaw * 0.4) // 40점 만점으로 변환
-
-  // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
-  const baseScore = 20
-  const finalScore = baseScore + itemScore + colorScore
-
-  return {
-    score: Math.min(100, finalScore),
-    matchedColor: colorResult.matchedColor,
-    bestItemHex: colorResult.bestItemHex,
-    itemSimilarity: similarity
-  }
-}
-
-// HEX를 RGB로 변환
-const hexToRgb = (hex) => {
-  if (!hex) return { r: 128, g: 128, b: 128 }
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
-  return result ? {
-    r: parseInt(result[1], 16),
-    g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
-  } : { r: 128, g: 128, b: 128 }
-}
-
-// 유클리드 거리 계산 (0 ~ 441.67 범위, sqrt(255^2 * 3))
-const euclideanDistance = (rgb1, rgb2) => {
-  return Math.sqrt(
-    Math.pow(rgb1.r - rgb2.r, 2) +
-    Math.pow(rgb1.g - rgb2.g, 2) +
-    Math.pow(rgb1.b - rgb2.b, 2)
-  )
-}
-
-// 유클리드 거리를 0-100 점수로 변환 - 더 엄격한 비선형 계산
-const distanceToScore = (distance) => {
-  const maxDistance = Math.sqrt(255 * 255 * 3) // ~441.67
-
-  // 거리 임계값 설정 (더 엄격하게)
-  // 거리 0-50: 90-100점 (거의 같은 색)
-  // 거리 50-100: 70-90점 (비슷한 색)
-  // 거리 100-150: 50-70점 (약간 다른 색)
-  // 거리 150-200: 30-50점 (다른 색)
-  // 거리 200+: 0-30점 (완전히 다른 색)
-
-  if (distance <= 50) {
-    return Math.round(90 + (50 - distance) / 50 * 10)
-  } else if (distance <= 100) {
-    return Math.round(70 + (100 - distance) / 50 * 20)
-  } else if (distance <= 150) {
-    return Math.round(50 + (150 - distance) / 50 * 20)
-  } else if (distance <= 200) {
-    return Math.round(30 + (200 - distance) / 50 * 20)
-  } else {
-    return Math.round(Math.max(0, 30 - (distance - 200) / (maxDistance - 200) * 30))
-  }
-}
-
-// 아이템의 모든 색상과 행운색들 간의 최대 유사도 점수 계산 (유클리드 거리 기반)
-const calculateColorMatchScore = (itemColors, luckyColorNames) => {
-  if (!itemColors || itemColors.length === 0) return { score: 0, matchedColor: null, bestItemHex: null }
-  if (!luckyColorNames || luckyColorNames.length === 0) return { score: 0, matchedColor: null, bestItemHex: null }
-
-  // 행운색 이름을 HEX로 변환
-  const luckyColorHexes = luckyColorNames.map(name => ({
-    name,
-    hex: colorMap[name] || '#808080'
-  }))
-
-  let maxScore = 0
-  let matchedColor = null
-  let bestItemHex = null
-
-  // 아이템 각 색상과 행운색들 간의 유클리드 거리 계산
-  for (const itemColor of itemColors) {
-    const itemHex = itemColor.hex || '#808080'
-    const itemRgb = hexToRgb(itemHex)
-
-    for (const luckyColor of luckyColorHexes) {
-      const luckyRgb = hexToRgb(luckyColor.hex)
-      const distance = euclideanDistance(itemRgb, luckyRgb)
-      const score = distanceToScore(distance)
-
-      if (score > maxScore) {
-        maxScore = score
-        matchedColor = luckyColor.name
-        bestItemHex = itemHex
-      }
-    }
-  }
-
-  return { score: maxScore, matchedColor, bestItemHex }
+  const luckyItemList = getLuckyItemList()
+  return calcLuckScoreUtil(itemName, itemColors || detectedColors.value, luckyColorNames, luckyItemList)
 }
 
 const animateLuckScore = (targetScore) => {
@@ -711,39 +485,16 @@ const animateLuckScore = (targetScore) => {
   }, 20)
 }
 
-// 매치 설명 업데이트 (점수 구간별 세분화)
-const updateMatchDescription = (score, item, matchedColor) => {
+// 매치 설명 업데이트 (유틸리티 사용)
+const updateMatchDescription = (score, itemName, matchedColor) => {
   // 매칭된 행운색으로 "오늘의 행운색" 원 업데이트
   if (matchedColor && colorMap[matchedColor]) {
     luckyColor.value = colorMap[matchedColor]
   }
 
-  // matchedColor는 실제로 행운색과 매칭된 경우에만 값이 있음
-  const colorText = matchedColor ? `${matchedColor} 색상이 ` : ''
-
-  // 더 엄격한 기준
-  if (score >= 95) {
-    matchTitle.value = '🎉 완벽한 매치!'
-    matchDescription.value = `${item}이(가) 오늘의 행운 아이템과 완벽하게 일치합니다! 최고의 행운이 함께할 것입니다.`
-  } else if (score >= 90) {
-    matchTitle.value = '✨ 훌륭한 매치!'
-    matchDescription.value = `${item}이(가) 오늘의 행운과 잘 어울립니다. ${colorText}행운을 더해줄 것입니다.`
-  } else if (score >= 80) {
-    matchTitle.value = '👍 좋은 매치'
-    matchDescription.value = `${item}이(가) 오늘의 운세와 어울립니다. 긍정적인 에너지를 느낄 수 있을 거예요.`
-  } else if (score >= 70) {
-    matchTitle.value = '🙂 나쁘지 않은 선택'
-    matchDescription.value = `${item}은(는) 괜찮은 선택입니다. ${colorText ? colorText + '도움이 됩니다.' : ''}`
-  } else if (score >= 60) {
-    matchTitle.value = '😐 무난한 선택'
-    matchDescription.value = `${item}은(는) 평범한 선택입니다. 행운 아이템인 '${luckyItems.value.main || '추천 아이템'}'을 활용해보세요.`
-  } else if (score >= 50) {
-    matchTitle.value = '🤔 아쉬운 매치'
-    matchDescription.value = `오늘의 행운 아이템과는 거리가 있네요. '${luckyItems.value.main || '추천 아이템'}'이나 '${luckyItems.value.zodiac || '다른 아이템'}'을 고려해보세요.`
-  } else {
-    matchTitle.value = '💫 다른 아이템을 추천드려요'
-    matchDescription.value = `이 아이템보다는 오늘의 행운 아이템 '${luckyItems.value.main || '추천 아이템'}'을 사용해보시는 건 어떨까요?`
-  }
+  const msg = getScoreMessage(score)
+  matchTitle.value = msg.title
+  matchDescription.value = generateMatchDescription(score, itemName, matchedColor, luckyItems.value.main || '추천 아이템')
 }
 
 const resetUpload = () => {
