@@ -214,25 +214,11 @@ class FortuneCalculator:
         )
 
         if fortune_texts:
-            # LLM이 점수도 함께 반환한 경우, 그 점수를 사용 (텍스트와 점수 일치)
+            # LLM 응답의 scores 무시 - 자체 계산한 점수 사용
+            # (LLM이 프롬프트의 예시 점수를 복사하는 문제 방지)
             if 'scores' in fortune_texts:
-                llm_scores = fortune_texts['scores']
-                fortune_scores = {
-                    'total': llm_scores.get('total', fortune_scores['total']),
-                    'money': llm_scores.get('money', fortune_scores['money']),
-                    'love': llm_scores.get('love', fortune_scores['love']),
-                    'study': llm_scores.get('study', fortune_scores['study']),
-                    'work': llm_scores.get('work', fortune_scores['work']),
-                    'health': llm_scores.get('health', fortune_scores['health'])
-                }
-                print(f"[DEBUG] LLM 점수 사용: {fortune_scores}")
-
-                # LLM 점수 기반으로 lucky_item 재계산 (낮은 운세 2개가 바뀔 수 있음)
-                lucky_item = self._determine_lucky_item(
-                    zodiac_sign, today, user_id, session_key, lucky_colors,
-                    fortune_score=fortune_scores['total'],
-                    fortune_scores=fortune_scores
-                )
+                del fortune_texts['scores']
+            print(f"[DEBUG] 자체 계산 점수 사용: {fortune_scores}")
 
             # LLM lucky_item 설명 사용 안함 - 하드코딩된 설명 사용
             # LLM이 아이템 이름을 제대로 반영하지 않아서 비활성화
@@ -372,7 +358,6 @@ class FortuneCalculator:
     "study": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
     "work": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
     "health": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "scores": {{"total": {scores.get('total', 75) if scores else 75}, "money": {scores.get('money', 75) if scores else 75}, "love": {scores.get('love', 75) if scores else 75}, "study": {scores.get('study', 75) if scores else 75}, "work": {scores.get('work', 75) if scores else 75}, "health": {scores.get('health', 75) if scores else 75}}},
     "lucky_item": {{"description": "...", "zodiac_description": "..."}}
 }}"""
 
@@ -422,7 +407,6 @@ class FortuneCalculator:
     "study": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
     "work": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
     "health": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "scores": {{"total": {scores.get('total', 75) if scores else 75}, "money": {scores.get('money', 75) if scores else 75}, "love": {scores.get('love', 75) if scores else 75}, "study": {scores.get('study', 75) if scores else 75}, "work": {scores.get('work', 75) if scores else 75}, "health": {scores.get('health', 75) if scores else 75}}},
     "lucky_item": {{"description": "...", "zodiac_description": "..."}}
 }}"""
 
@@ -465,7 +449,6 @@ class FortuneCalculator:
     "study": "학업운 내용 5문장...",
     "work": "직장운 내용 5문장...",
     "health": "건강운 내용 5문장...",
-    "scores": {{"total": {scores.get('total', 75) if scores else 75}, "money": {scores.get('money', 75) if scores else 75}, "love": {scores.get('love', 75) if scores else 75}, "study": {scores.get('study', 75) if scores else 75}, "work": {scores.get('work', 75) if scores else 75}, "health": {scores.get('health', 75) if scores else 75}}},
     "lucky_item": {{"description": "...", "zodiac_description": "..."}}
 }}"""
 
@@ -487,8 +470,8 @@ class FortuneCalculator:
         """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
         import time
 
-        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v5: 실제 점수 기반)
-        cache_key = f"fortune_text_v5_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
+        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v6: scores 필드 제거)
+        cache_key = f"fortune_text_v6_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
         cached_result = cache.get(cache_key)
 
         if cached_result:
