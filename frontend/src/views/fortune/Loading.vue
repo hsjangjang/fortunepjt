@@ -139,22 +139,16 @@ async function calculateFortune() {
 
       console.log('[FortuneLoading] 일일 운세 저장 완료:', today)
 
-      // 계산 완료 - 원래 가려던 페이지 또는 결과 페이지로 이동
+      // 주간/월간 운세도 생성 (일간 완료 후)
+      await generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
+
+      // 일간/주간/월간 3개 모두 완료 후 리다이렉트
       if (textInterval) clearInterval(textInterval)
       currentText.value = '완료! 결과 페이지로 이동합니다...'
 
-      // redirect 쿼리가 있으면 해당 페이지로, 없으면 fortune/today로
       const redirectPath = route.query.redirect || '/fortune/today'
-      console.log('[FortuneLoading] 리다이렉트 시작:', redirectPath)
-
-      // 주간/월간 운세는 리다이렉트 이후 백그라운드에서 생성 (setTimeout으로 완전히 분리)
-      setTimeout(() => {
-        generateWeeklyAndMonthlyFortunes(formDataForWeeklyMonthly)
-      }, 100)
-
-      // 즉시 리다이렉트
+      console.log('[FortuneLoading] 일간/주간/월간 모두 완료, 리다이렉트:', redirectPath)
       router.replace(redirectPath)
-      console.log('[FortuneLoading] 리다이렉트 완료')
     } else {
       // 에러 발생
       let errorMsg = data.error || '운세 계산 중 오류가 발생했습니다.'

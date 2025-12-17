@@ -878,9 +878,9 @@ onMounted(async () => {
 
     // daily인 경우에만 Store 캐시 사용 (weekly/monthly는 항상 API 호출)
     if (currentPeriod === 'daily') {
-      // 1. 비로그인 사용자: Fortune Store에 이미 데이터가 있으면 사용
-      if (!authStore.isAuthenticated && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
-        console.log('[Today] Fortune Store에서 운세 로드 (비로그인)')
+      // 1. Fortune Store에 오늘 날짜 데이터가 있으면 먼저 사용 (로그인/비로그인 모두)
+      if (fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
+        console.log('[Today] Fortune Store에서 운세 로드')
         fortune.value = fortuneStore.fortuneData
         setupFortuneUI()
         // Store에 데이터가 있으면 API 호출 생략 (return으로 조기 종료)
@@ -888,7 +888,7 @@ onMounted(async () => {
         return
       }
 
-      // 2. 로그인 사용자 또는 Store에 데이터 없음: API 호출
+      // 2. Store에 데이터 없음: API 호출
       console.log('[Today] API에서 운세 로드')
       const response = await apiClient.get('/api/fortune/today/')
 

@@ -446,8 +446,8 @@ class FortuneCalculator:
         """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
         import time
 
-        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v7: 점수 정보 제거)
-        cache_key = f"fortune_text_v7_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
+        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v8: 점수 정보 완전 제거)
+        cache_key = f"fortune_text_v8_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
         cached_result = cache.get(cache_key)
 
         if cached_result:

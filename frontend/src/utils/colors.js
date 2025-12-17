@@ -50,8 +50,29 @@ export const colorMap = {
   // 은색
   '은색': '#C0C0C0', '은': '#C0C0C0', '실버': '#C0C0C0',
 
-  // 기타
-  '다양': '#8B5CF6'
+  // 기타 (다양 = 무지개 그라데이션용 플래그)
+  '다양': 'rainbow'
+}
+
+// 무지개 그라데이션 CSS
+export const RAINBOW_GRADIENT = 'linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF)'
+
+// 색상이 '다양'(무지개)인지 확인
+export const isRainbowColor = (colorName) => {
+  return colorName === '다양' || colorMap[colorName] === 'rainbow'
+}
+
+// 색상 배경 스타일 반환 (다양이면 무지개 그라데이션)
+export const getColorBackground = (colorNameOrHex) => {
+  if (isRainbowColor(colorNameOrHex)) {
+    return RAINBOW_GRADIENT
+  }
+  // HEX 값이면 그대로 반환
+  if (colorNameOrHex?.startsWith('#')) {
+    return colorNameOrHex
+  }
+  // 색상 이름이면 HEX로 변환
+  return colorMap[colorNameOrHex] || '#808080'
 }
 
 // 색상 이름으로 HEX 값 가져오기
