@@ -167,6 +167,12 @@ class WeeklyFortuneCache(models.Model):
         blank=True,
         db_index=True
     )
+    gender = models.CharField(
+        max_length=10,
+        verbose_name='성별',
+        blank=True,
+        default=''
+    )
 
     # 전체 운세 데이터 (JSON)
     full_fortune_data = models.TextField(
@@ -213,6 +219,12 @@ class MonthlyFortuneCache(models.Model):
         null=True,
         blank=True,
         db_index=True
+    )
+    gender = models.CharField(
+        max_length=10,
+        verbose_name='성별',
+        blank=True,
+        default=''
     )
 
     # 전체 운세 데이터 (JSON)

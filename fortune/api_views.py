@@ -22,7 +22,7 @@ def get_current_month():
     return today.year, today.month
 
 
-def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date=None):
+def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date=None, gender=''):
     """주간 운세 데이터베이스에 저장"""
     try:
         if user and user.is_authenticated:
@@ -35,13 +35,54 @@ def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth
             return False
 
         cache.birth_date = birth_date
+        cache.gender = gender or ''
         cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
         cache.save()
-        print(f"[Weekly Cache] 저장 완료: user={user}, year={year}, week={week}")
+        print(f"[Weekly Cache] 저장 완료: user={user}, year={year}, week={week}, birth={birth_date}, gender={gender}")
         return True
     except Exception as e:
         print(f"[Weekly Cache] 저장 실패: {e}")
         return False
+
+
+def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
+    """동일 조건(생년월일+성별+주차)의 주간 운세 캐시 찾기"""
+    try:
+        cache = WeeklyFortuneCache.objects.filter(
+            year=year,
+            week_number=week,
+            birth_date=birth_date,
+            gender=gender or ''
+        ).order_by('created_at').first()
+
+        if cache and cache.full_fortune_data:
+            fortune_data = json.loads(cache.full_fortune_data)
+            print(f"[Weekly Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, week={week}")
+            return fortune_data
+        return None
+    except Exception as e:
+        print(f"[Weekly Cache] 동일 조건 조회 실패: {e}")
+        return None
+
+
+def find_same_condition_monthly_fortune(year, month, birth_date, gender=''):
+    """동일 조건(생년월일+성별+월)의 월간 운세 캐시 찾기"""
+    try:
+        cache = MonthlyFortuneCache.objects.filter(
+            year=year,
+            month=month,
+            birth_date=birth_date,
+            gender=gender or ''
+        ).order_by('created_at').first()
+
+        if cache and cache.full_fortune_data:
+            fortune_data = json.loads(cache.full_fortune_data)
+            print(f"[Monthly Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, month={month}")
+            return fortune_data
+        return None
+    except Exception as e:
+        print(f"[Monthly Cache] 동일 조건 조회 실패: {e}")
+        return None
 
 
 def load_weekly_fortune_from_db(user, session_key, year, week):
@@ -64,7 +105,7 @@ def load_weekly_fortune_from_db(user, session_key, year, week):
         return None
 
 
-def save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date=None):
+def save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date=None, gender=''):
     """월간 운세 데이터베이스에 저장"""
     try:
         if user and user.is_authenticated:
@@ -77,9 +118,10 @@ def save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, bir
             return False
 
         cache.birth_date = birth_date
+        cache.gender = gender or ''
         cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
         cache.save()
-        print(f"[Monthly Cache] 저장 완료: user={user}, year={year}, month={month}")
+        print(f"[Monthly Cache] 저장 완료: user={user}, year={year}, month={month}, birth={birth_date}, gender={gender}")
         return True
     except Exception as e:
         print(f"[Monthly Cache] 저장 실패: {e}")
@@ -620,11 +662,15 @@ class WeeklyFortuneAPIView(APIView):
             if isinstance(birth_date, str):
                 birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
 
-        # 이미 캐시가 있는지 확인
+        # 1. 본인 캐시 확인 (user/session 기반)
         fortune_data = load_weekly_fortune_from_db(user, session_key, year, week)
 
         if not fortune_data:
-            # 주간 운세 계산 (주간용 시드 사용 + 주간용 프롬프트)
+            # 2. 동일 조건 캐시 확인 (생년월일+성별+주차)
+            fortune_data = find_same_condition_weekly_fortune(year, week, birth_date, gender)
+
+        if not fortune_data:
+            # 3. 캐시 없음 - 새로 생성
             calculator = FortuneCalculator()
             fortune_data = calculator.calculate_fortune(
                 birth_date=birth_date,
@@ -642,8 +688,8 @@ class WeeklyFortuneAPIView(APIView):
             fortune_data['period_type'] = 'weekly'
             fortune_data['period_label'] = f'{year}년 {week}주차'
 
-            # DB에 저장
-            save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date)
+        # DB에 저장 (본인 캐시 생성/갱신 - 동일 조건에서 가져온 경우도 본인 캐시로 저장)
+        save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date, gender)
 
         return Response({
             'success': True,
@@ -739,11 +785,15 @@ class MonthlyFortuneAPIView(APIView):
             if isinstance(birth_date, str):
                 birth_date = datetime.strptime(birth_date, '%Y-%m-%d').date()
 
-        # 이미 캐시가 있는지 확인
+        # 1. 본인 캐시 확인 (user/session 기반)
         fortune_data = load_monthly_fortune_from_db(user, session_key, year, month)
 
         if not fortune_data:
-            # 월간 운세 계산 (월간용 시드 사용 + 월간용 프롬프트)
+            # 2. 동일 조건 캐시 확인 (생년월일+성별+월)
+            fortune_data = find_same_condition_monthly_fortune(year, month, birth_date, gender)
+
+        if not fortune_data:
+            # 3. 캐시 없음 - 새로 생성
             calculator = FortuneCalculator()
             fortune_data = calculator.calculate_fortune(
                 birth_date=birth_date,
@@ -761,8 +811,8 @@ class MonthlyFortuneAPIView(APIView):
             fortune_data['period_type'] = 'monthly'
             fortune_data['period_label'] = f'{year}년 {month}월'
 
-            # DB에 저장
-            save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date)
+        # DB에 저장 (본인 캐시 생성/갱신 - 동일 조건에서 가져온 경우도 본인 캐시로 저장)
+        save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date, gender)
 
         return Response({
             'success': True,
