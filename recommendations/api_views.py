@@ -159,6 +159,8 @@ def get_fortune_data_for_user(user):
         gender=user.gender,
         birth_time=getattr(user, 'birth_time', None),
         chinese_name=getattr(user, 'chinese_name', None),
+        mbti=getattr(user, 'mbti', None),
+        personal_color=getattr(user, 'personal_color', None),
         calendar_type=getattr(user, 'calendar_type', 'solar'),
         user_id=user.id,
         session_key=None

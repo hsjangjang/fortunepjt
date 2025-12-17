@@ -181,8 +181,8 @@
             </div>
       </div>
 
-      <!-- Lucky Colors Section -->
-      <div v-if="fortune" class="card-base card-lg section-spacing">
+      <!-- Lucky Colors Section (일간 운세에서만 표시) -->
+      <div v-if="fortune && selectedPeriod === 'daily'" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
@@ -215,8 +215,8 @@
               </p>
       </div>
 
-      <!-- Lucky Item Section -->
-      <div v-if="fortune" class="card-base card-lg section-spacing">
+      <!-- Lucky Item Section (일간 운세에서만 표시) -->
+      <div v-if="fortune && selectedPeriod === 'daily'" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
@@ -227,7 +227,7 @@
                 <div class="col-6">
                   <div class="lucky-item-card text-center p-4 h-100"
                        style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px; cursor: pointer;"
-                       @click="showMainItemDesc = !showMainItemDesc">
+                       @click.stop.prevent="showMainItemDesc = !showMainItemDesc">
                     <div class="mb-2">
                       <span class="badge" style="background: #a78bfa; color: white;">운세 기반</span>
                     </div>
@@ -249,7 +249,7 @@
                 <div class="col-6">
                   <div class="lucky-item-card text-center p-4 h-100"
                        style="background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.3); border-radius: 15px; cursor: pointer;"
-                       @click="showZodiacItemDesc = !showZodiacItemDesc">
+                       @click.stop.prevent="showZodiacItemDesc = !showZodiacItemDesc">
                     <div class="mb-2">
                       <span class="badge" style="background: #a78bfa; color: white;">{{ fortune.zodiac_sign }} 추천</span>
                     </div>
@@ -282,8 +282,8 @@
               </div>
       </div>
 
-      <!-- Lucky Numbers Section (성인만 표시) -->
-      <div v-if="fortune && !isMinor" class="card-base card-lg section-spacing">
+      <!-- Lucky Numbers Section (일간 운세 + 성인만 표시) -->
+      <div v-if="fortune && selectedPeriod === 'daily' && !isMinor" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-4 lotto-title">
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호

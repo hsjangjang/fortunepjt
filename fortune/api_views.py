@@ -385,6 +385,7 @@ class FortuneCalculateAPIView(APIView):
                     birth_time=birth_time,
                     chinese_name=chinese_name,
                     mbti=serializer.validated_data.get('mbti'),
+                    personal_color=serializer.validated_data.get('personal_color'),
                     calendar_type=calendar_type,
                     user_id=user_id,
                     session_key=session_key
@@ -523,8 +524,9 @@ class GenerateFortuneAPIView(APIView):
                 gender=request.user.gender,
                 birth_time=birth_time,
                 chinese_name=chinese_name,
-                calendar_type=calendar_type,
                 mbti=getattr(request.user, 'mbti', None),
+                personal_color=getattr(request.user, 'personal_color', None),
+                calendar_type=calendar_type,
                 user_id=request.user.id,
                 session_key=session_key
             )
@@ -571,6 +573,8 @@ class ItemCheckAPIView(APIView):
             gender=request.user.gender,
             birth_time=getattr(request.user, 'birth_time', None),
             chinese_name=getattr(request.user, 'chinese_name', None),
+            mbti=getattr(request.user, 'mbti', None),
+            personal_color=getattr(request.user, 'personal_color', None),
             user_id=request.user.id,
             session_key=None
         )
@@ -643,7 +647,8 @@ class BasePeriodFortuneAPIView(APIView):
                 'gender': user.gender,
                 'birth_time': getattr(user, 'birth_time', None),
                 'chinese_name': getattr(user, 'chinese_name', None),
-                'mbti': getattr(user, 'mbti', None)
+                'mbti': getattr(user, 'mbti', None),
+                'personal_color': getattr(user, 'personal_color', None)
             }, None
 
         # 비로그인 사용자
@@ -661,7 +666,8 @@ class BasePeriodFortuneAPIView(APIView):
             'gender': gender,
             'birth_time': request.data.get('birth_time'),
             'chinese_name': request.data.get('chinese_name'),
-            'mbti': request.data.get('mbti')
+            'mbti': request.data.get('mbti'),
+            'personal_color': request.data.get('personal_color')
         }, None
 
     def get(self, request):
@@ -727,6 +733,7 @@ class BasePeriodFortuneAPIView(APIView):
                 birth_time=user_info['birth_time'],
                 chinese_name=user_info['chinese_name'],
                 mbti=user_info['mbti'],
+                personal_color=user_info['personal_color'],
                 user_id=user.id if user else None,
                 session_key=session_key,
                 fortune_seed=f"{self.period_type}_{year}_{period_value}",

@@ -1,5 +1,38 @@
 # 📋 업데이트 내역
 
+## v1.7.4 (25.12.18)
+
+### 장하선
+- Backend
+  - 스파게티 코드 리팩토링 (`fortune/constants/`, `fortune/services.py`)
+    - 색상, 아이템, 템플릿 상수를 별도 모듈로 분리 (colors.py, items.py, templates.py)
+    - 중복 코드 제거 및 유틸리티 함수 통합
+  - 점수별 톤 가이드 추가 (`fortune/services.py`)
+    - `_get_tone_for_score()`: 점수 구간별 톤 설명 반환 (매우 긍정적/긍정적/보통/다소 부정적/부정적)
+    - `_build_score_tone_guide()`: LLM 프롬프트용 점수 정보 및 톤 가이드 생성
+    - 운세 텍스트가 점수와 일관되게 생성되도록 개선 (55점에 긍정적 멘트 방지)
+  - MBTI별 톤 가이드 추가 (`fortune/services.py`)
+    - `_get_mbti_tone_guide()`: 16가지 MBTI 유형별 맞춤 스타일 가이드
+    - 분석가형(NT), 외교관형(NF), 관리자형(SJ), 탐험가형(SP) 그룹별 특성 반영
+    - LLM 프롬프트에 MBTI 맞춤 스타일 안내 추가
+  - 퍼스널컬러 기반 행운색 로직 추가 (`fortune/constants/colors.py`, `fortune/services.py`)
+    - `PERSONAL_COLOR_PALETTES`: 봄웜/여름쿨/가을웜/겨울쿨 유형별 어울리는 색상 풀
+    - `PERSONAL_COLOR_AVOID`: 유형별 피해야 할 색상 목록
+    - `_determine_lucky_colors()`: 퍼스널컬러 우선순위 적용 및 부적합 색상 필터링
+  - `calculate_fortune()` 함수에 `personal_color` 파라미터 추가 (`fortune/services.py`)
+  - API Views personal_color 전달 추가 (`fortune/api_views.py`, `recommendations/api_views.py`)
+    - 일간/주간/월간 운세 생성 시 퍼스널컬러 정보 전달
+    - 아이템 체크, 추천 API에도 퍼스널컬러 적용
+  - 캐시 키 버전 v10 → v11 변경 (MBTI/퍼스널컬러 반영)
+- Frontend
+  - 주간/월간 운세에서 일간 전용 섹션 숨김 처리 (`Fortune.vue`)
+    - 행운색, 행운아이템, 로또번호 섹션을 일간 운세에서만 표시
+    - `selectedPeriod === 'daily'` 조건 추가
+  - 행운 아이템 클릭 시 스크롤 버그 수정 (`Fortune.vue`)
+    - `@click.stop.prevent` 이벤트 수식어 추가
+
+---
+
 ## v1.7.3 (25.12.17)
 
 ### 장하선

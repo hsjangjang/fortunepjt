@@ -14,7 +14,7 @@ from .lunar_converter import lunar_to_solar
 from .constants import (
     COLOR_NAMES, NAME_TO_HEX, STAR_SIGN_COLORS, CHINESE_ZODIAC_COLORS, ALL_COLORS,
     FORTUNE_NAMES, COMBO_TO_INDEX, HIGH_SCORE_ITEMS, MID_SCORE_ITEMS, LOW_SCORE_ITEMS,
-    ZODIAC_ITEMS, DEFAULT_ZODIAC_ITEM,
+    ZODIAC_ITEMS, DEFAULT_ZODIAC_ITEM, PERSONAL_COLOR_PALETTES, PERSONAL_COLOR_AVOID,
 )
 from .constants.templates import FORTUNE_TEMPLATES, PERIOD_TIME_EXPRESSIONS, ACTION_WORDS, PLACES
 
@@ -69,6 +69,7 @@ class FortuneCalculator:
         birth_time: Optional[datetime] = None,
         chinese_name: Optional[str] = None,
         mbti: Optional[str] = None,  # MBTI 추가
+        personal_color: Optional[str] = None,  # 퍼스널컬러 추가
         calendar_type: str = 'solar',  # 양력/음력 구분 (기본값: 양력)
         user_id: Optional[int] = None,  # 로그인 사용자 ID (로또 번호용)
         session_key: Optional[str] = None,  # 세션 키 (비로그인 사용자 로또 번호용)
@@ -119,9 +120,9 @@ class FortuneCalculator:
             # 양력은 입춘 기준
             chinese_zodiac = self._get_chinese_zodiac(birth_date)
         
-        # 행운의 색상들 결정 (별자리 + 띠 + 날짜 + 운세점수 기반)
+        # 행운의 색상들 결정 (별자리 + 띠 + 날짜 + 운세점수 + 퍼스널컬러 기반)
         lucky_colors = self._determine_lucky_colors(
-            zodiac_sign, chinese_zodiac, today, fortune_scores
+            zodiac_sign, chinese_zodiac, today, fortune_scores, personal_color
         )
 
         # 로또 번호 6개 생성 (user_id 또는 session_key 기반으로 사용자별 다른 번호)
@@ -174,6 +175,83 @@ class FortuneCalculator:
             'session_key': session_key,  # 비로그인 사용자 식별용
             'mbti': mbti  # 결과에 MBTI 포함
         }
+
+    def _get_tone_for_score(self, score: int) -> str:
+        """점수에 따른 톤 설명 반환"""
+        if score >= 85:
+            return "매우 긍정적 (대길, 최상의 운)"
+        elif score >= 70:
+            return "긍정적 (길, 좋은 운)"
+        elif score >= 55:
+            return "보통 (평범한 하루, 무난함)"
+        elif score >= 40:
+            return "다소 부정적 (주의 필요, 조심스러운 톤)"
+        else:
+            return "부정적 (흉, 어려움 예상, 위로와 조언)"
+
+    def _build_score_tone_guide(self, scores: Dict) -> str:
+        """점수 정보와 톤 가이드를 프롬프트용 문자열로 생성"""
+        if not scores:
+            return ""
+
+        score_names = {
+            'total': '종합운',
+            'money': '금전운',
+            'love': '애정운',
+            'study': '학업운',
+            'work': '직장운',
+            'health': '건강운'
+        }
+
+        lines = ["[각 운세 항목의 점수와 톤 가이드]"]
+        lines.append("아래 점수에 맞게 긍정/부정 톤을 조절하세요. 점수가 낮으면 주의사항과 조언 위주로, 높으면 희망적인 내용으로 작성하세요.")
+        lines.append("")
+
+        for key, name in score_names.items():
+            score = scores.get(key, 50)
+            tone = self._get_tone_for_score(score)
+            lines.append(f"- {name}: {score}점 → {tone}")
+
+        return "\n".join(lines)
+
+    def _get_mbti_tone_guide(self, mbti: Optional[str]) -> str:
+        """MBTI 유형에 따른 운세 톤/스타일 가이드 반환"""
+        if not mbti:
+            return ""
+
+        mbti = mbti.upper()
+
+        # MBTI 유형별 선호하는 운세 스타일
+        mbti_guides = {
+            # 분석가형 (NT)
+            'INTJ': "논리적이고 전략적인 조언 선호. 구체적인 행동 계획 제시. 감정적 표현보다 실용적 정보 위주.",
+            'INTP': "분석적이고 객관적인 설명 선호. '왜 그런지' 원인 설명 포함. 가능성과 대안 제시.",
+            'ENTJ': "목표 달성을 위한 명확한 방향성 제시. 리더십과 성취 관련 조언. 도전적인 톤.",
+            'ENTP': "새로운 가능성과 기회 강조. 창의적 접근법 제안. 유연하고 열린 톤.",
+
+            # 외교관형 (NF)
+            'INFJ': "의미와 목적을 강조하는 깊이 있는 조언. 내면의 성장과 통찰 관련. 따뜻하고 영감을 주는 톤.",
+            'INFP': "개인의 가치와 감정을 존중하는 표현. 이상과 꿈 관련 조언. 부드럽고 공감적인 톤.",
+            'ENFJ': "대인관계와 소통 관련 조언 강조. 타인을 돕고 영향을 주는 방법 제시. 따뜻하고 격려하는 톤.",
+            'ENFP': "열정과 가능성을 북돋는 표현. 새로운 경험과 만남 강조. 밝고 긍정적인 톤.",
+
+            # 관리자형 (SJ)
+            'ISTJ': "구체적이고 실용적인 조언. 계획과 준비의 중요성 강조. 신뢰할 수 있는 정보 위주.",
+            'ISFJ': "안정과 조화를 강조. 가까운 사람들과의 관계 조언. 따뜻하고 배려하는 톤.",
+            'ESTJ': "명확하고 직접적인 조언. 효율성과 책임감 강조. 실행 가능한 단계별 안내.",
+            'ESFJ': "인간관계와 조화 강조. 주변 사람들과의 교류 조언. 친근하고 지지하는 톤.",
+
+            # 탐험가형 (SP)
+            'ISTP': "실용적이고 간결한 조언. 문제 해결 방법 제시. 독립성과 자율성 존중.",
+            'ISFP': "현재의 순간과 경험 강조. 예술적/감각적 즐거움 조언. 부드럽고 자유로운 톤.",
+            'ESTP': "즉각적인 행동과 기회 포착 강조. 모험과 도전 관련 조언. 역동적이고 직접적인 톤.",
+            'ESFP': "즐거움과 사교적 활동 강조. 긍정적 에너지와 순간을 즐기는 조언. 밝고 유쾌한 톤.",
+        }
+
+        guide = mbti_guides.get(mbti, "")
+        if guide:
+            return f"\n[MBTI 맞춤 스타일 가이드 - {mbti}]\n{guide}\n"
+        return ""
 
     def _combine_period_fortune_text(self, result: Dict, period_type: str) -> Dict:
         """주간/월간 운세: 시간대별 개별 필드를 하나의 텍스트로 조합"""
@@ -235,10 +313,17 @@ class FortuneCalculator:
         lucky_item_name: str,
         zodiac_item_name: str,
         period_type: str = 'daily',
-        scores: Dict = None
+        scores: Dict = None,
+        mbti: str = None
     ) -> str:
         """기간 유형에 따른 운세 프롬프트 생성"""
         today = date.today()
+
+        # 점수별 톤 가이드 생성
+        score_guide = self._build_score_tone_guide(scores) if scores else ""
+
+        # MBTI별 톤 가이드 생성
+        mbti_guide = self._get_mbti_tone_guide(mbti) if mbti else ""
 
         # 기간별 설정
         if period_type == 'weekly':
@@ -252,10 +337,11 @@ class FortuneCalculator:
 - 별자리: {zodiac}
 - 띠: {chinese_zodiac}
 {mbti_info}
-{lucky_item_info}
 - 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시
 - 현재 날짜: {today}
 
+{score_guide}
+{mbti_guide}
 [중요 - 반드시 지켜야 할 JSON 구조]
 각 운세 항목(total, money, love, study, work, health)은 반드시 아래 5개 필드를 가진 객체여야 합니다:
 - "summary": 이번 주 전체 요약 (1문장)
@@ -266,10 +352,8 @@ class FortuneCalculator:
 
 [작성 가이드]
 1. 말투: "~합니다", "~입니다" 체의 정중한 문체
-2. 행운의 아이템:
-   - '{lucky_item_name}' 설명: 2문장
-   - '{zodiac_item_name}' 설명: 2문장
-3. 점수는 백엔드에서 계산하므로 텍스트만 작성하세요
+2. 점수에 맞는 톤으로 작성 (위 점수별 톤 가이드 참고)
+3. MBTI 스타일 가이드가 있으면 해당 유형에 맞는 톤으로 작성
 
 반드시 아래 JSON 구조로 출력하세요:
 """ + """{{
@@ -278,8 +362,7 @@ class FortuneCalculator:
     "love": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
     "study": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
     "work": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "health": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}},
-    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+    "health": {{"summary": "...", "early_week": "...", "late_week": "...", "weekend": "...", "advice": "..."}}
 }}"""
 
         elif period_type == 'monthly':
@@ -293,10 +376,11 @@ class FortuneCalculator:
 - 별자리: {zodiac}
 - 띠: {chinese_zodiac}
 {mbti_info}
-{lucky_item_info}
 - 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시
 - 현재 날짜: {today}
 
+{score_guide}
+{mbti_guide}
 [중요 - 반드시 지켜야 할 JSON 구조]
 각 운세 항목(total, money, love, study, work, health)은 반드시 아래 5개 필드를 가진 객체여야 합니다:
 - "summary": 이번 달 전체 요약 (1문장)
@@ -307,10 +391,8 @@ class FortuneCalculator:
 
 [작성 가이드]
 1. 말투: "~합니다", "~입니다" 체의 정중한 문체
-2. 행운의 아이템:
-   - '{lucky_item_name}' 설명: 2문장
-   - '{zodiac_item_name}' 설명: 2문장
-3. 점수는 백엔드에서 계산하므로 텍스트만 작성하세요
+2. 점수에 맞는 톤으로 작성 (위 점수별 톤 가이드 참고)
+3. MBTI 스타일 가이드가 있으면 해당 유형에 맞는 톤으로 작성
 
 반드시 아래 JSON 구조로 출력하세요:
 """ + """{{
@@ -319,8 +401,7 @@ class FortuneCalculator:
     "love": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
     "study": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
     "work": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "health": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}},
-    "lucky_item": {{"description": "...", "zodiac_description": "..."}}
+    "health": {{"summary": "...", "early_month": "...", "mid_month": "...", "late_month": "...", "advice": "..."}}
 }}"""
 
         else:  # daily
@@ -338,13 +419,16 @@ class FortuneCalculator:
 - 사주: {saju['year']}년 {saju['month']}월 {saju['day']}일 {saju['hour']}시
 - 현재 날짜: {today}
 
+{score_guide}
+{mbti_guide}
 [작성 가이드]
 1. 말투: "~합니다", "~입니다" 체의 정중한 문체
 2. 각 운세 항목당 5문장으로 작성 (오전/오후/저녁 시간대 활용)
-3. 행운의 아이템:
+3. 점수에 맞는 톤으로 작성 (위 점수별 톤 가이드 참고)
+4. MBTI 스타일 가이드가 있으면 해당 유형에 맞는 톤으로 작성
+5. 행운의 아이템:
    - '{lucky_item_name}' 설명: 2문장
    - '{zodiac_item_name}' 설명: 2문장
-4. 점수는 백엔드에서 계산하므로 텍스트만 작성하세요
 
 반드시 아래 JSON 구조로 출력하세요:
 """ + """{{
@@ -375,8 +459,8 @@ class FortuneCalculator:
         """GMS API (Claude/GPT) 또는 Gemini를 사용한 운세 텍스트 생성"""
         import time
 
-        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v8: 점수 정보 완전 제거)
-        cache_key = f"fortune_text_v8_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
+        # 캐시 키 생성 (period_type 포함, 프롬프트 버전 v11: 퍼스널컬러 기반 행운색 추가)
+        cache_key = f"fortune_text_v11_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
         cached_result = cache.get(cache_key)
 
         if cached_result:
@@ -401,7 +485,7 @@ class FortuneCalculator:
         # 기간별 프롬프트 설정
         prompt = self._build_fortune_prompt(
             birth_date, gender, zodiac, chinese_zodiac, mbti_info, lucky_item_info,
-            saju, lucky_item_name, zodiac_item_name, period_type, scores
+            saju, lucky_item_name, zodiac_item_name, period_type, scores, mbti
         )
 
         # 시스템 메시지 (형식 강제)
@@ -738,13 +822,14 @@ class FortuneCalculator:
         zodiac_sign: str,
         chinese_zodiac: str,
         today: date,
-        fortune_scores: Dict = None
+        fortune_scores: Dict = None,
+        personal_color: Optional[str] = None
     ) -> List[str]:
-        """행운의 색상들 결정 (별자리 + 띠 + 날짜 + 운세점수 기반)"""
+        """행운의 색상들 결정 (별자리 + 띠 + 날짜 + 운세점수 + 퍼스널컬러 기반)"""
         import hashlib
 
-        # 시드 생성: 별자리 + 띠 + 날짜 조합으로 매일 다른 결과
-        seed_string = f"{zodiac_sign}_{chinese_zodiac}_{today.isoformat()}"
+        # 시드 생성: 별자리 + 띠 + 날짜 + 퍼스널컬러 조합으로 매일 다른 결과
+        seed_string = f"{zodiac_sign}_{chinese_zodiac}_{today.isoformat()}_{personal_color or 'none'}"
         seed_hash = int(hashlib.md5(seed_string.encode()).hexdigest(), 16)
 
         # 별자리 색상 풀
@@ -755,6 +840,16 @@ class FortuneCalculator:
 
         # 후보 색상 풀 구성 (별자리 + 띠 색상 합치기)
         candidate_colors = list(star_colors) + list(zodiac_colors)
+
+        # 퍼스널컬러가 있으면 해당 톤에 어울리는 색상 우선 추가
+        avoid_colors = []
+        if personal_color and personal_color in PERSONAL_COLOR_PALETTES:
+            # 퍼스널컬러 팔레트 색상을 우선 후보로 추가
+            personal_palette = PERSONAL_COLOR_PALETTES[personal_color]
+            # 퍼스널컬러 팔레트를 맨 앞에 추가 (우선순위 높임)
+            candidate_colors = list(personal_palette) + candidate_colors
+            # 피해야 할 색상 목록
+            avoid_colors = PERSONAL_COLOR_AVOID.get(personal_color, [])
 
         # 운세 점수가 있으면 점수에 따라 색상 가중치 조정
         if fortune_scores:
@@ -769,6 +864,10 @@ class FortuneCalculator:
                 # 운세가 낮으면 안정적인 색상 추가
                 candidate_colors.extend(['남색', '회색', '베이지색'])
 
+        # 피해야 할 색상 제거 (퍼스널컬러 기반)
+        if avoid_colors:
+            candidate_colors = [c for c in candidate_colors if c not in avoid_colors]
+
         # 중복 제거
         candidate_colors = list(dict.fromkeys(candidate_colors))
 
@@ -782,9 +881,9 @@ class FortuneCalculator:
             selected_colors.append(candidate_colors[idx])
             candidate_colors.pop(idx)  # 중복 선택 방지
 
-        # 3개 미만이면 전체 풀에서 보충
+        # 3개 미만이면 전체 풀에서 보충 (피해야 할 색상 제외)
         if len(selected_colors) < 3:
-            remaining = [c for c in ALL_COLORS if c not in selected_colors]
+            remaining = [c for c in ALL_COLORS if c not in selected_colors and c not in avoid_colors]
             for i in range(3 - len(selected_colors)):
                 if remaining:
                     idx = (seed_hash + i * 13) % len(remaining)
