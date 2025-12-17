@@ -9,9 +9,9 @@ import { getMaxSimilarityWithLuckyItems, similarityToScore } from './itemSimilar
 
 // 점수 가중치 상수
 const SCORE_WEIGHTS = {
-  BASE: 20,      // 기본 점수
-  ITEM: 0.4,     // 아이템 유사도 가중치 (40점 만점)
-  COLOR: 0.4     // 색상 매칭 가중치 (40점 만점)
+  BASE: 35,      // 기본 점수 (35점)
+  COLOR: 0.35,   // 색상 매칭 가중치 (35점 만점)
+  ITEM: 0.30     // 아이템 유사도 가중치 (30점 만점)
 }
 
 // 점수 구간별 메시지 설정
@@ -34,7 +34,7 @@ const SCORE_COLORS = [
 ]
 
 /**
- * 행운 점수 계산 (기본 20점 + 아이템 유사도 40점 + 색상 40점)
+ * 행운 점수 계산 (기본 35점 + 색상 35점 + 아이템 유사도 30점)
  * @param {string} itemName - 아이템 이름
  * @param {Array<{hex: string}>} itemColors - 아이템 색상 배열
  * @param {string[]} luckyColorNames - 행운색 이름 배열
@@ -42,16 +42,16 @@ const SCORE_COLORS = [
  * @returns {{score: number, matchedColor: string|null, bestItemHex: string|null, itemSimilarity: number}}
  */
 export const calculateLuckScore = (itemName, itemColors, luckyColorNames, luckyItemList) => {
-  // 1. 색상 점수 계산 (0-40점)
+  // 1. 색상 점수 계산 (0-35점)
   const colorResult = calculateColorMatchScore(itemColors, luckyColorNames)
   const colorScore = Math.round(colorResult.score * SCORE_WEIGHTS.COLOR)
 
-  // 2. 아이템 유사도 계산 (0-40점)
+  // 2. 아이템 유사도 계산 (0-30점)
   const { similarity } = getMaxSimilarityWithLuckyItems(itemName, luckyItemList)
   const itemScoreRaw = similarityToScore(similarity)
   const itemScore = Math.round(itemScoreRaw * SCORE_WEIGHTS.ITEM)
 
-  // 3. 최종 점수: 기본 20점 + 아이템 40점 + 색상 40점
+  // 3. 최종 점수: 기본 35점 + 색상 35점 + 아이템 30점
   const finalScore = Math.min(100, SCORE_WEIGHTS.BASE + itemScore + colorScore)
 
   return {

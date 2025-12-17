@@ -254,7 +254,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
@@ -505,6 +505,17 @@ onMounted(() => {
   fetchItemDetail()
   fetchUserItems()
 })
+
+// route params 변경 감지 (같은 컴포넌트 내에서 다른 아이템으로 이동 시)
+watch(
+  () => route.params.id,
+  (newId, oldId) => {
+    if (newId && newId !== oldId) {
+      item.value = null // 로딩 상태 표시
+      fetchItemDetail()
+    }
+  }
+)
 </script>
 
 <style scoped>
