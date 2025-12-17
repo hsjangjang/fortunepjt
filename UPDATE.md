@@ -1,5 +1,26 @@
 # 📋 업데이트 내역
 
+## v1.8.1 (25.12.18)
+
+### 장하선
+- Backend
+  - GMS Embedding API 기반 아이템 유사도 엔드포인트 추가 (`items/api_views.py`, `items/api_urls.py`)
+    - `POST /api/items/similarity/`: text-embedding-3-small 모델로 코사인 유사도 계산
+    - 아이템 이름과 행운 아이템 간 의미적 유사도 반환
+  - `requirements.txt`에 numpy 의존성 추가
+- Frontend
+  - 하이브리드 아이템 유사도 계산 로직 구현 (`itemSimilarity.js`, `luckScore.js`)
+    - `getHybridSimilarity()`: FastText(즉시) + GMS Embedding(비동기) 중 높은 값 반환
+    - `calculateLuckScoreAsync()`: 비동기 하이브리드 점수 계산 함수 추가
+  - 아이템 상세 페이지 하이브리드 점수 적용 (`Detail.vue`)
+    - 페이지 로드 시 FastText 점수 즉시 표시 → GMS 결과가 높으면 자동 업데이트
+  - 행운 점수 공식 조정 (`luckScore.js`)
+    - 기본 20점 → 35점, 색상 40점 → 35점, 아이템 40점 → 30점
+  - 아이템 상세 페이지 라우트 변경 감지 버그 수정 (`Detail.vue`)
+    - `watch(route.params.id)` 추가: 같은 컴포넌트 내 다른 아이템 이동 시 데이터 갱신
+
+---
+
 ## v1.8.0 (25.12.18)
 
 ### 장하선
