@@ -18,7 +18,6 @@
               class="btn-period btn-daily"
               :class="{ active: selectedPeriod === 'daily' }"
               @click="changePeriod('daily')"
-              :disabled="isLoadingPeriod"
             >
               <i class="fas fa-sun me-1"></i> 오늘의 운세
             </button>
@@ -26,7 +25,6 @@
               class="btn-period btn-weekly"
               :class="{ active: selectedPeriod === 'weekly' }"
               @click="changePeriod('weekly')"
-              :disabled="isLoadingPeriod"
             >
               <i class="fas fa-calendar-week me-1"></i> 이 주의 운세
             </button>
@@ -34,22 +32,13 @@
               class="btn-period btn-monthly"
               :class="{ active: selectedPeriod === 'monthly' }"
               @click="changePeriod('monthly')"
-              :disabled="isLoadingPeriod"
             >
               <i class="fas fa-calendar-alt me-1"></i> 이 달의 운세
             </button>
           </div>
         </div>
 
-        <!-- 로딩 상태 -->
-        <div v-if="isLoadingPeriod" class="text-center py-5">
-          <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Loading...</span>
-          </div>
-          <p class="text-white mt-3">{{ periodTitle }}를 불러오는 중...</p>
-        </div>
-
-      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing">
+      <div v-if="fortune" class="card-base card-lg section-spacing">
             <div class="fortune-circle">
               <svg width="220" height="220">
                 <defs>
@@ -86,7 +75,7 @@
       </div>
 
       <!-- Fortune Details Tabs -->
-      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing overflow-hidden">
+      <div v-if="fortune" class="card-base card-lg section-spacing overflow-hidden">
             <div class="card-header border-0 responsive-padding-header">
               <ul class="nav nav-pills fortune-tabs gap-2 mobile-grid-tabs justify-content-center" role="tablist">
                 <li class="nav-item">
@@ -193,7 +182,7 @@
       </div>
 
       <!-- Lucky Colors Section -->
-      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing">
+      <div v-if="fortune" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운색
@@ -227,7 +216,7 @@
       </div>
 
       <!-- Lucky Item Section -->
-      <div v-if="fortune && !isLoadingPeriod" class="card-base card-lg section-spacing">
+      <div v-if="fortune" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
                 <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
                 오늘의 행운 아이템
@@ -294,7 +283,7 @@
       </div>
 
       <!-- Lucky Numbers Section (성인만 표시) -->
-      <div v-if="fortune && !isMinor && !isLoadingPeriod" class="card-base card-lg section-spacing">
+      <div v-if="fortune && !isMinor" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-4 lotto-title">
                 <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
                 재미로 보는 오늘의 추천 로또 번호
@@ -315,7 +304,7 @@
       </div>
 
       <!-- Recommendations -->
-      <div v-if="fortune && !isLoadingPeriod" class="card-grid cols-2 section-spacing">
+      <div v-if="fortune" class="card-grid cols-2 section-spacing">
             <div class="card-base card-md card-interactive text-center">
                 <i class="fas fa-tshirt fa-3x mb-3" style="color: #a78bfa;"></i>
                 <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
@@ -335,7 +324,7 @@
       </div>
 
       <!-- No Fortune Yet (로딩 중이 아닐 때만 표시) -->
-      <div v-if="!fortune && !isLoadingPeriod && !isLoading" class="card-base card-lg">
+      <div v-if="!fortune && !isLoading" class="card-base card-lg">
         <div class="empty-state">
           <i class="fas fa-question-circle empty-icon"></i>
           <h3 class="empty-title">운세 정보가 없습니다</h3>
@@ -368,7 +357,6 @@ const fortune = ref(null)
 const displayScore = ref(0)
 const isMinor = ref(false)
 const isLoading = ref(true)
-const isLoadingPeriod = ref(false)
 const showMainItemDesc = ref(false)
 const showZodiacItemDesc = ref(false)
 
@@ -711,8 +699,19 @@ const changePeriod = async (period) => {
 
 // 실제 운세 데이터 로드 함수
 const loadFortuneData = async (period) => {
-  isLoadingPeriod.value = true
   fortune.value = null // 기존 데이터 초기화
+
+  // 로컬 시간 기준 오늘 날짜
+  const now = new Date()
+  const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+
+  // daily인 경우 Store 캐시 먼저 확인
+  if (period === 'daily' && fortuneStore.fortuneData && fortuneStore.fortuneDate === today) {
+    console.log('[Fortune] Store에서 daily 운세 로드')
+    fortune.value = fortuneStore.fortuneData
+    setupFortuneUI()
+    return
+  }
 
   try {
     let response
@@ -805,11 +804,8 @@ const loadFortuneData = async (period) => {
       return
     }
   } finally {
-    // 운세가 있을 때만 로딩 상태 해제 (리다이렉트 시에는 유지)
+    // 애니메이션은 로딩 완료 후, nextTick에서 실행
     if (fortune.value) {
-      isLoadingPeriod.value = false
-
-      // 애니메이션은 로딩 완료 후, nextTick에서 실행
       await nextTick()
       setTimeout(() => {
         animateScore()
