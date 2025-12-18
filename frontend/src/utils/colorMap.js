@@ -64,5 +64,5 @@ export const RAINBOW_GRADIENT = 'linear-gradient(90deg, #FF0000, #FF7F00, #FFFF0
 
 // 색상이 '다양'(무지개)인지 확인
 export const isRainbowColor = (colorName) => {
-  return colorName === '다양' || colorMap[colorName] === 'rainbow'
+  return colorName === '다양' || colorName === 'rainbow' || colorMap[colorName] === 'rainbow'
 }

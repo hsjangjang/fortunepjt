@@ -78,7 +78,7 @@
                   <div class="d-flex align-items-center justify-content-center gap-2 pb-2">
                     <div v-for="color in detectedColors" :key="color.hex"
                          class="flex-shrink-0"
-                         :style="`width: 40px; height: 40px; border-radius: 50%; background: ${color.hex}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
+                         :style="`width: 40px; height: 40px; border-radius: 50%; background: ${getColorBackground(color.korean_name)}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
                   </div>
                 </div>
 
@@ -111,7 +111,7 @@
                     <span class="text-white opacity-75">오늘의 행운색</span>
                   </div>
                   <div class="color-circles">
-                    <div class="color-circle" :style="`background: ${itemColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                    <div class="color-circle" :style="`background: ${getColorBackground(itemColor)}; border: 2px solid rgba(255,255,255,0.2);`"></div>
                     <div class="match-arrow text-white opacity-50">
                       <i class="fas fa-arrows-alt-h"></i>
                     </div>
@@ -246,7 +246,7 @@ import { useToast } from '@/composables/useToast'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
-import { colorMap, getTextColor } from '@/utils/colors'
+import { colorMap, getTextColor, getColorBackground } from '@/utils/colors'
 import { calculateLuckScore as calcLuckScoreUtil, getScoreMessage, generateMatchDescription } from '@/utils/luckScore'
 import {
   findBestLuckyItem,
