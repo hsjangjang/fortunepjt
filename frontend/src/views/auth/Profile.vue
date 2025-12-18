@@ -447,6 +447,12 @@ h5 {
   color: #fff;
 }
 
+.btn-outline-danger.btn-sm {
+  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+}
+
 /* Responsive Padding Utilities - Strictly matching Today.vue */
 .responsive-padding {
   padding: 3rem !important; /* Desktop Default */
