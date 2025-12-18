@@ -246,8 +246,8 @@ class ItemAnalyzer:
             total_color_count = len(all_colors)
             print(f"[DEBUG] 감지된 색상 {total_color_count}개: {all_colors}")
 
-            # 3개 이상의 색상이면 '다양'으로 처리
-            if total_color_count >= 3:
+            # 4개 이상의 색상이면 '다양'으로 처리
+            if total_color_count >= 4:
                 colors.append({
                     'name': 'primary',
                     'korean_name': '다양',
@@ -255,9 +255,9 @@ class ItemAnalyzer:
                     'rgb': (128, 128, 128),
                     'percentage': 100.0
                 })
-                print(f"[DEBUG] 색상 3개 이상 ({total_color_count}개) → '다양'으로 자동 변환")
+                print(f"[DEBUG] 색상 4개 이상 ({total_color_count}개) → '다양'으로 자동 변환")
             else:
-                # 1-2개 색상: 개별 색상으로 처리
+                # 1-3개 색상: 상위 2개만 표시
                 for idx, color_name in enumerate(all_colors[:2]):
                     if color_name:
                         colors.append({
