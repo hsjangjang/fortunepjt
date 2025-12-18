@@ -832,9 +832,7 @@ onMounted(async () => {
   gap: 15px;
 }
 
-.hover-lift:hover {
-  transform: translateY(-5px);
-}
+/* .hover-lift는 전역 CSS에서 관리 */
 
 .lucky-item-icon {
   font-size: 3rem;

@@ -265,26 +265,8 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.hover-lift {
-  transition: transform 0.3s;
-}
+/* .hover-lift, .animate-float은 전역 CSS에서 관리 */
 
-.hover-lift:hover {
-  transform: translateY(-5px);
-}
-
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
 /* 메인 추천 메뉴 이미지 */
 .main-menu-img {
   width: 150px;

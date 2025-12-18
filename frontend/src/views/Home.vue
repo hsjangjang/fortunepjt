@@ -116,28 +116,6 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 </script>
 
 <style scoped>
-/* Django 템플릿과 동일한 스타일 - 전역 CSS 사용 */
-.animate-float {
-  animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
-.display-title {
-  font-size: 3.5rem;
-  line-height: 1.2;
-}
-
-@media (max-width: 768px) {
-  .display-title {
-    font-size: 2.15rem;
-  }
-}
+/* 전역 CSS의 .display-title, .animate-float 사용 */
+/* 추가 스타일 불필요 - style.css에서 통합 관리 */
 </style>
