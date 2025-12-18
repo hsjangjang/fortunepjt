@@ -3,7 +3,7 @@
   <nav ref="navbarRef" class="navbar navbar-expand-xl navbar-dark fixed-top" @mouseleave="handleNavbarMouseLeave" @mouseenter="handleNavbarMouseEnter">
     <div class="container">
       <router-link class="navbar-brand d-flex align-items-center" to="/">
-        <img src="https://i.imgur.com/cND5Scv.png" alt="Logo" class="navbar-logo me-2" />
+        <img src="/logo.png" alt="Logo" class="navbar-logo me-2" />
         <span class="text-gradient fw-bold">Lucky Pick it</span>
       </router-link>
       <button class="navbar-toggler border-0" type="button" @click="toggleMobileMenu">

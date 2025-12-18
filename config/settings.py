@@ -313,7 +313,8 @@ EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Fortune Life <noreply@fortunelife.com>')
 
 # 이메일 로고 URL (S3나 외부 URL로 설정)
-EMAIL_LOGO_URL = config('EMAIL_LOGO_URL', default='https://i.imgur.com/cND5Scv.png')
+# 배포 후 Vercel URL로 설정: https://your-domain.vercel.app/logo.png
+EMAIL_LOGO_URL = config('EMAIL_LOGO_URL', default='')
 
 # AI Service Configuration
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
