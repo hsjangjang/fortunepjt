@@ -129,82 +129,53 @@ class ItemAnalyzer:
             1. item_name: 물체의 구체적인 이름 (한글로, 2-4글자)
                - 예시: '마우스', '향수', '지갑', '키링', '인형', '껌', '사탕', '초콜릿', '이어폰', '목걸이', '반지', '팔찌', '립스틱', '볼펜', '텀블러' 등
                - 구체적인 물건 이름을 사용하세요
-               - 무지개색/그라데이션 이미지나 색상표는 '색상판' 또는 '무지개 장식'으로 명명
 
-            2. primary_color: 물체의 **가장 넓은 면적을 차지하는** 주요 색상 (한글로)
-               - **반드시 아래 16가지 중 하나만 선택**:
-                 '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색', '다양'
-               - 배경색이나 작은 로고 색상은 제외하고 물체 자체의 색상만 판단
-               - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로 분류
-               - ⚠️ **중요: 무지개색, 레인보우, 그라데이션, 여러 색이 섞인 물체는 무조건 '다양'으로 선택!**
-               - 빨강-주황-노랑-초록-파랑-보라 등 스펙트럼 색상이 보이면 → '다양'
-               - 3가지 이상의 서로 다른 색상이 고르게 분포되어 있으면 → '다양'
+            2. all_colors: 물체에서 눈에 띄는 **모든 색상**을 배열로 나열
+               - **반드시 아래 15가지 색상만 사용**:
+                 '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색'
+               - 배경색 제외, 물체 자체의 색상만
+               - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로
+               - **단색 물체: 1개만** (예: ["검은색"])
+               - **2색 물체: 2개** (예: ["분홍색", "금색"])
+               - **다색/무지개/그라데이션: 보이는 모든 색상 나열** (예: ["빨간색", "주황색", "노란색", "초록색", "파란색", "보라색"])
+               - 로고, 스티칭, 지퍼, 단추 등 작은 장식 색상은 무시
+               - 반사광, 그림자는 별도 색상으로 취급 안 함
 
-            3. secondary_colors: 보조 색상 배열 (primary_color 외에 눈에 띄는 모든 색상)
-               - **단색 물체(한 가지 색만 보이는 경우)는 반드시 빈 배열 []**
-               - **여러 색이 보이면 모두 나열** (예: 무지개색이면 ['주황색', '노란색', '초록색', '파란색', '보라색'])
-               - ⚠️ primary_color가 '다양'이어도 secondary_colors에 실제 보이는 색상들 나열!
-               - 로고, 스티칭(박음질), 지퍼, 단추 등 작은 장식 색상은 무시
-               - 반사광, 그림자는 별도 색상으로 취급하지 않음
-
-            4. tags: 해시태그 3개 (아이템 특성과 행운 관련)
+            3. tags: 해시태그 3개 (아이템 특성과 행운 관련)
                - 첫 번째: 아이템 종류 (예: '지갑', '향수', '키링')
-               - 두 번째: **반드시** 아래 5개 운세 중 하나 선택 (필수!):
+               - 두 번째: **반드시** 아래 5개 운세 중 하나 선택:
                  '애정운', '금전운', '직장운', '건강운', '학업운'
-               - 세 번째: 아이템 느낌이나 특성 (예: '고급스러움', '심플함', '귀여움', '세련됨')
+               - 세 번째: 아이템 느낌 (예: '고급스러움', '심플함', '귀여움')
 
-            5. fortune_scores: 이 아이템이 각 운세를 얼마나 강화해주는지 점수 (0~100)
-               - love: 애정운 강화 점수
-               - money: 금전운 강화 점수
-               - work: 직장운 강화 점수
-               - health: 건강운 강화 점수
-               - study: 학업운 강화 점수
-               - 아이템 특성에 따라 판단:
-                 * 지갑, 돈, 금고 → money 높음
-                 * 향수, 반지, 꽃 → love 높음
-                 * 마우스, 명함, 볼펜 → work 높음
-                 * 운동용품, 물병, 비타민 → health 높음
-                 * 노트, 펜, 책 → study 높음
+            4. fortune_scores: 각 운세 강화 점수 (0~100)
+               - love: 애정운, money: 금전운, work: 직장운, health: 건강운, study: 학업운
+               - 아이템 특성에 따라 판단
 
             **중요**:
             - 반드시 유효한 JSON 형식으로만 응답
-            - 모든 값은 한글로 작성 (fortune_scores의 키는 영문)
             - 마크다운 코드 블록(```) 절대 사용 금지
-            - 단색 물체는 secondary_colors를 빈 배열로!
-            - tags의 두 번째 요소는 반드시 '애정운', '금전운', '직장운', '건강운', '학업운' 중 하나!
+            - all_colors는 **최소 1개 이상** 반드시 포함
 
-            예시 1 (검은 지갑):
+            예시 1 (검은 지갑 - 단색):
             {
               "item_name": "지갑",
-              "primary_color": "검은색",
-              "secondary_colors": [],
+              "all_colors": ["검은색"],
               "tags": ["지갑", "금전운", "고급스러움"],
               "fortune_scores": {"love": 20, "money": 95, "work": 50, "health": 10, "study": 15}
             }
 
-            예시 2 (분홍+금색 향수):
+            예시 2 (분홍+금색 향수 - 2색):
             {
               "item_name": "향수",
-              "primary_color": "분홍색",
-              "secondary_colors": ["금색"],
+              "all_colors": ["분홍색", "금색"],
               "tags": ["향수", "애정운", "화려함"],
               "fortune_scores": {"love": 90, "money": 30, "work": 40, "health": 15, "study": 10}
             }
 
-            예시 3 (검은 마우스):
+            예시 3 (무지개/멀티컬러 - 다색):
             {
-              "item_name": "마우스",
-              "primary_color": "검은색",
-              "secondary_colors": [],
-              "tags": ["마우스", "직장운", "심플함"],
-              "fortune_scores": {"love": 10, "money": 40, "work": 85, "health": 15, "study": 30}
-            }
-
-            예시 4 (무지개색/멀티컬러 아이템):
-            {
-              "item_name": "색상판",
-              "primary_color": "다양",
-              "secondary_colors": ["빨간색", "주황색", "노란색", "초록색", "파란색", "보라색"],
+              "item_name": "무지개",
+              "all_colors": ["빨간색", "주황색", "노란색", "초록색", "파란색", "보라색"],
               "tags": ["장식품", "애정운", "알록달록"],
               "fortune_scores": {"love": 60, "money": 50, "work": 50, "health": 50, "study": 50}
             }
@@ -241,17 +212,23 @@ class ItemAnalyzer:
             # item_name을 category로도 저장 (하위 호환성)
             if 'item_name' in ai_result and 'category' not in ai_result:
                 ai_result['category'] = ai_result['item_name']
-            
+
             # 색상 정보를 표준 형식으로 변환
             colors = []
-            primary_color_name = ai_result.get('primary_color', '')
-            secondary_colors = ai_result.get('secondary_colors', [])
+            all_colors = ai_result.get('all_colors', [])
 
-            # 총 색상 개수 계산 (primary 1개 + secondary 개수)
-            total_color_count = 1 + len(secondary_colors) if primary_color_name else len(secondary_colors)
+            # 하위 호환성: 기존 primary_color/secondary_colors 형식도 지원
+            if not all_colors:
+                primary_color = ai_result.get('primary_color', '')
+                secondary_colors = ai_result.get('secondary_colors', [])
+                if primary_color:
+                    all_colors = [primary_color] + secondary_colors
 
-            # 3개 이상의 색상이면 자동으로 '다양'으로 처리 (무지개색 이미지 대응)
-            if total_color_count >= 3 or primary_color_name == '다양':
+            total_color_count = len(all_colors)
+            print(f"[DEBUG] 감지된 색상 {total_color_count}개: {all_colors}")
+
+            # 3개 이상의 색상이면 '다양'으로 처리
+            if total_color_count >= 3:
                 colors.append({
                     'name': 'primary',
                     'korean_name': '다양',
@@ -259,29 +236,18 @@ class ItemAnalyzer:
                     'rgb': (128, 128, 128),
                     'percentage': 100.0
                 })
-                print(f"[DEBUG] 색상 3개 이상 감지 ({total_color_count}개) → '다양'으로 자동 변환")
+                print(f"[DEBUG] 색상 3개 이상 ({total_color_count}개) → '다양'으로 자동 변환")
             else:
-                # 일반 색상 처리
-                if primary_color_name:
-                    colors.append({
-                        'name': 'primary',
-                        'korean_name': primary_color_name,
-                        'hex': self._color_name_to_hex(primary_color_name),
-                        'rgb': (128, 128, 128),
-                        'percentage': 80.0
-                    })
-
-                # 보조 색상 (있을 때만 추가, 최대 1개만)
-                if secondary_colors:
-                    for idx, sec_color in enumerate(secondary_colors[:1]):
-                        if sec_color:
-                            colors.append({
-                                'name': f'secondary_{idx}',
-                                'korean_name': sec_color,
-                                'hex': self._color_name_to_hex(sec_color),
-                                'rgb': (100, 100, 100),
-                                'percentage': 10.0
-                            })
+                # 1-2개 색상: 개별 색상으로 처리
+                for idx, color_name in enumerate(all_colors[:2]):
+                    if color_name:
+                        colors.append({
+                            'name': 'primary' if idx == 0 else 'secondary',
+                            'korean_name': color_name,
+                            'hex': self._color_name_to_hex(color_name),
+                            'rgb': (128, 128, 128),
+                            'percentage': 80.0 if idx == 0 else 20.0
+                        })
             
             print("[DEBUG] AI 분석 성공!")
             return {
