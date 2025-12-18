@@ -122,10 +122,10 @@
                       </span>
                     </div>
 
-                    <!-- 모바일 행운 점수 (간략) -->
+                    <!-- 모바일 행운 점수 (간략) - 선택된 운세 카테고리 아이콘 표시 -->
                     <div class="mt-auto d-md-none">
-                      <div class="mobile-luck-score">
-                        <i class="fas fa-star text-warning me-1"></i>
+                      <div class="mobile-luck-score" :style="{ background: `${selectedCategoryColor}25`, color: selectedCategoryColor }">
+                        <i :class="'fas ' + fortuneCategories.find(c => c.key === selectedCategory)?.icon" class="me-1"></i>
                         <span>{{ getFortuneBoost(item, selectedCategory) }}</span>
                       </div>
                     </div>
@@ -479,17 +479,16 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
 }
 
-/* 모바일 행운 점수 */
+/* 모바일 행운 점수 - 선택된 운세 카테고리 색상으로 동적 표시 */
 .mobile-luck-score {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(251, 191, 36, 0.15);
   border-radius: 8px;
   padding: 4px 8px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #fbbf24;
+  transition: background 0.3s, color 0.3s;
 }
 
 /* 운세별/행운색 라벨 동일 스타일 */

@@ -191,7 +191,7 @@
 
               <div v-if="fortune.lucky_colors && fortune.lucky_colors.length > 0" class="d-flex justify-content-center align-items-center gap-3 gap-md-5">
                 <div v-for="color in fortune.lucky_colors" :key="color" class="text-center">
-                  <div class="lucky-color-circle" :style="`background: ${getColorHex(color)};`"></div>
+                  <div class="lucky-color-circle" :style="`background: ${getColorBackground(color)};`"></div>
                   <p class="mt-3 mb-0 fw-bold text-white responsive-text-shadow">{{ color }}</p>
                 </div>
               </div>
@@ -346,7 +346,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFortuneStore } from '@/stores/fortune'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
-import { getColorHex } from '@/utils/colors'
+import { getColorBackground } from '@/utils/colors'
 import { getLuckyItemImage } from '@/utils/luckyItems'
 import { getZodiacIcon, getChineseZodiacEmoji } from '@/utils/zodiac'
 import {
@@ -961,8 +961,10 @@ onMounted(async () => {
 
 /* Lucky Color Circle Responsive */
 .lucky-color-circle {
-  width: 100px;
-  height: 100px;
+  width: min(100px, 20vw);
+  height: min(100px, 20vw);
+  min-width: 40px;
+  min-height: 40px;
   border-radius: 50%;
   margin: 0 auto;
   box-shadow: 0 8px 20px rgba(0,0,0,0.3), inset 0 -5px 10px rgba(0,0,0,0.2), inset 0 5px 10px rgba(255,255,255,0.2);

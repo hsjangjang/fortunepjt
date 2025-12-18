@@ -131,13 +131,15 @@ class ItemAnalyzer:
                - 구체적인 물건 이름을 사용하세요
 
             2. primary_color: 물체의 **가장 넓은 면적을 차지하는** 주요 색상 (한글로)
-               - **반드시 아래 15가지 중 하나만 선택**:
-                 '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색'
+               - **반드시 아래 16가지 중 하나만 선택**:
+                 '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색', '다양'
                - 배경색이나 작은 로고 색상은 제외하고 물체 자체의 색상만 판단
                - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로 분류
+               - **4가지 이상의 서로 다른 색상이 고르게 분포되어 있으면 '다양'으로 선택** (무지개, 멀티컬러, 알록달록한 아이템)
 
             3. secondary_colors: 보조 색상 배열
                - **단색 물체(한 가지 색만 보이는 경우)는 반드시 빈 배열 []**
+               - **primary_color가 '다양'인 경우도 빈 배열 []**
                - 두 가지 이상의 색이 **전체 면적의 20% 이상**을 차지할 때만 추가
                - 로고, 스티칭(박음질), 지퍼, 단추, 장식 등 작은 부분의 색상은 무시
                - 그라데이션, 반사광, 그림자는 별도 색상으로 취급하지 않음
@@ -198,7 +200,16 @@ class ItemAnalyzer:
             """
             
             print("[DEBUG] Gemini API 호출 시작")
-            response = model.generate_content([prompt, image_parts[0]])
+            # temperature=0으로 설정하여 동일 이미지에 대해 일관된 결과 반환
+            generation_config = genai.types.GenerationConfig(
+                temperature=0,
+                top_p=1,
+                top_k=1
+            )
+            response = model.generate_content(
+                [prompt, image_parts[0]],
+                generation_config=generation_config
+            )
             response.resolve()
             response_text = response.text
             print("[DEBUG] Gemini API 응답 수신 완료")

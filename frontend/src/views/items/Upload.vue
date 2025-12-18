@@ -22,6 +22,10 @@
                   class="upload-area border rounded text-center"
                   :class="imagePreview ? 'p-3' : 'p-5'"
                   style="border-style: dashed !important;"
+                  @dragenter.prevent="handleDragEnter"
+                  @dragover.prevent="handleDragOver"
+                  @dragleave.prevent="handleDragLeave"
+                  @drop.prevent="handleDrop"
                 >
                   <!-- 이미지 미리보기 -->
                   <div v-if="imagePreview" class="preview-container" @click="triggerFileInput" style="cursor: pointer;">
@@ -39,7 +43,7 @@
                       <button type="button" class="btn btn-primary" @click="openCamera">
                         <i class="fas fa-camera"></i> 카메라로 촬영
                       </button>
-                      <button type="button" class="btn btn-outline-primary" @click="openGallery">
+                      <button type="button" class="btn btn-primary" @click="openGallery">
                         <i class="fas fa-image"></i> 갤러리에서 선택
                       </button>
                     </div>

@@ -5,7 +5,10 @@
  * - 색상 매칭 점수 계산
  */
 
-import { colorMap } from './colorMap'
+import { colorMap, isRainbowColor } from './colorMap'
+
+// '다양'(무지개) 색상일 때 부여할 고정 점수 (60%)
+const RAINBOW_COLOR_SCORE = 60
 
 /**
  * HEX를 RGB로 변환
@@ -75,13 +78,27 @@ export const distanceToScore = (distance) => {
 
 /**
  * 아이템 색상과 행운색 간의 최대 유사도 점수 계산
- * @param {Array<{hex: string}>} itemColors - 아이템 색상 배열
+ * @param {Array<{hex: string, korean_name?: string}>} itemColors - 아이템 색상 배열
  * @param {string[]} luckyColorNames - 행운색 이름 배열
  * @returns {{score: number, matchedColor: string|null, bestItemHex: string|null}}
  */
 export const calculateColorMatchScore = (itemColors, luckyColorNames) => {
   if (!itemColors?.length || !luckyColorNames?.length) {
     return { score: 0, matchedColor: null, bestItemHex: null }
+  }
+
+  // 아이템 색상 중 '다양'(무지개)이 있는지 확인
+  const hasRainbowColor = itemColors.some(color =>
+    isRainbowColor(color.korean_name) || isRainbowColor(color.hex)
+  )
+
+  // '다양' 색상이면 60점 고정 부여
+  if (hasRainbowColor) {
+    return {
+      score: RAINBOW_COLOR_SCORE,
+      matchedColor: '다양',
+      bestItemHex: 'rainbow'
+    }
   }
 
   // 행운색 이름을 HEX로 변환
