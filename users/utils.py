@@ -9,13 +9,13 @@ def get_logo_html():
     """로고 HTML 반환 (로고 URL이 있으면 이미지, 없으면 텍스트 로고)"""
     logo_url = getattr(settings, 'EMAIL_LOGO_URL', '')
     if logo_url:
-        return f'<img src="{logo_url}" alt="Fortune Life" style="width: 80px; height: 80px; margin-bottom: 10px;">'
+        return f'<img src="{logo_url}" alt="Lucky Pick it" style="width: 80px; height: 80px; margin-bottom: 10px;">'
     else:
         # 텍스트 기반 로고 (크리스탈 볼 이모지 사용)
         return '<div style="font-size: 48px; margin-bottom: 8px;">🔮</div>'
 
 
-def get_email_base_template(content, title="Fortune Life"):
+def get_email_base_template(content, title="Lucky Pick it"):
     """HTML 이메일 기본 템플릿"""
     logo_html = get_logo_html()
     return f'''<!DOCTYPE html>
@@ -25,29 +25,29 @@ def get_email_base_template(content, title="Fortune Life"):
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{title}</title>
 </head>
-<body style="margin: 0; padding: 0; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f5f0ff;">
+<body style="margin: 0; padding: 0; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #1a1a2e;">
     <table role="presentation" style="width: 100%; border-collapse: collapse;">
         <tr>
             <td style="padding: 40px 0;">
-                <table role="presentation" style="max-width: 480px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(138, 99, 210, 0.15);">
+                <table role="presentation" style="max-width: 480px; margin: 0 auto; background-color: #16213e; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);">
                     <!-- Header with Logo -->
                     <tr>
-                        <td style="background: linear-gradient(135deg, #a78bda 0%, #d4a5d9 50%, #f5d89a 100%); padding: 30px 40px; text-align: center;">
+                        <td style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); padding: 30px 40px; text-align: center;">
                             {logo_html}
-                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Fortune Life</h1>
+                            <h1 style="margin: 0; color: #a78bfa; font-size: 24px; font-weight: 600;">Lucky Pick it</h1>
                         </td>
                     </tr>
                     <!-- Content -->
                     <tr>
-                        <td style="padding: 40px;">
+                        <td style="padding: 40px; background-color: #1e2746;">
                             {content}
                         </td>
                     </tr>
                     <!-- Footer -->
                     <tr>
-                        <td style="background-color: #f9f7fc; padding: 24px 40px; text-align: center; border-top: 1px solid #e8e0f0;">
-                            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">본인이 요청하지 않으셨다면 이 메일을 무시해주세요.</p>
-                            <p style="margin: 0; color: #b8a9cf; font-size: 11px;">© 2025 Fortune Life. All rights reserved.</p>
+                        <td style="background-color: #16213e; padding: 24px 40px; text-align: center; border-top: 1px solid #2d3a5c;">
+                            <p style="margin: 0 0 8px 0; color: #8892b0; font-size: 12px;">본인이 요청하지 않으셨다면 이 메일을 무시해주세요.</p>
+                            <p style="margin: 0; color: #5a6785; font-size: 11px;">© 2025 Lucky Pick it. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
@@ -136,21 +136,21 @@ def create_username_email(user, email):
 본인이 요청하지 않으셨다면 이 메일을 무시해주세요.
 
 감사합니다.
-Fortune Life 팀'''
+Lucky Pick it 팀'''
 
     # HTML 버전
     content = f'''
-        <p style="margin: 0 0 24px 0; color: #4a4a6a; font-size: 16px; line-height: 1.6;">
-            안녕하세요, <strong style="color: #7c5cbf;">{name}</strong>님.
+        <p style="margin: 0 0 24px 0; color: #e2e8f0; font-size: 16px; line-height: 1.6;">
+            안녕하세요, <strong style="color: #a78bfa;">{name}</strong>님.
         </p>
-        <p style="margin: 0 0 24px 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 0 0 24px 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
             요청하신 아이디 정보를 안내해 드립니다.
         </p>
-        <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fff5f5 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
-            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">회원님의 아이디</p>
-            <p style="margin: 0; color: #7c5cbf; font-size: 28px; font-weight: 700; letter-spacing: 1px;">{user.username}</p>
+        <div style="background: linear-gradient(135deg, #1e1e3f 0%, #2d2a4a 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0; border: 1px solid #3d3a5c;">
+            <p style="margin: 0 0 8px 0; color: #8892b0; font-size: 12px;">회원님의 아이디</p>
+            <p style="margin: 0; color: #a78bfa; font-size: 28px; font-weight: 700; letter-spacing: 1px;">{user.username}</p>
         </div>
-        <p style="margin: 24px 0 0 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 24px 0 0 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
             감사합니다.
         </p>
     '''
@@ -174,26 +174,26 @@ def create_verification_email(user, verification_code):
 본인이 요청하지 않으셨다면 이 메일을 무시해주세요.
 
 감사합니다.
-Fortune Life 팀'''
+Lucky Pick it 팀'''
 
     # HTML 버전
     content = f'''
-        <p style="margin: 0 0 24px 0; color: #4a4a6a; font-size: 16px; line-height: 1.6;">
-            안녕하세요, <strong style="color: #7c5cbf;">{name}</strong>님.
+        <p style="margin: 0 0 24px 0; color: #e2e8f0; font-size: 16px; line-height: 1.6;">
+            안녕하세요, <strong style="color: #a78bfa;">{name}</strong>님.
         </p>
-        <p style="margin: 0 0 24px 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 0 0 24px 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
             비밀번호 찾기 인증코드를 안내해 드립니다.
         </p>
-        <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fff5f5 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
-            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">인증코드</p>
-            <p style="margin: 0; color: #7c5cbf; font-size: 36px; font-weight: 700; letter-spacing: 8px;">{verification_code}</p>
+        <div style="background: linear-gradient(135deg, #1e1e3f 0%, #2d2a4a 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0; border: 1px solid #3d3a5c;">
+            <p style="margin: 0 0 8px 0; color: #8892b0; font-size: 12px;">인증코드</p>
+            <p style="margin: 0; color: #a78bfa; font-size: 36px; font-weight: 700; letter-spacing: 8px;">{verification_code}</p>
         </div>
-        <div style="background-color: #fff8e6; border-radius: 8px; padding: 12px 16px; margin: 24px 0;">
-            <p style="margin: 0; color: #c4930a; font-size: 13px;">
+        <div style="background-color: #2d2a1a; border-radius: 8px; padding: 12px 16px; margin: 24px 0; border: 1px solid #4a4520;">
+            <p style="margin: 0; color: #fbbf24; font-size: 13px;">
                 ⏱️ 이 인증코드는 <strong>5분 후 만료</strong>됩니다.
             </p>
         </div>
-        <p style="margin: 24px 0 0 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 24px 0 0 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
             감사합니다.
         </p>
     '''
@@ -217,26 +217,26 @@ def create_temp_password_email(user, temp_password):
 본인이 요청하지 않으셨다면 고객센터로 문의해주세요.
 
 감사합니다.
-Fortune Life 팀'''
+Lucky Pick it 팀'''
 
     # HTML 버전
     content = f'''
-        <p style="margin: 0 0 24px 0; color: #4a4a6a; font-size: 16px; line-height: 1.6;">
-            안녕하세요, <strong style="color: #7c5cbf;">{name}</strong>님.
+        <p style="margin: 0 0 24px 0; color: #e2e8f0; font-size: 16px; line-height: 1.6;">
+            안녕하세요, <strong style="color: #a78bfa;">{name}</strong>님.
         </p>
-        <p style="margin: 0 0 24px 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 0 0 24px 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
             인증이 완료되어 임시 비밀번호를 안내해 드립니다.
         </p>
-        <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fff5f5 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
-            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">임시 비밀번호</p>
-            <p style="margin: 0; color: #7c5cbf; font-size: 24px; font-weight: 700; letter-spacing: 2px; font-family: 'Courier New', monospace;">{temp_password}</p>
+        <div style="background: linear-gradient(135deg, #1e1e3f 0%, #2d2a4a 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0; border: 1px solid #3d3a5c;">
+            <p style="margin: 0 0 8px 0; color: #8892b0; font-size: 12px;">임시 비밀번호</p>
+            <p style="margin: 0; color: #a78bfa; font-size: 24px; font-weight: 700; letter-spacing: 2px; font-family: 'Courier New', monospace;">{temp_password}</p>
         </div>
-        <div style="background-color: #ffefef; border-radius: 8px; padding: 12px 16px; margin: 24px 0;">
-            <p style="margin: 0; color: #d94848; font-size: 13px;">
+        <div style="background-color: #2d1a1a; border-radius: 8px; padding: 12px 16px; margin: 24px 0; border: 1px solid #4a2020;">
+            <p style="margin: 0; color: #f87171; font-size: 13px;">
                 🔐 로그인 후 <strong>반드시 비밀번호를 변경</strong>해주세요.
             </p>
         </div>
-        <p style="margin: 24px 0 0 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+        <p style="margin: 24px 0 0 0; color: #94a3b8; font-size: 14px; line-height: 1.6;">
             감사합니다.
         </p>
     '''
