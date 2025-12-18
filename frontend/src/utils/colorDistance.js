@@ -93,10 +93,11 @@ export const calculateColorMatchScore = (itemColors, luckyColorNames) => {
   )
 
   // '다양' 색상이면 60점 고정 부여
+  // 오늘의 행운색은 첫 번째 행운색으로 표시 (아이템 색상만 무지개)
   if (hasRainbowColor) {
     return {
       score: RAINBOW_COLOR_SCORE,
-      matchedColor: '다양',
+      matchedColor: luckyColorNames[0] || null,
       bestItemHex: 'rainbow'
     }
   }

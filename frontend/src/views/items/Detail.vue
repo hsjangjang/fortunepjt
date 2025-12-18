@@ -749,8 +749,7 @@ watch(
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid #fff;
 }
 
 .color-compare-arrow {
