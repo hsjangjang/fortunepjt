@@ -1,6 +1,6 @@
 <template>
   <DefaultLayout>
-    <div class="page-container">
+    <div class="page-container" style="overflow-x: hidden;">
       <div class="content-wrapper wide">
         <!-- 페이지 헤더 -->
         <div class="page-header">
@@ -66,8 +66,8 @@
                 <h4 class="text-center text-white mb-4">분석 결과</h4>
 
                 <!-- Item Preview -->
-                <div class="text-center mb-4">
-                  <img :src="itemPreview" alt="업로드된 아이템" class="item-preview" style="border: 1px solid rgba(255,255,255,0.2);">
+                <div class="text-center mb-4" style="overflow: hidden; border-radius: 15px;">
+                  <img :src="itemPreview" alt="업로드된 아이템" class="item-preview" style="border: 1px solid rgba(255,255,255,0.2); max-width: 100%;">
                 </div>
 
                 <!-- Detected Item Info -->
