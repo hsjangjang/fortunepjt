@@ -123,14 +123,14 @@
                   <div class="color-compare-section">
                     <div class="color-compare-item">
                       <span class="color-label">아이템 색상</span>
-                      <div class="color-circle" :style="`background: ${bestItemColor};`"></div>
+                      <div class="color-circle" :style="`background: ${bestItemColor === 'rainbow' ? RAINBOW_GRADIENT : bestItemColor};`"></div>
                     </div>
                     <div class="color-compare-arrow">
                       <i class="fas fa-arrows-alt-h"></i>
                     </div>
                     <div class="color-compare-item">
                       <span class="color-label">오늘의 행운색</span>
-                      <div class="color-circle" :style="`background: ${matchedLuckyColor};`"></div>
+                      <div class="color-circle" :style="`background: ${matchedLuckyColor === 'rainbow' ? RAINBOW_GRADIENT : matchedLuckyColor};`"></div>
                     </div>
                   </div>
 
@@ -173,12 +173,12 @@
                       :style="{
                         width: '30px',
                         height: '30px',
-                        backgroundColor: color.hex
+                        background: getColorBackground(color.korean_name)
                       }"
                     ></div>
                     <div>
                       <span class="fw-bold">{{ color.korean_name }}</span>
-                      <small class="text-muted ms-2">({{ color.hex }})</small>
+                      <small v-if="!isRainbowColor(color.korean_name)" class="text-muted ms-2">({{ color.hex }})</small>
                     </div>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { getColorMatchScore, colorMap } from '@/utils/colors'
+import { getColorMatchScore, colorMap, getColorBackground, isRainbowColor, RAINBOW_GRADIENT } from '@/utils/colors'
 import { getFortuneBoostScore, fortuneKeywords } from '@/utils/similarity'
 import { calculateLuckScore, calculateLuckScoreAsync, getScoreMessage, getScoreColor, calculateProgressOffset } from '@/utils/luckScore'
 import { findBestLuckyItem, hasNoGoodItem, formatItemDate } from '@/utils/itemAnalysis'
