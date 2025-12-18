@@ -119,7 +119,7 @@
                 <router-link to="/change-password" class="btn btn-outline-light btn-sm rounded-pill px-3">
                   <i class="fas fa-key me-1"></i> 비밀번호 변경
                 </router-link>
-                <router-link to="/delete-account" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                <router-link to="/delete-account" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1">
                   <i class="fas fa-user-times me-1"></i> 회원 탈퇴
                 </router-link>
               </div>
