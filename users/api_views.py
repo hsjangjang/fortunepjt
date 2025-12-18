@@ -202,10 +202,12 @@ class FindUsernameAPIView(APIView):
 
         try:
             user = User.objects.get(email__iexact=email.strip())
+            text_content, html_content = create_username_email(user, email)
             send_fortune_email(
                 '[Fortune Life] 아이디 찾기 안내',
-                create_username_email(user, email),
-                email
+                text_content,
+                email,
+                html_message=html_content
             )
             masked_email = mask_email(email)
             return Response({
@@ -258,10 +260,12 @@ class SendPasswordResetCodeAPIView(APIView):
                 expires_at=timezone.now() + timedelta(minutes=5)
             )
 
+            text_content, html_content = create_verification_email(user, verification_code)
             send_fortune_email(
                 '[Fortune Life] 비밀번호 찾기 인증코드',
-                create_verification_email(user, verification_code),
-                email
+                text_content,
+                email,
+                html_message=html_content
             )
             masked_email = mask_email(email)
             return Response({
@@ -334,10 +338,12 @@ class VerifyCodeAndResetPasswordAPIView(APIView):
             # 인증코드 삭제
             verification.delete()
 
+            text_content, html_content = create_temp_password_email(user, temp_password)
             send_fortune_email(
                 '[Fortune Life] 임시 비밀번호 안내',
-                create_temp_password_email(user, temp_password),
-                email
+                text_content,
+                email,
+                html_message=html_content
             )
             masked_email = mask_email(email)
             return Response({

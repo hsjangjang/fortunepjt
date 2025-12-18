@@ -1,8 +1,61 @@
 """
 사용자 관련 유틸리티 함수
 """
-from django.core.mail import send_mail
+from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
+
+
+def get_logo_html():
+    """로고 HTML 반환 (로고 URL이 있으면 이미지, 없으면 텍스트 로고)"""
+    logo_url = getattr(settings, 'EMAIL_LOGO_URL', '')
+    if logo_url:
+        return f'<img src="{logo_url}" alt="Fortune Life" style="width: 80px; height: 80px; margin-bottom: 10px;">'
+    else:
+        # 텍스트 기반 로고 (크리스탈 볼 이모지 사용)
+        return '<div style="font-size: 48px; margin-bottom: 8px;">🔮</div>'
+
+
+def get_email_base_template(content, title="Fortune Life"):
+    """HTML 이메일 기본 템플릿"""
+    logo_html = get_logo_html()
+    return f'''<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{title}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; background-color: #f5f0ff;">
+    <table role="presentation" style="width: 100%; border-collapse: collapse;">
+        <tr>
+            <td style="padding: 40px 0;">
+                <table role="presentation" style="max-width: 480px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(138, 99, 210, 0.15);">
+                    <!-- Header with Logo -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #a78bda 0%, #d4a5d9 50%, #f5d89a 100%); padding: 30px 40px; text-align: center;">
+                            {logo_html}
+                            <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600; text-shadow: 0 2px 4px rgba(0,0,0,0.1);">Fortune Life</h1>
+                        </td>
+                    </tr>
+                    <!-- Content -->
+                    <tr>
+                        <td style="padding: 40px;">
+                            {content}
+                        </td>
+                    </tr>
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #f9f7fc; padding: 24px 40px; text-align: center; border-top: 1px solid #e8e0f0;">
+                            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">본인이 요청하지 않으셨다면 이 메일을 무시해주세요.</p>
+                            <p style="margin: 0; color: #b8a9cf; font-size: 11px;">© 2025 Fortune Life. All rights reserved.</p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>'''
 
 
 def mask_email(email):
@@ -34,33 +87,47 @@ def get_from_email():
     return getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@fortunelife.com')
 
 
-def send_fortune_email(subject, message, recipient_email):
+def send_fortune_email(subject, message, recipient_email, html_message=None):
     """Fortune Life 이메일 전송
 
     Args:
         subject: 이메일 제목
-        message: 이메일 본문
+        message: 이메일 본문 (텍스트)
         recipient_email: 수신자 이메일
+        html_message: HTML 본문 (선택)
 
     Returns:
         bool: 전송 성공 여부
     """
     try:
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=get_from_email(),
-            recipient_list=[recipient_email],
-            fail_silently=False,
-        )
+        if html_message:
+            email = EmailMultiAlternatives(
+                subject=subject,
+                body=message,
+                from_email=get_from_email(),
+                to=[recipient_email],
+            )
+            email.attach_alternative(html_message, "text/html")
+            email.send(fail_silently=False)
+        else:
+            send_mail(
+                subject=subject,
+                message=message,
+                from_email=get_from_email(),
+                recipient_list=[recipient_email],
+                fail_silently=False,
+            )
         return True
     except Exception:
         return False
 
 
 def create_username_email(user, email):
-    """아이디 찾기 이메일 내용 생성"""
-    return f'''안녕하세요, {user.first_name}님.
+    """아이디 찾기 이메일 내용 생성 (텍스트 + HTML)"""
+    name = user.first_name or user.username
+
+    # 텍스트 버전
+    text = f'''안녕하세요, {name}님.
 
 요청하신 아이디 정보를 안내해 드립니다.
 
@@ -71,10 +138,33 @@ def create_username_email(user, email):
 감사합니다.
 Fortune Life 팀'''
 
+    # HTML 버전
+    content = f'''
+        <p style="margin: 0 0 24px 0; color: #4a4a6a; font-size: 16px; line-height: 1.6;">
+            안녕하세요, <strong style="color: #7c5cbf;">{name}</strong>님.
+        </p>
+        <p style="margin: 0 0 24px 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+            요청하신 아이디 정보를 안내해 드립니다.
+        </p>
+        <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fff5f5 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
+            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">회원님의 아이디</p>
+            <p style="margin: 0; color: #7c5cbf; font-size: 28px; font-weight: 700; letter-spacing: 1px;">{user.username}</p>
+        </div>
+        <p style="margin: 24px 0 0 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+            감사합니다.
+        </p>
+    '''
+    html = get_email_base_template(content, "아이디 찾기 안내")
+
+    return text, html
+
 
 def create_verification_email(user, verification_code):
-    """인증코드 이메일 내용 생성"""
-    return f'''안녕하세요, {user.first_name or user.username}님.
+    """인증코드 이메일 내용 생성 (텍스트 + HTML)"""
+    name = user.first_name or user.username
+
+    # 텍스트 버전
+    text = f'''안녕하세요, {name}님.
 
 비밀번호 찾기 인증코드를 안내해 드립니다.
 
@@ -86,10 +176,38 @@ def create_verification_email(user, verification_code):
 감사합니다.
 Fortune Life 팀'''
 
+    # HTML 버전
+    content = f'''
+        <p style="margin: 0 0 24px 0; color: #4a4a6a; font-size: 16px; line-height: 1.6;">
+            안녕하세요, <strong style="color: #7c5cbf;">{name}</strong>님.
+        </p>
+        <p style="margin: 0 0 24px 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+            비밀번호 찾기 인증코드를 안내해 드립니다.
+        </p>
+        <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fff5f5 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
+            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">인증코드</p>
+            <p style="margin: 0; color: #7c5cbf; font-size: 36px; font-weight: 700; letter-spacing: 8px;">{verification_code}</p>
+        </div>
+        <div style="background-color: #fff8e6; border-radius: 8px; padding: 12px 16px; margin: 24px 0;">
+            <p style="margin: 0; color: #c4930a; font-size: 13px;">
+                ⏱️ 이 인증코드는 <strong>5분 후 만료</strong>됩니다.
+            </p>
+        </div>
+        <p style="margin: 24px 0 0 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+            감사합니다.
+        </p>
+    '''
+    html = get_email_base_template(content, "비밀번호 찾기 인증코드")
+
+    return text, html
+
 
 def create_temp_password_email(user, temp_password):
-    """임시 비밀번호 이메일 내용 생성"""
-    return f'''안녕하세요, {user.first_name or user.username}님.
+    """임시 비밀번호 이메일 내용 생성 (텍스트 + HTML)"""
+    name = user.first_name or user.username
+
+    # 텍스트 버전
+    text = f'''안녕하세요, {name}님.
 
 인증이 완료되어 임시 비밀번호를 안내해 드립니다.
 
@@ -100,3 +218,28 @@ def create_temp_password_email(user, temp_password):
 
 감사합니다.
 Fortune Life 팀'''
+
+    # HTML 버전
+    content = f'''
+        <p style="margin: 0 0 24px 0; color: #4a4a6a; font-size: 16px; line-height: 1.6;">
+            안녕하세요, <strong style="color: #7c5cbf;">{name}</strong>님.
+        </p>
+        <p style="margin: 0 0 24px 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+            인증이 완료되어 임시 비밀번호를 안내해 드립니다.
+        </p>
+        <div style="background: linear-gradient(135deg, #f5f0ff 0%, #fff5f5 100%); border-radius: 12px; padding: 24px; text-align: center; margin: 24px 0;">
+            <p style="margin: 0 0 8px 0; color: #9b8ab8; font-size: 12px;">임시 비밀번호</p>
+            <p style="margin: 0; color: #7c5cbf; font-size: 24px; font-weight: 700; letter-spacing: 2px; font-family: 'Courier New', monospace;">{temp_password}</p>
+        </div>
+        <div style="background-color: #ffefef; border-radius: 8px; padding: 12px 16px; margin: 24px 0;">
+            <p style="margin: 0; color: #d94848; font-size: 13px;">
+                🔐 로그인 후 <strong>반드시 비밀번호를 변경</strong>해주세요.
+            </p>
+        </div>
+        <p style="margin: 24px 0 0 0; color: #6b6b8a; font-size: 14px; line-height: 1.6;">
+            감사합니다.
+        </p>
+    '''
+    html = get_email_base_template(content, "임시 비밀번호 안내")
+
+    return text, html

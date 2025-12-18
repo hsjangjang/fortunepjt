@@ -2,8 +2,8 @@
   <!-- Navigation - Django base.html과 동일 -->
   <nav ref="navbarRef" class="navbar navbar-expand-xl navbar-dark fixed-top" @mouseleave="handleNavbarMouseLeave" @mouseenter="handleNavbarMouseEnter">
     <div class="container">
-      <router-link class="navbar-brand" to="/">
-        <MoonStar class="text-warning me-2" :size="24" />
+      <router-link class="navbar-brand d-flex align-items-center" to="/">
+        <img src="https://i.imgur.com/cND5Scv.png" alt="Logo" class="navbar-logo me-2" />
         <span class="text-gradient fw-bold">Lucky Pick it</span>
       </router-link>
       <button class="navbar-toggler border-0" type="button" @click="toggleMobileMenu">
@@ -72,7 +72,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import {
-  MoonStar, Sparkles, Diamond, Shirt, UtensilsCrossed,
+  Sparkles, Diamond, Shirt, UtensilsCrossed,
   UserCircle, IdCard, PlusCircle, LogOut, Package
 } from 'lucide-vue-next'
 
@@ -235,6 +235,13 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
+/* 로고 이미지 스타일 */
+.navbar-logo {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}
+
 /* 네비게이션 부드러운 애니메이션 */
 .navbar-collapse {
   transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.4s ease-in-out;
