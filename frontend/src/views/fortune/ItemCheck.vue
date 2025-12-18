@@ -113,11 +113,11 @@
                     <span class="text-white opacity-75">오늘의 행운색</span>
                   </div>
                   <div class="color-circles">
-                    <div class="color-circle" :style="`background: ${getColorBackground(itemColor)}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                    <div class="color-circle" :style="`background: ${getColorBackground(itemColor)}; border: 1px solid #fff;`"></div>
                     <div class="match-arrow text-white opacity-50">
                       <i class="fas fa-arrows-alt-h"></i>
                     </div>
-                    <div class="color-circle" :style="`background: ${luckyColor}; border: 2px solid rgba(255,255,255,0.2);`"></div>
+                    <div class="color-circle" :style="`background: ${luckyColor}; border: 1px solid #fff;`"></div>
                   </div>
                 </div>
 
