@@ -75,10 +75,12 @@
                   <h5 class="text-primary-light">인식된 아이템</h5>
                   <p class="fs-4 text-white fw-bold mb-3">{{ detectedItem }}</p>
                   <h5 class="text-primary-light">감지된 색상</h5>
-                  <div class="d-flex align-items-center justify-content-center gap-2 pb-2">
+                  <div class="d-flex align-items-center justify-content-center gap-3 pb-2">
                     <div v-for="color in detectedColors" :key="color.hex"
-                         class="flex-shrink-0"
-                         :style="`width: 40px; height: 40px; border-radius: 50%; background: ${getColorBackground(color.korean_name)}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
+                         class="d-flex flex-column align-items-center">
+                      <div :style="`width: 40px; height: 40px; border-radius: 50%; background: ${getColorBackground(color.korean_name)}; box-shadow: 0 2px 8px rgba(0,0,0,0.2);`"></div>
+                      <span class="text-white small mt-1">{{ color.korean_name }}</span>
+                    </div>
                   </div>
                 </div>
 
