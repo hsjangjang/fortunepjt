@@ -129,17 +129,21 @@ class ItemAnalyzer:
             1. item_name: 물체의 구체적인 이름 (한글로, 2-4글자)
                - 예시: '마우스', '향수', '지갑', '키링', '인형', '껌', '사탕', '초콜릿', '이어폰', '목걸이', '반지', '팔찌', '립스틱', '볼펜', '텀블러' 등
                - 구체적인 물건 이름을 사용하세요
+               - 무지개색/그라데이션 이미지나 색상표는 '색상판' 또는 '무지개 장식'으로 명명
 
             2. primary_color: 물체의 **가장 넓은 면적을 차지하는** 주요 색상 (한글로)
                - **반드시 아래 16가지 중 하나만 선택**:
                  '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색', '다양'
                - 배경색이나 작은 로고 색상은 제외하고 물체 자체의 색상만 판단
                - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로 분류
-               - **4가지 이상의 서로 다른 색상이 고르게 분포되어 있으면 '다양'으로 선택** (무지개, 멀티컬러, 알록달록한 아이템)
+               - ⚠️ **중요: 무지개색, 레인보우, 그라데이션, 여러 색이 섞인 물체는 무조건 '다양'으로 선택!**
+               - 빨강-주황-노랑-초록-파랑-보라 등 스펙트럼 색상이 보이면 → '다양'
+               - 3가지 이상의 서로 다른 색상이 고르게 분포되어 있으면 → '다양'
 
             3. secondary_colors: 보조 색상 배열 (primary_color 외에 눈에 띄는 모든 색상)
                - **단색 물체(한 가지 색만 보이는 경우)는 반드시 빈 배열 []**
                - **여러 색이 보이면 모두 나열** (예: 무지개색이면 ['주황색', '노란색', '초록색', '파란색', '보라색'])
+               - ⚠️ primary_color가 '다양'이어도 secondary_colors에 실제 보이는 색상들 나열!
                - 로고, 스티칭(박음질), 지퍼, 단추 등 작은 장식 색상은 무시
                - 반사광, 그림자는 별도 색상으로 취급하지 않음
 
@@ -195,6 +199,15 @@ class ItemAnalyzer:
               "tags": ["마우스", "직장운", "심플함"],
               "fortune_scores": {"love": 10, "money": 40, "work": 85, "health": 15, "study": 30}
             }
+
+            예시 4 (무지개색/멀티컬러 아이템):
+            {
+              "item_name": "색상판",
+              "primary_color": "다양",
+              "secondary_colors": ["빨간색", "주황색", "노란색", "초록색", "파란색", "보라색"],
+              "tags": ["장식품", "애정운", "알록달록"],
+              "fortune_scores": {"love": 60, "money": 50, "work": 50, "health": 50, "study": 50}
+            }
             """
             
             print("[DEBUG] Gemini API 호출 시작")
@@ -237,8 +250,8 @@ class ItemAnalyzer:
             # 총 색상 개수 계산 (primary 1개 + secondary 개수)
             total_color_count = 1 + len(secondary_colors) if primary_color_name else len(secondary_colors)
 
-            # 4개 이상의 색상이면 자동으로 '다양'으로 처리
-            if total_color_count >= 4 or primary_color_name == '다양':
+            # 3개 이상의 색상이면 자동으로 '다양'으로 처리 (무지개색 이미지 대응)
+            if total_color_count >= 3 or primary_color_name == '다양':
                 colors.append({
                     'name': 'primary',
                     'korean_name': '다양',
@@ -246,7 +259,7 @@ class ItemAnalyzer:
                     'rgb': (128, 128, 128),
                     'percentage': 100.0
                 })
-                print(f"[DEBUG] 색상 4개 이상 감지 ({total_color_count}개) → '다양'으로 자동 변환")
+                print(f"[DEBUG] 색상 3개 이상 감지 ({total_color_count}개) → '다양'으로 자동 변환")
             else:
                 # 일반 색상 처리
                 if primary_color_name:

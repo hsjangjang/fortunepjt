@@ -66,14 +66,14 @@
             </div>
 
             <div class="row mb-3">
-              <div class="col-md-3">
+              <div class="col-lg-3 col-md-4 mb-3 mb-lg-0">
                 <label class="form-label">생년월일 구분 <span class="text-warning">*</span></label>
                 <select v-model="form.calendar_type" class="form-select" required>
                   <option value="solar">양력</option>
                   <option value="lunar">음력</option>
                 </select>
               </div>
-              <div class="col-md-9">
+              <div class="col-lg-9 col-md-8">
                 <label class="form-label">생년월일 <span class="text-warning">*</span></label>
                 <div class="row g-2">
                   <div class="col-4">
