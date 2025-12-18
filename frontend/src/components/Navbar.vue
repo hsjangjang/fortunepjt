@@ -4,7 +4,7 @@
     <div class="container">
       <router-link class="navbar-brand" to="/">
         <MoonStar class="text-warning me-2" :size="24" />
-        <span class="text-gradient fw-bold">Fortune Life</span>
+        <span class="text-gradient fw-bold">Lucky Pick it</span>
       </router-link>
       <button class="navbar-toggler border-0" type="button" @click="toggleMobileMenu">
         <span class="navbar-toggler-icon"></span>
