@@ -43,7 +43,7 @@ Thumbs.db
 .env
 .env.local
 frontend/.env
-deploy.zip
+*.zip
 
 # Claude
 .claude/settings.local.json
