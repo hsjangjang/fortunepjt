@@ -9,7 +9,7 @@
           </span>
         </div>
         <h1 class="display-title fw-bold mb-4">
-          오늘의 운세가<br>당신의 일상을 바꿉니다
+          행운의 픽<br>당신의 하루를 열어보아요
         </h1>
         <p class="lead text-muted mb-5">
           사주와 별자리를 분석하여<br>
