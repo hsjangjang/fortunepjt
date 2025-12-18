@@ -112,6 +112,17 @@
                   <i class="fas fa-times"></i> 취소
                 </button>
               </div>
+
+              <hr class="my-4 border-light border-opacity-25">
+
+              <div class="text-center d-flex justify-content-center gap-2 flex-wrap">
+                <router-link to="/change-password" class="btn btn-outline-light btn-sm rounded-pill px-3">
+                  <i class="fas fa-key me-1"></i> 비밀번호 변경
+                </router-link>
+                <router-link to="/delete-account" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                  <i class="fas fa-user-times me-1"></i> 회원 탈퇴
+                </router-link>
+              </div>
             </form>
 
             <!-- 프로필 보기 -->
@@ -177,24 +188,8 @@
               <hr class="my-4">
 
               <div class="text-center">
-                <router-link to="/fortune/today" class="btn btn-primary rounded-pill px-4 mb-3">
+                <router-link to="/fortune/today" class="btn btn-primary rounded-pill px-4">
                   <i class="fas fa-star me-1"></i> 오늘의 운세 보기
-                </router-link>
-              </div>
-              <div class="text-center d-flex justify-content-center gap-2 flex-wrap">
-                <button class="btn btn-outline-light btn-sm rounded-pill px-3" @click="editProfile">
-                  <i class="fas fa-edit me-1"></i> 프로필 수정
-                </button>
-                <router-link to="/change-password" class="btn btn-outline-light btn-sm rounded-pill px-3">
-                  <i class="fas fa-key me-1"></i> 비밀번호 변경
-                </router-link>
-              </div>
-
-              <hr class="my-4 border-light border-opacity-25">
-
-              <div class="text-center">
-                <router-link to="/delete-account" class="btn btn-outline-danger btn-sm rounded-pill px-3">
-                  <i class="fas fa-user-times me-1"></i> 회원 탈퇴
                 </router-link>
               </div>
             </div>
