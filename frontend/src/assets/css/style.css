@@ -724,14 +724,14 @@ h6 { font-size: var(--font-size-base); }
     max-width: 700px;
 }
 
-/* Page Header - 페이지 헤더 */
+/* Page Header - 페이지 헤더 (통일된 크기) */
 .page-header {
     text-align: center;
     margin-bottom: 2rem;
 }
 
 .page-header .page-title {
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl);  /* 2.5rem, 모바일에서 자동 축소 */
     font-weight: 700;
     color: white;
     margin-bottom: 0.5rem;
@@ -742,19 +742,18 @@ h6 { font-size: var(--font-size-base); }
 }
 
 .page-header .page-subtitle {
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);  /* 1.125rem */
     color: rgba(255, 255, 255, 0.75);
     margin: 0;
 }
 
-/* Page Header Large - 조금 더 큰 헤더 (메뉴추천, 내아이템 등) */
+/* page-header-lg는 더 이상 사용하지 않음 - 하위 호환성 유지 */
 .page-header.page-header-lg .page-title {
-    font-size: 2.8rem;
+    font-size: var(--font-size-4xl);
 }
 
 .page-header.page-header-lg .page-subtitle {
-    font-size: 1rem;
-    margin-top: 0.25rem;
+    font-size: var(--font-size-lg);
 }
 
 /* Card Base - 기본 카드 스타일 (글래스모피즘) */
@@ -977,9 +976,7 @@ h6 { font-size: var(--font-size-base); }
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .page-header .page-title {
-        font-size: 2rem;
-    }
+    /* .page-title은 CSS 변수로 자동 반응형 적용 */
 
     .card-base.card-lg {
         padding: 2rem;
@@ -1001,13 +998,13 @@ h6 { font-size: var(--font-size-base); }
     }
 
     .page-header .page-title {
-        font-size: 1.75rem;
+        /* font-size는 CSS 변수로 자동 적용 */
         flex-direction: column;
         gap: 0.5rem;
     }
 
     .page-header .page-subtitle {
-        font-size: 1rem;
+        /* font-size는 CSS 변수로 자동 적용 */
     }
 
     .card-base {
@@ -1065,9 +1062,7 @@ h6 { font-size: var(--font-size-base); }
 
 /* Small Mobile (480px 이하) */
 @media (max-width: 480px) {
-    .page-header .page-title {
-        font-size: 1.5rem;
-    }
+    /* .page-title font-size는 CSS 변수로 자동 적용 */
 
     .card-base.card-lg {
         padding: 1rem;
