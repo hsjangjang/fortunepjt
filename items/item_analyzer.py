@@ -137,13 +137,11 @@ class ItemAnalyzer:
                - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로 분류
                - **4가지 이상의 서로 다른 색상이 고르게 분포되어 있으면 '다양'으로 선택** (무지개, 멀티컬러, 알록달록한 아이템)
 
-            3. secondary_colors: 보조 색상 배열
+            3. secondary_colors: 보조 색상 배열 (primary_color 외에 눈에 띄는 모든 색상)
                - **단색 물체(한 가지 색만 보이는 경우)는 반드시 빈 배열 []**
-               - **primary_color가 '다양'인 경우도 빈 배열 []**
-               - 두 가지 이상의 색이 **전체 면적의 20% 이상**을 차지할 때만 추가
-               - 로고, 스티칭(박음질), 지퍼, 단추, 장식 등 작은 부분의 색상은 무시
-               - 그라데이션, 반사광, 그림자는 별도 색상으로 취급하지 않음
-               - **확실하지 않으면 빈 배열 []로 응답**
+               - **여러 색이 보이면 모두 나열** (예: 무지개색이면 ['주황색', '노란색', '초록색', '파란색', '보라색'])
+               - 로고, 스티칭(박음질), 지퍼, 단추 등 작은 장식 색상은 무시
+               - 반사광, 그림자는 별도 색상으로 취급하지 않음
 
             4. tags: 해시태그 3개 (아이템 특성과 행운 관련)
                - 첫 번째: 아이템 종류 (예: '지갑', '향수', '키링')
@@ -233,30 +231,44 @@ class ItemAnalyzer:
             
             # 색상 정보를 표준 형식으로 변환
             colors = []
-            if ai_result.get('primary_color'):
-                primary_color_name = ai_result['primary_color']
-                # AI가 한글로 응답하므로 그대로 사용
+            primary_color_name = ai_result.get('primary_color', '')
+            secondary_colors = ai_result.get('secondary_colors', [])
+
+            # 총 색상 개수 계산 (primary 1개 + secondary 개수)
+            total_color_count = 1 + len(secondary_colors) if primary_color_name else len(secondary_colors)
+
+            # 4개 이상의 색상이면 자동으로 '다양'으로 처리
+            if total_color_count >= 4 or primary_color_name == '다양':
                 colors.append({
                     'name': 'primary',
-                    'korean_name': primary_color_name,  # 한글 색상명 (AI가 직접 한글로 제공)
-                    'hex': self._color_name_to_hex(primary_color_name),  # 매칭용
+                    'korean_name': '다양',
+                    'hex': 'rainbow',
                     'rgb': (128, 128, 128),
-                    'percentage': 80.0
+                    'percentage': 100.0
                 })
+                print(f"[DEBUG] 색상 4개 이상 감지 ({total_color_count}개) → '다양'으로 자동 변환")
+            else:
+                # 일반 색상 처리
+                if primary_color_name:
+                    colors.append({
+                        'name': 'primary',
+                        'korean_name': primary_color_name,
+                        'hex': self._color_name_to_hex(primary_color_name),
+                        'rgb': (128, 128, 128),
+                        'percentage': 80.0
+                    })
 
-            # 보조 색상 (있을 때만 추가, 최대 1개만)
-            secondary_colors = ai_result.get('secondary_colors', [])
-            if secondary_colors:  # 빈 배열이 아닐 때만
-                # 첫 번째 색상만 사용 (AI가 너무 많이 추가하는 경향이 있음)
-                for idx, sec_color in enumerate(secondary_colors[:1]):  # 최대 1개만!
-                    if sec_color:  # 빈 문자열 체크
-                        colors.append({
-                            'name': f'secondary_{idx}',
-                            'korean_name': sec_color,  # 한글 색상명 (AI가 직접 한글로 제공)
-                            'hex': self._color_name_to_hex(sec_color),
-                            'rgb': (100, 100, 100),
-                            'percentage': 10.0
-                        })
+                # 보조 색상 (있을 때만 추가, 최대 1개만)
+                if secondary_colors:
+                    for idx, sec_color in enumerate(secondary_colors[:1]):
+                        if sec_color:
+                            colors.append({
+                                'name': f'secondary_{idx}',
+                                'korean_name': sec_color,
+                                'hex': self._color_name_to_hex(sec_color),
+                                'rgb': (100, 100, 100),
+                                'percentage': 10.0
+                            })
             
             print("[DEBUG] AI 분석 성공!")
             return {
