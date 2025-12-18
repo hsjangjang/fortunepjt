@@ -60,7 +60,7 @@ export const colorMap = {
 }
 
 // 무지개 그라데이션 CSS
-export const RAINBOW_GRADIENT = 'linear-gradient(90deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF)'
+export const RAINBOW_GRADIENT = 'conic-gradient(from 0deg, #FF0000, #FF7F00, #FFFF00, #00FF00, #0000FF, #4B0082, #8B00FF, #FF0000)'
 
 // 색상이 '다양'(무지개)인지 확인
 export const isRainbowColor = (colorName) => {
