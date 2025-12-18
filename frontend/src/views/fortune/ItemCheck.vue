@@ -61,7 +61,7 @@
             </div>
             
              <!-- Analysis Result -->
-            <div v-if="showResult" class="result-card card-base card-md mt-4">
+            <div v-if="showResult" class="result-card card-base card-md mt-4" style="overflow: hidden;">
               <div class="card-body">
                 <h4 class="text-center text-white mb-4">분석 결과</h4>
 
@@ -492,6 +492,9 @@ const updateMatchDescription = (score, itemName, matchedColor) => {
   // 매칭된 행운색으로 "오늘의 행운색" 원 업데이트
   if (matchedColor && colorMap[matchedColor]) {
     luckyColor.value = colorMap[matchedColor]
+  } else if (luckyColorsWithHex.value.length > 0) {
+    // 매칭된 색상이 없으면 첫 번째 행운색 표시
+    luckyColor.value = luckyColorsWithHex.value[0].hex
   }
 
   const msg = getScoreMessage(score)
