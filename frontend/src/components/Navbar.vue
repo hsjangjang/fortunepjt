@@ -240,7 +240,7 @@ const handleLogout = async () => {
   width: 30px;
   height: 30px;
   object-fit: contain;
-  margin-right: 6px;
+  /* margin-right: 6px; */
 }
 
 /* 네비게이션 부드러운 애니메이션 */
