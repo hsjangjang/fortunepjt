@@ -130,44 +130,44 @@ class ItemAnalyzer:
                - 예시: '마우스', '향수', '지갑', '키링', '인형', '껌', '사탕', '초콜릿', '이어폰', '목걸이', '반지', '팔찌', '립스틱', '볼펜', '텀블러' 등
                - 구체적인 물건 이름을 사용하세요
 
-            2. all_colors: 물체에서 눈에 띄는 **모든 색상**을 배열로 나열 (필수!)
+            2. primary_colors: 물체의 **주요 색상** (면적이 큰 핵심 색상만!)
                - **반드시 아래 15가지 색상만 사용**:
                  '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색'
                - 배경색 제외, 물체 자체의 색상만
-               - 어두운 색(짙은 네이비, 차콜, 진회색 등)은 '검은색'으로
+               - **주요 색상만 포함**: 물체의 본체, 몸통 등 면적이 큰 부분의 색상
+               - 작은 부분(눈, 버튼, 로고, 지퍼, 스티칭 등)의 색상은 제외!
 
-               **색상 개수 판단 기준 (매우 중요!):**
-               - **단색 물체**: 전체가 1가지 색이면 1개만 (예: ["검은색"])
-               - **2색 물체**: 2가지 주요 색상이면 2개 (예: ["분홍색", "금색"])
-               - **다색/무지개/그라데이션/색상표**: 3가지 이상 색상이 보이면 **모든 색상 나열**
-                 - 무지개: ["빨간색", "주황색", "노란색", "초록색", "파란색", "보라색"]
-                 - 색상표/팔레트: 보이는 모든 색상 나열 (3개 이상)
-                 - 알록달록한 물체: 보이는 모든 색상 나열 (3개 이상)
+               **주요 색상 판단 기준:**
+               - **단색 물체**: 1개 (예: ["검은색"])
+               - **2색 물체**: 2개 (예: ["분홍색", "금색"])
+               - **다색/무지개/그라데이션**: 면적이 큰 색상들만 (예: ["빨간색", "주황색", "노란색", "초록색", "파란색", "보라색"])
 
-               - 로고, 스티칭, 지퍼, 단추 등 작은 장식 색상은 무시
-               - 반사광, 그림자는 별도 색상으로 취급 안 함
-               - **이미지에 여러 색상이 보이면 반드시 모두 나열하세요!**
+            3. accent_colors: 물체의 **보조/악센트 색상** (작은 부분, 장식)
+               - 눈, 버튼, 로고, 지퍼, 스티칭, 단추 등 작은 장식의 색상
+               - 주요 색상에 포함되지 않은 부가적인 색상
+               - 없으면 빈 배열 []
 
-            3. tags: 해시태그 3개 (아이템 특성과 행운 관련)
+            4. tags: 해시태그 3개 (아이템 특성과 행운 관련)
                - 첫 번째: 아이템 종류 (예: '지갑', '향수', '키링')
                - 두 번째: **반드시** 아래 5개 운세 중 하나 선택:
                  '애정운', '금전운', '직장운', '건강운', '학업운'
                - 세 번째: 아이템 느낌 (예: '고급스러움', '심플함', '귀여움', '다채로움')
 
-            4. fortune_scores: 각 운세 강화 점수 (0~100)
+            5. fortune_scores: 각 운세 강화 점수 (0~100)
                - love: 애정운, money: 금전운, work: 직장운, health: 건강운, study: 학업운
                - 아이템 특성에 따라 판단
 
             **중요**:
             - 반드시 유효한 JSON 형식으로만 응답
             - 마크다운 코드 블록(```) 절대 사용 금지
-            - all_colors는 **필수 필드**이며, 최소 1개 이상 반드시 포함
-            - primary_color, secondary_colors 사용 금지 - 오직 all_colors만 사용
+            - primary_colors는 **필수 필드**이며, 최소 1개 이상 반드시 포함
+            - accent_colors는 없으면 빈 배열 []
 
             예시 1 (검은 지갑 - 단색):
             {
               "item_name": "지갑",
-              "all_colors": ["검은색"],
+              "primary_colors": ["검은색"],
+              "accent_colors": [],
               "tags": ["지갑", "금전운", "고급스러움"],
               "fortune_scores": {"love": 20, "money": 95, "work": 50, "health": 10, "study": 15}
             }
@@ -175,25 +175,28 @@ class ItemAnalyzer:
             예시 2 (분홍+금색 향수 - 2색):
             {
               "item_name": "향수",
-              "all_colors": ["분홍색", "금색"],
+              "primary_colors": ["분홍색", "금색"],
+              "accent_colors": [],
               "tags": ["향수", "애정운", "화려함"],
               "fortune_scores": {"love": 90, "money": 30, "work": 40, "health": 15, "study": 10}
             }
 
-            예시 3 (무지개 색상표 - 다색):
+            예시 3 (흰색+초록색 오리인형 - 눈/발은 악센트):
             {
-              "item_name": "색상표",
-              "all_colors": ["빨간색", "주황색", "노란색", "초록색", "파란색", "남색", "보라색"],
-              "tags": ["색상표", "애정운", "다채로움"],
-              "fortune_scores": {"love": 60, "money": 50, "work": 50, "health": 50, "study": 50}
+              "item_name": "오리인형",
+              "primary_colors": ["흰색", "초록색"],
+              "accent_colors": ["노란색", "검은색"],
+              "tags": ["인형", "애정운", "귀여움"],
+              "fortune_scores": {"love": 90, "money": 15, "work": 20, "health": 60, "study": 10}
             }
 
-            예시 4 (알록달록한 키링 - 다색):
+            예시 4 (무지개 색상표 - 다색):
             {
-              "item_name": "키링",
-              "all_colors": ["빨간색", "노란색", "파란색", "초록색"],
-              "tags": ["키링", "금전운", "알록달록"],
-              "fortune_scores": {"love": 50, "money": 70, "work": 45, "health": 40, "study": 35}
+              "item_name": "색상표",
+              "primary_colors": ["빨간색", "주황색", "노란색", "초록색", "파란색", "남색", "보라색"],
+              "accent_colors": [],
+              "tags": ["색상표", "애정운", "다채로움"],
+              "fortune_scores": {"love": 60, "money": 50, "work": 50, "health": 50, "study": 50}
             }
             """
             
@@ -231,23 +234,26 @@ class ItemAnalyzer:
 
             # 색상 정보를 표준 형식으로 변환
             colors = []
-            all_colors = ai_result.get('all_colors', [])
+            primary_colors = ai_result.get('primary_colors', [])
+            accent_colors = ai_result.get('accent_colors', [])
 
-            # 하위 호환성: 기존 primary_color/secondary_colors 형식도 지원
-            if not all_colors:
-                primary_color = ai_result.get('primary_color', '')
-                secondary_colors = ai_result.get('secondary_colors', [])
-                if primary_color:
-                    all_colors = [primary_color] + secondary_colors
-                    # ai_result에도 all_colors 추가 (프론트엔드 일관성)
-                    ai_result['all_colors'] = all_colors
-                    print(f"[DEBUG] primary_color/secondary_colors -> all_colors 변환: {all_colors}")
+            # 하위 호환성: 기존 all_colors 형식도 지원
+            if not primary_colors:
+                all_colors = ai_result.get('all_colors', [])
+                if all_colors:
+                    primary_colors = all_colors
+                    ai_result['primary_colors'] = primary_colors
+                    print(f"[DEBUG] all_colors -> primary_colors 변환: {primary_colors}")
 
-            total_color_count = len(all_colors)
-            print(f"[DEBUG] 감지된 색상 {total_color_count}개: {all_colors}")
+            # all_colors는 primary_colors + accent_colors 합친 것으로 저장 (프론트엔드 호환성)
+            ai_result['all_colors'] = primary_colors + accent_colors
 
-            # 4개 이상의 색상이면 '다양'으로 처리
-            if total_color_count >= 4:
+            primary_count = len(primary_colors)
+            print(f"[DEBUG] 주요 색상 {primary_count}개: {primary_colors}")
+            print(f"[DEBUG] 악센트 색상 {len(accent_colors)}개: {accent_colors}")
+
+            # primary_colors가 4개 이상이면 '다양'으로 처리
+            if primary_count >= 4:
                 colors.append({
                     'name': 'primary',
                     'korean_name': '다양',
@@ -255,10 +261,10 @@ class ItemAnalyzer:
                     'rgb': (128, 128, 128),
                     'percentage': 100.0
                 })
-                print(f"[DEBUG] 색상 4개 이상 ({total_color_count}개) → '다양'으로 자동 변환")
+                print(f"[DEBUG] 주요 색상 4개 이상 ({primary_count}개) → '다양'으로 자동 변환")
             else:
-                # 1-3개 색상: 상위 2개만 표시
-                for idx, color_name in enumerate(all_colors[:2]):
+                # 1-3개 주요 색상: 상위 2개만 표시
+                for idx, color_name in enumerate(primary_colors[:2]):
                     if color_name:
                         colors.append({
                             'name': 'primary' if idx == 0 else 'secondary',
