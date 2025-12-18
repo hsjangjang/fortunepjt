@@ -36,13 +36,24 @@
             <div class="row mb-3">
               <div class="col-md-6 mb-3 mb-md-0">
                 <label class="form-label">이름 <span class="text-warning">*</span></label>
-                <input
-                  type="text"
-                  v-model="form.first_name"
-                  class="form-control"
-                  required
-                  placeholder="실명을 입력하세요"
-                >
+                <div class="d-flex gap-2">
+                  <input
+                    type="text"
+                    v-model="form.last_name"
+                    class="form-control"
+                    required
+                    placeholder="성"
+                    style="flex: 1;"
+                  >
+                  <input
+                    type="text"
+                    v-model="form.first_name"
+                    class="form-control"
+                    required
+                    placeholder="이름"
+                    style="flex: 2;"
+                  >
+                </div>
               </div>
               <div class="col-md-6">
                 <label class="form-label">성별 <span class="text-warning">*</span></label>
