@@ -52,7 +52,12 @@
             </div>
             <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
               <span class="text-white-50 me-2 fortune-label"><i class="fas fa-palette me-1" style="color: #a78bfa;"></i>오늘의 행운색:</span>
-              <span class="text-white">{{ luckyColors.join(', ') }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
+                  <span class="lucky-color-dot" :style="{ background: getColorBackground(color) }"></span>
+                  <span class="text-white">{{ color }}</span>
+                </span>
+              </div>
             </div>
           </div>
 
@@ -176,7 +181,7 @@ import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
-import { getTextColor, getColorMatchScore } from '@/utils/colors'
+import { getTextColor, getColorMatchScore, getColorBackground } from '@/utils/colors'
 import { getFortuneBoostScore } from '@/utils/similarity'
 import { FORTUNE_CATEGORIES, getCategoryColor } from '@/utils/fortuneCategories'
 
@@ -494,6 +499,21 @@ onMounted(() => {
 /* 운세별/행운색 라벨 동일 스타일 */
 .fortune-label {
   font-size: 0.9rem;
+}
+
+/* 행운색 아이템 (점 + 텍스트) */
+.lucky-color-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.lucky-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
 }
 
 /* 운세 미생성 시 유도 배너 */

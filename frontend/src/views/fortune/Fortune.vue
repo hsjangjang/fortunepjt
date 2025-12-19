@@ -11,30 +11,24 @@
           <p class="page-subtitle">{{ periodSubtitle }}</p>
         </div>
 
-        <!-- 기간 선택 버튼 -->
-        <div class="period-selector mb-4">
-          <div class="btn-group-period d-flex justify-content-center gap-2">
+        <!-- 기간 선택 버튼 (한 줄) -->
+        <div class="period-selector mb-3">
+          <div class="btn-group-period">
             <button
-              class="btn-period btn-daily"
+              class="btn-period"
               :class="{ active: selectedPeriod === 'daily' }"
               @click="changePeriod('daily')"
-            >
-              <i class="fas fa-sun me-1"></i> 오늘의 운세
-            </button>
+            >오늘</button>
             <button
-              class="btn-period btn-weekly"
+              class="btn-period"
               :class="{ active: selectedPeriod === 'weekly' }"
               @click="changePeriod('weekly')"
-            >
-              <i class="fas fa-calendar-week me-1"></i> 이 주의 운세
-            </button>
+            >이번 주</button>
             <button
-              class="btn-period btn-monthly"
+              class="btn-period"
               :class="{ active: selectedPeriod === 'monthly' }"
               @click="changePeriod('monthly')"
-            >
-              <i class="fas fa-calendar-alt me-1"></i> 이 달의 운세
-            </button>
+            >이번 달</button>
           </div>
         </div>
 
@@ -52,8 +46,7 @@
                         :data-score="fortune.fortune_score || 0"></circle>
               </svg>
               <div class="fortune-score-text">
-                <div class="score">{{ displayScore }}</div>
-                <div class="label">점</div>
+                <span class="score">{{ displayScore }}</span><span class="label">점</span>
               </div>
             </div>
 
@@ -77,26 +70,32 @@
       <!-- Fortune Details Tabs -->
       <div v-if="fortune" class="card-base card-lg section-spacing overflow-hidden">
             <div class="card-header border-0 responsive-padding-header">
-              <ul class="nav nav-pills fortune-tabs gap-2 mobile-grid-tabs justify-content-center" role="tablist">
-                <li class="nav-item">
-                  <a class="nav-link active" id="tab-total" data-bs-toggle="tab" href="#total">종합운</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="tab-money" data-bs-toggle="tab" href="#money">재물운</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="tab-love" data-bs-toggle="tab" href="#love">연애운</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="tab-study" data-bs-toggle="tab" href="#study">학업운</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="tab-work" data-bs-toggle="tab" href="#work">직장운</a>
-                </li>
-                <li class="nav-item">
-                  <a class="nav-link" id="tab-health" data-bs-toggle="tab" href="#health">건강운</a>
-                </li>
-              </ul>
+              <div class="fortune-tabs-wrapper">
+                <a class="fortune-tab active" id="tab-total" data-bs-toggle="tab" href="#total">
+                  <span class="tab-icon">⭐</span>
+                  <span class="tab-label">종합운</span>
+                </a>
+                <a class="fortune-tab" id="tab-love" data-bs-toggle="tab" href="#love">
+                  <span class="tab-icon">💗</span>
+                  <span class="tab-label">애정운</span>
+                </a>
+                <a class="fortune-tab" id="tab-money" data-bs-toggle="tab" href="#money">
+                  <span class="tab-icon">🪙</span>
+                  <span class="tab-label">금전운</span>
+                </a>
+                <a class="fortune-tab" id="tab-work" data-bs-toggle="tab" href="#work">
+                  <span class="tab-icon">💼</span>
+                  <span class="tab-label">직장운</span>
+                </a>
+                <a class="fortune-tab" id="tab-health" data-bs-toggle="tab" href="#health">
+                  <span class="tab-icon">💚</span>
+                  <span class="tab-label">건강운</span>
+                </a>
+                <a class="fortune-tab" id="tab-study" data-bs-toggle="tab" href="#study">
+                  <span class="tab-icon">📘</span>
+                  <span class="tab-label">학업운</span>
+                </a>
+              </div>
             </div>
             <div class="card-body responsive-padding">
               <div class="tab-content">
@@ -885,68 +884,88 @@ onMounted(async () => {
   color: rgba(255, 255, 255, 0.8);
 }
 
-.nav-pills .nav-link {
-  color: rgba(255,255,255,0.6);
-  transition: all 0.3s;
-  border: 1px solid rgba(255,255,255,0.15);
-  border-radius: 12px; /* Rounded corners like the score box */
-  background: rgba(255, 255, 255, 0.05); /* Faint background */
-  width: 100%;
-  padding: 0.6rem 0.5rem;
-}
-.nav-pills .nav-item:last-child .nav-link {
-  border-right: 1px solid rgba(255,255,255,0.15);
-}
-.nav-pills .nav-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-}
-.nav-pills .nav-link.active {
-  color: white;
-  font-weight: bold;
+/* 운세 탭 래퍼 - 6개 탭 가로 배치 */
+.fortune-tabs-wrapper {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
 }
 
-/* Individual Active Colors for Tabs (Rounded Line Button Style) */
-/* Total: Purple */
+/* 운세 탭 버튼 스타일 */
+.fortune-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  min-width: 70px;
+  background: rgba(30, 30, 40, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.fortune-tab:hover {
+  background: rgba(50, 50, 60, 0.9);
+  color: white;
+  transform: translateY(-2px);
+}
+
+.fortune-tab .tab-icon {
+  font-size: 1.3rem;
+  margin-bottom: 0.25rem;
+}
+
+.fortune-tab .tab-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+/* 탭 활성 상태 - 각 탭별 색상 */
+.fortune-tab.active {
+  color: white;
+  font-weight: 600;
+}
+
 #tab-total.active {
-  background: rgba(124, 58, 237, 0.25);
+  background: rgba(124, 58, 237, 0.4);
   border-color: #a78bfa;
-  box-shadow: 0 0 10px rgba(167, 139, 250, 0.2);
-}
-/* Money: Yellow */
-#tab-money.active {
-  background: rgba(245, 158, 11, 0.25);
-  border-color: #fbbf24;
-  box-shadow: 0 0 10px rgba(251, 191, 36, 0.2);
-}
-/* Love: Red */
-#tab-love.active {
-  background: rgba(239, 68, 68, 0.25);
-  border-color: #f87171;
-  box-shadow: 0 0 10px rgba(248, 113, 113, 0.2);
-}
-/* Study: Blue */
-#tab-study.active {
-  background: rgba(59, 130, 246, 0.25);
-  border-color: #60a5fa;
-  box-shadow: 0 0 10px rgba(96, 165, 250, 0.2);
-}
-/* Work: Green */
-#tab-work.active {
-  background: rgba(16, 185, 129, 0.25);
-  border-color: #34d399;
-  box-shadow: 0 0 10px rgba(52, 211, 153, 0.2);
-}
-/* Health: Teal */
-#tab-health.active {
-  background: rgba(45, 212, 191, 0.25);
-  border-color: #2dd4bf;
-  box-shadow: 0 0 10px rgba(45, 212, 191, 0.2);
+  box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
 }
 
-/* Mobile Grid for Tabs */
-.mobile-grid-tabs {
-  display: flex !important;
+#tab-love.active {
+  background: rgba(239, 68, 68, 0.4);
+  border-color: #f87171;
+  box-shadow: 0 0 15px rgba(248, 113, 113, 0.3);
+}
+
+#tab-money.active {
+  background: rgba(245, 158, 11, 0.4);
+  border-color: #fbbf24;
+  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
+}
+
+#tab-work.active {
+  background: rgba(16, 185, 129, 0.4);
+  border-color: #34d399;
+  box-shadow: 0 0 15px rgba(52, 211, 153, 0.3);
+}
+
+#tab-health.active {
+  background: rgba(45, 212, 191, 0.4);
+  border-color: #2dd4bf;
+  box-shadow: 0 0 15px rgba(45, 212, 191, 0.3);
+}
+
+#tab-study.active {
+  background: rgba(59, 130, 246, 0.4);
+  border-color: #60a5fa;
+  box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
 }
 
 /* Responsive Padding Utilities */
@@ -976,21 +995,23 @@ onMounted(async () => {
 }
 
 @media (max-width: 768px) {
-  /* 모바일 기간 선택 버튼 */
+  /* 모바일 기간 선택 버튼 - 한 줄 유지 */
   .btn-group-period {
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.5rem !important;
+    justify-content: center;
   }
 
   .btn-period {
-    width: 100%;
-    padding: 0.5rem 1rem;
-    font-size: 0.85rem;
+    flex: 1;
+    max-width: 100px;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.8rem;
   }
 
   /* Percentage based padding for mobile */
   .responsive-padding {
-    padding: 3% !important; /* Minimized padding */
+    padding: 3% !important;
   }
   .responsive-padding-header {
     padding: 3% !important;
@@ -1000,13 +1021,47 @@ onMounted(async () => {
     border-radius: 12px;
   }
 
+  /* 모바일 별자리/띠 글자 크기 줄이기 */
+  .zodiac-badge {
+    font-size: 0.9rem !important;
+    padding: 0.4rem 0.8rem !important;
+    min-width: 100px;
+    min-height: 40px;
+  }
+
+  .zodiac-icon {
+    width: 22px;
+    height: 22px;
+  }
+
+  /* 모바일 운세 탭 - 3x2 그리드 */
+  .fortune-tabs-wrapper {
+    display: grid !important;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .fortune-tab {
+    min-width: unset;
+    padding: 0.6rem 0.5rem;
+  }
+
+  .fortune-tab .tab-icon {
+    font-size: 1.1rem;
+  }
+
+  .fortune-tab .tab-label {
+    font-size: 0.65rem;
+  }
+
   /* Responsive Lucky Color Circle */
   .lucky-color-circle {
     width: 60px;
     height: 60px;
     border-width: 2px;
   }
-  
+
   .responsive-text-shadow {
     font-size: 0.9rem;
   }
@@ -1017,27 +1072,6 @@ onMounted(async () => {
     height: 32px;
     font-size: 0.9rem;
     border-width: 1px;
-  }
-
-  /* 2x3 Grid implementation */
-  .mobile-grid-tabs {
-    display: grid !important;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(3, auto);
-    gap: 0.75rem !important;
-  }
-
-  .nav-pills .nav-item {
-    width: 100%;
-  }
-
-  .nav-pills .nav-link {
-    text-align: center;
-    font-size: 0.95rem;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
   }
 
   /* 모바일 행운 아이템 카드 */

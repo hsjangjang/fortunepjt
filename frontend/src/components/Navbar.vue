@@ -3,7 +3,7 @@
   <nav ref="navbarRef" class="navbar navbar-expand-xl navbar-dark fixed-top" @mouseleave="handleNavbarMouseLeave" @mouseenter="handleNavbarMouseEnter">
     <div class="container">
       <router-link class="navbar-brand d-flex align-items-center" to="/">
-        <img src="/logo.png" alt="Logo" class="navbar-logo" />
+        <span class="navbar-logo-icon">🔮</span>
         <span class="text-gradient fw-bold">Lucky Pick it</span>
       </router-link>
       <button class="navbar-toggler border-0" type="button" @click="toggleMobileMenu">
@@ -235,12 +235,11 @@ const handleLogout = async () => {
 </script>
 
 <style scoped>
-/* 로고 이미지 스타일 */
-.navbar-logo {
-  width: 30px;
-  height: 30px;
-  object-fit: contain;
-  /* margin-right: 6px; */
+/* 로고 아이콘 스타일 */
+.navbar-logo-icon {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+  filter: drop-shadow(0 0 6px rgba(167, 139, 250, 0.5));
 }
 
 /* 네비게이션 부드러운 애니메이션 */

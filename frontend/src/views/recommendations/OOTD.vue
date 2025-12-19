@@ -18,13 +18,18 @@
               <i class="fas fa-star-half-alt text-warning me-1"></i>
               {{ fortuneSummary }}
             </p>
-            <!-- 오늘의 행운색 - 텍스트로 표시 -->
+            <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
             <div v-if="luckyColors && luckyColors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
               <span class="text-white opacity-75 me-1">
                 <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
                 오늘의 행운색:
               </span>
-              <span class="text-white">{{ luckyColors.join(', ') }}</span>
+              <div class="d-flex align-items-center gap-2">
+                <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
+                  <span class="lucky-color-dot" :style="{ background: getColorBackground(color) }"></span>
+                  <span class="text-white">{{ color }}</span>
+                </span>
+              </div>
             </div>
         </div>
 
@@ -176,7 +181,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { colorMap } from '@/utils/colors'
+import { colorMap, getColorBackground } from '@/utils/colors'
 import { Chart, registerables } from 'chart.js'
 import ChartDataLabels from 'chartjs-plugin-datalabels'
 import {
@@ -733,6 +738,21 @@ onMounted(() => {
 .color-dot.small {
   width: 10px;
   height: 10px;
+}
+
+/* 행운색 아이템 (점 + 텍스트) */
+.lucky-color-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.lucky-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
 }
 
 .weather-icon-svg {
