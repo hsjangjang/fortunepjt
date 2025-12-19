@@ -1,18 +1,36 @@
 """
 사용자 관련 유틸리티 함수
 """
+import os
+from email.mime.image import MIMEImage
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 
 
+def get_logo_path():
+    """로고 파일 경로 반환"""
+    return os.path.join(settings.BASE_DIR, 'static', 'images', 'email', 'logo.png')
+
+
 def get_logo_html():
-    """로고 HTML 반환 (로고 URL이 있으면 이미지, 없으면 텍스트 로고)"""
-    logo_url = getattr(settings, 'EMAIL_LOGO_URL', '')
-    if logo_url and 'your-logo-url' not in logo_url:
-        return f'<img src="{logo_url}" alt="Lucky Pick it" style="width: 100px; height: 100px; margin-bottom: 16px; border-radius: 12px; object-fit: contain;">'
+    """로고 HTML 반환 (CID 참조 방식)"""
+    logo_path = get_logo_path()
+    if os.path.exists(logo_path):
+        return '<img src="cid:logo" alt="Lucky Pick It" style="width: 100px; height: 100px; margin-bottom: 16px; border-radius: 12px; object-fit: contain;">'
     else:
-        # 텍스트 기반 로고 (크리스탈 볼 이모지 사용)
+        # 로고 파일이 없으면 텍스트 기반 로고
         return '<div style="font-size: 64px; margin-bottom: 12px;">🔮</div>'
+
+
+def attach_logo(email_message):
+    """이메일에 로고 이미지 첨부"""
+    logo_path = get_logo_path()
+    if os.path.exists(logo_path):
+        with open(logo_path, 'rb') as f:
+            logo_image = MIMEImage(f.read())
+            logo_image.add_header('Content-ID', '<logo>')
+            logo_image.add_header('Content-Disposition', 'inline', filename='logo.png')
+            email_message.attach(logo_image)
 
 
 def get_email_base_template(content, title="Lucky Pick it"):
@@ -108,6 +126,8 @@ def send_fortune_email(subject, message, recipient_email, html_message=None):
                 to=[recipient_email],
             )
             email.attach_alternative(html_message, "text/html")
+            email.mixed_subtype = 'related'
+            attach_logo(email)
             email.send(fail_silently=False)
         else:
             send_mail(
