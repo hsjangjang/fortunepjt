@@ -15,6 +15,8 @@ from fortune.constants import (
     get_food_color_keywords,
     get_korean_color,
     get_color_gradient,
+    PERSONAL_COLOR_PALETTES,
+    PERSONAL_COLOR_AVOID,
 )
 from config.weather_config import DEFAULT_LOCATION
 
@@ -210,15 +212,16 @@ class OOTDRecommendationAPIView(APIView):
             recommendation_type='OOTD'
         ).first()
 
-        # 사용자 성별 가져오기
+        # 사용자 성별 및 퍼스널 컬러 가져오기
         user_gender = getattr(request.user, 'gender', None)
+        user_personal_color = getattr(request.user, 'personal_color', None)
 
         if existing_recommendation:
             # 기존 추천이 있으면 DB에서 가져오기
             outfit = existing_recommendation.recommendation_data
         else:
-            # 새로 생성하고 DB에 저장 (성별 반영)
-            outfit = self._generate_ootd(weather_data, lucky_colors, user_gender)
+            # 새로 생성하고 DB에 저장 (성별, 퍼스널 컬러 반영)
+            outfit = self._generate_ootd(weather_data, lucky_colors, user_gender, user_personal_color)
             DailyRecommendation.objects.create(
                 user=request.user,
                 recommendation_date=today,
@@ -236,8 +239,8 @@ class OOTDRecommendationAPIView(APIView):
             'date': str(today)
         })
 
-    def _generate_ootd(self, weather, lucky_colors, gender=None):
-        """OOTD 추천 생성 (성별 반영)"""
+    def _generate_ootd(self, weather, lucky_colors, gender=None, personal_color=None):
+        """OOTD 추천 생성 (성별, 퍼스널 컬러 반영)"""
         current_temp = weather.get('temp', 15)
         description = weather.get('description', '맑음')
 
@@ -256,11 +259,29 @@ class OOTDRecommendationAPIView(APIView):
         outers = get_clothes_by_temp_and_category(current_temp, '아우터', weather_condition, gender)
         accessories = get_clothes_by_temp_and_category(current_temp, '액세서리', weather_condition, gender)
 
-        # 행운색 변환
+        # 퍼스널 컬러에 맞는 색상 팔레트 가져오기
+        personal_color_palette = []
+        avoid_colors = []
+        if personal_color:
+            personal_color_palette = PERSONAL_COLOR_PALETTES.get(personal_color, [])
+            avoid_colors = PERSONAL_COLOR_AVOID.get(personal_color, [])
+
+        # 행운색 변환 (퍼스널 컬러 필터링 적용)
         lucky_color_variants = []
         if lucky_colors:
             for lc in lucky_colors:
+                # 퍼스널 컬러가 있으면 피해야 할 색상 제외
+                if personal_color and lc in avoid_colors:
+                    continue
+
                 variants = get_lucky_color_to_ootd(lc)
+                if variants and variants[0] not in lucky_color_variants:
+                    lucky_color_variants.append(variants[0])
+
+        # 퍼스널 컬러가 있는데 행운색이 모두 필터링된 경우, 퍼스널 컬러 팔레트에서 선택
+        if personal_color and not lucky_color_variants and personal_color_palette:
+            for palette_color in personal_color_palette[:3]:
+                variants = get_lucky_color_to_ootd(palette_color)
                 if variants and variants[0] not in lucky_color_variants:
                     lucky_color_variants.append(variants[0])
 
