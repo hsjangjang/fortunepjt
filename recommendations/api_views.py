@@ -414,9 +414,10 @@ class MenuRecommendationAPIView(APIView):
             # 추천 형식화
             recommendations = []
             for idx, food in enumerate(recommended_list, 1):
+                food_color = self._get_korean_color(food.get('color_category', ''))
                 recommendations.append({
                     'rank': idx,
-                    'color': lucky_color,
+                    'color': food_color,
                     'menu': {
                         'name': food.get('name_ko', ''),
                         'category': food.get('type', '기타'),
