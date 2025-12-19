@@ -271,7 +271,7 @@
               </div>
               <div v-else class="text-center">
                 <span class="lucky-item-icon">🎁</span>
-                <h5 class="text-white mt-3">미니 키링</h5>
+                <h5 class="text-white mt-3">열쇠고리</h5>
                 <p class="text-white opacity-75">새로운 문을 여는 열쇠가 됩니다</p>
               </div>
 

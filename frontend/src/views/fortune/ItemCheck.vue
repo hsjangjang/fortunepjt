@@ -289,7 +289,7 @@ const isRegistering = ref(false)  // 등록 중 상태
 const isAnalyzing = ref(false)  // 분석 중 상태
 const analysisResult = ref(null)  // AI 분석 결과 저장
 const luckyItems = ref({
-  main: '미니 키링',
+  main: '열쇠고리',
   zodiac: '실버 키링',
   special: '폰 스트랩'
 })
@@ -568,7 +568,7 @@ const fetchFortuneData = async () => {
 
     if (fortune.lucky_item) {
       luckyItems.value = {
-        main: fortune.lucky_item.main || '미니 키링',
+        main: fortune.lucky_item.main || '열쇠고리',
         zodiac: fortune.lucky_item.zodiac || '실버 키링',
         special: fortune.lucky_item.today_special || '폰 스트랩'
       }

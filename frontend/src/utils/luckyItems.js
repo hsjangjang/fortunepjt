@@ -42,7 +42,6 @@ export const luckyItemImages = {
   '시계': watchImg,
   '손목시계': watchImg,
   '열쇠고리': miniKeyringImg,
-  '미니 키링': miniKeyringImg,
   '동전 키링': miniKeyringImg,
   '스카프': scarfImg,
   '머플러': scarfImg,
