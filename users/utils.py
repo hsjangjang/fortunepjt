@@ -88,7 +88,7 @@ def get_from_email():
 
 
 def send_fortune_email(subject, message, recipient_email, html_message=None):
-    """Fortune Life 이메일 전송
+    """Lucky Pick It 이메일 전송
 
     Args:
         subject: 이메일 제목

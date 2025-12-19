@@ -1,4 +1,4 @@
-# Fortune Life - Vue3 Frontend
+# Lucky Pick It - Vue3 Frontend
 
 AI 기반 운세 서비스의 Vue3 SPA 프론트엔드입니다.
 
@@ -141,7 +141,7 @@ await authStore.login(username, password)
 
 ```env
 VITE_API_BASE_URL=http://localhost:8000
-VITE_APP_TITLE=Fortune Life
+VITE_APP_TITLE=Lucky Pick It
 ```
 
 컴포넌트에서 사용:
@@ -219,4 +219,4 @@ CORS_ALLOWED_ORIGINS = [
 
 ## 📄 라이선스
 
-© 2025 Fortune Life. All rights reserved.
+© 2025 Lucky Pick It. All rights reserved.
