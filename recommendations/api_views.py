@@ -403,12 +403,12 @@ class MenuRecommendationAPIView(APIView):
             all_foods = load_food_data()
             matching_foods = self._get_food_by_color(lucky_color, all_foods)
 
-            # 추천 음식 선택
+            # 추천 음식 선택 (최소 2개)
             if len(matching_foods) >= 2:
+                # 행운색 음식이 2개 이상이면 그 중에서 2개 선택
                 recommended_list = random.sample(matching_foods, 2)
-            elif len(matching_foods) == 1:
-                recommended_list = matching_foods
             else:
+                # 행운색 음식이 부족하면 전체에서 2개 선택
                 recommended_list = random.sample(all_foods, min(2, len(all_foods)))
 
             # 추천 형식화
