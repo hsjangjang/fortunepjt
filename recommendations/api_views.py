@@ -375,7 +375,6 @@ class MenuRecommendationAPIView(APIView):
                 'error': '생년월일 정보가 없습니다.'
             }, status=status.HTTP_400_BAD_REQUEST)
 
-        lucky_color = fortune_data.get('lucky_colors', ['노란색'])[0]
         lucky_colors = fortune_data.get('lucky_colors', [])[:3]
         zodiac_sign = fortune_data.get('zodiac_sign', '')
 
@@ -401,7 +400,14 @@ class MenuRecommendationAPIView(APIView):
         else:
             # 새로 생성
             all_foods = load_food_data()
-            matching_foods = self._get_food_by_color(lucky_color, all_foods)
+
+            # 3개 행운색 모두 고려하여 음식 찾기
+            matching_foods = []
+            for lucky_color in lucky_colors:
+                color_foods = self._get_food_by_color(lucky_color, all_foods)
+                for food in color_foods:
+                    if food not in matching_foods:
+                        matching_foods.append(food)
 
             # 추천 음식 선택 (최소 2개)
             if len(matching_foods) >= 2:
@@ -413,6 +419,7 @@ class MenuRecommendationAPIView(APIView):
 
             # 추천 형식화
             recommendations = []
+            primary_lucky_color = lucky_colors[0] if lucky_colors else '노란색'
             for idx, food in enumerate(recommended_list, 1):
                 food_color = self._get_korean_color(food.get('color_category', ''))
                 recommendations.append({
@@ -422,9 +429,9 @@ class MenuRecommendationAPIView(APIView):
                         'name': food.get('name_ko', ''),
                         'category': food.get('type', '기타'),
                         'icon': self._get_emoji_for_food(food),
-                        'desc': food.get('desc', f"행운의 {lucky_color} 에너지를 담은 음식입니다.")
+                        'desc': food.get('desc', f"행운의 색상 에너지를 담은 음식입니다.")
                     },
-                    'bg_gradient': self._get_gradient_for_color(lucky_color)
+                    'bg_gradient': self._get_gradient_for_color(primary_lucky_color)
                 })
 
             # 다른 추천
