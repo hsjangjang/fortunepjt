@@ -312,9 +312,12 @@ EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
 DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Lucky Pick It <noreply@luckypickit.com>')
 
-# 이메일 로고 URL (S3나 외부 URL로 설정)
-# 배포 후 Vercel URL로 설정: https://your-domain.vercel.app/logo.png
-EMAIL_LOGO_URL = config('EMAIL_LOGO_URL', default='')
+# 이메일 로고 URL
+# 이메일에서는 절대 URL이 필요합니다
+# 로컬 개발: http://localhost:8000/static/images/email/logo.png
+# 배포: 환경 변수로 S3 URL이나 외부 URL 설정
+SITE_URL = config('SITE_URL', default='http://localhost:8000')
+EMAIL_LOGO_URL = config('EMAIL_LOGO_URL', default=f'{SITE_URL}/static/images/email/logo.png')
 
 # AI Service Configuration
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
