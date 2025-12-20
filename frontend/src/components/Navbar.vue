@@ -3,7 +3,7 @@
   <nav ref="navbarRef" class="navbar navbar-expand-xl navbar-dark fixed-top" @mouseleave="handleNavbarMouseLeave" @mouseenter="handleNavbarMouseEnter">
     <div class="container">
       <router-link class="navbar-brand d-flex align-items-center" to="/">
-        <span class="navbar-logo-icon">🔮</span>
+        <img src="/logo.png" alt="Lucky Pick it Logo" class="navbar-logo-icon" width="32" height="32" />
         <span class="text-gradient fw-bold">Lucky Pick it</span>
       </router-link>
       <button class="navbar-toggler border-0" type="button" @click="toggleMobileMenu">
