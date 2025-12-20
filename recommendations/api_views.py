@@ -419,16 +419,10 @@ class MenuRecommendationAPIView(APIView):
 
             # 추천 형식화
             recommendations = []
-            primary_lucky_color = lucky_colors[0] if lucky_colors else '노란색'
             for idx, food in enumerate(recommended_list, 1):
                 food_color = self._get_korean_color(food.get('color_category', ''))
-                # 각 음식마다 해당하는 행운색 찾기
-                matched_lucky_color = primary_lucky_color
-                for lucky_color in lucky_colors:
-                    matched_foods = self._get_food_by_color(lucky_color, [food])
-                    if matched_foods:  # 매칭되는 음식이 있으면
-                        matched_lucky_color = lucky_color
-                        break
+                # 첫 번째 행운색 사용
+                lucky_color = lucky_colors[0] if lucky_colors else '노란색'
 
                 recommendations.append({
                     'rank': idx,
@@ -439,7 +433,7 @@ class MenuRecommendationAPIView(APIView):
                         'icon': self._get_emoji_for_food(food),
                         'desc': food.get('desc', f"행운의 색상 에너지를 담은 음식입니다.")
                     },
-                    'bg_gradient': self._get_gradient_for_color(matched_lucky_color)
+                    'bg_gradient': self._get_gradient_for_color(lucky_color)
                 })
 
             # 다른 추천
