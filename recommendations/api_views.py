@@ -464,7 +464,7 @@ class MenuRecommendationAPIView(APIView):
 
         return Response({
             'success': True,
-            'lucky_color': lucky_color,
+            'lucky_colors': lucky_colors,
             'recommendations': recommendations,
             'other_recommendations': other_recommendations,
             'fortune_data': {
