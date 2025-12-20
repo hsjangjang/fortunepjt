@@ -421,8 +421,9 @@ class MenuRecommendationAPIView(APIView):
             recommendations = []
             for idx, food in enumerate(recommended_list, 1):
                 food_color = self._get_korean_color(food.get('color_category', ''))
-                # 첫 번째 행운색 사용
-                lucky_color = lucky_colors[0] if lucky_colors else '노란색'
+                # 순환하며 행운색 3개 모두 사용
+                lucky_color_idx = (idx - 1) % len(lucky_colors) if lucky_colors else 0
+                lucky_color = lucky_colors[lucky_color_idx] if lucky_colors else '노란색'
 
                 recommendations.append({
                     'rank': idx,
