@@ -415,8 +415,19 @@ const animateScore = () => {
 }
 
 // 탭 변경 함수
-const changeTab = (tab) => {
+const changeTab = async (tab) => {
   activeTab.value = tab
+  await nextTick()
+
+  // 활성 탭의 점수 바 애니메이션
+  const activePane = document.getElementById(tab)
+  if (activePane) {
+    const bar = activePane.querySelector('.sub-score-bar')
+    if (bar) {
+      const { animateBar } = await import('@/utils/fortuneAnimations')
+      animateBar(bar)
+    }
+  }
 }
 
 // 기간 변경 함수
@@ -603,6 +614,9 @@ onMounted(async () => {
 }
 
 .btn-group-period {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
