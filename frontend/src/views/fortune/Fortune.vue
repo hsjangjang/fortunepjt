@@ -71,27 +71,27 @@
       <div v-if="fortune" class="card-base card-lg section-spacing overflow-hidden">
             <div class="card-header border-0 responsive-padding-header">
               <div class="fortune-tabs-wrapper">
-                <a class="fortune-tab active" id="tab-total" data-bs-toggle="tab" href="#total">
+                <a class="fortune-tab" :class="{ active: activeTab === 'total' }" id="tab-total" @click.prevent="changeTab('total')">
                   <span class="tab-icon">⭐</span>
                   <span class="tab-label">종합운</span>
                 </a>
-                <a class="fortune-tab" id="tab-love" data-bs-toggle="tab" href="#love">
+                <a class="fortune-tab" :class="{ active: activeTab === 'love' }" id="tab-love" @click.prevent="changeTab('love')">
                   <span class="tab-icon">💗</span>
                   <span class="tab-label">애정운</span>
                 </a>
-                <a class="fortune-tab" id="tab-money" data-bs-toggle="tab" href="#money">
+                <a class="fortune-tab" :class="{ active: activeTab === 'money' }" id="tab-money" @click.prevent="changeTab('money')">
                   <span class="tab-icon">🪙</span>
                   <span class="tab-label">금전운</span>
                 </a>
-                <a class="fortune-tab" id="tab-work" data-bs-toggle="tab" href="#work">
+                <a class="fortune-tab" :class="{ active: activeTab === 'work' }" id="tab-work" @click.prevent="changeTab('work')">
                   <span class="tab-icon">💼</span>
                   <span class="tab-label">직장운</span>
                 </a>
-                <a class="fortune-tab" id="tab-health" data-bs-toggle="tab" href="#health">
+                <a class="fortune-tab" :class="{ active: activeTab === 'health' }" id="tab-health" @click.prevent="changeTab('health')">
                   <span class="tab-icon">💚</span>
                   <span class="tab-label">건강운</span>
                 </a>
-                <a class="fortune-tab" id="tab-study" data-bs-toggle="tab" href="#study">
+                <a class="fortune-tab" :class="{ active: activeTab === 'study' }" id="tab-study" @click.prevent="changeTab('study')">
                   <span class="tab-icon">📘</span>
                   <span class="tab-label">학업운</span>
                 </a>
@@ -100,7 +100,7 @@
             <div class="card-body responsive-padding">
               <div class="tab-content">
                 <!-- 종합운 -->
-                <div class="tab-pane fade show active" id="total">
+                <div v-show="activeTab === 'total'" id="total">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-star text-primary me-2" style="color: #a78bfa !important;"></i> 종합운</h4>
                     <span class="text-white opacity-50 small">{{ fortune.fortune_score || 0 }} / 100</span>
@@ -113,7 +113,7 @@
                 </div>
 
                 <!-- 재물운 -->
-                <div class="tab-pane fade" id="money">
+                <div v-show="activeTab === 'money'" id="money">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-coins text-warning me-2" style=" -webkit-text-stroke: 1px rgba(255,255,255,0.1);"></i> 재물운</h4>
                     <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.money || 70 }} / 100</span>
@@ -125,21 +125,21 @@
                   <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.money || '재물운 내용', 'color-yellow')"></p>
                 </div>
 
-                <!-- 연애운 -->
-                <div class="tab-pane fade" id="love">
+                <!-- 애정운 -->
+                <div v-show="activeTab === 'love'" id="love">
                   <div class="d-flex justify-content-between align-items-center mb-3">
-                    <h4 class="text-white"><i class="fas fa-heart text-danger me-2"></i> 연애운</h4>
+                    <h4 class="text-white"><i class="fas fa-heart text-danger me-2"></i> 애정운</h4>
                     <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.love || 65 }} / 100</span>
                   </div>
                   <div class="sub-score-bar">
                     <span class="score-text">{{ fortune.fortune_scores?.love || 65 }}%</span>
                     <div class="sub-score-fill" :style="`width: ${fortune.fortune_scores?.love || 65}%; background: linear-gradient(90deg, #ef4444, #f87171);`" :data-target="fortune.fortune_scores?.love || 65"></div>
                   </div>
-                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.love || '연애운 내용', 'color-red')"></p>
+                  <p class="fortune-text" v-html="formatFortuneText(fortune.fortune_texts?.love || '애정운 내용', 'color-red')"></p>
                 </div>
 
                 <!-- 학업운 -->
-                <div class="tab-pane fade" id="study">
+                <div v-show="activeTab === 'study'" id="study">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-graduation-cap text-info me-2"></i> 학업운</h4>
                     <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.study || 75 }} / 100</span>
@@ -152,7 +152,7 @@
                 </div>
 
                 <!-- 직장운 -->
-                <div class="tab-pane fade" id="work">
+                <div v-show="activeTab === 'work'" id="work">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-briefcase text-success me-2"></i> 직장운</h4>
                     <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.work || 80 }} / 100</span>
@@ -165,7 +165,7 @@
                 </div>
 
                 <!-- 건강운 -->
-                <div class="tab-pane fade" id="health">
+                <div v-show="activeTab === 'health'" id="health">
                   <div class="d-flex justify-content-between align-items-center mb-3">
                     <h4 class="text-white"><i class="fas fa-heartbeat me-2" style="color: #2dd4bf;"></i> 건강운</h4>
                     <span class="text-white opacity-50 small">{{ fortune.fortune_scores?.health || 70 }} / 100</span>
@@ -374,6 +374,7 @@ const isMinor = ref(false)
 const isLoading = ref(true)
 const showMainItemDesc = ref(false)
 const showZodiacItemDesc = ref(false)
+const activeTab = ref('total')
 
 // URL 경로에서 기간 결정
 const getPeriodFromRoute = () => {
@@ -411,6 +412,11 @@ const formatFortuneText = (text, colorClass = '') => {
 // 애니메이션 래퍼 (displayScore ref 전달)
 const animateScore = () => {
   baseAnimateScore({ setDisplayScore: (val) => { displayScore.value = val } })
+}
+
+// 탭 변경 함수
+const changeTab = (tab) => {
+  activeTab.value = tab
 }
 
 // 기간 변경 함수
