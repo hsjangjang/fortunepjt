@@ -422,10 +422,11 @@ class MenuRecommendationAPIView(APIView):
             primary_lucky_color = lucky_colors[0] if lucky_colors else '노란색'
             for idx, food in enumerate(recommended_list, 1):
                 food_color = self._get_korean_color(food.get('color_category', ''))
-                # 각 음식마다 해당하는 행운색 찾기 (매칭된 경우에만)
+                # 각 음식마다 해당하는 행운색 찾기
                 matched_lucky_color = primary_lucky_color
                 for lucky_color in lucky_colors:
-                    if food in self._get_food_by_color(lucky_color, [food]):
+                    matched_foods = self._get_food_by_color(lucky_color, [food])
+                    if matched_foods:  # 매칭되는 음식이 있으면
                         matched_lucky_color = lucky_color
                         break
 
