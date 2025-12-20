@@ -397,6 +397,7 @@ class MenuRecommendationAPIView(APIView):
             saved_data = existing_recommendation.recommendation_data
             recommendations = saved_data.get('recommendations', [])
             other_recommendations = saved_data.get('other_recommendations', [])
+            print(f"[Menu API] 기존 추천 사용 - recommendations 개수: {len(recommendations)}, other: {len(other_recommendations)}")
         else:
             # 새로 생성
             all_foods = load_food_data()
@@ -422,8 +423,11 @@ class MenuRecommendationAPIView(APIView):
             for idx, food in enumerate(recommended_list, 1):
                 food_color = self._get_korean_color(food.get('color_category', ''))
                 # 순환하며 행운색 3개 모두 사용
-                lucky_color_idx = (idx - 1) % len(lucky_colors) if lucky_colors else 0
-                lucky_color = lucky_colors[lucky_color_idx] if lucky_colors else '노란색'
+                if lucky_colors and len(lucky_colors) > 0:
+                    lucky_color_idx = (idx - 1) % len(lucky_colors)
+                    lucky_color = lucky_colors[lucky_color_idx]
+                else:
+                    lucky_color = '노란색'
 
                 recommendations.append({
                     'rank': idx,
@@ -455,6 +459,7 @@ class MenuRecommendationAPIView(APIView):
             ]
 
             # DB에 저장
+            print(f"[Menu API] 새 추천 생성 - recommendations 개수: {len(recommendations)}, other: {len(other_recommendations)}")
             DailyRecommendation.objects.create(
                 user=request.user,
                 recommendation_date=today,
@@ -465,6 +470,7 @@ class MenuRecommendationAPIView(APIView):
                 }
             )
 
+        print(f"[Menu API] 최종 응답 - recommendations: {len(recommendations)}, other: {len(other_recommendations)}")
         return Response({
             'success': True,
             'lucky_colors': lucky_colors,
