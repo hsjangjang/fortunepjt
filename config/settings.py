@@ -239,7 +239,6 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_DEFAULT_ACL = None
     AWS_S3_FILE_OVERWRITE = False
     AWS_QUERYSTRING_AUTH = False
-    AWS_LOCATION = 'media'
 
     # CloudFront URL 설정 (환경변수로 설정 가능)
     CLOUDFRONT_DOMAIN = os.getenv('CLOUDFRONT_DOMAIN', '')
@@ -247,7 +246,7 @@ if AWS_STORAGE_BUCKET_NAME:
         # CloudFront 도메인이 있으면 CloudFront URL 사용
         AWS_S3_CUSTOM_DOMAIN = CLOUDFRONT_DOMAIN
 
-    # Django 5.x용 STORAGES 설정
+    # Django 5.x용 STORAGES 설정 (location 없음 - 버킷 루트에 저장)
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -256,7 +255,8 @@ if AWS_STORAGE_BUCKET_NAME:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    # 파일이 items/2025/12/에 저장되므로 URL도 루트로 설정
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
