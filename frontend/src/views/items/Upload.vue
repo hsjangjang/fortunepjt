@@ -119,18 +119,6 @@
                 >
               </div>
 
-              <div class="form-check mb-3">
-                <input
-                  v-model="formData.is_favorite"
-                  class="form-check-input"
-                  type="checkbox"
-                  id="favorite"
-                >
-                <label class="form-check-label" for="favorite">
-                  즐겨찾기에 추가
-                </label>
-              </div>
-
               <div class="d-grid gap-2">
                 <button type="submit" class="btn btn-primary btn-lg">
                   <i class="fas fa-upload"></i> 업로드 및 색상 분석

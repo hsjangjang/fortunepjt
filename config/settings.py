@@ -343,6 +343,10 @@ DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Lucky Picky <noreply@
 SITE_URL = config('SITE_URL', default='http://localhost:8000')
 EMAIL_LOGO_URL = config('EMAIL_LOGO_URL', default=f'{SITE_URL}/static/images/email/logo.png')
 
+# API 알림 이메일 설정
+ALERT_FROM_EMAIL = config('ALERT_FROM_EMAIL', default=DEFAULT_FROM_EMAIL)
+ALERT_RECIPIENT_LIST = config('ALERT_RECIPIENT_LIST', default='', cast=Csv())
+
 # AI Service Configuration
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
 OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-3.5-turbo')
