@@ -231,7 +231,7 @@ AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-northeast-2')
 
 # S3 설정이 있으면 S3 스토리지 사용
 if AWS_STORAGE_BUCKET_NAME:
-    # S3 기본 설정
+    # S3 직접 URL 사용 (CloudFront 우회 - CloudFront가 /items/* 를 EB로 라우팅하는 문제 해결)
     AWS_S3_CUSTOM_DOMAIN = f'{AWS_STORAGE_BUCKET_NAME}.s3.{AWS_S3_REGION_NAME}.amazonaws.com'
     AWS_S3_OBJECT_PARAMETERS = {
         'CacheControl': 'max-age=86400',
@@ -240,11 +240,8 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_S3_FILE_OVERWRITE = False
     AWS_QUERYSTRING_AUTH = False
 
-    # CloudFront URL 설정 (환경변수로 설정 가능)
-    CLOUDFRONT_DOMAIN = os.getenv('CLOUDFRONT_DOMAIN', '')
-    if CLOUDFRONT_DOMAIN:
-        # CloudFront 도메인이 있으면 CloudFront URL 사용
-        AWS_S3_CUSTOM_DOMAIN = CLOUDFRONT_DOMAIN
+    # CloudFront는 사용하지 않음 - S3 직접 접근
+    # CLOUDFRONT_DOMAIN 환경변수가 있어도 무시
 
     # Django 5.x용 STORAGES 설정 (location 없음 - 버킷 루트에 저장)
     STORAGES = {
@@ -255,7 +252,7 @@ if AWS_STORAGE_BUCKET_NAME:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-    # 파일이 items/2025/12/에 저장되므로 URL도 루트로 설정
+    # S3 직접 URL 사용
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
 
 # Default primary key field type
