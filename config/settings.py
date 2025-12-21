@@ -247,10 +247,20 @@ if AWS_STORAGE_BUCKET_NAME:
         # CloudFront 도메인이 있으면 CloudFront URL 사용
         AWS_S3_CUSTOM_DOMAIN = CLOUDFRONT_DOMAIN
 
-    # Django 5.x용 STORAGES 설정
+    # Django 5.x용 STORAGES 설정 - OPTIONS에 location 명시
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
+            "OPTIONS": {
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "region_name": AWS_S3_REGION_NAME,
+                "location": AWS_LOCATION,
+                "custom_domain": AWS_S3_CUSTOM_DOMAIN,
+                "file_overwrite": False,
+                "querystring_auth": False,
+                "object_parameters": AWS_S3_OBJECT_PARAMETERS,
+                "default_acl": None,
+            },
         },
         "staticfiles": {
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
