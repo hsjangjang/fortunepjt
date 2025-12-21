@@ -15,10 +15,10 @@ def send_api_quota_alert(api_name: str, error_message: str):
         return
 
     try:
-        subject = f"[Lucky Pick It] {api_name} API 크레딧 소진 알림"
+        subject = f"[Lucky Picky] {api_name} API 크레딧 소진 알림"
         message = f"""안녕하세요,
 
-Lucky Pick It 서비스에서 {api_name} API 크레딧이 소진되었습니다.
+Lucky Picky 서비스에서 {api_name} API 크레딧이 소진되었습니다.
 
 발생 시간: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 API: {api_name}
@@ -27,7 +27,7 @@ API: {api_name}
 빠른 시일 내에 크레딧을 충전해 주세요.
 
 감사합니다.
-Lucky Pick It 시스템
+Lucky Picky 시스템
 """
         from_email = getattr(settings, 'ALERT_FROM_EMAIL', 'sinhyeongman634@gmail.com')
         recipient_list = getattr(settings, 'ALERT_RECIPIENT_LIST', ['99gktjs2937@naver.com'])

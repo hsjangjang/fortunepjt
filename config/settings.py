@@ -229,6 +229,11 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', '')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-northeast-2')
 
+# 스토리지 디버그 로깅
+print(f"[Settings Debug] AWS_STORAGE_BUCKET_NAME: '{AWS_STORAGE_BUCKET_NAME}'")
+print(f"[Settings Debug] AWS_ACCESS_KEY_ID exists: {bool(AWS_ACCESS_KEY_ID)}")
+print(f"[Settings Debug] AWS_SECRET_ACCESS_KEY exists: {bool(AWS_SECRET_ACCESS_KEY)}")
+
 # S3 설정이 있으면 S3 스토리지 사용
 if AWS_STORAGE_BUCKET_NAME:
     # S3 기본 설정
@@ -267,6 +272,9 @@ if AWS_STORAGE_BUCKET_NAME:
         },
     }
     MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    print(f"[Settings Debug] S3 스토리지 활성화됨 - MEDIA_URL: {MEDIA_URL}")
+else:
+    print("[Settings Debug] S3 비활성화 - 로컬 파일 스토리지 사용")
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
@@ -347,7 +355,7 @@ EMAIL_PORT = config('EMAIL_PORT', default=587, cast=int)
 EMAIL_USE_TLS = config('EMAIL_USE_TLS', default=True, cast=bool)
 EMAIL_HOST_USER = config('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD', default='')
-DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Lucky Pick It <noreply@luckypickit.com>')
+DEFAULT_FROM_EMAIL = config('DEFAULT_FROM_EMAIL', default='Lucky Picky <noreply@luckypicky.com>')
 
 # 이메일 로고 URL
 # 이메일에서는 절대 URL이 필요합니다
