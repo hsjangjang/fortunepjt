@@ -244,7 +244,7 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_DEFAULT_ACL = None
     AWS_S3_FILE_OVERWRITE = False
     AWS_QUERYSTRING_AUTH = False
-    AWS_LOCATION = 'media'  # S3 버킷 내 media 폴더에 저장
+    # AWS_LOCATION 제거 - 파일이 버킷 루트에 저장되므로 MEDIA_URL도 루트로 설정
 
     # CloudFront URL 설정 (환경변수로 설정 가능)
     CLOUDFRONT_DOMAIN = os.getenv('CLOUDFRONT_DOMAIN', '')
@@ -252,14 +252,13 @@ if AWS_STORAGE_BUCKET_NAME:
         # CloudFront 도메인이 있으면 CloudFront URL 사용
         AWS_S3_CUSTOM_DOMAIN = CLOUDFRONT_DOMAIN
 
-    # Django 5.x용 STORAGES 설정 - OPTIONS에 location 명시
+    # Django 5.x용 STORAGES 설정
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
             "OPTIONS": {
                 "bucket_name": AWS_STORAGE_BUCKET_NAME,
                 "region_name": AWS_S3_REGION_NAME,
-                "location": AWS_LOCATION,
                 "custom_domain": AWS_S3_CUSTOM_DOMAIN,
                 "file_overwrite": False,
                 "querystring_auth": False,
@@ -271,7 +270,8 @@ if AWS_STORAGE_BUCKET_NAME:
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
+    # 파일이 items/2025/12/ 경로로 저장되므로 MEDIA_URL은 루트로 설정
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
     print(f"[Settings Debug] S3 스토리지 활성화됨 - MEDIA_URL: {MEDIA_URL}")
 else:
     print("[Settings Debug] S3 비활성화 - 로컬 파일 스토리지 사용")
