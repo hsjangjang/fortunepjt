@@ -36,8 +36,8 @@ class ItemListAPIView(APIView):
                 'item_name': item.item_name,
                 'main_category': item.main_category,
                 'sub_categories': item.sub_categories,
-                'image': item.image.url if item.image else None,
-                'image_url': item.image.url if item.image else None,
+                'image': item.image_full_url,
+                'image_url': item.image_full_url,
                 'dominant_colors': item.dominant_colors,
                 'ai_analysis': item.ai_analysis_result,
                 'is_favorite': item.is_favorite,
@@ -112,7 +112,7 @@ class ItemListAPIView(APIView):
                 'item': {
                     'id': item.id,
                     'item_name': item.item_name,
-                    'image_url': item.image.url,
+                    'image_url': item.image_full_url,
                     'dominant_colors': item.dominant_colors,
                     'ai_analysis': item.ai_analysis_result
                 }
@@ -161,7 +161,7 @@ class ItemDetailAPIView(APIView):
                 'item_name': item.item_name,
                 'main_category': item.main_category,
                 'sub_categories': item.sub_categories,
-                'image_url': item.image.url if item.image else None,
+                'image_url': item.image_full_url,
                 'dominant_colors': item.dominant_colors,
                 'ai_analysis': item.ai_analysis_result,
                 'is_favorite': item.is_favorite,

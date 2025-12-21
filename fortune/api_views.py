@@ -586,7 +586,7 @@ class ItemCheckAPIView(APIView):
             {
                 'id': item.id,
                 'name': item.item_name,
-                'image_url': item.image.url if item.image else None,
+                'image_url': item.image_full_url,
                 'dominant_colors': item.dominant_colors or [],
                 'created_at': item.created_at.isoformat()
             }

@@ -109,3 +109,26 @@ class UserItem(models.Model):
             return self.dominant_colors[0].get('color', '#000000')
         return '#000000'
 
+    @property
+    def image_full_url(self):
+        """이미지의 전체 URL 반환 (S3 또는 로컬)"""
+        if not self.image:
+            return None
+
+        # 이미 절대 URL인 경우 그대로 반환
+        url = self.image.url
+        if url.startswith('http'):
+            return url
+
+        # S3 설정이 있으면 S3 URL 생성
+        from django.conf import settings
+        bucket = getattr(settings, 'AWS_STORAGE_BUCKET_NAME', '')
+        region = getattr(settings, 'AWS_S3_REGION_NAME', 'ap-northeast-2')
+
+        if bucket:
+            # image.name은 'items/2025/12/filename.jpg' 형태
+            return f'https://{bucket}.s3.{region}.amazonaws.com/{self.image.name}'
+
+        # 로컬 환경에서는 상대 경로 반환
+        return url
+
