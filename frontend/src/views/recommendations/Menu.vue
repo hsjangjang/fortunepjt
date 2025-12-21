@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header page-header-lg">
           <h1 class="page-title">
-            <i class="fas fa-utensils" style="color: #a78bfa !important;"></i>
+            <span class="page-title-emoji">🍴</span>
             오늘의 메뉴 추천
           </h1>
           <p class="page-subtitle">운세와 행운색을 기반으로 한 맞춤 메뉴</p>
@@ -28,13 +28,18 @@
                 <i class="fas fa-star-half-alt text-warning me-1"></i>
                 {{ fortuneData.fortune_summary }}
               </p>
-              <!-- 오늘의 행운색 - 텍스트로 표시 -->
+              <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
               <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
                 <span class="text-white opacity-75 me-1">
-                  <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
+                  <span class="palette-emoji">🎨</span>
                   오늘의 행운색:
                 </span>
-                <span class="text-white">{{ fortuneData.lucky_colors.join(', ') }}</span>
+                <div class="d-flex align-items-center gap-2">
+                  <span v-for="(color, index) in fortuneData.lucky_colors" :key="index" class="lucky-color-item">
+                    <span class="lucky-color-dot" :style="{ background: getColorBackground(color) }"></span>
+                    <span class="text-white">{{ color }}</span>
+                  </span>
+                </div>
               </div>
           </div>
 
@@ -126,7 +131,7 @@ import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
-import { colorMap, getTextColor } from '@/utils/colors'
+import { colorMap, getTextColor, getColorBackground } from '@/utils/colors'
 
 // 모든 음식 이미지를 동적으로 import (png, jpg 모두 지원)
 const foodImages = import.meta.glob('@/assets/images/food/*.{png,jpg,jpeg}', { eager: true })
@@ -298,6 +303,25 @@ onMounted(() => {
   font-weight: 500;
   line-height: 1.3;
   word-break: keep-all;
+}
+
+/* 행운색 아이템 (점 + 텍스트) */
+.lucky-color-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.lucky-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.palette-emoji {
+  margin-right: 0.25rem;
 }
 
 @media (max-width: 768px) {

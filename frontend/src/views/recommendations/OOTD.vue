@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <i class="fas fa-tshirt" style="color: #a78bfa !important;"></i>
+            <span class="page-title-emoji">👕</span>
             OOTD 추천
           </h1>
           <p class="page-subtitle">날씨와 행운색 기반 오늘의 코디</p>

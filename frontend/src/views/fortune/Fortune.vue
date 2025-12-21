@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <i class="fas fa-crystal-ball" style="color: #a78bfa !important;"></i>
+            <span class="page-title-emoji">🔮</span>
             {{ periodTitle }}
           </h1>
           <p class="page-subtitle">{{ periodSubtitle }}</p>
@@ -46,7 +46,7 @@
                         :data-score="fortune.fortune_score || 0"></circle>
               </svg>
               <div class="fortune-score-text">
-                <span class="score">{{ displayScore }}</span><span class="label">점</span>
+                <span class="score-wrapper"><span class="score">{{ displayScore }}</span><span class="label">점</span></span>
               </div>
             </div>
 
@@ -71,28 +71,28 @@
       <div v-if="fortune" class="card-base card-lg section-spacing overflow-hidden">
             <div class="card-header border-0 responsive-padding-header">
               <div class="fortune-tabs-wrapper">
-                <a class="fortune-tab" :class="{ active: activeTab === 'total' }" id="tab-total" @click.prevent="changeTab('total')">
-                  <span class="tab-icon">⭐</span>
+                <a class="fortune-tab-pill" :class="{ active: activeTab === 'total' }" @click.prevent="changeTab('total')">
+                  <span class="tab-icon">⭐️</span>
                   <span class="tab-label">종합운</span>
                 </a>
-                <a class="fortune-tab" :class="{ active: activeTab === 'love' }" id="tab-love" @click.prevent="changeTab('love')">
-                  <span class="tab-icon">💗</span>
+                <a class="fortune-tab-pill" :class="{ active: activeTab === 'love' }" @click.prevent="changeTab('love')">
+                  <span class="tab-icon">❤️</span>
                   <span class="tab-label">애정운</span>
                 </a>
-                <a class="fortune-tab" :class="{ active: activeTab === 'money' }" id="tab-money" @click.prevent="changeTab('money')">
-                  <span class="tab-icon">🪙</span>
+                <a class="fortune-tab-pill" :class="{ active: activeTab === 'money' }" @click.prevent="changeTab('money')">
+                  <span class="tab-icon">💰</span>
                   <span class="tab-label">금전운</span>
                 </a>
-                <a class="fortune-tab" :class="{ active: activeTab === 'work' }" id="tab-work" @click.prevent="changeTab('work')">
+                <a class="fortune-tab-pill" :class="{ active: activeTab === 'work' }" @click.prevent="changeTab('work')">
                   <span class="tab-icon">💼</span>
                   <span class="tab-label">직장운</span>
                 </a>
-                <a class="fortune-tab" :class="{ active: activeTab === 'health' }" id="tab-health" @click.prevent="changeTab('health')">
-                  <span class="tab-icon">💪</span>
+                <a class="fortune-tab-pill" :class="{ active: activeTab === 'health' }" @click.prevent="changeTab('health')">
+                  <span class="tab-icon">💚</span>
                   <span class="tab-label">건강운</span>
                 </a>
-                <a class="fortune-tab" :class="{ active: activeTab === 'study' }" id="tab-study" @click.prevent="changeTab('study')">
-                  <span class="tab-icon">📘</span>
+                <a class="fortune-tab-pill" :class="{ active: activeTab === 'study' }" @click.prevent="changeTab('study')">
+                  <span class="tab-icon">📚</span>
                   <span class="tab-label">학업운</span>
                 </a>
               </div>
@@ -183,7 +183,7 @@
       <!-- Lucky Colors Section (일간 운세에서만 표시) -->
       <div v-if="fortune && selectedPeriod === 'daily'" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
-                <i class="fas fa-palette text-primary me-2" style="color: #a78bfa !important;"></i>
+                <span class="section-emoji">🎨</span>
                 오늘의 행운색
               </h4>
               <p class="text-center text-white opacity-75 mb-5">오늘 당신에게 행운을 가져다 줄 색상</p>
@@ -217,7 +217,7 @@
       <!-- Lucky Item Section (일간 운세에서만 표시) -->
       <div v-if="fortune && selectedPeriod === 'daily'" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-2">
-                <i class="fas fa-gem text-primary me-2" style="color: #a78bfa !important;"></i>
+                <span class="section-emoji">💎</span>
                 오늘의 행운 아이템
               </h4>
               <p class="text-center text-white opacity-75 mb-5">오늘 당신에게 행운을 가져다 줄 아이템들</p>
@@ -284,7 +284,7 @@
       <!-- Lucky Numbers Section (일간 운세 + 성인만 표시) -->
       <div v-if="fortune && selectedPeriod === 'daily' && !isMinor" class="card-base card-lg section-spacing">
               <h4 class="text-white text-center mb-4 lotto-title">
-                <i class="fas fa-dice text-primary me-2" style="color: #a78bfa !important;"></i>
+                <span class="section-emoji">🎲</span>
                 재미로 보는 오늘의 추천 로또 번호
               </h4>
               <div v-if="fortune.lotto_numbers && fortune.lotto_numbers.length > 0" class="lotto-numbers d-flex justify-content-center flex-nowrap gap-2 gap-md-3">
@@ -305,19 +305,19 @@
       <!-- Recommendations -->
       <div v-if="fortune" class="card-grid cols-2 section-spacing">
             <div class="card-base card-md card-interactive text-center">
-                <i class="fas fa-tshirt fa-3x mb-3" style="color: #a78bfa;"></i>
+                <span class="recommend-emoji">👕</span>
                 <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
                 <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4">
-                  추천 받기 <i class="fas fa-arrow-right ms-2"></i>
+                  추천 받기 →
                 </router-link>
             </div>
             <div class="card-base card-md card-interactive text-center">
-                <i class="fas fa-utensils fa-3x mb-3" style="color: #a78bfa;"></i>
+                <span class="recommend-emoji">🍴</span>
                 <h5 class="text-white recommend-title">메뉴 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">운세에 맞는 행운의 메뉴</p>
                 <router-link to="/recommendations/menu" class="btn btn-outline-light rounded-pill px-4">
-                  추천 받기 <i class="fas fa-arrow-right ms-2"></i>
+                  추천 받기 →
                 </router-link>
             </div>
       </div>
@@ -735,6 +735,12 @@ onMounted(async () => {
   text-align: center;
 }
 
+.fortune-score-text .score-wrapper {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.1rem;
+}
+
 .fortune-score-text .score {
   font-size: 4rem;
   font-weight: 800;
@@ -746,9 +752,9 @@ onMounted(async () => {
 }
 
 .fortune-score-text .label {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: rgba(255, 255, 255, 0.7);
-  font-weight: 300;
+  font-weight: 400;
 }
 
 .sub-score-bar {
@@ -851,6 +857,23 @@ onMounted(async () => {
   gap: 15px;
 }
 
+/* 섹션 이모지 스타일 */
+.section-emoji {
+  margin-right: 0.5rem;
+}
+
+/* 페이지 타이틀 이모지 */
+.page-title-emoji {
+  margin-right: 0.5rem;
+}
+
+/* 추천 이모지 스타일 */
+.recommend-emoji {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
 /* .hover-lift는 전역 CSS에서 관리 */
 
 .lucky-item-icon {
@@ -912,80 +935,45 @@ onMounted(async () => {
   justify-content: center;
 }
 
-/* 운세 탭 버튼 스타일 */
-.fortune-tab {
-  display: flex;
-  flex-direction: column;
+/* 운세 탭 Pill 버튼 스타일 (첨부 이미지 참고) */
+.fortune-tab-pill {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1rem;
-  min-width: 70px;
-  background: rgba(30, 30, 40, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  background: rgba(40, 40, 50, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 30px;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   transition: all 0.3s ease;
   cursor: pointer;
+  font-size: 0.9rem;
 }
 
-.fortune-tab:hover {
-  background: rgba(50, 50, 60, 0.9);
+.fortune-tab-pill:hover {
+  background: rgba(60, 60, 70, 0.9);
   color: white;
-  transform: translateY(-2px);
+  border-color: rgba(167, 139, 250, 0.5);
 }
 
-.fortune-tab .tab-icon {
-  font-size: 1.3rem;
-  margin-bottom: 0.25rem;
+.fortune-tab-pill .tab-icon {
+  font-size: 1rem;
 }
 
-.fortune-tab .tab-label {
-  font-size: 0.75rem;
+.fortune-tab-pill .tab-label {
   font-weight: 500;
   white-space: nowrap;
 }
 
-/* 탭 활성 상태 - 각 탭별 색상 */
-.fortune-tab.active {
+/* Pill 버튼 활성 상태 - 보라색 배경 */
+.fortune-tab-pill.active {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-color: #a78bfa;
   color: white;
   font-weight: 600;
-}
-
-#tab-total.active {
-  background: rgba(124, 58, 237, 0.4);
-  border-color: #a78bfa;
-  box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
-}
-
-#tab-love.active {
-  background: rgba(239, 68, 68, 0.4);
-  border-color: #f87171;
-  box-shadow: 0 0 15px rgba(248, 113, 113, 0.3);
-}
-
-#tab-money.active {
-  background: rgba(245, 158, 11, 0.4);
-  border-color: #fbbf24;
-  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
-}
-
-#tab-work.active {
-  background: rgba(16, 185, 129, 0.4);
-  border-color: #34d399;
-  box-shadow: 0 0 15px rgba(52, 211, 153, 0.3);
-}
-
-#tab-health.active {
-  background: rgba(45, 212, 191, 0.4);
-  border-color: #2dd4bf;
-  box-shadow: 0 0 15px rgba(45, 212, 191, 0.3);
-}
-
-#tab-study.active {
-  background: rgba(59, 130, 246, 0.4);
-  border-color: #60a5fa;
-  box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+  box-shadow: 0 0 15px rgba(167, 139, 250, 0.4);
 }
 
 /* Responsive Padding Utilities */
@@ -1043,36 +1031,43 @@ onMounted(async () => {
 
   /* 모바일 별자리/띠 글자 크기 줄이기 */
   .zodiac-badge {
-    font-size: 0.9rem !important;
-    padding: 0.4rem 0.8rem !important;
-    min-width: 100px;
-    min-height: 40px;
+    font-size: 0.85rem !important;
+    padding: 0.35rem 0.7rem !important;
+    min-width: 90px;
+    min-height: 36px;
   }
 
   .zodiac-icon {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
+  }
+
+  /* 모바일 별자리/띠 라벨 */
+  .badge-row h6 {
+    font-size: 0.75rem !important;
+    margin-bottom: 0.3rem !important;
   }
 
   /* 모바일 운세 탭 - 3x2 그리드 */
   .fortune-tabs-wrapper {
     display: grid !important;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.4rem;
+    margin-bottom: 1.5rem;
   }
 
-  .fortune-tab {
-    min-width: unset;
-    padding: 0.6rem 0.5rem;
+  .fortune-tab-pill {
+    padding: 0.5rem 0.6rem;
+    font-size: 0.75rem;
+    gap: 0.25rem;
   }
 
-  .fortune-tab .tab-icon {
-    font-size: 1.1rem;
+  .fortune-tab-pill .tab-icon {
+    font-size: 0.85rem;
   }
 
-  .fortune-tab .tab-label {
-    font-size: 0.65rem;
+  .fortune-tab-pill .tab-label {
+    font-size: 0.7rem;
   }
 
   /* Responsive Lucky Color Circle */

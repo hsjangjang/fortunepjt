@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header page-header-lg">
           <h1 class="page-title">
-            <i class="fas fa-gem" style="color: #a78bfa !important;"></i>
+            <span class="page-title-emoji">💎</span>
             내 아이템
           </h1>
           <p class="page-subtitle">업로드한 아이템과 행운색 매칭도를 확인하세요</p>
@@ -81,6 +81,7 @@
                       :src="getImageUrl(item.image)"
                       class="card-img-top item-image"
                       :alt="item.item_name"
+                      @error="handleImageError"
                     >
                   </router-link>
                   <!-- 삭제 버튼 - 이미지 우상단 -->
@@ -229,9 +230,19 @@ const fetchFortuneData = async () => {
 
 // 이미지 URL에 base URL 추가
 const getImageUrl = (url) => {
-  if (!url) return ''
+  if (!url) return '/placeholder-item.svg'
   if (url.startsWith('http')) return url
   return `${API_BASE_URL}${url}`
+}
+
+// 이미지 로딩 실패 시 플레이스홀더로 대체
+const handleImageError = (event) => {
+  event.target.src = 'data:image/svg+xml,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+      <rect fill="#2d2d3d" width="200" height="200"/>
+      <text x="100" y="100" font-family="Arial" font-size="48" fill="#666" text-anchor="middle" dominant-baseline="middle">📷</text>
+    </svg>
+  `)
 }
 
 const fetchItems = async () => {
