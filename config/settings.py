@@ -28,14 +28,23 @@ _allowed_hosts = os.getenv('ALLOWED_HOSTS', '')
 if _allowed_hosts:
     ALLOWED_HOSTS = _allowed_hosts.split(',')
 else:
-    ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=Csv())
+    # 개발 환경에서는 모든 호스트 허용 (프로덕션에서는 특정 도메인으로 제한 권장)
+    if DEBUG:
+        ALLOWED_HOSTS = ['*']
+    else:
+        ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1,0.0.0.0', cast=Csv())
 
 # AWS EB 환경에서 필요한 호스트 추가
-ALLOWED_HOSTS += [
-    '.elasticbeanstalk.com',
-    '.vercel.app',
-    '.cloudfront.net',
-]
+if not DEBUG:
+    ALLOWED_HOSTS += [
+        '.elasticbeanstalk.com',
+        '.vercel.app',
+        '.cloudfront.net',
+    ]
+
+# CloudFront 및 프록시를 통한 요청 허용
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 # EB 헬스체크를 위한 내부 IP 허용
 # AWS EB 로드밸런서는 내부 IP로 헬스체크를 하므로 EC2 메타데이터에서 IP를 가져옴
