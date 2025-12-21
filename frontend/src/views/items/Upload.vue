@@ -173,7 +173,6 @@ const formData = ref({
   main_category: '',
   sub_category: '',
   custom_category: '',
-  is_favorite: false,
   image: null
 })
 
@@ -334,7 +333,6 @@ const handleSubmit = async () => {
     data.append('item_name', formData.value.item_name)
     data.append('main_category', formData.value.main_category)
     data.append('category', formData.value.main_category) // 하위 호환성
-    data.append('is_favorite', formData.value.is_favorite)
 
     if (formData.value.main_category === 'etc') {
       data.append('custom_category', formData.value.custom_category)
