@@ -1,10 +1,35 @@
 # 📋 업데이트 내역
 
+## v1.8.3 (25.12.21)
+
+### 장하선
+- Backend
+  - S3 이미지 URL 문제 해결 (`items/models.py`, `items/api_views.py`, `fortune/api_views.py`)
+    - 문제: S3에 이미지 업로드는 되지만 프론트엔드에서 이미지가 표시되지 않음
+    - 원인: CloudFront가 `/items/*` 경로를 S3가 아닌 EB로 라우팅하여 404 반환
+    - 해결: `image_full_url` property 추가 - S3 절대 URL 직접 생성
+    - `item.image.url` → `item.image_full_url`로 변경 (API 응답에서 S3 직접 URL 반환)
+  - 백엔드 코드 리팩토링 (`fortune/services.py` 삭제)
+    - 1107줄짜리 거대한 단일 파일 `services.py` 제거
+    - 리팩토링된 `fortune/services/` 패키지 사용으로 전환
+    - `FortuneCalculator` 클래스 중복 제거
+  - 설정 개선 (`config/settings.py`)
+    - `ALERT_FROM_EMAIL`, `ALERT_RECIPIENT_LIST` 환경변수 추가
+    - 하드코딩된 이메일 주소 환경변수화
+- Frontend
+  - 사용되지 않는 코드 정리
+    - `frontend/src/api/fortune.js` 삭제 (미사용 파일)
+    - `frontend/src/api/` 폴더 삭제
+  - 아이템 업로드 UI 정리 (`Upload.vue`)
+    - 사용하지 않는 즐겨찾기 체크박스 제거
+
+---
+
 ## v1.8.2 (25.12.21)
 
 ### 김유림
 - Backend
-  - **배포 환경 ALLOWED_HOSTS 설정 수정** (`config/settings.py`)
+  - 배포 환경 ALLOWED_HOSTS 설정 수정 (`config/settings.py`)
     - 문제: Vercel 프론트엔드에서 백엔드 API 호출 시 500 에러 발생
     - 원인: Django가 특정 IP 주소를 허용된 호스트로 인식하지 못함
     - 해결:
@@ -21,23 +46,23 @@
 
 ### 김유림
 - Backend
-  - **메뉴 추천 API 버그 수정 및 로직 개선** (`recommendations/api_views.py`)
+  - 메뉴 추천 API 버그 수정 및 로직 개선 (`recommendations/api_views.py`)
     - ZeroDivisionError 수정: 빈 행운색 배열 처리
     - 행운색 3개 모두 순환하여 추천 메뉴에 적용
     - 그라데이션 배경 로직 단순화
     - 행운색 매칭 로직 개선
     - 디버깅 로그 추가 (추천 생성/로드 시 개수 출력)
 - Frontend
-  - **운세 페이지 탭 내용 표시 안 되는 버그 수정** (`Fortune.vue`)
+  - 운세 페이지 탭 내용 표시 안 되는 버그 수정 (`Fortune.vue`)
     - 문제: 종합운 외 다른 탭(애정운, 금전운, 직장운 등) 클릭 시 내용이 표시되지 않음
     - 원인: Bootstrap 탭 방식과 Vue 충돌
     - 해결: Vue 방식(`v-show`, `@click.prevent`)으로 탭 전환 로직 재구현
-  - **운세 페이지 UI 개선** (`Fortune.vue`)
+  - 운세 페이지 UI 개선 (`Fortune.vue`)
     - 기간 선택 버튼 가운데 정렬
     - 탭 점수 바에 애니메이션 효과 추가
     - 연애운 → 애정운 용어 변경
     - 직장운 CSS 클래스 오타 수정
-  - **네비게이션바 로고 변경** (`Navbar.vue`)
+  - 네비게이션바 로고 변경 (`Navbar.vue`)
     - 로고 이미지 경로 업데이트
 
 ---
@@ -63,18 +88,18 @@
 
 ### 김유림
 - Backend
-  - **메뉴 추천 로직 개선**
+  - 메뉴 추천 로직 개선
     - 3가지 행운색 모두 고려하여 추천 점수 산출
     - 추천 메뉴 항상 2개 표시 보장 (행운색 음식 부족 시 전체 음식 중 랜덤 선택)
     - 메뉴 추천 목록에서 음식의 실제 색상 정보 표시 기능 추가
-  - **OOTD 추천 개선**
+  - OOTD 추천 개선
     - 퍼스널 컬러 필터링 로직 적용
-  - **이메일 서비스 개선 (Email Service)**
+  - 이메일 서비스 개선 (Email Service)
     - 서비스 명칭 브랜딩: 'Lucky Pick It' 적용
     - 이메일 제목 및 템플릿 디자인 변경 (다크 테마 적용)
     - HTML 이메일 템플릿 적용 및 로고 이미지 삽입
 - Frontend
-  - **Assets**
+  - Assets
     - 로고 이미지를 외부 링크에서 프로젝트 정적 리소스(`assets`)로 변경하여 안정성 확보
       
 ---
@@ -151,7 +176,7 @@
   - 운세 점수 85점 고정 문제 해결 (`fortune/services.py`)
     - LLM 프롬프트에서 점수 정보 완전 제거 (텍스트만 생성하도록 변경)
     - 캐시 키 버전 v6 → v7 변경
-    - **해결 방법**: Django Admin에서 DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache 모두 삭제 필요
+    - 해결 방법: Django Admin에서 DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache 모두 삭제 필요
     - 점수는 백엔드 `_calculate_all_fortunes`에서 사주/오행 기반으로 계산 (50~100점 범위)
 
 ---
