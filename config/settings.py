@@ -220,6 +220,12 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_QUERYSTRING_AUTH = False
     AWS_LOCATION = 'media'  # S3 버킷 내 media 폴더에 저장
 
+    # CloudFront URL 설정 (환경변수로 설정 가능)
+    CLOUDFRONT_DOMAIN = os.getenv('CLOUDFRONT_DOMAIN', '')
+    if CLOUDFRONT_DOMAIN:
+        # CloudFront 도메인이 있으면 CloudFront URL 사용
+        AWS_S3_CUSTOM_DOMAIN = CLOUDFRONT_DOMAIN
+
     # Django 5.x용 STORAGES 설정
     STORAGES = {
         "default": {

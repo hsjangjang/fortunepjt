@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <i class="fas fa-search text-primary"></i>
+            <span class="page-title-emoji">🔍</span>
             아이템 상세 분석
             <span v-if="item && item.user_order" class="item-number"></span>
           </h1>
@@ -17,15 +17,16 @@
           <div class="item-image-container">
             <img
               v-if="item.image"
-              :src="item.image"
+              :src="getImageUrl(item.image)"
               class="item-image"
               :alt="item.item_name"
+              @error="handleImageError"
             >
             <div
               v-else
               class="item-image-placeholder"
             >
-              <span class="text-muted">이미지 없음</span>
+              <span class="text-muted">📷 이미지 없음</span>
             </div>
           </div>
 
@@ -258,6 +259,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
+import { API_BASE_URL } from '@/config/api'
 import { getColorMatchScore, colorMap, getColorBackground, isRainbowColor, RAINBOW_GRADIENT } from '@/utils/colors'
 import { getFortuneBoostScore, fortuneKeywords } from '@/utils/similarity'
 import { calculateLuckScore, calculateLuckScoreAsync, getScoreMessage, getScoreColor, calculateProgressOffset } from '@/utils/luckScore'
@@ -534,6 +536,25 @@ const formatDate = (dateString) => {
   const hour = String(date.getHours()).padStart(2, '0')
   const minute = String(date.getMinutes()).padStart(2, '0')
   return `${baseDate} ${hour}:${minute}`
+}
+
+// 이미지 URL에 base URL 추가
+const getImageUrl = (url) => {
+  if (!url) return null
+  // 이미 절대 URL인 경우 (S3/CloudFront URL)
+  if (url.startsWith('http')) return url
+  // 상대 경로인 경우 API_BASE_URL 추가
+  return `${API_BASE_URL}${url}`
+}
+
+// 이미지 로딩 실패 시 플레이스홀더로 대체
+const handleImageError = (event) => {
+  event.target.src = 'data:image/svg+xml,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+      <rect fill="#2d2d3d" width="400" height="300"/>
+      <text x="200" y="150" font-family="Arial" font-size="64" fill="#666" text-anchor="middle" dominant-baseline="middle">📷</text>
+    </svg>
+  `)
 }
 
 onMounted(() => {

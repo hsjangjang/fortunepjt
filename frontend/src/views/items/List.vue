@@ -230,8 +230,15 @@ const fetchFortuneData = async () => {
 
 // 이미지 URL에 base URL 추가
 const getImageUrl = (url) => {
-  if (!url) return '/placeholder-item.svg'
+  if (!url) return 'data:image/svg+xml,' + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+      <rect fill="#2d2d3d" width="200" height="200"/>
+      <text x="100" y="100" font-family="Arial" font-size="48" fill="#666" text-anchor="middle" dominant-baseline="middle">📷</text>
+    </svg>
+  `)
+  // 이미 절대 URL인 경우 (S3/CloudFront URL)
   if (url.startsWith('http')) return url
+  // 상대 경로인 경우 API_BASE_URL 추가
   return `${API_BASE_URL}${url}`
 }
 
