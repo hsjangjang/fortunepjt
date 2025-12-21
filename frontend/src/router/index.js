@@ -49,7 +49,7 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: Home,
-      meta: { title: 'Lucky Pick it - AI 기반 운세 서비스' }
+      meta: { title: 'Lucky Picky - AI 기반 운세 서비스' }
     },
 
     // 인증 관련
@@ -225,7 +225,7 @@ router.beforeEach(async (to, from, next) => {
   console.log('[Router Guard] hasTodayFortune:', fortuneStore.hasTodayFortune)
 
   // 페이지 타이틀 설정
-  document.title = to.meta.title || 'Lucky Pick it'
+  document.title = to.meta.title || 'Lucky Picky'
 
   // 인증 필요한 페이지
   if (to.meta.requiresAuth && !authStore.isAuthenticated) {

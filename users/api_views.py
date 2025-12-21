@@ -204,7 +204,7 @@ class FindUsernameAPIView(APIView):
             user = User.objects.get(email__iexact=email.strip())
             text_content, html_content = create_username_email(user, email)
             send_fortune_email(
-                '[Lucky Pick it] 아이디 찾기 안내',
+                '[Lucky Picky] 아이디 찾기 안내',
                 text_content,
                 email,
                 html_message=html_content
@@ -262,7 +262,7 @@ class SendPasswordResetCodeAPIView(APIView):
 
             text_content, html_content = create_verification_email(user, verification_code)
             send_fortune_email(
-                '[Lucky Pick it] 비밀번호 찾기 인증코드',
+                '[Lucky Picky] 비밀번호 찾기 인증코드',
                 text_content,
                 email,
                 html_message=html_content
@@ -340,7 +340,7 @@ class VerifyCodeAndResetPasswordAPIView(APIView):
 
             text_content, html_content = create_temp_password_email(user, temp_password)
             send_fortune_email(
-                '[Lucky Pick it] 임시 비밀번호 안내',
+                '[Lucky Picky] 임시 비밀번호 안내',
                 text_content,
                 email,
                 html_message=html_content

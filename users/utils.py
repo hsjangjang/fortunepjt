@@ -13,13 +13,9 @@ def get_logo_path():
 
 
 def get_logo_html():
-    """로고 HTML 반환 (CID 참조 방식)"""
-    logo_path = get_logo_path()
-    if os.path.exists(logo_path):
-        return '<img src="cid:logo" alt="Lucky Pick It" style="width: 100px; height: 100px; margin-bottom: 16px; border-radius: 12px; object-fit: contain;">'
-    else:
-        # 로고 파일이 없으면 텍스트 기반 로고
-        return '<div style="font-size: 64px; margin-bottom: 12px;">🔮</div>'
+    """로고 HTML 반환 (이모지 기반)"""
+    # 이모지 로고 사용 (이미지 파일 불필요)
+    return '<div style="font-size: 64px; margin-bottom: 12px;">🔮</div>'
 
 
 def attach_logo(email_message):
@@ -33,7 +29,7 @@ def attach_logo(email_message):
             email_message.attach(logo_image)
 
 
-def get_email_base_template(content, title="Lucky Pick it"):
+def get_email_base_template(content, title="Lucky Picky"):
     """HTML 이메일 기본 템플릿"""
     logo_html = get_logo_html()
     return f'''<!DOCTYPE html>
@@ -52,7 +48,7 @@ def get_email_base_template(content, title="Lucky Pick it"):
                     <tr>
                         <td style="background: linear-gradient(135deg, #1e1b3c 0%, #2d2650 50%, #1a1733 100%); padding: 40px; text-align: center; position: relative;">
                             {logo_html}
-                            <h1 style="margin: 0; color: #a78bfa; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Lucky Pick it</h1>
+                            <h1 style="margin: 0; color: #a78bfa; font-size: 28px; font-weight: 700; letter-spacing: 0.5px;">Lucky Picky</h1>
                         </td>
                     </tr>
                     <!-- Content -->
@@ -65,7 +61,7 @@ def get_email_base_template(content, title="Lucky Pick it"):
                     <tr>
                         <td style="background: #0f1419; padding: 28px 40px; text-align: center; border-top: 1px solid rgba(167, 139, 250, 0.15);">
                             <p style="margin: 0 0 10px 0; color: #6b7280; font-size: 13px; line-height: 1.5;">본인이 요청하지 않으셨다면 이 메일을 무시해주세요.</p>
-                            <p style="margin: 0; color: #4b5563; font-size: 12px;">© 2025 Lucky Pick it. All rights reserved.</p>
+                            <p style="margin: 0; color: #4b5563; font-size: 12px;">© 2025 Lucky Picky. All rights reserved.</p>
                         </td>
                     </tr>
                 </table>
@@ -156,7 +152,7 @@ def create_username_email(user, email):
 본인이 요청하지 않으셨다면 이 메일을 무시해주세요.
 
 감사합니다.
-Lucky Pick it 팀'''
+Lucky Picky 팀'''
 
     # HTML 버전
     content = f'''
@@ -194,7 +190,7 @@ def create_verification_email(user, verification_code):
 본인이 요청하지 않으셨다면 이 메일을 무시해주세요.
 
 감사합니다.
-Lucky Pick it 팀'''
+Lucky Picky 팀'''
 
     # HTML 버전
     content = f'''
@@ -237,7 +233,7 @@ def create_temp_password_email(user, temp_password):
 본인이 요청하지 않으셨다면 고객센터로 문의해주세요.
 
 감사합니다.
-Lucky Pick it 팀'''
+Lucky Picky 팀'''
 
     # HTML 버전
     content = f'''
