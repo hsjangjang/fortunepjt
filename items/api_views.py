@@ -55,8 +55,6 @@ class ItemListAPIView(APIView):
     def post(self, request):
         """아이템 생성"""
         import json
-        from django.conf import settings
-        from django.core.files.storage import default_storage
 
         image = request.FILES.get('image')
         if not image:
@@ -64,12 +62,6 @@ class ItemListAPIView(APIView):
                 'success': False,
                 'error': '이미지를 업로드해주세요.'
             }, status=status.HTTP_400_BAD_REQUEST)
-
-        # 스토리지 디버그 로깅
-        storage_backend = default_storage.__class__.__name__
-        print(f"[Storage Debug] Backend: {storage_backend}")
-        print(f"[Storage Debug] AWS_STORAGE_BUCKET_NAME: {getattr(settings, 'AWS_STORAGE_BUCKET_NAME', 'NOT SET')}")
-        print(f"[Storage Debug] MEDIA_URL: {getattr(settings, 'MEDIA_URL', 'NOT SET')}")
 
         try:
             # 이미 분석된 데이터가 있는지 확인 (행운템 분석에서 넘어온 경우)
@@ -94,8 +86,6 @@ class ItemListAPIView(APIView):
                     dominant_colors=dominant_colors,
                     ai_analysis_result=ai_analysis
                 )
-                print(f"[Storage Debug] Saved image path: {item.image.name}")
-                print(f"[Storage Debug] Saved image URL: {item.image.url}")
             else:
                 # 새로 분석 수행
                 from .item_analyzer import ImageColorAnalyzer
@@ -115,9 +105,6 @@ class ItemListAPIView(APIView):
                     item.dominant_colors = analysis_result['colors']
                     item.ai_analysis_result = analysis_result.get('ai_analysis', {})
                     item.save()
-
-                print(f"[Storage Debug] Saved image path: {item.image.name}")
-                print(f"[Storage Debug] Saved image URL: {item.image.url}")
 
             return Response({
                 'success': True,

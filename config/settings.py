@@ -229,11 +229,6 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY', '')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME', '')
 AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-northeast-2')
 
-# 스토리지 디버그 로깅
-print(f"[Settings Debug] AWS_STORAGE_BUCKET_NAME: '{AWS_STORAGE_BUCKET_NAME}'")
-print(f"[Settings Debug] AWS_ACCESS_KEY_ID exists: {bool(AWS_ACCESS_KEY_ID)}")
-print(f"[Settings Debug] AWS_SECRET_ACCESS_KEY exists: {bool(AWS_SECRET_ACCESS_KEY)}")
-
 # S3 설정이 있으면 S3 스토리지 사용
 if AWS_STORAGE_BUCKET_NAME:
     # S3 기본 설정
@@ -244,7 +239,7 @@ if AWS_STORAGE_BUCKET_NAME:
     AWS_DEFAULT_ACL = None
     AWS_S3_FILE_OVERWRITE = False
     AWS_QUERYSTRING_AUTH = False
-    # AWS_LOCATION 제거 - 파일이 버킷 루트에 저장되므로 MEDIA_URL도 루트로 설정
+    AWS_LOCATION = 'media'
 
     # CloudFront URL 설정 (환경변수로 설정 가능)
     CLOUDFRONT_DOMAIN = os.getenv('CLOUDFRONT_DOMAIN', '')
@@ -256,25 +251,12 @@ if AWS_STORAGE_BUCKET_NAME:
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
-            "OPTIONS": {
-                "bucket_name": AWS_STORAGE_BUCKET_NAME,
-                "region_name": AWS_S3_REGION_NAME,
-                "custom_domain": AWS_S3_CUSTOM_DOMAIN,
-                "file_overwrite": False,
-                "querystring_auth": False,
-                "object_parameters": AWS_S3_OBJECT_PARAMETERS,
-                "default_acl": None,
-            },
         },
         "staticfiles": {
             "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-    # 파일이 items/2025/12/ 경로로 저장되므로 MEDIA_URL은 루트로 설정
-    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/'
-    print(f"[Settings Debug] S3 스토리지 활성화됨 - MEDIA_URL: {MEDIA_URL}")
-else:
-    print("[Settings Debug] S3 비활성화 - 로컬 파일 스토리지 사용")
+    MEDIA_URL = f'https://{AWS_S3_CUSTOM_DOMAIN}/{AWS_LOCATION}/'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

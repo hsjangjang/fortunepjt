@@ -107,16 +107,46 @@ def get_weather_info(lat: float = None, lon: float = None):
         # 오늘 최고/최저 기온 계산
         today_str = now.strftime('%Y%m%d')
         today_temps = []
+        tmx_value = None  # 일 최고기온 (TMX)
+        tmn_value = None  # 일 최저기온 (TMN)
+
         for key, values in weather_by_time.items():
-            if key.startswith(today_str) and 'TMP' in values:
-                try:
-                    today_temps.append(float(values['TMP']))
-                except:
-                    pass
+            if key.startswith(today_str):
+                # TMX (일 최고기온) - 보통 15시에 발표
+                if 'TMX' in values:
+                    try:
+                        tmx_value = float(values['TMX'])
+                    except:
+                        pass
+                # TMN (일 최저기온) - 보통 06시에 발표
+                if 'TMN' in values:
+                    try:
+                        tmn_value = float(values['TMN'])
+                    except:
+                        pass
+                # TMP (시간별 기온)
+                if 'TMP' in values:
+                    try:
+                        today_temps.append(float(values['TMP']))
+                    except:
+                        pass
 
         temp = float(current_data.get('TMP', 15))
-        temp_max = max(today_temps) if today_temps else temp + 3
-        temp_min = min(today_temps) if today_temps else temp - 3
+
+        # TMX/TMN이 있으면 사용, 없으면 시간별 기온에서 계산
+        if tmx_value is not None:
+            temp_max = tmx_value
+        elif today_temps:
+            temp_max = max(today_temps)
+        else:
+            temp_max = temp + 5
+
+        if tmn_value is not None:
+            temp_min = tmn_value
+        elif today_temps:
+            temp_min = min(today_temps)
+        else:
+            temp_min = temp - 5
 
         # 날씨 설명 생성
         sky = current_data.get('SKY', '1')
