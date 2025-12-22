@@ -146,10 +146,10 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 
 .feature-content {
   flex-shrink: 0;
+  margin-bottom: 1.5rem;
 }
 
 .feature-btn {
   margin-top: auto;
-  padding-top: 1.5rem;
 }
 </style>
