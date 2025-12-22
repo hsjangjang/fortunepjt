@@ -5,8 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <i class="fas fa-search" style="color: #a78bfa !important;"></i>
-            아이템 행운도 측정
+            <img src="@/assets/images/item_check_icon.png" alt="" class="page-title-icon" />아이템 행운도 측정
           </h1>
           <p class="page-subtitle">
             가지고 있는 아이템을 촬영하거나 업로드하여<br>
@@ -858,5 +857,13 @@ onMounted(() => {
 .recommend-section.no-item {
   background: rgba(59, 130, 246, 0.1);
   border-color: rgba(59, 130, 246, 0.3);
+}
+
+.page-title-icon {
+  width: 60px;
+  height: 60px;
+  margin-right: -8px;
+  vertical-align: middle;
+  object-fit: contain;
 }
 </style>
