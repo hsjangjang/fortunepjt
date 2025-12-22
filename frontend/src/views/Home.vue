@@ -132,13 +132,13 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
   text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.5);
 }
 
-/* 메인 피처 카드 내부 요소 아래 정렬 */
+/* 메인 피처 카드: 버튼만 아래 고정, 내용은 위에 유지 */
 #features .glass-card {
   display: flex;
   flex-direction: column;
 }
 
-#features .glass-card .btn {
-  margin-top: auto;
+#features .glass-card p.text-muted {
+  flex: 1;
 }
 </style>
