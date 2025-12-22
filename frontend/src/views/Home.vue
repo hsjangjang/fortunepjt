@@ -142,13 +142,10 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 .feature-card {
   display: flex;
   flex-direction: column;
-}
-
-.feature-content {
-  flex: 1;
+  justify-content: space-between;
 }
 
 .feature-btn {
-  margin-top: auto;
+  margin-top: 1.5rem;
 }
 </style>
