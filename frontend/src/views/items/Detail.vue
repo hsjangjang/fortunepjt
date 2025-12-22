@@ -178,7 +178,6 @@
                     ></div>
                     <div>
                       <span class="fw-bold">{{ color.korean_name }}</span>
-                      <small v-if="!isRainbowColor(color.korean_name)" class="text-muted ms-2">({{ color.hex }})</small>
                     </div>
                   </div>
                 </div>
@@ -259,7 +258,7 @@ import { useRoute, useRouter } from 'vue-router'
 import DefaultLayout from '@/layouts/DefaultLayout.vue'
 import api from '@/services/api'
 import { API_BASE_URL } from '@/config/api'
-import { getColorMatchScore, colorMap, getColorBackground, isRainbowColor, RAINBOW_GRADIENT } from '@/utils/colors'
+import { getColorMatchScore, colorMap, getColorBackground, RAINBOW_GRADIENT } from '@/utils/colors'
 import { getFortuneBoostScore, fortuneKeywords } from '@/utils/similarity'
 import { calculateLuckScore, calculateLuckScoreAsync, getScoreMessage, getScoreColor, calculateProgressOffset } from '@/utils/luckScore'
 import { findBestLuckyItem, hasNoGoodItem, formatItemDate } from '@/utils/itemAnalysis'
