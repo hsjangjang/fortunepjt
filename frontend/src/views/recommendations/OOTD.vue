@@ -18,16 +18,16 @@
               <i class="fas fa-star-half-alt text-warning me-1"></i>
               {{ fortuneSummary }}
             </p>
-            <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
-            <div v-if="luckyColors && luckyColors.length" class="d-flex flex-nowrap align-items-center justify-content-center gap-2">
-              <span class="text-white opacity-75 me-1 d-flex align-items-center lucky-color-label">
-                <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />
-                행운색:
+            <!-- 오늘의 행운색 - 메뉴 추천과 동일한 레이아웃 -->
+            <div v-if="luckyColors && luckyColors.length" class="lucky-colors-row">
+              <span class="lucky-colors-label">
+                <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon" />
+                오늘의 행운색:
               </span>
-              <div class="d-flex align-items-center gap-3">
-                <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
-                  <span class="lucky-color-dot-lg" :style="{ background: getColorBackground(color) }"></span>
-                  <span class="text-white lucky-color-name">{{ color }}</span>
+              <div class="lucky-colors-list">
+                <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-badge">
+                  <span class="lucky-color-dot" :style="{ background: getColorBackground(color) }"></span>
+                  {{ color }}
                 </span>
               </div>
             </div>
@@ -812,6 +812,37 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
+/* 행운색 가로 배치 (메뉴 추천과 동일) */
+.lucky-colors-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.lucky-colors-label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 1rem;
+}
+
+.lucky-colors-list {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.lucky-color-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: white;
+  font-weight: 500;
+}
+
 /* 옷 이미지 고정 크기 컨테이너 */
 .outfit-image-container {
   width: 160px;
@@ -844,7 +875,7 @@ onMounted(() => {
   height: 70px;
   margin: 0 auto;
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 }
 
