@@ -394,8 +394,19 @@ const luckProgressOffset = computed(() => calculateProgressOffset(luckScore.valu
 // 행운 지수 색상 (유틸리티 사용)
 const luckScoreColor = computed(() => getScoreColor(luckScore.value))
 
-// 아이템 색상 (가장 매칭되는)
-const bestItemColor = computed(() => colorMatchResult.value.bestItemHex)
+// 아이템 색상 (가장 매칭되는) - korean_name 기반으로 colorMap에서 HEX 가져오기
+const bestItemColor = computed(() => {
+  const bestHex = colorMatchResult.value.bestItemHex
+  if (!bestHex || bestHex === 'rainbow') return bestHex
+
+  // DB의 HEX가 아닌, 해당 색상의 korean_name으로 colorMap에서 올바른 HEX 가져오기
+  const colors = item.value?.dominant_colors || []
+  const matchedColor = colors.find(c => c.hex === bestHex)
+  if (matchedColor?.korean_name) {
+    return getColorBackground(matchedColor.korean_name)
+  }
+  return bestHex
+})
 
 // 매칭된 행운색
 const matchedLuckyColor = computed(() => {
