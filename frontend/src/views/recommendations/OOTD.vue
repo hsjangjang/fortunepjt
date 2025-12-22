@@ -995,12 +995,28 @@ onMounted(() => {
   /* 모바일에서 액세서리 3개 가로 일렬 배치 */
   .accessories-grid {
     flex-wrap: nowrap;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 0 0.5rem;
   }
 
   .accessory-item {
-    width: calc(33.33% - 0.35rem);
+    flex: 0 0 30%;
+    max-width: 90px;
     min-width: 0;
+  }
+
+  .accessory-card {
+    padding: 0.5rem !important;
+  }
+
+  .accessory-image-container {
+    width: 55px;
+    height: 55px;
+  }
+
+  .accessory-card h6 {
+    font-size: 0.8rem;
   }
 }
 </style>
