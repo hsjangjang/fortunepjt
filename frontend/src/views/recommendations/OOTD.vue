@@ -156,8 +156,8 @@
               </h5>
             </div>
             <div class="card-body">
-              <div class="row g-3 justify-content-center">
-                <div v-for="acc in outfit.accessories" :key="acc.name" class="col-4 col-md-3">
+              <div class="accessories-grid">
+                <div v-for="acc in outfit.accessories" :key="acc.name" class="accessory-item">
                   <div class="accessory-card text-center p-3 h-100">
                     <div class="accessory-image-container mb-2">
                       <img :src="getAccessoryImage(acc.name)" alt="Accessory" class="accessory-image" />
@@ -861,6 +861,19 @@ onMounted(() => {
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
+/* 액세서리 그리드 - flexbox로 가운데 정렬 */
+.accessories-grid {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.accessory-item {
+  flex: 0 0 auto;
+  width: 140px;
+}
+
 /* 액세서리 카드 스타일 */
 .accessory-card {
   background: rgba(255,255,255,0.05);
@@ -977,6 +990,11 @@ onMounted(() => {
 
   .hourly-prob {
     font-size: 10px;
+  }
+
+  /* 모바일에서 액세서리 아이템 크기 조정 */
+  .accessory-item {
+    width: 100px;
   }
 }
 </style>
