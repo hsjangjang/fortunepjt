@@ -436,42 +436,45 @@ h5 {
 
 /* 정보 섹션 블록 스타일 */
 .info-section-block {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  padding: 1.25rem 1.5rem;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 16px !important;
+  padding: 1.25rem 1.5rem !important;
+  margin-bottom: 1.5rem !important;
 }
 
 .info-section-title {
-  text-align: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center !important;
+  margin-bottom: 1rem !important;
+  padding-bottom: 0.75rem !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+  font-size: 1.1rem !important;
 }
 
 .info-items {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 0.75rem !important;
 }
 
 .info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.25rem 0;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  padding: 0.5rem 0 !important;
 }
 
 .info-label {
-  color: rgba(255, 255, 255, 0.7);
-  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-size: 0.95rem !important;
 }
 
 .info-value {
-  color: #fff;
-  font-weight: 600;
-  font-size: 0.95rem;
-  text-align: right;
+  color: #fff !important;
+  font-weight: 700 !important;
+  font-size: 0.95rem !important;
+  text-align: right !important;
 }
 
 .btn-outline-secondary {
