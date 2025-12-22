@@ -237,9 +237,10 @@ const handleLogout = async () => {
 <style scoped>
 /* 로고 이미지 스타일 */
 .navbar-logo-img {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   margin-right: 0.5rem;
+  object-fit: contain;
   filter: drop-shadow(0 0 6px rgba(167, 139, 250, 0.5));
 }
 

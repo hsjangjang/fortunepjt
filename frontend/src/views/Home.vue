@@ -9,7 +9,7 @@
           </span>
         </div>
         <h1 class="display-title fw-bold mb-4">
-          행운을 PICK✨<br>당신의 하루를 열어보아요
+          행운을 PICK<span class="star-icon">✨</span><br>당신의 하루를 열어보아요
         </h1>
         <p class="lead text-muted mb-5">
           사주와 별자리를 분석하여<br>
@@ -29,7 +29,9 @@
       <div class="col-md-4">
         <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--primary); filter: blur(60px); opacity: 0.4;"></div>
-          <div class="mb-4 mt-3" style="font-size: 3.5rem;">🔮</div>
+          <div class="mb-4 mt-3">
+            <img src="@/assets/images/logo.png" alt="" class="feature-icon" />
+          </div>
           <h4 class="mb-3">아이템 행운도</h4>
           <p class="text-muted mb-4">
             내 아이템이 오늘의 행운과<br>
@@ -45,7 +47,9 @@
       <div class="col-md-4">
         <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--success); filter: blur(60px); opacity: 0.3;"></div>
-          <div class="mb-4 mt-3" style="font-size: 3.5rem;">👕</div>
+          <div class="mb-4 mt-3">
+            <img src="@/assets/images/ootd-icon.png" alt="" class="feature-icon" />
+          </div>
           <h4 class="mb-3">OOTD 추천</h4>
           <p class="text-muted mb-4">
             행운색과 날씨를 고려한<br>
@@ -116,6 +120,16 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 </script>
 
 <style scoped>
-/* 전역 CSS의 .display-title, .animate-float 사용 */
-/* 추가 스타일 불필요 - style.css에서 통합 관리 */
+/* 피처 아이콘 */
+.feature-icon {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+/* 별 아이콘 노란색 */
+.star-icon {
+  color: #fbbf24;
+  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+}
 </style>

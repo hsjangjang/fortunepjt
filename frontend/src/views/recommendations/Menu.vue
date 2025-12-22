@@ -30,8 +30,8 @@
               </p>
               <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
               <div v-if="fortuneData.lucky_colors && fortuneData.lucky_colors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-                <span class="text-white opacity-75 me-1">
-                  <span class="palette-emoji">🎨</span>
+                <span class="text-white opacity-75 me-1 d-flex align-items-center">
+                  <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-1" />
                   오늘의 행운색:
                 </span>
                 <div class="d-flex align-items-center gap-2">
@@ -320,8 +320,11 @@ onMounted(() => {
   flex-shrink: 0;
 }
 
-.palette-emoji {
-  margin-right: 0.25rem;
+/* 팔레트 아이콘 */
+.lucky-color-palette-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 
 @media (max-width: 768px) {
