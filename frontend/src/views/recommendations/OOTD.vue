@@ -869,6 +869,7 @@ onMounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  text-align: center;
 }
 
 /* 액세서리 이미지 고정 크기 컨테이너 */
@@ -879,6 +880,12 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* 액세서리 이름 */
+.accessory-card h6 {
+  width: 100%;
+  text-align: center;
 }
 
 .accessory-image {
