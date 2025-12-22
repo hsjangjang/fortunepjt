@@ -19,10 +19,10 @@
               {{ fortuneSummary }}
             </p>
             <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
-            <div v-if="luckyColors && luckyColors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+            <div v-if="luckyColors && luckyColors.length" class="d-flex flex-nowrap align-items-center justify-content-center gap-2">
               <span class="text-white opacity-75 me-1 d-flex align-items-center lucky-color-label">
                 <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />
-                오늘의 행운색:
+                행운색:
               </span>
               <div class="d-flex align-items-center gap-3">
                 <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
@@ -162,8 +162,7 @@
                     <div class="accessory-image-container mb-2">
                       <img :src="getAccessoryImage(acc.name)" alt="Accessory" class="accessory-image" />
                     </div>
-                    <h6 class="text-white mt-2 mb-1 text-truncate">{{ acc.name }}</h6>
-                    <small class="text-muted d-block text-truncate">{{ acc.description }}</small>
+                    <h6 class="text-white mt-2 mb-0 text-truncate">{{ acc.name }}</h6>
                   </div>
                 </div>
               </div>

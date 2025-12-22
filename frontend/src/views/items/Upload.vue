@@ -39,12 +39,12 @@
                     <p class="small text-muted">JPG, PNG 파일 (최대 10MB)</p>
 
                     <!-- 카메라/갤러리 선택 버튼 -->
-                    <div class="d-flex gap-2 justify-content-center mt-3">
-                      <button type="button" class="btn btn-primary" @click="openCamera">
-                        <i class="fas fa-camera"></i> 카메라로 촬영
+                    <div class="d-flex gap-2 justify-content-center mt-3 flex-nowrap">
+                      <button type="button" class="btn btn-primary px-3" @click="openCamera">
+                        <i class="fas fa-camera"></i> 카메라
                       </button>
-                      <button type="button" class="btn btn-primary" @click="openGallery">
-                        <i class="fas fa-image"></i> 갤러리에서 선택
+                      <button type="button" class="btn btn-primary px-3" @click="openGallery">
+                        <i class="fas fa-image"></i> 갤러리
                       </button>
                     </div>
 

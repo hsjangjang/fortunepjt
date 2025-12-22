@@ -6,7 +6,7 @@
         <div class="mb-4 animate-float">
         </div>
         <h1 class="display-title fw-bold mb-4">
-          행운을 PICK<span class="star-icon">✨</span><br>당신의 하루를 열어보아요
+          행운을 PICK<span class="star-icon">✨</span><br class="d-none d-md-inline">당신의 하루를 열어보아요
         </h1>
         <p class="lead text-muted mb-5">
           사주와 별자리를 분석하여<br>
