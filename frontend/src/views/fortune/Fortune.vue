@@ -907,7 +907,7 @@ onMounted(async () => {
 
 .recommend-desc {
   flex-grow: 1;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 .recommend-btn {
