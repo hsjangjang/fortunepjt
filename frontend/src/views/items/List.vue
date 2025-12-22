@@ -107,8 +107,8 @@
                         :key="index"
                         class="badge rounded-pill"
                         :style="{
-                          backgroundColor: color.hex,
-                          color: getTextColor(color.hex),
+                          backgroundColor: getColorBackground(color.korean_name),
+                          color: getTextColor(getColorBackground(color.korean_name)),
                           border: '1px solid rgba(255,255,255,0.2)'
                         }"
                       >
