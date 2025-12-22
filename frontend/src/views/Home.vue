@@ -138,14 +138,18 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
   text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.5);
 }
 
-/* 메인 피처 카드: 버튼만 아래 고정, 내용은 위에 유지 */
+/* 메인 피처 카드: 내용은 상단에, 버튼만 아래 고정 */
 .feature-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+}
+
+.feature-content {
+  flex-shrink: 0;
 }
 
 .feature-btn {
-  margin-top: 1.5rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
 }
 </style>
