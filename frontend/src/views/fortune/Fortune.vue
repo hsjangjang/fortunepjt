@@ -304,19 +304,23 @@
 
       <!-- Recommendations -->
       <div v-if="fortune" class="card-grid cols-2 section-spacing">
-            <div class="card-base card-md card-interactive text-center">
-                <img src="@/assets/images/ootd-icon.png" alt="" class="recommend-icon" />
+            <div class="card-base card-md card-interactive text-center recommend-card">
+                <div class="recommend-icon-wrapper">
+                  <img src="@/assets/images/ootd-icon.png" alt="" class="recommend-icon" />
+                </div>
                 <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
-                <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
-                <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4">
+                <p class="text-white opacity-75 small recommend-desc">오늘의 날씨와 행운색 기반 코디</p>
+                <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4 recommend-btn">
                   추천 받기 →
                 </router-link>
             </div>
-            <div class="card-base card-md card-interactive text-center">
-                <span class="recommend-emoji">🍴</span>
+            <div class="card-base card-md card-interactive text-center recommend-card">
+                <div class="recommend-icon-wrapper">
+                  <img src="@/assets/images/recommendations_menu_icon.png" alt="" class="recommend-icon" />
+                </div>
                 <h5 class="text-white recommend-title">메뉴 추천 받기</h5>
-                <p class="text-white opacity-75 small mb-4">운세에 맞는 행운의 메뉴</p>
-                <router-link to="/recommendations/menu" class="btn btn-outline-light rounded-pill px-4">
+                <p class="text-white opacity-75 small recommend-desc">운세에 맞는 행운의 메뉴</p>
+                <router-link to="/recommendations/menu" class="btn btn-outline-light rounded-pill px-4 recommend-btn">
                   추천 받기 →
                 </router-link>
             </div>
@@ -873,13 +877,41 @@ onMounted(async () => {
   object-fit: contain;
 }
 
+/* 추천 카드 레이아웃 */
+.recommend-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+}
+
+.recommend-icon-wrapper {
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
 /* 추천 아이콘 스타일 */
 .recommend-icon {
   width: 64px;
   height: 64px;
   object-fit: contain;
-  display: block;
-  margin: 0 auto 0.75rem;
+}
+
+.recommend-title {
+  margin-bottom: 0.5rem;
+}
+
+.recommend-desc {
+  flex-grow: 1;
+  margin-bottom: 1rem;
+}
+
+.recommend-btn {
+  margin-top: auto;
 }
 
 /* 추천 이모지 스타일 */
