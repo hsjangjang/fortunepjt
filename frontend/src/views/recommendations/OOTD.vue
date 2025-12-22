@@ -158,9 +158,9 @@
             <div class="card-body">
               <div class="row g-3 justify-content-center">
                 <div v-for="acc in outfit.accessories" :key="acc.name" class="col-4 col-md-3">
-                  <div class="text-center p-3 h-100" style="background: rgba(255,255,255,0.05); border-radius: 15px;">
-                    <div class="mb-2 d-flex justify-content-center">
-                      <img :src="getAccessoryImage(acc.name)" alt="Accessory" width="60" class="img-fluid drop-shadow" />
+                  <div class="accessory-card text-center p-3 h-100">
+                    <div class="accessory-image-container mb-2">
+                      <img :src="getAccessoryImage(acc.name)" alt="Accessory" class="accessory-image" />
                     </div>
                     <h6 class="text-white mt-2 mb-1 text-truncate">{{ acc.name }}</h6>
                     <small class="text-muted d-block text-truncate">{{ acc.description }}</small>
@@ -723,6 +723,17 @@ onMounted(() => {
   overflow: hidden;
 }
 
+/* 상의/하의 카드 내부 요소 아래 정렬 */
+.outfit-card .card-body {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.outfit-card .card-body .d-flex.justify-content-center {
+  margin-top: auto;
+}
+
 .outfit-card:hover {
   transform: translateY(-5px);
 }
@@ -818,6 +829,31 @@ onMounted(() => {
   max-height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+}
+
+/* 액세서리 카드 스타일 */
+.accessory-card {
+  background: rgba(255,255,255,0.05);
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 액세서리 이미지 고정 크기 컨테이너 */
+.accessory-image-container {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.accessory-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 /* Loading Screen Styles */

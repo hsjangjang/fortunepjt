@@ -127,9 +127,18 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
   object-fit: contain;
 }
 
-/* 별 아이콘 노란색 */
+/* 별 아이콘 노란색 - 이모지는 filter 대신 text-shadow 사용 */
 .star-icon {
-  color: #fbbf24;
-  filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6));
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+/* 메인 피처 카드 내부 요소 아래 정렬 */
+#features .glass-card {
+  display: flex;
+  flex-direction: column;
+}
+
+#features .glass-card .btn {
+  margin-top: auto;
 }
 </style>
