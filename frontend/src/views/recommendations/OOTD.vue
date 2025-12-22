@@ -19,12 +19,12 @@
               {{ fortuneSummary }}
             </p>
             <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
-            <div v-if="luckyColors && luckyColors.length" class="d-flex flex-nowrap align-items-center justify-content-center gap-2">
-              <span class="text-white opacity-75 me-1 d-flex align-items-center lucky-color-label">
+            <div v-if="luckyColors && luckyColors.length" class="lucky-color-container">
+              <span class="text-white opacity-75 d-flex align-items-center justify-content-center lucky-color-label">
                 <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />
                 행운색:
               </span>
-              <div class="d-flex align-items-center gap-3">
+              <div class="lucky-color-list">
                 <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
                   <span class="lucky-color-dot-lg" :style="{ background: getColorBackground(color) }"></span>
                   <span class="text-white lucky-color-name">{{ color }}</span>
@@ -795,6 +795,20 @@ onMounted(() => {
   font-size: 1.05rem;
 }
 
+.lucky-color-container {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.lucky-color-list {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .lucky-color-label {
   font-size: 1.05rem;
 }
@@ -937,6 +951,23 @@ onMounted(() => {
 
   .hourly-prob {
     font-size: 10px;
+  }
+
+  /* 모바일에서 행운색 세로 배열 */
+  .lucky-color-container {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .lucky-color-list {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .lucky-color-item {
+    justify-content: center;
   }
 }
 </style>
