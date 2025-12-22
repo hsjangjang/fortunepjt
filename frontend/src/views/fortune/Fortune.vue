@@ -304,26 +304,26 @@
 
       <!-- Recommendations -->
       <div v-if="fortune" class="card-grid cols-2 section-spacing">
-            <div class="card-base card-md card-interactive text-center recommend-card">
+            <router-link to="/recommendations/ootd" class="card-base card-md card-interactive text-center recommend-card recommend-card-link">
                 <div class="recommend-icon-wrapper">
                   <img src="@/assets/images/ootd-icon.png" alt="" class="recommend-icon" />
                 </div>
                 <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
                 <p class="text-white opacity-75 small recommend-desc">오늘의 날씨와 행운색 기반 코디</p>
-                <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4 recommend-btn">
+                <span class="btn btn-outline-light rounded-pill px-4 recommend-btn">
                   추천 받기 →
-                </router-link>
-            </div>
-            <div class="card-base card-md card-interactive text-center recommend-card">
+                </span>
+            </router-link>
+            <router-link to="/recommendations/menu" class="card-base card-md card-interactive text-center recommend-card recommend-card-link">
                 <div class="recommend-icon-wrapper">
                   <img src="@/assets/images/recommendations_menu_icon.png" alt="" class="recommend-icon" />
                 </div>
                 <h5 class="text-white recommend-title">메뉴 추천 받기</h5>
                 <p class="text-white opacity-75 small recommend-desc">운세에 맞는 행운의 메뉴</p>
-                <router-link to="/recommendations/menu" class="btn btn-outline-light rounded-pill px-4 recommend-btn">
+                <span class="btn btn-outline-light rounded-pill px-4 recommend-btn">
                   추천 받기 →
-                </router-link>
-            </div>
+                </span>
+            </router-link>
       </div>
 
       <!-- No Fortune Yet (로딩 중이 아닐 때만 표시) -->
@@ -912,6 +912,12 @@ onMounted(async () => {
 
 .recommend-btn {
   margin-top: auto;
+}
+
+/* 전체 클릭 가능한 추천 카드 링크 */
+.recommend-card-link {
+  text-decoration: none;
+  cursor: pointer;
 }
 
 /* 추천 이모지 스타일 */
