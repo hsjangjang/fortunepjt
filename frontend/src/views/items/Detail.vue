@@ -7,7 +7,6 @@
           <h1 class="page-title">
             <span class="page-title-emoji">🔍</span>
             아이템 상세 분석
-            <span v-if="item && item.user_order" class="item-number"></span>
           </h1>
           <p class="page-subtitle">AI가 분석한 아이템의 상세 정보입니다</p>
         </div>
@@ -335,6 +334,12 @@ const getLuckyItemList = () => {
   return [luckyItem.main, luckyItem.zodiac, luckyItem.today_special].filter(Boolean)
 }
 
+// AI 분석 태그 추출
+const getAiTags = () => {
+  const tags = aiAnalysis.value?.tags || []
+  return tags
+}
+
 // 아이템 색상과 행운색 매칭 계산 (하이브리드: FastText 즉시 + GMS Embedding 비동기)
 const colorMatchResult = computed(() => {
   // 하이브리드 결과가 있으면 우선 사용
@@ -351,7 +356,8 @@ const colorMatchResult = computed(() => {
     item.value.item_name,
     item.value.dominant_colors,
     fortuneStore.luckyColors,
-    getLuckyItemList()
+    getLuckyItemList(),
+    getAiTags()  // AI 태그 전달
   )
 })
 
@@ -365,7 +371,8 @@ const calculateHybridScore = async () => {
       item.value.item_name,
       item.value.dominant_colors,
       fortuneStore.luckyColors,
-      getLuckyItemList()
+      getLuckyItemList(),
+      getAiTags()  // AI 태그 전달
     )
     // 하이브리드 결과가 더 높으면 업데이트
     if (!hybridScoreResult.value || result.score > hybridScoreResult.value.score) {

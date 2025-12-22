@@ -35,22 +35,53 @@ const SCORE_COLORS = [
 ]
 
 /**
+ * AI 태그에서 아이템 관련 키워드 추출
+ * @param {string[]} aiTags - AI 분석 태그 배열 (예: ['목도리', '건강운', '따뜻함'])
+ * @returns {string[]} 아이템 관련 키워드 배열
+ */
+const extractItemKeywordsFromTags = (aiTags) => {
+  if (!aiTags || !Array.isArray(aiTags) || aiTags.length === 0) return []
+  // 태그에서 '#' 제거하고 반환
+  return aiTags.map(tag => tag.replace(/^#/, '').trim()).filter(Boolean)
+}
+
+/**
  * 행운 점수 계산 - 동기 버전 (FastText만 사용)
  * 기본 35점 + 색상 35점 + 아이템 유사도 30점
  * @param {string} itemName - 아이템 이름
  * @param {Array<{hex: string}>} itemColors - 아이템 색상 배열
  * @param {string[]} luckyColorNames - 행운색 이름 배열
  * @param {string[]} luckyItemList - 행운 아이템 이름 배열
+ * @param {string[]} aiTags - AI 분석 태그 배열 (옵션)
  * @returns {{score: number, matchedColor: string|null, bestItemHex: string|null, itemSimilarity: number}}
  */
-export const calculateLuckScore = (itemName, itemColors, luckyColorNames, luckyItemList) => {
+export const calculateLuckScore = (itemName, itemColors, luckyColorNames, luckyItemList, aiTags = []) => {
   // 1. 색상 점수 계산 (0-35점)
   const colorResult = calculateColorMatchScore(itemColors, luckyColorNames)
   const colorScore = Math.round(colorResult.score * SCORE_WEIGHTS.COLOR)
 
   // 2. 아이템 유사도 계산 (0-30점) - FastText
-  const { similarity } = getMaxSimilarityWithLuckyItems(itemName, luckyItemList)
-  const itemScoreRaw = similarityToScore(similarity)
+  // AI 태그가 있으면 태그 기반으로 유사도 계산, 없으면 아이템 이름 사용
+  const itemKeywords = extractItemKeywordsFromTags(aiTags)
+  let maxSimilarity = 0
+
+  // AI 태그의 각 키워드로 유사도 계산하여 최대값 사용
+  if (itemKeywords.length > 0) {
+    for (const keyword of itemKeywords) {
+      const { similarity } = getMaxSimilarityWithLuckyItems(keyword, luckyItemList)
+      if (similarity > maxSimilarity) {
+        maxSimilarity = similarity
+      }
+    }
+  }
+
+  // 아이템 이름으로도 계산하여 더 높은 값 사용
+  const { similarity: nameSimilarity } = getMaxSimilarityWithLuckyItems(itemName, luckyItemList)
+  if (nameSimilarity > maxSimilarity) {
+    maxSimilarity = nameSimilarity
+  }
+
+  const itemScoreRaw = similarityToScore(maxSimilarity)
   const itemScore = Math.round(itemScoreRaw * SCORE_WEIGHTS.ITEM)
 
   // 3. 최종 점수: 기본 35점 + 색상 35점 + 아이템 30점
@@ -60,7 +91,7 @@ export const calculateLuckScore = (itemName, itemColors, luckyColorNames, luckyI
     score: finalScore,
     matchedColor: colorResult.matchedColor,
     bestItemHex: colorResult.bestItemHex,
-    itemSimilarity: similarity,
+    itemSimilarity: maxSimilarity,
     colorScore,
     itemScore,
     source: 'fasttext'
@@ -74,16 +105,39 @@ export const calculateLuckScore = (itemName, itemColors, luckyColorNames, luckyI
  * @param {Array<{hex: string}>} itemColors - 아이템 색상 배열
  * @param {string[]} luckyColorNames - 행운색 이름 배열
  * @param {string[]} luckyItemList - 행운 아이템 이름 배열
+ * @param {string[]} aiTags - AI 분석 태그 배열 (옵션)
  * @returns {Promise<{score: number, matchedColor: string|null, bestItemHex: string|null, itemSimilarity: number, source: string}>}
  */
-export const calculateLuckScoreAsync = async (itemName, itemColors, luckyColorNames, luckyItemList) => {
+export const calculateLuckScoreAsync = async (itemName, itemColors, luckyColorNames, luckyItemList, aiTags = []) => {
   // 1. 색상 점수 계산 (0-35점) - 동기
   const colorResult = calculateColorMatchScore(itemColors, luckyColorNames)
   const colorScore = Math.round(colorResult.score * SCORE_WEIGHTS.COLOR)
 
   // 2. 아이템 유사도 계산 (0-30점) - 하이브리드 (비동기)
-  const { similarity, source } = await getHybridSimilarity(itemName, luckyItemList)
-  const itemScoreRaw = similarityToScore(similarity)
+  // AI 태그가 있으면 태그 기반으로 유사도 계산, 없으면 아이템 이름 사용
+  const itemKeywords = extractItemKeywordsFromTags(aiTags)
+  let maxSimilarity = 0
+  let bestSource = 'fasttext'
+
+  // AI 태그의 각 키워드로 유사도 계산하여 최대값 사용
+  if (itemKeywords.length > 0) {
+    for (const keyword of itemKeywords) {
+      const { similarity, source } = await getHybridSimilarity(keyword, luckyItemList)
+      if (similarity > maxSimilarity) {
+        maxSimilarity = similarity
+        bestSource = source
+      }
+    }
+  }
+
+  // 아이템 이름으로도 계산하여 더 높은 값 사용
+  const { similarity: nameSimilarity, source: nameSource } = await getHybridSimilarity(itemName, luckyItemList)
+  if (nameSimilarity > maxSimilarity) {
+    maxSimilarity = nameSimilarity
+    bestSource = nameSource
+  }
+
+  const itemScoreRaw = similarityToScore(maxSimilarity)
   const itemScore = Math.round(itemScoreRaw * SCORE_WEIGHTS.ITEM)
 
   // 3. 최종 점수: 기본 35점 + 색상 35점 + 아이템 30점
@@ -93,10 +147,10 @@ export const calculateLuckScoreAsync = async (itemName, itemColors, luckyColorNa
     score: finalScore,
     matchedColor: colorResult.matchedColor,
     bestItemHex: colorResult.bestItemHex,
-    itemSimilarity: similarity,
+    itemSimilarity: maxSimilarity,
     colorScore,
     itemScore,
-    source  // 'fasttext' 또는 'embedding'
+    source: bestSource  // 'fasttext' 또는 'embedding'
   }
 }
 
