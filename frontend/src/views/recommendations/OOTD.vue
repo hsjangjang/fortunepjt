@@ -867,6 +867,8 @@ onMounted(() => {
   border-radius: 15px;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 액세서리 이미지 고정 크기 컨테이너 */
