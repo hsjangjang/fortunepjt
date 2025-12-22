@@ -322,7 +322,7 @@
                 <div v-else id="profile-view">
                   <div class="row">
                     <div class="col-md-6">
-                      <h5>기본 정보</h5>
+                      <h5 class="text-center">기본 정보</h5>
                       <table class="table table-borderless">
                         <tbody>
                           <tr>
@@ -350,7 +350,7 @@
                     </div>
 
                     <div class="col-md-6">
-                      <h5>추가 정보</h5>
+                      <h5 class="text-center">추가 정보</h5>
                       <table class="table table-borderless">
                         <tbody>
                           <tr>
