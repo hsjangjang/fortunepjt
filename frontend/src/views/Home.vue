@@ -70,7 +70,7 @@
         <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--warning); filter: blur(60px); opacity: 0.3;"></div>
           <div class="feature-content">
-            <div class="mb-4 mt-3" style="font-size: 3.5rem;">🍽️</div>
+            <div class="mb-4 mt-3 feature-emoji">🍽️</div>
             <h4 class="mb-3">메뉴 추천</h4>
             <p class="text-muted mb-0">
               오늘의 운세에 맞는<br>
@@ -138,17 +138,27 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
   text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.5);
 }
 
-/* 메인 피처 카드: 버튼만 아래 고정, 내용은 위에 유지 */
+/* 메인 피처 카드: 내용은 상단에, 버튼만 아래 고정 */
 .feature-card {
   display: flex;
   flex-direction: column;
 }
 
 .feature-content {
-  flex: 1;
+  flex-shrink: 0;
+  margin-bottom: 1.5rem;
 }
 
 .feature-btn {
   margin-top: auto;
+}
+
+/* 이모지 아이콘을 이미지 아이콘과 같은 높이로 맞춤 */
+.feature-emoji {
+  font-size: 3.5rem;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>
