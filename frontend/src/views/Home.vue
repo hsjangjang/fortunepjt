@@ -4,9 +4,6 @@
     <div class="row align-items-center mb-5 py-5">
       <div class="col-lg-8 mx-auto text-center">
         <div class="mb-4 animate-float">
-          <span class="badge rounded-pill bg-primary bg-opacity-25 text-primary border border-primary border-opacity-25 px-3 py-2">
-            <i class="fas fa-sparkles me-1"></i> AI 기반 운세 & 라이프스타일
-          </span>
         </div>
         <h1 class="display-title fw-bold mb-4">
           행운을 PICK<span class="star-icon">✨</span><br>당신의 하루를 열어보아요
