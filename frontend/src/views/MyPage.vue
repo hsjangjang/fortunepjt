@@ -349,6 +349,8 @@
                       </table>
                     </div>
 
+                    <hr class="d-md-none my-3 border-light border-opacity-25">
+
                     <div class="col-md-6">
                       <h5 class="text-center">추가 정보</h5>
                       <table class="table table-borderless">
