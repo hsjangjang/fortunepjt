@@ -27,17 +27,19 @@
     <div id="features" class="row mb-5 g-4">
       <!-- 오늘의 운세 -->
       <div class="col-md-4">
-        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
+        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--primary); filter: blur(60px); opacity: 0.4;"></div>
-          <div class="mb-4 mt-3">
-            <img src="@/assets/images/logo.png" alt="" class="feature-icon" />
+          <div class="feature-content">
+            <div class="mb-4 mt-3">
+              <img src="@/assets/images/logo.png" alt="" class="feature-icon" />
+            </div>
+            <h4 class="mb-3">아이템 행운도</h4>
+            <p class="text-muted mb-0">
+              내 아이템이 오늘의 행운과<br>
+              얼마나 맞는지 AI가 분석합니다
+            </p>
           </div>
-          <h4 class="mb-3">아이템 행운도</h4>
-          <p class="text-muted mb-4">
-            내 아이템이 오늘의 행운과<br>
-            얼마나 맞는지 AI가 분석합니다
-          </p>
-          <router-link to="/fortune/item-check" class="btn btn-outline-light w-100 stretched-link">
+          <router-link to="/fortune/item-check" class="btn btn-outline-light w-100 feature-btn stretched-link">
             행운도 측정하기
           </router-link>
         </div>
@@ -45,17 +47,19 @@
 
       <!-- OOTD 추천 -->
       <div class="col-md-4">
-        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
+        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--success); filter: blur(60px); opacity: 0.3;"></div>
-          <div class="mb-4 mt-3">
-            <img src="@/assets/images/ootd-icon.png" alt="" class="feature-icon" />
+          <div class="feature-content">
+            <div class="mb-4 mt-3">
+              <img src="@/assets/images/ootd-icon.png" alt="" class="feature-icon" />
+            </div>
+            <h4 class="mb-3">OOTD 추천</h4>
+            <p class="text-muted mb-0">
+              행운색과 날씨를 고려한<br>
+              완벽한 코디를 제안합니다
+            </p>
           </div>
-          <h4 class="mb-3">OOTD 추천</h4>
-          <p class="text-muted mb-4">
-            행운색과 날씨를 고려한<br>
-            완벽한 코디를 제안합니다
-          </p>
-          <router-link to="/recommendations/ootd" class="btn btn-outline-light w-100 stretched-link">
+          <router-link to="/recommendations/ootd" class="btn btn-outline-light w-100 feature-btn stretched-link">
             코디 추천받기
           </router-link>
         </div>
@@ -63,15 +67,17 @@
 
       <!-- 메뉴 추천 -->
       <div class="col-md-4">
-        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
+        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--warning); filter: blur(60px); opacity: 0.3;"></div>
-          <div class="mb-4 mt-3" style="font-size: 3.5rem;">🍽️</div>
-          <h4 class="mb-3">메뉴 추천</h4>
-          <p class="text-muted mb-4">
-            오늘의 운세에 맞는<br>
-            행운의 메뉴를 추천합니다
-          </p>
-          <router-link to="/recommendations/menu" class="btn btn-outline-light w-100 stretched-link">
+          <div class="feature-content">
+            <div class="mb-4 mt-3" style="font-size: 3.5rem;">🍽️</div>
+            <h4 class="mb-3">메뉴 추천</h4>
+            <p class="text-muted mb-0">
+              오늘의 운세에 맞는<br>
+              행운의 메뉴를 추천합니다
+            </p>
+          </div>
+          <router-link to="/recommendations/menu" class="btn btn-outline-light w-100 feature-btn stretched-link">
             메뉴 추천받기
           </router-link>
         </div>
@@ -133,12 +139,16 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 }
 
 /* 메인 피처 카드: 버튼만 아래 고정, 내용은 위에 유지 */
-#features .glass-card {
+.feature-card {
   display: flex;
   flex-direction: column;
 }
 
-#features .glass-card p.text-muted {
+.feature-content {
   flex: 1;
+}
+
+.feature-btn {
+  margin-top: auto;
 }
 </style>
