@@ -6,12 +6,8 @@
           <!-- 좌측 사이드바 -->
           <aside class="mypage-sidebar">
             <div class="sidebar-header">
-              <div class="user-avatar">
-                <UserCircle :size="48" />
-              </div>
               <div class="user-info">
-                <h4 class="user-name">{{ userFullName }}님</h4>
-                <p class="user-id">@{{ authStore.user?.username }}</p>
+                <h4 class="user-name">{{ userFullName }}님 <span class="user-id">@{{ authStore.user?.username }}</span></h4>
               </div>
             </div>
             <nav class="sidebar-nav">
@@ -410,7 +406,7 @@ import { API_BASE_URL } from '@/config/api'
 import { getTextColor, getColorMatchScore, getColorBackground } from '@/utils/colors'
 import { getFortuneBoostScore } from '@/utils/similarity'
 import { FORTUNE_CATEGORIES, getCategoryColor } from '@/utils/fortuneCategories'
-import { UserCircle, Package, Settings } from 'lucide-vue-next'
+import { Package, Settings } from 'lucide-vue-next'
 
 const route = useRoute()
 const authStore = useAuthStore()
@@ -748,8 +744,10 @@ onMounted(() => {
 
 .sidebar-header {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  justify-content: center;
+  gap: 0.5rem;
   padding-bottom: 1.5rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   margin-bottom: 1.5rem;
@@ -761,11 +759,12 @@ onMounted(() => {
 
 .user-info {
   overflow: hidden;
+  text-align: center;
 }
 
 .user-name {
   color: #fff;
-  font-size: 1rem;
+  font-size: 1.5rem;
   font-weight: 600;
   margin: 0;
   white-space: nowrap;
@@ -775,8 +774,8 @@ onMounted(() => {
 
 .user-id {
   color: rgba(255, 255, 255, 0.5);
-  font-size: 0.85rem;
-  margin: 0;
+  font-size: 1.0rem;
+  font-weight: 400;
 }
 
 .sidebar-nav {

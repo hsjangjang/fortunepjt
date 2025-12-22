@@ -40,10 +40,10 @@
 
                     <!-- 카메라/갤러리 선택 버튼 -->
                     <div class="d-flex gap-2 justify-content-center mt-3 flex-nowrap">
-                      <button type="button" class="btn btn-primary px-3" @click="openCamera">
+                      <button type="button" class="btn btn-primary px-3 upload-btn" @click="openCamera">
                         <i class="fas fa-camera"></i> 카메라
                       </button>
-                      <button type="button" class="btn btn-primary px-3" @click="openGallery">
+                      <button type="button" class="btn btn-primary px-3 upload-btn" @click="openGallery">
                         <i class="fas fa-image"></i> 갤러리
                       </button>
                     </div>
@@ -392,6 +392,18 @@ const handleSubmit = async () => {
 @media (max-width: 768px) {
   .preview-image {
     max-height: 180px;
+  }
+
+  /* 모바일에서 업로드 버튼 스타일 */
+  .upload-btn {
+    font-size: 0.8rem;
+    padding: 0.5rem 1rem !important;
+    border-radius: 50px;
+    white-space: nowrap;
+  }
+
+  .upload-btn i {
+    margin-right: 0.25rem;
   }
 }
 </style>
