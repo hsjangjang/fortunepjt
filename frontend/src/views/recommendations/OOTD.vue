@@ -992,9 +992,15 @@ onMounted(() => {
     font-size: 10px;
   }
 
-  /* 모바일에서 액세서리 아이템 크기 조정 */
+  /* 모바일에서 액세서리 3개 가로 일렬 배치 */
+  .accessories-grid {
+    flex-wrap: nowrap;
+    gap: 0.5rem;
+  }
+
   .accessory-item {
-    width: 100px;
+    width: calc(33.33% - 0.35rem);
+    min-width: 0;
   }
 }
 </style>
