@@ -5,29 +5,29 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <img src="@/assets/images/ootd-icon.png" alt="" class="page-title-icon" />
+            <img src="@/assets/images/ootd-icon.png" alt="" class="page-title-icon-ootd" />
             OOTD 추천
           </h1>
           <p class="page-subtitle">날씨와 행운색 기반 오늘의 코디</p>
         </div>
 
         <!-- 운세 요약 카드 -->
-        <div v-if="fortuneSummary || (luckyColors && luckyColors.length)" class="card-base card-sm text-center mb-5">
+        <div v-if="fortuneSummary || (luckyColors && luckyColors.length)" class="card-base card-sm text-center mb-5 lucky-color-card">
             <!-- 운세 요약 한줄 -->
-            <p v-if="fortuneSummary" class="text-white mb-2" style="font-size: 0.95rem;">
+            <p v-if="fortuneSummary" class="text-white mb-2 fortune-summary-text">
               <i class="fas fa-star-half-alt text-warning me-1"></i>
               {{ fortuneSummary }}
             </p>
             <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
             <div v-if="luckyColors && luckyColors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-              <span class="text-white opacity-75 me-1 d-flex align-items-center">
-                <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-1" />
+              <span class="text-white opacity-75 me-1 d-flex align-items-center lucky-color-label">
+                <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />
                 오늘의 행운색:
               </span>
-              <div class="d-flex align-items-center gap-2">
+              <div class="d-flex align-items-center gap-3">
                 <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
-                  <span class="lucky-color-dot" :style="{ background: getColorBackground(color) }"></span>
-                  <span class="text-white">{{ color }}</span>
+                  <span class="lucky-color-dot-lg" :style="{ background: getColorBackground(color) }"></span>
+                  <span class="text-white lucky-color-name">{{ color }}</span>
                 </span>
               </div>
             </div>
@@ -94,8 +94,8 @@
                   <h5 class="mb-0 text-white">오늘의 상의</h5>
                 </div>
                 <div class="card-body text-center">
-                  <div class="mb-3 d-flex justify-content-center">
-                    <img :src="getTopImage" alt="Top" width="100" class="img-fluid drop-shadow" />
+                  <div class="outfit-image-container mb-3">
+                    <img :src="getTopImage" alt="Top" class="outfit-image" />
                   </div>
                   <h4>{{ outfit.top || '니트' }}</h4>
                   <p class="text-muted">{{ outfit.top_desc || '따뜻하고 포근한 느낌' }}</p>
@@ -113,8 +113,8 @@
                   <h5 class="mb-0 text-white">오늘의 하의</h5>
                 </div>
                 <div class="card-body text-center">
-                  <div class="mb-3 d-flex justify-content-center">
-                    <img :src="getBottomImage" alt="Bottom" width="100" class="img-fluid drop-shadow" />
+                  <div class="outfit-image-container mb-3">
+                    <img :src="getBottomImage" alt="Bottom" class="outfit-image" />
                   </div>
                   <h4>{{ outfit.bottom || '청바지' }}</h4>
                   <p class="text-muted">{{ outfit.bottom_desc || '편안한 일상 바지' }}</p>
@@ -135,8 +135,8 @@
               </h5>
             </div>
             <div class="card-body text-center">
-              <div class="mb-3 d-flex justify-content-center">
-                <img :src="getOuterImage" alt="Outer" width="100" class="img-fluid drop-shadow" />
+              <div class="outfit-image-container mb-3">
+                <img :src="getOuterImage" alt="Outer" class="outfit-image" />
               </div>
               <h4>{{ outfit.outer || '코트' }}</h4>
               <p class="text-muted">{{ outfit.outer_desc || '오늘같은 날씨엔 꼭 필요합니다.' }}</p>
@@ -760,19 +760,64 @@ onMounted(() => {
   filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
 }
 
-/* 페이지 타이틀 아이콘 */
-.page-title-icon {
-  width: 36px;
-  height: 36px;
+/* OOTD 페이지 타이틀 아이콘 */
+.page-title-icon-ootd {
+  width: 42px;
+  height: 42px;
   margin-right: 0.5rem;
   vertical-align: middle;
+  object-fit: contain;
 }
 
 /* 팔레트 아이콘 */
 .lucky-color-palette-icon {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
+}
+
+/* 행운색 카드 내부 스타일 */
+.lucky-color-card {
+  padding: 1.25rem 1.5rem;
+}
+
+.fortune-summary-text {
+  font-size: 1.05rem;
+}
+
+.lucky-color-label {
+  font-size: 1.05rem;
+}
+
+.lucky-color-name {
+  font-size: 1.05rem;
+  font-weight: 500;
+}
+
+.lucky-color-dot-lg {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+/* 옷 이미지 고정 크기 컨테이너 */
+.outfit-image-container {
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.outfit-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
 }
 
 /* Loading Screen Styles */

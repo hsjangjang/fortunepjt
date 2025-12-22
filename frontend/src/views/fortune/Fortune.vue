@@ -866,10 +866,11 @@ onMounted(async () => {
 
 /* 페이지 타이틀 아이콘 */
 .page-title-icon {
-  width: 36px;
-  height: 36px;
+  width: 42px;
+  height: 42px;
   margin-right: 0.5rem;
   vertical-align: middle;
+  object-fit: contain;
 }
 
 /* 추천 아이콘 스타일 */

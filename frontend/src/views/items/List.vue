@@ -51,11 +51,11 @@
               </button>
             </div>
             <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-              <span class="text-white-50 me-2 fortune-label d-flex align-items-center"><img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-1" />오늘의 행운색:</span>
-              <div class="d-flex align-items-center gap-2">
+              <span class="text-white-50 me-2 fortune-label d-flex align-items-center"><img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />오늘의 행운색:</span>
+              <div class="d-flex align-items-center gap-3">
                 <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
-                  <span class="lucky-color-dot" :style="{ background: getColorBackground(color) }"></span>
-                  <span class="text-white">{{ color }}</span>
+                  <span class="lucky-color-dot-lg" :style="{ background: getColorBackground(color) }"></span>
+                  <span class="text-white lucky-color-name">{{ color }}</span>
                 </span>
               </div>
             </div>
@@ -536,17 +536,32 @@ onMounted(() => {
 
 /* 팔레트 아이콘 */
 .lucky-color-palette-icon {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
 }
 
 /* 페이지 타이틀 아이콘 */
 .page-title-icon {
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   margin-right: 0.5rem;
   vertical-align: middle;
+  object-fit: contain;
+}
+
+/* 행운색 스타일 */
+.lucky-color-dot-lg {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.lucky-color-name {
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 /* 운세 미생성 시 유도 배너 */
