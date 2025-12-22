@@ -775,7 +775,7 @@ onMounted(() => {
 .page-title-icon-ootd {
   width: 42px;
   height: 42px;
-  margin-right: 0.5rem;
+  margin-right: -8px;
   vertical-align: middle;
   object-fit: contain;
 }

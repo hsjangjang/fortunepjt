@@ -5,8 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header page-header-lg">
           <h1 class="page-title">
-            <span class="page-title-emoji">🍴</span>
-            오늘의 메뉴 추천
+            <img src="@/assets/images/recommendations_menu_icon.png" alt="" class="page-title-icon-menu" />오늘의 메뉴 추천
           </h1>
           <p class="page-subtitle">운세와 행운색을 기반으로 한 맞춤 메뉴</p>
         </div>
@@ -271,6 +270,15 @@ onMounted(() => {
 
 <style scoped>
 /* .hover-lift, .animate-float은 전역 CSS에서 관리 */
+
+/* 페이지 타이틀 아이콘 */
+.page-title-icon-menu {
+  width: 42px;
+  height: 42px;
+  margin-right: -8px;
+  vertical-align: middle;
+  object-fit: contain;
+}
 
 /* 메인 추천 메뉴 이미지 */
 .main-menu-img {
