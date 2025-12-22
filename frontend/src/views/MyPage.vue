@@ -756,7 +756,7 @@ onMounted(() => {
 }
 
 .user-avatar {
-  color: #a78bfa;
+  color: #fff;
 }
 
 .user-info {
