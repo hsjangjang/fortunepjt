@@ -773,8 +773,8 @@ onMounted(() => {
 
 /* OOTD 페이지 타이틀 아이콘 */
 .page-title-icon-ootd {
-  width: 42px;
-  height: 42px;
+  width: 63px;
+  height: 63px;
   margin-right: -8px;
   vertical-align: middle;
   object-fit: contain;
