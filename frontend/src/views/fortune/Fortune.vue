@@ -88,7 +88,7 @@
                   <span class="tab-label">직장운</span>
                 </a>
                 <a class="fortune-tab-pill" :class="{ active: activeTab === 'health' }" @click.prevent="changeTab('health')">
-                  <span class="tab-icon">💚</span>
+                  <span class="tab-icon">💪</span>
                   <span class="tab-label">건강운</span>
                 </a>
                 <a class="fortune-tab-pill" :class="{ active: activeTab === 'study' }" @click.prevent="changeTab('study')">
