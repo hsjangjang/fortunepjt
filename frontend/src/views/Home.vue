@@ -9,7 +9,7 @@
           </span>
         </div>
         <h1 class="display-title fw-bold mb-4">
-          행운을 PICK✨<br>당신의 하루를 열어보아요
+          행운을 PICK<span class="star-icon">✨</span><br>당신의 하루를 열어보아요
         </h1>
         <p class="lead text-muted mb-5">
           사주와 별자리를 분석하여<br>
@@ -27,15 +27,19 @@
     <div id="features" class="row mb-5 g-4">
       <!-- 오늘의 운세 -->
       <div class="col-md-4">
-        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
+        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--primary); filter: blur(60px); opacity: 0.4;"></div>
-          <div class="mb-4 mt-3" style="font-size: 3.5rem;">🔮</div>
-          <h4 class="mb-3">아이템 행운도</h4>
-          <p class="text-muted mb-4">
-            내 아이템이 오늘의 행운과<br>
-            얼마나 맞는지 AI가 분석합니다
-          </p>
-          <router-link to="/fortune/item-check" class="btn btn-outline-light w-100 stretched-link">
+          <div class="feature-content">
+            <div class="mb-4 mt-3">
+              <img src="@/assets/images/logo.png" alt="" class="feature-icon" />
+            </div>
+            <h4 class="mb-3">아이템 행운도</h4>
+            <p class="text-muted mb-0">
+              내 아이템이 오늘의 행운과<br>
+              얼마나 맞는지 AI가 분석합니다
+            </p>
+          </div>
+          <router-link to="/fortune/item-check" class="btn btn-outline-light w-100 feature-btn stretched-link">
             행운도 측정하기
           </router-link>
         </div>
@@ -43,15 +47,19 @@
 
       <!-- OOTD 추천 -->
       <div class="col-md-4">
-        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
+        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--success); filter: blur(60px); opacity: 0.3;"></div>
-          <div class="mb-4 mt-3" style="font-size: 3.5rem;">👕</div>
-          <h4 class="mb-3">OOTD 추천</h4>
-          <p class="text-muted mb-4">
-            행운색과 날씨를 고려한<br>
-            완벽한 코디를 제안합니다
-          </p>
-          <router-link to="/recommendations/ootd" class="btn btn-outline-light w-100 stretched-link">
+          <div class="feature-content">
+            <div class="mb-4 mt-3">
+              <img src="@/assets/images/ootd-icon.png" alt="" class="feature-icon" />
+            </div>
+            <h4 class="mb-3">OOTD 추천</h4>
+            <p class="text-muted mb-0">
+              행운색과 날씨를 고려한<br>
+              완벽한 코디를 제안합니다
+            </p>
+          </div>
+          <router-link to="/recommendations/ootd" class="btn btn-outline-light w-100 feature-btn stretched-link">
             코디 추천받기
           </router-link>
         </div>
@@ -59,15 +67,17 @@
 
       <!-- 메뉴 추천 -->
       <div class="col-md-4">
-        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden">
+        <div class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card">
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--warning); filter: blur(60px); opacity: 0.3;"></div>
-          <div class="mb-4 mt-3" style="font-size: 3.5rem;">🍽️</div>
-          <h4 class="mb-3">메뉴 추천</h4>
-          <p class="text-muted mb-4">
-            오늘의 운세에 맞는<br>
-            행운의 메뉴를 추천합니다
-          </p>
-          <router-link to="/recommendations/menu" class="btn btn-outline-light w-100 stretched-link">
+          <div class="feature-content">
+            <div class="mb-4 mt-3" style="font-size: 3.5rem;">🍽️</div>
+            <h4 class="mb-3">메뉴 추천</h4>
+            <p class="text-muted mb-0">
+              오늘의 운세에 맞는<br>
+              행운의 메뉴를 추천합니다
+            </p>
+          </div>
+          <router-link to="/recommendations/menu" class="btn btn-outline-light w-100 feature-btn stretched-link">
             메뉴 추천받기
           </router-link>
         </div>
@@ -116,6 +126,29 @@ import DefaultLayout from '@/layouts/DefaultLayout.vue'
 </script>
 
 <style scoped>
-/* 전역 CSS의 .display-title, .animate-float 사용 */
-/* 추가 스타일 불필요 - style.css에서 통합 관리 */
+/* 피처 아이콘 */
+.feature-icon {
+  width: 72px;
+  height: 72px;
+  object-fit: contain;
+}
+
+/* 별 아이콘 노란색 - 이모지는 filter 대신 text-shadow 사용 */
+.star-icon {
+  text-shadow: 0 0 10px rgba(251, 191, 36, 0.8), 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+/* 메인 피처 카드: 버튼만 아래 고정, 내용은 위에 유지 */
+.feature-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.feature-content {
+  flex: 1;
+}
+
+.feature-btn {
+  margin-top: auto;
+}
 </style>

@@ -52,7 +52,7 @@ import outerFleeceJacket from '@/assets/images/ootd/outer_fleece_jacket.png'
 import outerRaincoat from '@/assets/images/ootd/outer_raincoat.png'
 
 // 액세서리 이미지
-import accScarf from '@/assets/images/ootd/acc_scarf.png'
+import accMuffler from '@/assets/images/ootd/acc_muffler.png'
 import accGloves from '@/assets/images/ootd/acc_gloves.png'
 import accBeanie from '@/assets/images/ootd/acc_beanie.png'
 import accCap from '@/assets/images/ootd/acc_cap.png'
@@ -137,9 +137,9 @@ export const outerImageMap = {
 
 // 액세서리 이미지 매핑
 export const accImageMap = {
-  '머플러': accScarf,
-  '스카프': accScarf,
-  '목도리': accScarf,
+  '머플러': accMuffler,
+  '스카프': accMuffler,
+  '목도리': accMuffler,
   '장갑': accGloves,
   '비니': accBeanie,
   '모자': accCap,
@@ -151,7 +151,7 @@ export const accImageMap = {
 export const defaultTopImage = topKnit
 export const defaultBottomImage = bottomJeans
 export const defaultOuterImage = outerCoat
-export const defaultAccImage = accScarf
+export const defaultAccImage = accMuffler
 
 /**
  * 상의 이름으로 이미지 가져오기

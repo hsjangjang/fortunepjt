@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <span class="page-title-emoji">🔮</span>
+            <img src="@/assets/images/logo.png" alt="" class="page-title-icon" />
             {{ periodTitle }}
           </h1>
           <p class="page-subtitle">{{ periodSubtitle }}</p>
@@ -182,8 +182,8 @@
 
       <!-- Lucky Colors Section (일간 운세에서만 표시) -->
       <div v-if="fortune && selectedPeriod === 'daily'" class="card-base card-lg section-spacing">
-              <h4 class="text-white text-center mb-2">
-                <span class="section-emoji">🎨</span>
+              <h4 class="text-white text-center mb-2 d-flex align-items-center justify-content-center gap-2">
+                <img src="@/assets/images/pallete.png" alt="" class="section-icon" />
                 오늘의 행운색
               </h4>
               <p class="text-center text-white opacity-75 mb-5">오늘 당신에게 행운을 가져다 줄 색상</p>
@@ -305,7 +305,7 @@
       <!-- Recommendations -->
       <div v-if="fortune" class="card-grid cols-2 section-spacing">
             <div class="card-base card-md card-interactive text-center">
-                <span class="recommend-emoji">👕</span>
+                <img src="@/assets/images/ootd-icon.png" alt="" class="recommend-icon" />
                 <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
                 <p class="text-white opacity-75 small mb-4">오늘의 날씨와 행운색 기반 코디</p>
                 <router-link to="/recommendations/ootd" class="btn btn-outline-light rounded-pill px-4">
@@ -857,14 +857,29 @@ onMounted(async () => {
   gap: 15px;
 }
 
-/* 섹션 이모지 스타일 */
-.section-emoji {
-  margin-right: 0.5rem;
+/* 섹션 아이콘 스타일 */
+.section-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
 }
 
-/* 페이지 타이틀 이모지 */
-.page-title-emoji {
+/* 페이지 타이틀 아이콘 */
+.page-title-icon {
+  width: 42px;
+  height: 42px;
   margin-right: 0.5rem;
+  vertical-align: middle;
+  object-fit: contain;
+}
+
+/* 추천 아이콘 스타일 */
+.recommend-icon {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 0.75rem;
 }
 
 /* 추천 이모지 스타일 */
