@@ -13,6 +13,21 @@
           </p>
         </div>
 
+        <!-- 오늘의 행운템 카드 -->
+        <div v-if="!showResult && (luckyItems.main || luckyItems.zodiac || luckyItems.special)" class="card-base card-sm text-center mb-4 lucky-item-card">
+          <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
+            <span class="text-white opacity-75 d-flex align-items-center lucky-item-label">
+              <i class="fas fa-gem text-warning me-2"></i>
+              오늘의 행운템:
+            </span>
+            <div class="lucky-item-list">
+              <span v-if="luckyItems.main" class="lucky-item-badge">{{ luckyItems.main }}</span>
+              <span v-if="luckyItems.zodiac" class="lucky-item-badge">{{ luckyItems.zodiac }}</span>
+              <span v-if="luckyItems.special" class="lucky-item-badge">{{ luckyItems.special }}</span>
+            </div>
+          </div>
+        </div>
+
         <div class="card-base card-lg">
 
             <!-- Upload Area -->
@@ -865,5 +880,46 @@ onMounted(() => {
   margin-right: -8px;
   vertical-align: middle;
   object-fit: contain;
+}
+
+/* 오늘의 행운템 카드 */
+.lucky-item-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.lucky-item-label {
+  font-size: 1.05rem;
+}
+
+.lucky-item-list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.lucky-item-badge {
+  display: inline-flex;
+  align-items: center;
+  background: rgba(124, 58, 237, 0.3);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+  border-radius: 20px;
+  border: 1px solid rgba(167, 139, 250, 0.4);
+}
+
+@media (max-width: 768px) {
+  .lucky-item-label {
+    font-size: 0.95rem;
+  }
+
+  .lucky-item-badge {
+    font-size: 0.85rem;
+    padding: 0.25rem 0.6rem;
+  }
 }
 </style>
