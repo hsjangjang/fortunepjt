@@ -38,6 +38,9 @@ const ItemList = lazyLoad(() => import('@/views/items/List.vue'))
 const ItemUpload = lazyLoad(() => import('@/views/items/Upload.vue'))
 const ItemDetail = lazyLoad(() => import('@/views/items/Detail.vue'))
 
+// MyPage
+const MyPage = lazyLoad(() => import('@/views/MyPage.vue'))
+
 // Recommendations
 const OOTDRecommendation = lazyLoad(() => import('@/views/recommendations/OOTD.vue'))
 const MenuRecommendation = lazyLoad(() => import('@/views/recommendations/Menu.vue'))
@@ -70,6 +73,12 @@ const router = createRouter({
       name: 'profile',
       component: Profile,
       meta: { title: '내 프로필', requiresAuth: true }
+    },
+    {
+      path: '/mypage',
+      name: 'mypage',
+      component: MyPage,
+      meta: { title: '마이페이지', requiresAuth: true }
     },
 
     // 운세 관련

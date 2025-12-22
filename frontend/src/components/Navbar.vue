@@ -23,11 +23,6 @@
               </router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/items">
-                <Package class="me-1" :size="18" /> 내 아이템
-              </router-link>
-            </li>
-            <li class="nav-item">
               <router-link class="nav-link" to="/recommendations/ootd">
                 <Shirt class="me-1" :size="18" /> OOTD
               </router-link>
@@ -42,8 +37,7 @@
                 <UserCircle class="me-1" :size="18" /> {{ userFullName }}님
               </a>
               <ul class="dropdown-menu dropdown-menu-end glass-card border-0 mt-2" :class="{ show: userDropdownOpen }">
-                <li><router-link class="dropdown-item text-white" to="/profile"><IdCard class="me-2" :size="16" /> 프로필</router-link></li>
-                <li><router-link class="dropdown-item text-white" to="/items/upload"><PlusCircle class="me-2" :size="16" /> 아이템 등록</router-link></li>
+                <li><router-link class="dropdown-item text-white" to="/mypage"><User class="me-2" :size="16" /> 마이페이지</router-link></li>
                 <li><hr class="dropdown-divider bg-light opacity-25"></li>
                 <li><a class="dropdown-item text-danger" href="#" @click.prevent="handleLogout"><LogOut class="me-2" :size="16" /> 로그아웃</a></li>
               </ul>
@@ -73,7 +67,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import {
   Sparkles, Diamond, Shirt, UtensilsCrossed,
-  UserCircle, IdCard, PlusCircle, LogOut, Package
+  UserCircle, User, LogOut
 } from 'lucide-vue-next'
 
 const router = useRouter()
