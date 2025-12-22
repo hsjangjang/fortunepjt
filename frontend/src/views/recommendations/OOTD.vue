@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <span class="page-title-emoji">👕</span>
+            <img src="@/assets/images/ootd-icon.png" alt="" class="page-title-icon" />
             OOTD 추천
           </h1>
           <p class="page-subtitle">날씨와 행운색 기반 오늘의 코디</p>
@@ -20,8 +20,8 @@
             </p>
             <!-- 오늘의 행운색 - 색상 점 + 텍스트 -->
             <div v-if="luckyColors && luckyColors.length" class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-              <span class="text-white opacity-75 me-1">
-                <i class="fas fa-palette me-1" style="color: #a78bfa;"></i>
+              <span class="text-white opacity-75 me-1 d-flex align-items-center">
+                <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-1" />
                 오늘의 행운색:
               </span>
               <div class="d-flex align-items-center gap-2">
@@ -758,6 +758,21 @@ onMounted(() => {
 .weather-icon-svg {
   color: #f59e0b;
   filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.5));
+}
+
+/* 페이지 타이틀 아이콘 */
+.page-title-icon {
+  width: 36px;
+  height: 36px;
+  margin-right: 0.5rem;
+  vertical-align: middle;
+}
+
+/* 팔레트 아이콘 */
+.lucky-color-palette-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
 }
 
 /* Loading Screen Styles */
