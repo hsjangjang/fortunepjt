@@ -21,7 +21,7 @@
             <form v-if="isEditing" @submit.prevent="handleProfileUpdate" style="display: block;">
               <div class="row">
                 <div class="col-md-6">
-                  <h5>기본 정보</h5>
+                  <h5 class="text-center">기본 정보</h5>
                   <div class="mb-3">
                     <label class="form-label">이름</label>
                     <div class="d-flex gap-2">
@@ -67,8 +67,10 @@
                   </div>
                 </div>
 
+                <hr class="d-md-none my-3 border-light border-opacity-25">
+
                 <div class="col-md-6">
-                  <h5>추가 정보</h5>
+                  <h5 class="text-center">추가 정보</h5>
                   <div class="mb-3">
                     <label class="form-label">MBTI</label>
                     <select v-model="profileForm.mbti" class="form-select glass-input">
