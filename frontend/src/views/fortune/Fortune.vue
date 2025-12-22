@@ -186,7 +186,7 @@
                 <img src="@/assets/images/pallete.png" alt="" class="section-icon" />
                 오늘의 행운색
               </h4>
-              <p class="text-center text-white opacity-75 mb-5">오늘 당신에게 행운을 가져다 줄 색상</p>
+              <p class="text-center text-white opacity-75 lucky-color-subtitle">오늘 당신에게 행운을 가져다 줄 색상</p>
 
               <div v-if="fortune.lucky_colors && fortune.lucky_colors.length > 0" class="d-flex justify-content-center align-items-center gap-3 gap-md-5">
                 <div v-for="color in fortune.lucky_colors" :key="color" class="text-center">
@@ -1047,6 +1047,10 @@ onMounted(async () => {
 .responsive-text-shadow {
   font-size: 1.1rem;
   text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.lucky-color-subtitle {
+  margin-bottom: 1.5rem;
 }
 
 @media (max-width: 768px) {
