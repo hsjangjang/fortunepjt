@@ -84,7 +84,7 @@
                   <i class="fas fa-user-times me-2"></i>회원 탈퇴 완료하기
                 </span>
               </button>
-              <button class="btn btn-warning btn-lg rounded-pill" @click="step = 1">
+              <button class="btn btn-outline-light btn-lg rounded-pill" @click="step = 1">
                 <i class="fas fa-arrow-left me-2"></i>이전으로
               </button>
             </div>
