@@ -114,6 +114,9 @@ const featureVisible = reactive([false, false, false])
 // Lenis 인스턴스
 let lenis = null
 
+// iOS Safari용 RAF ID
+let iosRafId = null
+
 // iOS Safari 감지
 const isIOSSafari = () => {
   const ua = navigator.userAgent
@@ -176,15 +179,16 @@ const scrollToFeatures = () => {
   }
 }
 
-// RAF 루프
+// RAF 루프 (Lenis용)
 const raf = (time) => {
   lenis?.raf(time)
   requestAnimationFrame(raf)
 }
 
-// 네이티브 스크롤 핸들러 (iOS Safari용)
-const nativeScrollHandler = () => {
+// iOS Safari용 RAF 폴링 루프 (스크롤 이벤트 쓰로틀링 우회)
+const iosRafLoop = () => {
   handleScroll(window.scrollY)
+  iosRafId = requestAnimationFrame(iosRafLoop)
 }
 
 onMounted(() => {
@@ -193,8 +197,8 @@ onMounted(() => {
   const isMobile = window.innerWidth <= 768
 
   if (useNativeScroll) {
-    // iOS Safari: 네이티브 스크롤 사용
-    window.addEventListener('scroll', nativeScrollHandler, { passive: true })
+    // iOS Safari: RAF 폴링으로 매 프레임 스크롤 위치 체크 (쓰로틀링 우회)
+    iosRafId = requestAnimationFrame(iosRafLoop)
   } else {
     // 다른 브라우저: Lenis 사용
     lenis = new Lenis({
@@ -221,8 +225,10 @@ onUnmounted(() => {
   if (lenis) {
     lenis.destroy()
     lenis = null
-  } else {
-    window.removeEventListener('scroll', nativeScrollHandler)
+  }
+  if (iosRafId) {
+    cancelAnimationFrame(iosRafId)
+    iosRafId = null
   }
 })
 </script>
@@ -309,10 +315,13 @@ onUnmounted(() => {
 /* Feature Item - 슈우웅 부드러운 애니메이션 */
 .feature-item {
   opacity: 0;
-  transform: translateY(100px);
+  transform: translateY(100px) translateZ(0);
   transition:
     opacity 1s cubic-bezier(0.16, 1, 0.3, 1),
     transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* 첫 번째 카드 */
@@ -332,7 +341,7 @@ onUnmounted(() => {
 
 .feature-item.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) translateZ(0);
 }
 
 /* 피처 아이콘 */
@@ -399,7 +408,7 @@ onUnmounted(() => {
   }
 
   .feature-item {
-    transform: translateY(60px);
+    transform: translateY(60px) translateZ(0);
   }
 }
 </style>
