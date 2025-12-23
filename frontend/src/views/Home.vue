@@ -397,6 +397,7 @@ onUnmounted(() => {
 
 /* Hero 버튼 - 비활성 상태는 outline-light 스타일 */
 .hero-btn {
+  display: inline-block;
   color: #fff;
   background-color: transparent;
   border: 1px solid #fff;
