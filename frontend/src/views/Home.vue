@@ -166,9 +166,12 @@ const raf = (time) => {
 }
 
 onMounted(() => {
-  // Lenis 초기화 - 부드러운 스크롤
+  // 모바일 여부 확인
+  const isMobile = window.innerWidth <= 768
+
+  // Lenis 초기화 - 부드러운 스크롤 (모바일에서 더 느리게)
   lenis = new Lenis({
-    duration: 1.2,
+    duration: isMobile ? 2.0 : 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     orientation: 'vertical',
     smoothWheel: true
