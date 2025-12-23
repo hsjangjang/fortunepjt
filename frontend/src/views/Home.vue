@@ -80,7 +80,7 @@
               <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--warning); filter: blur(60px); opacity: 0.3;"></div>
               <div class="feature-content">
                 <div class="mb-4 mt-3 feature-emoji">🍽️</div>
-                <h4 class="mb-3 text-white">메뉴 추천</h4>
+                <h4 class="mb-3 text-white">오늘의 메뉴 추천</h4>
                 <p class="text-muted mb-0">
                   오늘의 운세에 맞는<br>
                   행운의 메뉴를 추천합니다
