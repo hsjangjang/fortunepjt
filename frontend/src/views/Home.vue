@@ -28,9 +28,9 @@
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--primary); filter: blur(60px); opacity: 0.4;"></div>
           <div class="feature-content">
             <div class="mb-4 mt-3">
-              <img src="@/assets/images/logo.png" alt="" class="feature-icon" />
+              <img src="@/assets/images/item_check_icon.png" alt="" class="feature-icon" />
             </div>
-            <h4 class="mb-3 text-white">아이템 행운도</h4>
+            <h4 class="mb-3 text-white">아이템 행운도 분석</h4>
             <p class="text-muted mb-0">
               내 아이템이 오늘의 행운과<br>
               얼마나 맞는지 AI가 분석합니다
