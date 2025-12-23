@@ -1002,7 +1002,7 @@ onMounted(() => {
 
   .accessory-item {
     flex: 0 0 30%;
-    max-width: 90px;
+    max-width: 117px;
     min-width: 0;
   }
 
