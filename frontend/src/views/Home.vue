@@ -8,6 +8,14 @@
         transform: `scale(${heroScale}) translateY(${heroTranslate}px)`,
         visibility: heroOpacity <= 0 ? 'hidden' : 'visible'
       }">
+        <!-- 은하수 반짝이 배경 -->
+        <div class="galaxy-sparkles">
+          <div v-for="n in 80" :key="'g'+n" class="galaxy-particle" :style="getGalaxyParticleStyle(n)"></div>
+        </div>
+        <!-- 반짝이는 별 배경 -->
+        <div class="stars-container">
+          <div v-for="n in 50" :key="n" class="star" :style="getStarStyle(n)"></div>
+        </div>
         <div class="hero-content text-center">
           <h1 class="display-title fw-bold mb-4">
             행운을 PICK<span class="star-icon">✨</span><br>당신의 하루를 열어보아요
@@ -110,6 +118,61 @@ const heroTranslate = ref(0)
 
 // Feature 카드 visible 상태
 const featureVisible = reactive([false, false, false])
+
+// 별 스타일 생성 함수 - 화면 전체에 골고루 분산
+const getStarStyle = (index) => {
+  // 황금각을 이용해 균일하게 분산
+  const goldenAngle = 137.508
+  const angle = index * goldenAngle
+  const radius = Math.sqrt(index / 50) * 50
+
+  // 극좌표를 직교좌표로 변환하여 화면 전체에 분산
+  const left = 50 + radius * Math.cos(angle * Math.PI / 180) * 0.9
+  const top = 50 + radius * Math.sin(angle * Math.PI / 180) * 0.9
+
+  // 크기와 애니메이션 타이밍 다양화
+  const size = 1.5 + (index % 3)
+  const delay = (index * 0.15) % 5
+  const duration = 2 + (index % 4)
+
+  return {
+    left: `${Math.max(2, Math.min(98, left))}%`,
+    top: `${Math.max(2, Math.min(98, top))}%`,
+    width: `${size}px`,
+    height: `${size}px`,
+    animationDelay: `${delay}s`,
+    animationDuration: `${duration}s`
+  }
+}
+
+// 은하수 반짝이 스타일 - 대각선 띠 형태로 분포
+const getGalaxyParticleStyle = (index) => {
+  // 대각선 띠를 따라 분포 (좌상단 -> 우하단)
+  const progress = index / 80
+  const baseLeft = 10 + progress * 80
+  const baseTop = 10 + progress * 80
+
+  // 띠 주변으로 랜덤하게 흩뿌림
+  const spread = 15
+  const offsetX = (Math.sin(index * 2.5) * spread)
+  const offsetY = (Math.cos(index * 3.7) * spread)
+
+  const left = baseLeft + offsetX
+  const top = baseTop + offsetY
+
+  const size = 0.5 + (index % 3) * 0.5
+  const delay = (index * 0.08) % 4
+  const duration = 1.5 + (index % 3)
+
+  return {
+    left: `${Math.max(0, Math.min(100, left))}%`,
+    top: `${Math.max(0, Math.min(100, top))}%`,
+    width: `${size}px`,
+    height: `${size}px`,
+    animationDelay: `${delay}s`,
+    animationDuration: `${duration}s`
+  }
+}
 
 // Lenis 인스턴스
 let lenis = null
@@ -236,6 +299,75 @@ onUnmounted(() => {
 <style scoped>
 .scroll-container {
   position: relative;
+  background: linear-gradient(180deg, #000005 0%, #020617 30%, #0a0a1a 100%);
+  min-height: 100vh;
+  margin-left: calc(-50vw + 50%);
+  margin-right: calc(-50vw + 50%);
+  width: 100vw;
+}
+
+/* 은하수 반짝이 */
+.galaxy-sparkles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.galaxy-particle {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  opacity: 0;
+  animation: sparkle ease-in-out infinite;
+}
+
+@keyframes sparkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1);
+    box-shadow: 0 0 4px 1px rgba(200, 180, 255, 0.5);
+  }
+}
+
+/* 반짝이는 별 배경 */
+.stars-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: twinkle ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% {
+    opacity: 0;
+    transform: scale(0.3);
+    filter: blur(0px);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1);
+    filter: blur(0.5px);
+    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4);
+  }
 }
 
 /* Hero Section - 화면 전체 정중앙 */
@@ -303,7 +435,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 0 1rem;
-  background: var(--dark);
+  background: transparent;
 }
 
 .features-row {
