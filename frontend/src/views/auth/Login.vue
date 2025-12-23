@@ -21,6 +21,9 @@
                     autofocus
                   >
                 </div>
+                <small v-if="showKoreanWarning" class="text-warning">
+                  <i class="fas fa-exclamation-triangle"></i> 영어와 숫자만 입력 가능합니다
+                </small>
               </div>
 
               <div class="mb-4">
@@ -98,9 +101,28 @@ const loginForm = ref({
   remember_me: false
 })
 
+const showKoreanWarning = ref(false)
+let warningTimeout = null
+
 // 아이디 입력 필터 (영문, 숫자만 허용)
 const filterUsername = () => {
-  loginForm.value.username = loginForm.value.username.replace(/[^A-Za-z0-9]/g, '')
+  const originalValue = loginForm.value.username
+  const filteredValue = originalValue.replace(/[^A-Za-z0-9]/g, '')
+
+  // 한글이나 특수문자가 입력되었는지 확인
+  if (originalValue !== filteredValue) {
+    showKoreanWarning.value = true
+    // 이전 타이머가 있으면 클리어
+    if (warningTimeout) {
+      clearTimeout(warningTimeout)
+    }
+    // 3초 후 경고 메시지 숨기기
+    warningTimeout = setTimeout(() => {
+      showKoreanWarning.value = false
+    }, 3000)
+  }
+
+  loginForm.value.username = filteredValue
 }
 
 const handleLogin = async () => {
