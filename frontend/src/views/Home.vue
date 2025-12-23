@@ -20,12 +20,12 @@
           <h1 class="display-title fw-bold mb-4">
             행운을 PICK<span class="star-icon">✨</span><br>당신의 하루를 열어보아요
           </h1>
-          <p class="lead text-muted mb-5">
+          <p class="lead mb-5 hero-description">
             사주와 별자리를 분석하여<br>
             당신에게 딱 맞는 <span class="text-white fw-bold">행운의 아이템, OOTD, 메뉴</span>를 추천해드립니다
           </p>
           <div class="d-flex justify-content-center gap-3">
-            <router-link to="/fortune/calculate" class="btn btn-primary btn-lg px-5 fortune-loading-link">
+            <router-link to="/fortune/calculate" class="btn btn-lg px-5 fortune-loading-link hero-btn">
               <i class="fas fa-calendar-check me-2"></i> 운세 보기
             </router-link>
           </div>
@@ -388,6 +388,26 @@ onUnmounted(() => {
 
 .hero-content {
   max-width: 800px;
+}
+
+/* Hero 설명 문구 색상 */
+.hero-description {
+  color: #c1c1c1;
+}
+
+/* Hero 버튼 - 비활성 상태는 outline-light 스타일 */
+.hero-btn {
+  color: #fff;
+  background-color: transparent;
+  border: 1px solid #fff;
+}
+
+.hero-btn:hover,
+.hero-btn:focus,
+.hero-btn:active {
+  color: #fff;
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 /* Hero 높이만큼 공간 확보 (카드가 보이도록 줄임) */
