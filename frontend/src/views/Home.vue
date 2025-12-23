@@ -182,9 +182,6 @@ const getGalaxyParticleStyle = (index) => {
 // Lenis 인스턴스
 let lenis = null
 
-// iOS Safari용 RAF ID
-let iosRafId = null
-
 // iOS Safari 감지
 const isIOSSafari = () => {
   const ua = navigator.userAgent
@@ -253,10 +250,9 @@ const raf = (time) => {
   requestAnimationFrame(raf)
 }
 
-// iOS Safari용 RAF 폴링 루프 (스크롤 이벤트 쓰로틀링 우회)
-const iosRafLoop = () => {
+// iOS Safari용 스크롤 핸들러
+const iosScrollHandler = () => {
   handleScroll(window.scrollY)
-  iosRafId = requestAnimationFrame(iosRafLoop)
 }
 
 onMounted(() => {
@@ -265,12 +261,12 @@ onMounted(() => {
   const isMobile = window.innerWidth <= 768
 
   if (useNativeScroll) {
-    // iOS Safari: RAF 폴링으로 매 프레임 스크롤 위치 체크 (쓰로틀링 우회)
-    iosRafId = requestAnimationFrame(iosRafLoop)
+    // iOS Safari: passive 스크롤 이벤트 사용 (가벼움)
+    window.addEventListener('scroll', iosScrollHandler, { passive: true })
   } else {
     // 다른 브라우저: Lenis 사용
     lenis = new Lenis({
-      duration: isMobile ? 2.0 : 1.2,
+      duration: isMobile ? 1.5 : 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       smoothWheel: true
@@ -294,10 +290,8 @@ onUnmounted(() => {
     lenis.destroy()
     lenis = null
   }
-  if (iosRafId) {
-    cancelAnimationFrame(iosRafId)
-    iosRafId = null
-  }
+  // iOS Safari 스크롤 이벤트 제거
+  window.removeEventListener('scroll', iosScrollHandler)
 })
 </script>
 
