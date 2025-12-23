@@ -382,7 +382,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   padding: 0 1rem;
-  z-index: 1;
+  z-index: 100;
   will-change: transform, opacity;
 }
 
@@ -452,7 +452,7 @@ onUnmounted(() => {
 /* Features Section - 화면 정중앙 배치 */
 .features-section {
   position: relative;
-  z-index: 2;
+  z-index: 101;
   min-height: calc(100vh - 76px);
   display: flex;
   align-items: center;
