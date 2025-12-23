@@ -318,7 +318,7 @@
                 <div class="recommend-icon-wrapper">
                   <img src="@/assets/images/recommendations_menu_icon.png" alt="" class="recommend-icon" />
                 </div>
-                <h5 class="text-white recommend-title">메뉴 추천 받기</h5>
+                <h5 class="text-white recommend-title">오늘의 메뉴 추천 받기</h5>
                 <p class="text-white opacity-75 small recommend-desc">운세에 맞는 행운의 메뉴</p>
                 <span class="btn btn-outline-light rounded-pill px-4 recommend-btn">
                   추천 받기 →
