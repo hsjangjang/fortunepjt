@@ -22,18 +22,14 @@ class UserItem(models.Model):
     # 새로운 카테고리 구조
     MAIN_CATEGORY_CHOICES = [
         ('clothing', '의류'),
-        ('cosmetics', '화장품'),
-        ('electronics', '전자제품'),
         ('accessories', '악세서리'),
         ('etc', '기타'),
     ]
     
     # 소분류 매핑
     SUB_CATEGORY_MAP = {
-        'clothing': ['상의', '하의', '아우터', '원피스', '신발', '가방'],
-        'cosmetics': ['스킨케어', '메이크업', '헤어'],
-        'electronics': ['스마트폰', '태블릿', '노트북', '이어폰'],
-        'accessories': ['귀걸이', '목걸이', '반지', '팔찌'],
+        'clothing': ['상의', '하의', '아우터', '원피스', '신발', '가방', '기타'],
+        'accessories': ['귀걸이', '목걸이', '반지', '팔찌', '기타'],
         'etc': []  # 빈 배열 = 사용자 직접 입력
     }
     

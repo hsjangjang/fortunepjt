@@ -8,13 +8,13 @@
         transform: `scale(${heroScale}) translateY(${heroTranslate}px)`,
         visibility: heroOpacity <= 0 ? 'hidden' : 'visible'
       }">
-        <!-- 은하수 반짝이 배경 -->
+        <!-- 은하수 반짝이 배경 (모바일: 15개, PC: 40개) -->
         <div class="galaxy-sparkles">
-          <div v-for="n in 80" :key="'g'+n" class="galaxy-particle" :style="getGalaxyParticleStyle(n)"></div>
+          <div v-for="n in galaxyCount" :key="'g'+n" class="galaxy-particle" :style="getGalaxyParticleStyle(n)"></div>
         </div>
-        <!-- 반짝이는 별 배경 -->
+        <!-- 반짝이는 별 배경 (모바일: 10개, PC: 25개) -->
         <div class="stars-container">
-          <div v-for="n in 50" :key="n" class="star" :style="getStarStyle(n)"></div>
+          <div v-for="n in starCount" :key="n" class="star" :style="getStarStyle(n)"></div>
         </div>
         <div class="hero-content text-center">
           <h1 class="display-title fw-bold mb-4">
@@ -116,6 +116,11 @@ const heroOpacity = ref(1)
 const heroScale = ref(1)
 const heroTranslate = ref(0)
 
+// 모바일 감지 및 파티클 수 조절
+const isMobileDevice = typeof window !== 'undefined' && window.innerWidth <= 768
+const starCount = isMobileDevice ? 10 : 25
+const galaxyCount = isMobileDevice ? 15 : 40
+
 // Feature 카드 visible 상태
 const featureVisible = reactive([false, false, false])
 
@@ -176,9 +181,6 @@ const getGalaxyParticleStyle = (index) => {
 
 // Lenis 인스턴스
 let lenis = null
-
-// iOS Safari용 RAF ID
-let iosRafId = null
 
 // iOS Safari 감지
 const isIOSSafari = () => {
@@ -248,10 +250,9 @@ const raf = (time) => {
   requestAnimationFrame(raf)
 }
 
-// iOS Safari용 RAF 폴링 루프 (스크롤 이벤트 쓰로틀링 우회)
-const iosRafLoop = () => {
+// iOS Safari용 스크롤 핸들러
+const iosScrollHandler = () => {
   handleScroll(window.scrollY)
-  iosRafId = requestAnimationFrame(iosRafLoop)
 }
 
 onMounted(() => {
@@ -260,12 +261,12 @@ onMounted(() => {
   const isMobile = window.innerWidth <= 768
 
   if (useNativeScroll) {
-    // iOS Safari: RAF 폴링으로 매 프레임 스크롤 위치 체크 (쓰로틀링 우회)
-    iosRafId = requestAnimationFrame(iosRafLoop)
+    // iOS Safari: passive 스크롤 이벤트 사용 (가벼움)
+    window.addEventListener('scroll', iosScrollHandler, { passive: true })
   } else {
     // 다른 브라우저: Lenis 사용
     lenis = new Lenis({
-      duration: isMobile ? 2.0 : 1.2,
+      duration: isMobile ? 1.5 : 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       smoothWheel: true
@@ -289,10 +290,8 @@ onUnmounted(() => {
     lenis.destroy()
     lenis = null
   }
-  if (iosRafId) {
-    cancelAnimationFrame(iosRafId)
-    iosRafId = null
-  }
+  // iOS Safari 스크롤 이벤트 제거
+  window.removeEventListener('scroll', iosScrollHandler)
 })
 </script>
 
@@ -323,6 +322,8 @@ onUnmounted(() => {
   border-radius: 50%;
   opacity: 0;
   animation: sparkle ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes sparkle {
@@ -333,7 +334,6 @@ onUnmounted(() => {
   50% {
     opacity: 0.7;
     transform: scale(1);
-    box-shadow: 0 0 4px 1px rgba(200, 180, 255, 0.5);
   }
 }
 
@@ -350,23 +350,22 @@ onUnmounted(() => {
 
 .star {
   position: absolute;
-  background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
+  background: white;
   border-radius: 50%;
   opacity: 0;
   animation: twinkle ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes twinkle {
   0%, 100% {
     opacity: 0;
     transform: scale(0.3);
-    filter: blur(0px);
   }
   50% {
     opacity: 0.9;
     transform: scale(1);
-    filter: blur(0.5px);
-    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -382,7 +381,7 @@ onUnmounted(() => {
   justify-content: center;
   align-items: center;
   padding: 0 1rem;
-  z-index: 1;
+  z-index: 100;
   will-change: transform, opacity;
 }
 
@@ -390,6 +389,16 @@ onUnmounted(() => {
   max-width: 800px;
   position: relative;
   z-index: 10;
+  pointer-events: auto;
+}
+
+/* Hero 버튼 클릭 가능하도록 */
+.hero-content .btn,
+.hero-content a {
+  position: relative;
+  z-index: 200;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* Hero 설명 문구 색상 */
@@ -452,13 +461,20 @@ onUnmounted(() => {
 /* Features Section - 화면 정중앙 배치 */
 .features-section {
   position: relative;
-  z-index: 2;
+  z-index: 101;
   min-height: calc(100vh - 76px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 0 1rem;
   background: transparent;
+  pointer-events: none; /* Hero 버튼 클릭 통과 허용 */
+}
+
+/* Features 내부 카드들은 클릭 가능 */
+.features-section .feature-item,
+.features-section .feature-card {
+  pointer-events: auto;
 }
 
 .features-row {
