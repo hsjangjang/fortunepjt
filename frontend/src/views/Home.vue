@@ -390,6 +390,16 @@ onUnmounted(() => {
   max-width: 800px;
   position: relative;
   z-index: 10;
+  pointer-events: auto;
+}
+
+/* Hero 버튼 클릭 가능하도록 */
+.hero-content .btn,
+.hero-content a {
+  position: relative;
+  z-index: 200;
+  pointer-events: auto;
+  cursor: pointer;
 }
 
 /* Hero 설명 문구 색상 */
@@ -459,6 +469,13 @@ onUnmounted(() => {
   justify-content: center;
   padding: 0 1rem;
   background: transparent;
+  pointer-events: none; /* Hero 버튼 클릭 통과 허용 */
+}
+
+/* Features 내부 카드들은 클릭 가능 */
+.features-section .feature-item,
+.features-section .feature-card {
+  pointer-events: auto;
 }
 
 .features-row {
