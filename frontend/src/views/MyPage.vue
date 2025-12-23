@@ -1137,10 +1137,10 @@ onMounted(() => {
   font-weight: 500;
 }
 
-/* 행운색 컨테이너 - 데스크톱: 가로 배치, 모바일: 세로 배치 */
+/* 행운색 컨테이너 - 항상 세로 2줄 배치 */
 .lucky-colors-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
@@ -1149,18 +1149,8 @@ onMounted(() => {
 .lucky-colors-list {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 1rem;
-}
-
-@media (max-width: 767.98px) {
-  .lucky-colors-container {
-    flex-direction: column !important;
-    gap: 0.75rem !important;
-  }
-
-  .lucky-colors-list {
-    justify-content: center !important;
-  }
 }
 
 /* 모바일 행운 점수 - 선택된 운세 카테고리 색상으로 동적 표시 */
