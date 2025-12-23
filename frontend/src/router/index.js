@@ -45,6 +45,9 @@ const MyPage = lazyLoad(() => import('@/views/MyPage.vue'))
 const OOTDRecommendation = lazyLoad(() => import('@/views/recommendations/OOTD.vue'))
 const MenuRecommendation = lazyLoad(() => import('@/views/recommendations/Menu.vue'))
 
+// About
+const About = lazyLoad(() => import('@/views/About.vue'))
+
 const router = createRouter({
   history: createWebHistory(),
   routes: [
@@ -157,6 +160,14 @@ const router = createRouter({
       name: 'menu',
       component: MenuRecommendation,
       meta: { title: '메뉴 추천', requiresAuth: true, requiresFortune: true }
+    },
+
+    // 사이트 소개
+    {
+      path: '/about',
+      name: 'about',
+      component: About,
+      meta: { title: '사이트 소개' }
     },
 
     // 아이디 찾기
