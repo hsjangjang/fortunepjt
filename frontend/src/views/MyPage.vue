@@ -56,22 +56,24 @@
                 </div>
               </div>
 
-              <!-- 운세 카테고리 선택 -->
-              <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
-                <div class="d-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
-                  <span class="text-white-50 me-2 d-none d-md-inline fortune-label"><i class="fas fa-magic me-1"></i>운세별 행운 아이템:</span>
+              <!-- 아이템 카테고리 선택 -->
+              <div class="card-base card-sm mb-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
                   <button
-                    v-for="cat in fortuneCategories"
+                    v-for="cat in itemCategories"
                     :key="cat.key"
-                    class="btn btn-sm rounded-pill fortune-cat-btn"
-                    :class="{ active: selectedCategory === cat.key }"
-                    :style="selectedCategory === cat.key ? { background: cat.color, borderColor: cat.color } : {}"
-                    @click="selectedCategory = cat.key"
+                    class="btn btn-sm rounded-pill item-cat-btn"
+                    :class="{ active: selectedItemCategory === cat.key }"
+                    @click="selectedItemCategory = cat.key"
                   >
-                    <span class="d-none d-sm-inline">{{ cat.label }}</span>
-                    <span class="d-sm-none">{{ cat.label.slice(0, 2) }}</span>
+                    <i :class="cat.icon" class="me-1"></i>
+                    {{ cat.label }}
                   </button>
                 </div>
+              </div>
+
+              <!-- 오늘의 행운색 표시 -->
+              <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
                 <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
                   <span class="text-white-50 me-2 fortune-label d-flex align-items-center"><img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />오늘의 행운색:</span>
                   <div class="d-flex align-items-center gap-3">
@@ -84,14 +86,14 @@
               </div>
 
               <div class="d-flex justify-content-between align-items-center mb-4">
-                <h5>총 {{ items.length }}개 아이템</h5>
+                <h5>총 {{ filteredItems.length }}개 아이템</h5>
                 <router-link to="/items/upload" class="btn btn-primary">
                   <i class="fas fa-plus"></i> 아이템 추가
                 </router-link>
               </div>
 
-              <div v-if="items.length > 0" class="row g-2 g-md-4">
-                <div v-for="item in items" :key="item.id" class="col-6 col-md-4 mb-2 mb-md-4">
+              <div v-if="filteredItems.length > 0" class="row g-2 g-md-4">
+                <div v-for="item in filteredItems" :key="item.id" class="col-6 col-md-4 mb-2 mb-md-4">
                   <div class="card h-100 item-card border-0" :class="{ 'top-luck-item': item.id === topLuckItemId }" :style="item.id === topLuckItemId ? `--luck-color: ${selectedCategoryColor}` : ''">
                     <!-- 최고 행운 배지 -->
                     <div v-if="item.id === topLuckItemId" class="top-luck-badge">
@@ -122,8 +124,8 @@
                       <div class="card-body flex-grow-1 d-flex flex-column item-body">
                         <h5 class="card-title text-white mb-1 mb-md-2 item-name">{{ item.item_name }}</h5>
 
-                        <!-- 색상 태그 - 모바일에서 숨김 -->
-                        <div v-if="item.dominant_colors && item.dominant_colors.length > 0" class="mb-1 mb-md-2 d-none d-md-block">
+                        <!-- 색상 태그 -->
+                        <div v-if="item.dominant_colors && item.dominant_colors.length > 0" class="mb-1 mb-md-2">
                           <span
                             v-for="(color, index) in item.dominant_colors.slice(0, 1)"
                             :key="index"
@@ -135,6 +137,13 @@
                             }"
                           >
                             {{ color.korean_name }}
+                          </span>
+                        </div>
+
+                        <!-- 소분류 태그 -->
+                        <div v-if="getSubCategoryDisplay(item)" class="mb-1 mb-md-2 d-none d-md-block">
+                          <span class="badge rounded-pill sub-category-badge">
+                            #{{ getSubCategoryDisplay(item) }}
                           </span>
                         </div>
 
@@ -185,10 +194,12 @@
               <div v-else class="card-base card-lg">
                 <div class="empty-state">
                   <i class="fas fa-camera empty-icon"></i>
-                  <h3 class="empty-title">아직 업로드한 아이템이 없습니다</h3>
-                  <p class="empty-text">첫 번째 아이템을 업로드하고 행운색 매칭도를 확인해보세요!</p>
+                  <h3 class="empty-title" v-if="items.length === 0">아직 업로드한 아이템이 없습니다</h3>
+                  <h3 class="empty-title" v-else>{{ itemCategories.find(c => c.key === selectedItemCategory)?.label }} 카테고리에 아이템이 없습니다</h3>
+                  <p class="empty-text" v-if="items.length === 0">첫 번째 아이템을 업로드하고 행운색 매칭도를 확인해보세요!</p>
+                  <p class="empty-text" v-else>다른 카테고리를 선택하거나 새 아이템을 업로드해보세요!</p>
                   <router-link to="/items/upload" class="btn btn-primary btn-lg rounded-pill px-5">
-                    <i class="fas fa-upload me-2"></i> 첫 아이템 업로드하기
+                    <i class="fas fa-upload me-2"></i> {{ items.length === 0 ? '첫 아이템 업로드하기' : '아이템 업로드하기' }}
                   </router-link>
                 </div>
               </div>
@@ -436,6 +447,34 @@ const luckyColors = ref([])
 const fortuneCategories = FORTUNE_CATEGORIES
 const selectedCategory = ref('overall')
 
+// 아이템 카테고리 정의
+const itemCategories = [
+  { key: 'all', label: '전체', icon: 'fas fa-th-large' },
+  { key: 'clothing', label: '의류', icon: 'fas fa-tshirt' },
+  { key: 'accessories', label: '액세서리', icon: 'fas fa-gem' },
+  { key: 'etc', label: '기타', icon: 'fas fa-ellipsis-h' }
+]
+const selectedItemCategory = ref('all')
+
+// 필터링된 아이템 목록
+const filteredItems = computed(() => {
+  if (selectedItemCategory.value === 'all') {
+    return items.value
+  }
+  return items.value.filter(item => item.main_category === selectedItemCategory.value)
+})
+
+// 소분류 표시 함수
+const getSubCategoryDisplay = (item) => {
+  if (item.sub_category) {
+    return item.sub_category
+  }
+  if (item.custom_category) {
+    return item.custom_category
+  }
+  return null
+}
+
 const selectedCategoryColor = computed(() => getCategoryColor(selectedCategory.value))
 
 // 아이템별 운세 점수 계산 (유틸리티 사용)
@@ -443,12 +482,12 @@ const getFortuneBoost = (item, category) => {
   return getFortuneBoostScore(item, luckyColors.value, category, getColorMatchScore, fortuneData.value?.lucky_item)
 }
 
-// 선택된 카테고리 기준 최고 행운 아이템 ID 계산
+// 선택된 카테고리 기준 최고 행운 아이템 ID 계산 (필터링된 아이템 기준)
 const topLuckItemId = computed(() => {
-  if (items.value.length === 0) return null
+  if (filteredItems.value.length === 0) return null
   let maxLuck = -1
   let topId = null
-  items.value.forEach(item => {
+  filteredItems.value.forEach(item => {
     const luck = getFortuneBoost(item, selectedCategory.value)
     if (luck > maxLuck) {
       maxLuck = luck
@@ -1065,6 +1104,37 @@ onMounted(() => {
   box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
 }
 
+/* 아이템 카테고리 버튼 */
+.item-cat-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  padding: 0.4rem 1rem;
+  transition: all 0.2s;
+}
+
+.item-cat-btn:hover {
+  background: rgba(124, 58, 237, 0.3);
+  border-color: rgba(124, 58, 237, 0.5);
+  color: #fff;
+}
+
+.item-cat-btn.active {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
+  border-color: #7c3aed;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+}
+
+/* 소분류 배지 */
+.sub-category-badge {
+  background: rgba(124, 58, 237, 0.3);
+  color: #c4b5fd;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
 /* 모바일 행운 점수 - 선택된 운세 카테고리 색상으로 동적 표시 */
 .mobile-luck-score {
   display: flex;
@@ -1172,6 +1242,15 @@ onMounted(() => {
   .fortune-cat-btn {
     font-size: 0.7rem;
     padding: 0.25rem 0.5rem;
+  }
+
+  .item-cat-btn {
+    font-size: 0.75rem;
+    padding: 0.3rem 0.6rem;
+  }
+
+  .item-cat-btn i {
+    display: none;
   }
 
   .fortune-label {
