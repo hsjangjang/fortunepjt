@@ -388,6 +388,8 @@ onUnmounted(() => {
 
 .hero-content {
   max-width: 800px;
+  position: relative;
+  z-index: 10;
 }
 
 /* Hero 설명 문구 색상 */
@@ -413,6 +415,7 @@ onUnmounted(() => {
 /* Hero 높이만큼 공간 확보 (카드가 보이도록 줄임) */
 .hero-spacer {
   height: 55vh;
+  pointer-events: none;
 }
 
 /* 스크롤 안내 화살표 */
