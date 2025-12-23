@@ -133,8 +133,8 @@ const handleScroll = (scrollY) => {
   const triggers = isMobile
     ? [
         windowHeight * 0.1,
-        windowHeight * 0.5,
-        windowHeight * 0.9
+        windowHeight * 0.35,
+        windowHeight * 0.6
       ]
     : [
         windowHeight * 0.15,
