@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <img src="@/assets/images/ootd-icon.png" alt="" class="page-title-icon-ootd" />
+            <img src="@/assets/images/ootd-icon2.png" alt="" class="page-title-icon-ootd" />
             OOTD 추천
           </h1>
           <p class="page-subtitle">날씨와 행운색 기반 오늘의 코디</p>

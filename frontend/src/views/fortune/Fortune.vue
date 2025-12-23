@@ -306,7 +306,7 @@
       <div v-if="fortune" class="card-grid cols-2 section-spacing">
             <router-link to="/recommendations/ootd" class="card-base card-md card-interactive text-center recommend-card recommend-card-link">
                 <div class="recommend-icon-wrapper">
-                  <img src="@/assets/images/ootd-icon.png" alt="" class="recommend-icon" />
+                  <img src="@/assets/images/ootd-icon2.png" alt="" class="recommend-icon" />
                 </div>
                 <h5 class="text-white recommend-title">OOTD 추천 받기</h5>
                 <p class="text-white opacity-75 small recommend-desc">오늘의 날씨와 행운색 기반 코디</p>

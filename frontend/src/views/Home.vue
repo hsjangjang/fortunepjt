@@ -48,7 +48,7 @@
           <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--success); filter: blur(60px); opacity: 0.3;"></div>
           <div class="feature-content">
             <div class="mb-4 mt-3">
-              <img src="@/assets/images/ootd-icon.png" alt="" class="feature-icon" />
+              <img src="@/assets/images/ootd-icon2.png" alt="" class="feature-icon" />
             </div>
             <h4 class="mb-3 text-white">OOTD 추천</h4>
             <p class="text-muted mb-0">
