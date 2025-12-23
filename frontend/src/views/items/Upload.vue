@@ -56,7 +56,6 @@
                     type="file"
                     class="form-control d-none"
                     accept="image/*"
-                    required
                     @change="handleFileChange"
                   >
                   <input
@@ -310,6 +309,18 @@ const handleSubmit = async () => {
     return
   }
 
+  // 아이템 이름 필수 체크
+  if (!formData.value.item_name || !formData.value.item_name.trim()) {
+    alert('아이템 이름을 입력해주세요.')
+    return
+  }
+
+  // 대분류 필수 체크
+  if (!formData.value.main_category) {
+    alert('대분류를 선택해주세요.')
+    return
+  }
+
   // 소분류 검증
   if (formData.value.main_category &&
       formData.value.main_category !== 'etc' &&
@@ -321,19 +332,27 @@ const handleSubmit = async () => {
     }
   }
 
+  // 기타 카테고리인 경우 직접 입력 필수 체크
+  if (formData.value.main_category === 'etc' && !formData.value.custom_category?.trim()) {
+    alert('카테고리를 직접 입력해주세요.')
+    return
+  }
+
   isUploading.value = true
 
   try {
     const data = new FormData()
     data.append('image', formData.value.image)
-    data.append('item_name', formData.value.item_name)
+    data.append('item_name', formData.value.item_name.trim())
     data.append('main_category', formData.value.main_category)
-    data.append('category', formData.value.main_category) // 하위 호환성
 
+    // sub_categories 배열로 전송 (백엔드 기대 형식)
     if (formData.value.main_category === 'etc') {
-      data.append('custom_category', formData.value.custom_category)
+      // 기타 카테고리: custom_category를 sub_categories 배열에 추가
+      data.append('sub_categories', formData.value.custom_category.trim())
     } else if (formData.value.sub_category) {
-      data.append('sub_category', formData.value.sub_category)
+      // 일반 소분류 선택
+      data.append('sub_categories', formData.value.sub_category)
     }
 
     const response = await api.post('/api/items/', data, {
@@ -345,10 +364,35 @@ const handleSubmit = async () => {
     if (response.data.success) {
       alert('아이템이 성공적으로 업로드되었습니다!')
       router.push('/mypage')
+    } else {
+      // 서버에서 success: false 응답
+      alert(response.data.error || '업로드에 실패했습니다.')
     }
   } catch (error) {
     console.error('업로드 실패:', error)
-    alert('업로드 중 오류가 발생했습니다.')
+
+    // 상세 에러 메시지 표시
+    if (error.response) {
+      // 서버 응답 에러
+      const status = error.response.status
+      const errorData = error.response.data
+
+      if (status === 401) {
+        alert('로그인이 필요합니다. 다시 로그인해주세요.')
+        router.push('/login')
+      } else if (status === 503 || errorData?.error_type === 'quota_exceeded') {
+        alert('AI 분석 서비스가 일시적으로 제한되었습니다. 잠시 후 다시 시도해주세요.')
+      } else if (status >= 500) {
+        alert('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.')
+      } else {
+        alert(errorData?.error || '업로드 중 오류가 발생했습니다.')
+      }
+    } else if (error.request) {
+      // 네트워크 에러 (서버 응답 없음)
+      alert('서버에 연결할 수 없습니다. 네트워크 상태를 확인해주세요.')
+    } else {
+      alert('업로드 중 오류가 발생했습니다.')
+    }
   } finally {
     isUploading.value = false
   }
