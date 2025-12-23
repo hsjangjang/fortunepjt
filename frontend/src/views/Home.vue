@@ -10,11 +10,11 @@
       }">
         <!-- 은하수 반짝이 배경 -->
         <div class="galaxy-sparkles">
-          <div v-for="n in 40" :key="'g'+n" class="galaxy-particle" :style="getGalaxyParticleStyle(n)"></div>
+          <div v-for="n in 80" :key="'g'+n" class="galaxy-particle" :style="getGalaxyParticleStyle(n)"></div>
         </div>
         <!-- 반짝이는 별 배경 -->
         <div class="stars-container">
-          <div v-for="n in 30" :key="n" class="star" :style="getStarStyle(n)"></div>
+          <div v-for="n in 50" :key="n" class="star" :style="getStarStyle(n)"></div>
         </div>
         <div class="hero-content text-center">
           <h1 class="display-title fw-bold mb-4">
@@ -22,7 +22,7 @@
           </h1>
           <p class="lead mb-5 hero-description">
             사주와 별자리를 분석하여<br>
-            당신에게 딱 맞는 <span class="hero-highlight fw-bold">행운의 아이템, OOTD, 메뉴</span>를 추천해드립니다
+            당신에게 딱 맞는 <span class="text-white fw-bold">행운의 아이템, OOTD, 메뉴</span>를 추천해드립니다
           </p>
           <div class="d-flex justify-content-center gap-3">
             <router-link to="/fortune/calculate" class="btn btn-lg px-5 fortune-loading-link hero-btn">
@@ -45,7 +45,7 @@
           <!-- 아이템 행운도 -->
           <div class="col-md-4 feature-item" :class="{ 'is-visible': featureVisible[0] }">
             <router-link to="/fortune/item-check" class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card text-decoration-none">
-              <div class="feature-glow feature-glow-primary"></div>
+              <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--primary); filter: blur(60px); opacity: 0.4;"></div>
               <div class="feature-content">
                 <div class="mb-4 mt-3">
                   <img src="@/assets/images/item_check_icon.png" alt="" class="feature-icon" />
@@ -65,7 +65,7 @@
           <!-- OOTD 추천 -->
           <div class="col-md-4 feature-item" :class="{ 'is-visible': featureVisible[1] }">
             <router-link to="/recommendations/ootd" class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card text-decoration-none">
-              <div class="feature-glow feature-glow-success"></div>
+              <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--success); filter: blur(60px); opacity: 0.3;"></div>
               <div class="feature-content">
                 <div class="mb-4 mt-3">
                   <img src="@/assets/images/ootd-icon2.png" alt="" class="feature-icon" />
@@ -85,7 +85,7 @@
           <!-- 메뉴 추천 -->
           <div class="col-md-4 feature-item" :class="{ 'is-visible': featureVisible[2] }">
             <router-link to="/recommendations/menu" class="glass-card h-100 p-4 text-center position-relative overflow-hidden feature-card text-decoration-none">
-              <div class="feature-glow feature-glow-warning"></div>
+              <div class="position-absolute top-0 start-50 translate-middle-x mt-n4" style="width: 100px; height: 100px; background: var(--warning); filter: blur(60px); opacity: 0.3;"></div>
               <div class="feature-content">
                 <div class="mb-4 mt-3 feature-emoji">🍽️</div>
                 <h4 class="mb-3 text-white">오늘의 메뉴 추천</h4>
@@ -124,16 +124,16 @@ const getStarStyle = (index) => {
   // 황금각을 이용해 균일하게 분산
   const goldenAngle = 137.508
   const angle = index * goldenAngle
-  const radius = Math.sqrt(index / 30) * 50
+  const radius = Math.sqrt(index / 50) * 50
 
   // 극좌표를 직교좌표로 변환하여 화면 전체에 분산
   const left = 50 + radius * Math.cos(angle * Math.PI / 180) * 0.9
   const top = 50 + radius * Math.sin(angle * Math.PI / 180) * 0.9
 
   // 크기와 애니메이션 타이밍 다양화
-  const size = 2 + (index % 3)
-  const delay = (index * 0.2) % 5
-  const duration = 3 + (index % 3)
+  const size = 1.5 + (index % 3)
+  const delay = (index * 0.15) % 5
+  const duration = 2 + (index % 4)
 
   return {
     left: `${Math.max(2, Math.min(98, left))}%`,
@@ -148,21 +148,21 @@ const getStarStyle = (index) => {
 // 은하수 반짝이 스타일 - 대각선 띠 형태로 분포
 const getGalaxyParticleStyle = (index) => {
   // 대각선 띠를 따라 분포 (좌상단 -> 우하단)
-  const progress = index / 40
+  const progress = index / 80
   const baseLeft = 10 + progress * 80
   const baseTop = 10 + progress * 80
 
   // 띠 주변으로 랜덤하게 흩뿌림
-  const spread = 18
+  const spread = 15
   const offsetX = (Math.sin(index * 2.5) * spread)
   const offsetY = (Math.cos(index * 3.7) * spread)
 
   const left = baseLeft + offsetX
   const top = baseTop + offsetY
 
-  const size = 1 + (index % 3) * 0.5
-  const delay = (index * 0.15) % 4
-  const duration = 2 + (index % 3)
+  const size = 0.5 + (index % 3) * 0.5
+  const delay = (index * 0.08) % 4
+  const duration = 1.5 + (index % 3)
 
   return {
     left: `${Math.max(0, Math.min(100, left))}%`,
@@ -331,8 +331,9 @@ onUnmounted(() => {
     transform: scale(0);
   }
   50% {
-    opacity: 0.8;
+    opacity: 0.7;
     transform: scale(1);
+    box-shadow: 0 0 4px 1px rgba(200, 180, 255, 0.5);
   }
 }
 
@@ -358,11 +359,14 @@ onUnmounted(() => {
 @keyframes twinkle {
   0%, 100% {
     opacity: 0;
-    transform: scale(0.5);
+    transform: scale(0.3);
+    filter: blur(0px);
   }
   50% {
-    opacity: 1;
+    opacity: 0.9;
     transform: scale(1);
+    filter: blur(0.5px);
+    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4);
   }
 }
 
@@ -380,42 +384,30 @@ onUnmounted(() => {
   padding: 0 1rem;
   z-index: 1;
   will-change: transform, opacity;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
 }
 
 .hero-content {
   max-width: 800px;
-  position: relative;
-  z-index: 10;
 }
 
 /* Hero 설명 문구 색상 */
 .hero-description {
-  color: #afafaf;
+  color: #c1c1c1;
 }
 
-/* Hero 강조 텍스트 색상 */
-.hero-highlight {
-  color: #afafaf;
-}
-
-/* Hero 버튼 - 비활성 상태는 outline-light 스타일, 둥근 모양 */
+/* Hero 버튼 - 비활성 상태는 outline-light 스타일 */
 .hero-btn {
   color: #fff;
   background-color: transparent;
   border: 1px solid #fff;
-  border-radius: 50px;
 }
 
 .hero-btn:hover,
 .hero-btn:focus,
 .hero-btn:active {
-  color: #000;
-  background-color: var(--warning);
-  border-color: var(--warning);
+  color: #fff;
+  background-color: var(--primary);
+  border-color: var(--primary);
 }
 
 /* Hero 높이만큼 공간 확보 (카드가 보이도록 줄임) */
@@ -502,30 +494,6 @@ onUnmounted(() => {
 .feature-item.is-visible {
   opacity: 1;
   transform: translateY(0) translateZ(0);
-}
-
-/* Feature glow 효과 - blur 대신 radial-gradient 사용 (성능 최적화) */
-.feature-glow {
-  position: absolute;
-  top: -50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  pointer-events: none;
-}
-
-.feature-glow-primary {
-  background: radial-gradient(circle, rgba(124, 58, 237, 0.4) 0%, rgba(124, 58, 237, 0) 70%);
-}
-
-.feature-glow-success {
-  background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, rgba(34, 197, 94, 0) 70%);
-}
-
-.feature-glow-warning {
-  background: radial-gradient(circle, rgba(250, 204, 21, 0.3) 0%, rgba(250, 204, 21, 0) 70%);
 }
 
 /* 피처 아이콘 */
