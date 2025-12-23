@@ -1,15 +1,8 @@
 """
 사용자 관련 유틸리티 함수
 """
-import os
-from email.mime.image import MIMEImage
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
-
-
-def get_logo_path():
-    """로고 파일 경로 반환"""
-    return os.path.join(settings.BASE_DIR, 'static', 'images', 'email', 'logo.png')
 
 
 def get_logo_html():
@@ -17,17 +10,6 @@ def get_logo_html():
     # Vercel 배포 URL의 public 폴더 로고 이미지 사용 (캐시 무효화용 버전 파라미터 추가)
     logo_url = "https://frontend-wheat-three-93.vercel.app/logo.png?v=2"
     return f'<img src="{logo_url}" alt="Lucky Picky" style="width: 80px; height: 80px; margin-bottom: 12px;">'
-
-
-def attach_logo(email_message):
-    """이메일에 로고 이미지 첨부"""
-    logo_path = get_logo_path()
-    if os.path.exists(logo_path):
-        with open(logo_path, 'rb') as f:
-            logo_image = MIMEImage(f.read())
-            logo_image.add_header('Content-ID', '<logo>')
-            logo_image.add_header('Content-Disposition', 'inline', filename='logo.png')
-            email_message.attach(logo_image)
 
 
 def get_email_base_template(content, title="Lucky Picky"):
