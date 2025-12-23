@@ -8,13 +8,13 @@
         transform: `scale(${heroScale}) translateY(${heroTranslate}px)`,
         visibility: heroOpacity <= 0 ? 'hidden' : 'visible'
       }">
-        <!-- 은하수 반짝이 배경 -->
+        <!-- 은하수 반짝이 배경 (모바일: 15개, PC: 40개) -->
         <div class="galaxy-sparkles">
-          <div v-for="n in 80" :key="'g'+n" class="galaxy-particle" :style="getGalaxyParticleStyle(n)"></div>
+          <div v-for="n in galaxyCount" :key="'g'+n" class="galaxy-particle" :style="getGalaxyParticleStyle(n)"></div>
         </div>
-        <!-- 반짝이는 별 배경 -->
+        <!-- 반짝이는 별 배경 (모바일: 10개, PC: 25개) -->
         <div class="stars-container">
-          <div v-for="n in 50" :key="n" class="star" :style="getStarStyle(n)"></div>
+          <div v-for="n in starCount" :key="n" class="star" :style="getStarStyle(n)"></div>
         </div>
         <div class="hero-content text-center">
           <h1 class="display-title fw-bold mb-4">
@@ -115,6 +115,11 @@ import Lenis from 'lenis'
 const heroOpacity = ref(1)
 const heroScale = ref(1)
 const heroTranslate = ref(0)
+
+// 모바일 감지 및 파티클 수 조절
+const isMobileDevice = typeof window !== 'undefined' && window.innerWidth <= 768
+const starCount = isMobileDevice ? 10 : 25
+const galaxyCount = isMobileDevice ? 15 : 40
 
 // Feature 카드 visible 상태
 const featureVisible = reactive([false, false, false])
@@ -323,6 +328,8 @@ onUnmounted(() => {
   border-radius: 50%;
   opacity: 0;
   animation: sparkle ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes sparkle {
@@ -333,7 +340,6 @@ onUnmounted(() => {
   50% {
     opacity: 0.7;
     transform: scale(1);
-    box-shadow: 0 0 4px 1px rgba(200, 180, 255, 0.5);
   }
 }
 
@@ -350,23 +356,22 @@ onUnmounted(() => {
 
 .star {
   position: absolute;
-  background: radial-gradient(circle, #ffffff 0%, rgba(255, 255, 255, 0.8) 50%, transparent 100%);
+  background: white;
   border-radius: 50%;
   opacity: 0;
   animation: twinkle ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 @keyframes twinkle {
   0%, 100% {
     opacity: 0;
     transform: scale(0.3);
-    filter: blur(0px);
   }
   50% {
     opacity: 0.9;
     transform: scale(1);
-    filter: blur(0.5px);
-    box-shadow: 0 0 8px 2px rgba(255, 255, 255, 0.4);
   }
 }
 
