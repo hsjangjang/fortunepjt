@@ -64,7 +64,7 @@
             <div class="col-md-4">
               <div class="feature-box text-center p-4">
                 <div class="feature-icon-wrapper mb-3">
-                  <img src="@/assets/images/ootd-icon.png" alt="" class="feature-icon" />
+                  <img src="@/assets/images/ootd-icon2.png" alt="" class="feature-icon" />
                 </div>
                 <h5 class="text-white mb-2">OOTD 추천</h5>
                 <p class="text-muted small mb-0">
