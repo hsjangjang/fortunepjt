@@ -56,6 +56,21 @@
                 </div>
               </div>
 
+              <!-- 오늘의 행운색 표시 -->
+              <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
+                <div class="lucky-colors-container">
+                  <span class="text-white-50 fortune-label d-flex align-items-center justify-content-center">
+                    <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />오늘의 행운색:
+                  </span>
+                  <div class="lucky-colors-list">
+                    <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
+                      <span class="lucky-color-dot-lg" :style="{ background: getColorBackground(color) }"></span>
+                      <span class="text-white lucky-color-name">{{ color }}</span>
+                    </span>
+                  </div>
+                </div>
+              </div>
+
               <!-- 아이템 카테고리 선택 -->
               <div class="card-base card-sm mb-4">
                 <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
@@ -69,19 +84,6 @@
                     <i :class="cat.icon" class="me-1"></i>
                     {{ cat.label }}
                   </button>
-                </div>
-              </div>
-
-              <!-- 오늘의 행운색 표시 -->
-              <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
-                <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
-                  <span class="text-white-50 me-2 fortune-label d-flex align-items-center"><img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />오늘의 행운색:</span>
-                  <div class="d-flex align-items-center gap-3">
-                    <span v-for="(color, index) in luckyColors" :key="index" class="lucky-color-item">
-                      <span class="lucky-color-dot-lg" :style="{ background: getColorBackground(color) }"></span>
-                      <span class="text-white lucky-color-name">{{ color }}</span>
-                    </span>
-                  </div>
                 </div>
               </div>
 
@@ -1133,6 +1135,32 @@ onMounted(() => {
   color: #c4b5fd;
   font-size: 0.75rem;
   font-weight: 500;
+}
+
+/* 행운색 컨테이너 - 데스크톱: 가로 배치, 모바일: 세로 배치 */
+.lucky-colors-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.lucky-colors-list {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+@media (max-width: 767.98px) {
+  .lucky-colors-container {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .lucky-colors-list {
+    justify-content: center;
+  }
 }
 
 /* 모바일 행운 점수 - 선택된 운세 카테고리 색상으로 동적 표시 */
