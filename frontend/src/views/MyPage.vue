@@ -321,62 +321,62 @@
                 <!-- 프로필 보기 -->
                 <div v-else id="profile-view">
                   <div class="row">
-                    <div class="col-md-6">
-                      <h5 class="text-center">기본 정보</h5>
-                      <table class="table table-borderless">
-                        <tbody>
-                          <tr>
-                            <th width="40%">이름:</th>
-                            <td>{{ fullName || '미입력' }}</td>
-                          </tr>
-                          <tr>
-                            <th>아이디:</th>
-                            <td>{{ authStore.user?.username }}</td>
-                          </tr>
-                          <tr>
-                            <th>이메일:</th>
-                            <td>{{ authStore.user?.email || '미입력' }}</td>
-                          </tr>
-                          <tr>
-                            <th>생년월일:</th>
-                            <td>{{ formatBirthDate(authStore.user?.birth_date) }}</td>
-                          </tr>
-                          <tr>
-                            <th>성별:</th>
-                            <td>{{ formatGender(authStore.user?.gender) }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <!-- 기본 정보 블록 -->
+                    <div class="col-md-6 mb-4">
+                      <div class="info-section-block">
+                        <h5 class="info-section-title">기본 정보</h5>
+                        <div class="info-items">
+                          <div class="info-row">
+                            <span class="info-label">이름:</span>
+                            <span class="info-value">{{ fullName || '미입력' }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">아이디:</span>
+                            <span class="info-value">{{ authStore.user?.username }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">이메일:</span>
+                            <span class="info-value">{{ authStore.user?.email || '미입력' }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">생년월일:</span>
+                            <span class="info-value">{{ formatBirthDate(authStore.user?.birth_date) }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">성별:</span>
+                            <span class="info-value">{{ formatGender(authStore.user?.gender) }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <hr class="d-md-none my-3 border-light border-opacity-25">
-
-                    <div class="col-md-6">
-                      <h5 class="text-center">추가 정보</h5>
-                      <table class="table table-borderless">
-                        <tbody>
-                          <tr>
-                            <th width="40%">별자리:</th>
-                            <td>{{ authStore.user?.zodiac_sign || '계산중' }}</td>
-                          </tr>
-                          <tr>
-                            <th>띠:</th>
-                            <td>{{ authStore.user?.chinese_zodiac || '계산중' }}</td>
-                          </tr>
-                          <tr>
-                            <th>MBTI:</th>
-                            <td>{{ authStore.user?.mbti || '미입력' }}</td>
-                          </tr>
-                          <tr>
-                            <th>퍼스널컬러:</th>
-                            <td>{{ getPersonalColorDisplay(authStore.user?.personal_color) }}</td>
-                          </tr>
-                          <tr>
-                            <th>태어난 시간:</th>
-                            <td>{{ formatBirthTime(authStore.user?.birth_time) }}</td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <!-- 추가 정보 블록 -->
+                    <div class="col-md-6 mb-4">
+                      <div class="info-section-block">
+                        <h5 class="info-section-title">추가 정보</h5>
+                        <div class="info-items">
+                          <div class="info-row">
+                            <span class="info-label">별자리:</span>
+                            <span class="info-value">{{ authStore.user?.zodiac_sign || '계산중' }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">띠:</span>
+                            <span class="info-value">{{ authStore.user?.chinese_zodiac || '계산중' }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">MBTI:</span>
+                            <span class="info-value">{{ authStore.user?.mbti || '미입력' }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">퍼스널컬러:</span>
+                            <span class="info-value">{{ getPersonalColorDisplay(authStore.user?.personal_color) }}</span>
+                          </div>
+                          <div class="info-row">
+                            <span class="info-label">태어난 시간:</span>
+                            <span class="info-value">{{ formatBirthTime(authStore.user?.birth_time) }}</span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
@@ -1259,6 +1259,50 @@ h5 {
 /* Responsive Padding Utilities */
 .responsive-padding {
   padding: 3rem !important;
+}
+
+/* 정보 섹션 블록 스타일 */
+.info-section-block {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  padding: 1.25rem 1.5rem;
+  height: 100%;
+}
+
+.info-section-title {
+  text-align: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.info-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+}
+
+.info-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.95rem;
+}
+
+.info-value {
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-align: right;
 }
 
 @media (max-width: 768px) {

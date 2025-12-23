@@ -251,6 +251,17 @@
       </div>
     </Teleport>
 
+    <!-- 분석 중 오버레이 -->
+    <Teleport to="body">
+      <div v-if="isAnalyzing" class="analyzing-overlay">
+        <div class="analyzing-content">
+          <div class="analyzing-spinner"></div>
+          <p class="analyzing-text">분석 중입니다...</p>
+          <p class="analyzing-subtext">잠시만 기다려주세요</p>
+        </div>
+      </div>
+    </Teleport>
+
   </DefaultLayout>
 </template>
 
@@ -921,5 +932,55 @@ onMounted(() => {
     font-size: 0.85rem;
     padding: 0.25rem 0.6rem;
   }
+}
+
+/* 분석 중 오버레이 */
+.analyzing-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(30, 41, 59, 0.85);
+  backdrop-filter: blur(8px);
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.analyzing-content {
+  text-align: center;
+  padding: 2rem;
+}
+
+.analyzing-spinner {
+  width: 80px;
+  height: 80px;
+  border: 4px solid rgba(167, 139, 250, 0.2);
+  border-top: 4px solid #a78bfa;
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.analyzing-text {
+  color: #fff;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.analyzing-subtext {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 1rem;
+  margin: 0;
 }
 </style>
