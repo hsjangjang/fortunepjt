@@ -388,6 +388,8 @@ onUnmounted(() => {
 
 .hero-content {
   max-width: 800px;
+  position: relative;
+  z-index: 10;
 }
 
 /* Hero 설명 문구 색상 */
