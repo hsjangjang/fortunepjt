@@ -996,27 +996,27 @@ onMounted(() => {
   .accessories-grid {
     flex-wrap: nowrap;
     justify-content: center;
-    gap: 0.25rem;
+    gap: 0.5rem;
     padding: 0 0.5rem;
   }
 
   .accessory-item {
-    flex: 0 0 30%;
-    max-width: 117px;
+    flex: 1 1 0;
+    max-width: 140px;
     min-width: 0;
   }
 
   .accessory-card {
-    padding: 0.5rem !important;
+    padding: 0.75rem !important;
   }
 
   .accessory-image-container {
-    width: 55px;
-    height: 55px;
+    width: 75px;
+    height: 75px;
   }
 
   .accessory-card h6 {
-    font-size: 0.8rem;
+    font-size: 0.9rem;
   }
 }
 </style>
