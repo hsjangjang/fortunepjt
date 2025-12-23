@@ -80,8 +80,6 @@
                 <select v-model="formData.main_category" class="form-select" required>
                   <option value="">선택하세요</option>
                   <option value="clothing">의류</option>
-                  <option value="cosmetics">화장품</option>
-                  <option value="electronics">전자제품</option>
                   <option value="accessories">악세서리</option>
                   <option value="etc">기타</option>
                 </select>

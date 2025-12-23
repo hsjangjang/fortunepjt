@@ -62,8 +62,6 @@
                   <label class="form-label text-muted small">카테고리</label>
                   <select v-model="editForm.main_category" class="form-select">
                     <option value="clothing">의류</option>
-                    <option value="cosmetics">화장품</option>
-                    <option value="electronics">전자제품</option>
                     <option value="accessories">악세서리</option>
                     <option value="etc">기타</option>
                   </select>
@@ -282,8 +280,6 @@ const isCalculatingScore = ref(false) // 점수 계산 중 상태
 // 카테고리 한글 매핑
 const categoryDisplayMap = {
   'clothing': '의류',
-  'cosmetics': '화장품',
-  'electronics': '전자제품',
   'accessories': '악세서리',
   'etc': '기타'
 }

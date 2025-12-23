@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('item_name', models.CharField(max_length=200, verbose_name='아이템 이름')),
                 ('item_category', models.CharField(blank=True, choices=[('top', '상의'), ('bottom', '하의'), ('outer', '아우터'), ('dress', '원피스'), ('shoes', '신발'), ('bag', '가방'), ('accessory', '악세서리'), ('etc', '기타')], max_length=50, null=True, verbose_name='카테고리')),
-                ('main_category', models.CharField(blank=True, choices=[('clothing', '의류'), ('cosmetics', '화장품'), ('electronics', '전자제품'), ('accessories', '악세서리'), ('etc', '기타')], max_length=50, null=True, verbose_name='대분류')),
+                ('main_category', models.CharField(blank=True, choices=[('clothing', '의류'), ('accessories', '악세서리'), ('etc', '기타')], max_length=50, null=True, verbose_name='대분류')),
                 ('sub_categories', models.JSONField(default=list, help_text='소분류 목록 또는 기타 카테고리의 경우 사용자 입력값', verbose_name='소분류 (목록)')),
                 ('image', models.ImageField(upload_to='items/%Y/%m/', verbose_name='이미지')),
                 ('image_url', models.URLField(blank=True, verbose_name='이미지 URL')),
