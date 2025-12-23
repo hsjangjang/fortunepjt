@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <img src="@/assets/images/item_check_icon.png" alt="" class="page-title-icon" />아이템 행운도 측정
+            <img src="@/assets/images/item_check_icon.png" alt="" class="page-title-icon" />아이템 행운도 분석
           </h1>
           <p class="page-subtitle">
             가지고 있는 아이템을 촬영하거나 업로드하여<br>
