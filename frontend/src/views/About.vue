@@ -53,9 +53,9 @@
             <div class="col-md-4">
               <div class="feature-box text-center p-4">
                 <div class="feature-icon-wrapper mb-3">
-                  <img src="@/assets/images/logo.png" alt="" class="feature-icon" />
+                  <img src="@/assets/images/item_check_icon.png" alt="" class="feature-icon" />
                 </div>
-                <h5 class="text-white mb-2">아이템 행운도</h5>
+                <h5 class="text-white mb-2">아이템 행운도 분석</h5>
                 <p class="text-muted small mb-0">
                   내 아이템이 오늘의 행운과 얼마나 맞는지 AI가 분석합니다
                 </p>
@@ -77,7 +77,7 @@
                 <div class="feature-icon-wrapper mb-3">
                   <span class="feature-emoji">🍽️</span>
                 </div>
-                <h5 class="text-white mb-2">메뉴 추천</h5>
+                <h5 class="text-white mb-2">오늘의 메뉴 추천</h5>
                 <p class="text-muted small mb-0">
                   오늘의 운세에 맞는 행운의 메뉴를 추천합니다
                 </p>

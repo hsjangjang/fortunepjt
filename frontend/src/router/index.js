@@ -167,7 +167,7 @@ const router = createRouter({
       path: '/about',
       name: 'about',
       component: About,
-      meta: { title: '사이트 소개' }
+      meta: { title: '' }
     },
 
     // 아이디 찾기
