@@ -874,8 +874,8 @@ onMounted(() => {
 
 /* 액세서리 이미지 고정 크기 컨테이너 */
 .accessory-image-container {
-  width: 70px;
-  height: 70px;
+  width: 91px;
+  height: 91px;
   margin: 0 auto;
   display: flex;
   align-items: center;
