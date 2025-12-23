@@ -1,5 +1,26 @@
 # 📋 업데이트 내역
 
+## v1.8.5 (25.12.23)
+
+### 코드 정리 및 리팩토링
+- Frontend
+  - 홈 화면 '운세 보기' 버튼 클릭 안 되는 문제 수정 (`Home.vue`)
+    - 원인: `.features-section`의 z-index(101)가 `.hero-section`(100)보다 높아 투명 영역이 버튼을 가림
+    - 해결: `.features-section`에 `pointer-events: none` 적용, 내부 카드들만 클릭 가능하게 설정
+    - `.hero-content` 버튼에 `pointer-events: auto` 및 높은 `z-index` 추가
+  - 사용되지 않는 빈 파일 삭제 (`assets/main.css`)
+  - CSS 중복 코드 정리 (`assets/css/style.css`)
+    - 중복된 `.animate-float`, `@keyframes float` 정의 제거
+    - 중복된 `.hover-lift` 정의 통합 (box-shadow 포함 버전 유지)
+- Backend
+  - 미사용 파일 삭제 (`items/word_similarity.py`, 372줄)
+  - 캐시 함수 중복 제거 및 리팩토링 (`fortune/api_views.py`)
+    - 770줄 → 562줄로 208줄 감소
+    - 중복 캐시 함수 제거, `FortuneCacheManager` 클래스 사용으로 통합
+    - 일간/주간/월간 캐시 로직 `cache_manager.py`로 일원화
+
+---
+
 ## v1.8.4 (25.12.22)
 
 ### 장하선

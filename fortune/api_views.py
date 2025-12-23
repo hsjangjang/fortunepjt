@@ -5,263 +5,55 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from datetime import date, datetime
 from .services import FortuneCalculator
 from .serializers import FortuneCalculateSerializer
-from .models import DailyFortuneCache, WeeklyFortuneCache, MonthlyFortuneCache
+from .models import DailyFortuneCache
+from .cache_manager import FortuneCacheManager
 import json
 
 
 # ============================================================
-# 기간 유틸리티 함수
+# 캐시 함수 래퍼 (FortuneCacheManager 사용)
 # ============================================================
 
 def get_current_week():
-    """현재 년도와 주차 반환 (ISO 주차 기준)"""
-    today = date.today()
-    iso_calendar = today.isocalendar()
-    return iso_calendar[0], iso_calendar[1]  # year, week
+    return FortuneCacheManager.get_current_week()
 
 
 def get_current_month():
-    """현재 년도와 월 반환"""
-    today = date.today()
-    return today.year, today.month
-
-
-# ============================================================
-# 일반화된 주간/월간 캐시 함수
-# ============================================================
-
-def _get_period_cache_model(period_type):
-    """기간 타입에 따른 캐시 모델 반환"""
-    return WeeklyFortuneCache if period_type == 'weekly' else MonthlyFortuneCache
-
-
-def _get_period_filter_field(period_type):
-    """기간 타입에 따른 필터 필드명 반환 (week_number 또는 month)"""
-    return 'week_number' if period_type == 'weekly' else 'month'
-
-
-def _get_period_label(period_type):
-    """기간 타입에 따른 로그 라벨 반환"""
-    return 'Weekly' if period_type == 'weekly' else 'Monthly'
+    return FortuneCacheManager.get_current_month()
 
 
 def save_period_fortune_to_db(period_type, user, session_key, year, period_value, fortune_data, birth_date=None, gender=''):
-    """주간/월간 운세 데이터베이스에 저장 (일반화)"""
-    try:
-        CacheModel = _get_period_cache_model(period_type)
-        period_field = _get_period_filter_field(period_type)
-        label = _get_period_label(period_type)
-
-        filter_kwargs = {'year': year, period_field: period_value}
-
-        if user and user.is_authenticated:
-            CacheModel.objects.filter(user=user, **filter_kwargs).delete()
-            cache = CacheModel(user=user, session_key=session_key or '', **filter_kwargs)
-        elif session_key:
-            CacheModel.objects.filter(session_key=session_key, **filter_kwargs).delete()
-            cache = CacheModel(session_key=session_key, **filter_kwargs)
-        else:
-            return False
-
-        cache.birth_date = birth_date
-        cache.gender = gender or ''
-        cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
-        cache.save()
-        print(f"[{label} Cache] 저장 완료: user={user}, year={year}, {period_field}={period_value}, birth={birth_date}, gender={gender}")
-        return True
-    except Exception as e:
-        label = _get_period_label(period_type)
-        print(f"[{label} Cache] 저장 실패: {e}")
-        return False
+    return FortuneCacheManager.save_period_fortune(period_type, user, session_key, year, period_value, fortune_data, birth_date, gender)
 
 
 def find_same_condition_period_fortune(period_type, year, period_value, birth_date, gender=''):
-    """동일 조건(생년월일+성별+기간)의 캐시 찾기 (일반화)"""
-    try:
-        CacheModel = _get_period_cache_model(period_type)
-        period_field = _get_period_filter_field(period_type)
-        label = _get_period_label(period_type)
-
-        print(f"[{label} Cache] 동일 조건 검색 시작: birth={birth_date}, gender={gender}, year={year}, {period_field}={period_value}")
-
-        base_filter = {'year': year, period_field: period_value, 'birth_date': birth_date}
-
-        # 1차: 정확히 일치하는 캐시 찾기 (birth_date + gender)
-        cache = CacheModel.objects.filter(**base_filter, gender=gender or '').order_by('created_at').first()
-
-        # 2차: gender가 비어있는 기존 캐시도 찾기 (마이그레이션 전 데이터 호환)
-        if not cache and gender:
-            cache = CacheModel.objects.filter(**base_filter, gender='').order_by('created_at').first()
-            if cache:
-                print(f"[{label} Cache] 2차 검색(gender='') 히트")
-
-        # 3차: birth_date만으로 검색 (기존에 birth_date 없이 저장된 캐시 대비)
-        if not cache and birth_date:
-            any_cache = CacheModel.objects.filter(year=year, **{period_field: period_value}).first()
-            if any_cache:
-                print(f"[{label} Cache] 해당 기간에 캐시 존재하지만 조건 불일치: "
-                      f"cache.birth_date={any_cache.birth_date}, cache.gender={any_cache.gender}")
-
-        if cache and cache.full_fortune_data:
-            fortune_data = json.loads(cache.full_fortune_data)
-            print(f"[{label} Cache] 동일 조건 캐시 히트: birth={birth_date}, gender={gender}, year={year}, {period_field}={period_value}")
-            return fortune_data
-
-        print(f"[{label} Cache] 동일 조건 캐시 없음")
-        return None
-    except Exception as e:
-        label = _get_period_label(period_type)
-        print(f"[{label} Cache] 동일 조건 조회 실패: {e}")
-        return None
+    return FortuneCacheManager.find_same_condition_period(period_type, year, period_value, birth_date, gender)
 
 
 def load_period_fortune_from_db(period_type, user, session_key, year, period_value):
-    """주간/월간 운세 데이터베이스에서 로드 (일반화)"""
-    try:
-        CacheModel = _get_period_cache_model(period_type)
-        period_field = _get_period_filter_field(period_type)
-        label = _get_period_label(period_type)
-
-        filter_kwargs = {'year': year, period_field: period_value}
-
-        if user and user.is_authenticated:
-            cache = CacheModel.objects.filter(user=user, **filter_kwargs).first()
-        elif session_key:
-            cache = CacheModel.objects.filter(session_key=session_key, **filter_kwargs).first()
-        else:
-            return None
-
-        if cache and cache.full_fortune_data:
-            fortune_data = json.loads(cache.full_fortune_data)
-            print(f"[{label} Cache] 히트: user={user}, year={year}, {period_field}={period_value}")
-            return fortune_data
-        return None
-    except Exception as e:
-        label = _get_period_label(period_type)
-        print(f"[{label} Cache] 로드 실패: {e}")
-        return None
-
-
-# 호환성을 위한 래퍼 함수 (기존 코드 호환)
-def save_weekly_fortune_to_db(user, session_key, year, week, fortune_data, birth_date=None, gender=''):
-    return save_period_fortune_to_db('weekly', user, session_key, year, week, fortune_data, birth_date, gender)
-
-
-def save_monthly_fortune_to_db(user, session_key, year, month, fortune_data, birth_date=None, gender=''):
-    return save_period_fortune_to_db('monthly', user, session_key, year, month, fortune_data, birth_date, gender)
-
-
-def find_same_condition_weekly_fortune(year, week, birth_date, gender=''):
-    return find_same_condition_period_fortune('weekly', year, week, birth_date, gender)
-
-
-def find_same_condition_monthly_fortune(year, month, birth_date, gender=''):
-    return find_same_condition_period_fortune('monthly', year, month, birth_date, gender)
-
-
-def load_weekly_fortune_from_db(user, session_key, year, week):
-    return load_period_fortune_from_db('weekly', user, session_key, year, week)
-
-
-def load_monthly_fortune_from_db(user, session_key, year, month):
-    return load_period_fortune_from_db('monthly', user, session_key, year, month)
+    return FortuneCacheManager.load_period_fortune(period_type, user, session_key, year, period_value)
 
 
 def save_fortune_to_db(user, session_key, fortune_date, fortune_data, birth_date=None, birth_time='', calendar_type='solar', chinese_name=''):
-    """데이터베이스에 운세 데이터 저장"""
-    try:
-        # 기존 데이터 삭제 후 새로 저장
-        if user and user.is_authenticated:
-            # 로그인 사용자: user 기반 + session_key 기반 모두 삭제 (충돌 방지)
-            DailyFortuneCache.objects.filter(user=user, fortune_date=fortune_date).delete()
-            if session_key:
-                DailyFortuneCache.objects.filter(session_key=session_key, fortune_date=fortune_date).delete()
-            cache = DailyFortuneCache(user=user, fortune_date=fortune_date, session_key=session_key)
-        elif session_key:
-            DailyFortuneCache.objects.filter(session_key=session_key, fortune_date=fortune_date).delete()
-            cache = DailyFortuneCache(session_key=session_key, fortune_date=fortune_date)
-        else:
-            return False
-
-        # 전체 운세 데이터를 JSON으로 저장
-        cache.full_fortune_data = json.dumps(fortune_data, ensure_ascii=False)
-
-        # 운세 계산 키 저장 (동일 조건 캐시용)
-        cache.birth_date = birth_date
-        cache.birth_time = birth_time or ''
-        cache.calendar_type = calendar_type or 'solar'
-        cache.chinese_name = chinese_name or ''
-
-        # 기본 필드도 저장 (검색/필터링용)
-        cache.fortune_score = fortune_data.get('fortune_score', 50)
-        cache.fortune_text = fortune_data.get('fortune_texts', {}).get('total', '')
-        cache.lucky_color = fortune_data.get('lucky_color', '#7c3aed')
-        cache.lucky_colors = fortune_data.get('lucky_colors', [])
-        cache.lucky_number = fortune_data.get('lotto_numbers', [None])[0]
-        cache.lucky_direction = fortune_data.get('lucky_item', {}).get('direction', '')
-        cache.zodiac_sign = fortune_data.get('zodiac_sign', '')
-        cache.chinese_zodiac = fortune_data.get('chinese_zodiac', '')
-        cache.saju_data = json.dumps(fortune_data.get('saju_data', {}), ensure_ascii=False)
-
-        cache.save()
-        print(f"[DB Cache] 저장 완료: user={user}, session={session_key}, date={fortune_date}, birth={birth_date}")
-        return True
-    except Exception as e:
-        print(f"[DB Cache] 저장 실패: {e}")
-        return False
+    return FortuneCacheManager.save_daily_fortune(user, session_key, fortune_date, fortune_data, birth_date, birth_time, calendar_type, chinese_name)
 
 
 def find_same_condition_fortune(fortune_date, birth_date, birth_time='', calendar_type='solar', chinese_name=''):
-    """동일 조건의 운세 캐시 찾기 (생년월일+시간+양음력+한자이름+날짜)"""
-    try:
-        cache = DailyFortuneCache.objects.filter(
-            fortune_date=fortune_date,
-            birth_date=birth_date,
-            birth_time=birth_time or '',
-            calendar_type=calendar_type or 'solar',
-            chinese_name=chinese_name or ''
-        ).order_by('created_at').first()  # 가장 먼저 생성된 것 사용
-
-        if cache and cache.full_fortune_data:
-            fortune_data = json.loads(cache.full_fortune_data)
-            print(f"[DB Cache] 동일 조건 캐시 히트: birth={birth_date}, time={birth_time}, name={chinese_name}")
-            return fortune_data
-        return None
-    except Exception as e:
-        print(f"[DB Cache] 동일 조건 조회 실패: {e}")
-        return None
+    return FortuneCacheManager.find_same_condition_daily(fortune_date, birth_date, birth_time, calendar_type, chinese_name)
 
 
 def load_fortune_from_db(user, session_key, fortune_date):
-    """데이터베이스에서 운세 데이터 로드"""
-    try:
+    """데이터베이스에서 운세 데이터 로드 (건강운 추가 로직 포함)"""
+    fortune_data = FortuneCacheManager.load_daily_fortune(user, session_key, fortune_date)
+    if fortune_data:
+        # 건강운이 없는 기존 데이터에 건강운 추가
+        cache = None
         if user and user.is_authenticated:
             cache = DailyFortuneCache.objects.filter(user=user, fortune_date=fortune_date).first()
         elif session_key:
             cache = DailyFortuneCache.objects.filter(session_key=session_key, fortune_date=fortune_date).first()
-        else:
-            return None
-
-        if not cache:
-            print(f"[DB Cache] 미스: user={user}, session={session_key}, date={fortune_date}")
-            return None
-
-        # full_fortune_data에서 전체 데이터 복원
-        if cache.full_fortune_data:
-            fortune_data = json.loads(cache.full_fortune_data)
-
-            # 건강운이 없는 기존 데이터에 건강운 추가
-            fortune_data = add_health_fortune_if_missing(fortune_data, cache)
-
-            print(f"[DB Cache] 히트: user={user}, session={session_key}, date={fortune_date}")
-            return fortune_data
-
-        # 레거시 데이터 처리 (full_fortune_data가 없는 경우)
-        print(f"[DB Cache] 레거시 데이터 - 재계산 필요")
-        return None
-    except Exception as e:
-        print(f"[DB Cache] 로드 실패: {e}")
-        return None
+        fortune_data = add_health_fortune_if_missing(fortune_data, cache)
+    return fortune_data
 
 
 def add_health_fortune_if_missing(fortune_data, cache=None):
