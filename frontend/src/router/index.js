@@ -34,7 +34,6 @@ const FortuneDetail = lazyLoad(() => import('@/views/fortune/Detail.vue'))
 const ItemCheck = lazyLoad(() => import('@/views/fortune/ItemCheck.vue'))
 
 // Items
-const ItemList = lazyLoad(() => import('@/views/items/List.vue'))
 const ItemUpload = lazyLoad(() => import('@/views/items/Upload.vue'))
 const ItemDetail = lazyLoad(() => import('@/views/items/Detail.vue'))
 
@@ -129,12 +128,6 @@ const router = createRouter({
     },
 
     // 아이템 관련
-    {
-      path: '/items',
-      name: 'item-list',
-      component: ItemList,
-      meta: { title: '내 아이템', requiresAuth: true }
-    },
     {
       path: '/items/upload',
       name: 'item-upload',

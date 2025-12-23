@@ -570,8 +570,8 @@ const registerAsMyItem = async () => {
 
     if (response.data.success) {
       showToast('아이템이 등록되었습니다!', 'success')
-      // 내 아이템 목록으로 이동
-      router.push('/items')
+      // 마이페이지로 이동
+      router.push('/mypage')
     } else {
       showToast(response.data.error || '등록에 실패했습니다.', 'error')
     }

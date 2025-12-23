@@ -226,7 +226,7 @@
                 </div>
 
                 <div class="d-grid gap-3 mt-4">
-                  <router-link to="/items" class="btn btn-outline-light rounded-pill py-2">
+                  <router-link to="/mypage" class="btn btn-outline-light rounded-pill py-2">
                     <i class="fas fa-list me-2"></i> 목록으로 돌아가기
                   </router-link>
                   <button class="btn btn-outline-danger rounded-pill py-2" @click="handleDelete">
@@ -470,7 +470,7 @@ const fetchItemDetail = async () => {
   } catch (error) {
     console.error('아이템 상세 정보 가져오기 실패:', error)
     alert('아이템을 찾을 수 없습니다.')
-    router.push('/items')
+    router.push('/mypage')
   }
 }
 
@@ -530,7 +530,7 @@ const handleDelete = async () => {
     const response = await api.delete(`/api/items/${item.value.id}/`)
     if (response.data.success) {
       alert('삭제되었습니다.')
-      router.push('/items')
+      router.push('/mypage')
     } else {
       alert(response.data.message || '삭제 중 오류가 발생했습니다.')
     }

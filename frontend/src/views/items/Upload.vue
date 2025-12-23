@@ -128,7 +128,7 @@
 
             <div v-if="authStore.isAuthenticated" class="text-center">
               <p class="text-muted">업로드한 아이템의 색상을 분석하여<br>오늘의 행운색과 매칭도를 계산합니다</p>
-              <router-link to="/items" class="btn btn-outline-primary">
+              <router-link to="/mypage" class="btn btn-outline-primary">
                 내 아이템 보기
               </router-link>
             </div>
@@ -344,7 +344,7 @@ const handleSubmit = async () => {
 
     if (response.data.success) {
       alert('아이템이 성공적으로 업로드되었습니다!')
-      router.push('/items')
+      router.push('/mypage')
     }
   } catch (error) {
     console.error('업로드 실패:', error)
