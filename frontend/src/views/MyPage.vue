@@ -1154,12 +1154,12 @@ onMounted(() => {
 
 @media (max-width: 767.98px) {
   .lucky-colors-container {
-    flex-direction: column;
-    gap: 0.75rem;
+    flex-direction: column !important;
+    gap: 0.75rem !important;
   }
 
   .lucky-colors-list {
-    justify-content: center;
+    justify-content: center !important;
   }
 }
 
