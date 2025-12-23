@@ -5,7 +5,8 @@
       <!-- Hero Section - 고정되어 있다가 스크롤 시 위로 사라짐 -->
       <div class="hero-section" :style="{
         opacity: heroOpacity,
-        transform: `scale(${heroScale}) translateY(${heroTranslate}px)`
+        transform: `scale(${heroScale}) translateY(${heroTranslate}px)`,
+        visibility: heroOpacity <= 0 ? 'hidden' : 'visible'
       }">
         <div class="hero-content text-center">
           <h1 class="display-title fw-bold mb-4">
@@ -125,11 +126,21 @@ const handleScroll = (scrollY) => {
   heroTranslate.value = -scrollY * 0.3
 
   // === Feature 카드 애니메이션 ===
-  const triggers = [
-    windowHeight * 0.15,
-    windowHeight * 0.25,
-    windowHeight * 0.35
-  ]
+  // 모바일 여부 확인 (768px 이하)
+  const isMobile = window.innerWidth <= 768
+
+  // 모바일에서는 카드가 세로로 배치되므로 트리거 간격을 더 넓게
+  const triggers = isMobile
+    ? [
+        windowHeight * 0.1,
+        windowHeight * 0.5,
+        windowHeight * 0.9
+      ]
+    : [
+        windowHeight * 0.15,
+        windowHeight * 0.25,
+        windowHeight * 0.35
+      ]
 
   for (let i = 0; i < 3; i++) {
     if (scrollY >= triggers[i]) {
