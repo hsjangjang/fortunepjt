@@ -123,8 +123,6 @@ def send_fortune_email(subject, message, recipient_email, html_message=None):
                 to=[recipient_email],
             )
             email.attach_alternative(html_message, "text/html")
-            email.mixed_subtype = 'related'
-            attach_logo(email)
             email.send(fail_silently=False)
         else:
             send_mail(
