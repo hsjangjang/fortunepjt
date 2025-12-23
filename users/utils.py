@@ -13,9 +13,10 @@ def get_logo_path():
 
 
 def get_logo_html():
-    """로고 HTML 반환 (이모지 기반)"""
-    # 이모지 로고 사용 (이미지 파일 불필요)
-    return '<div style="font-size: 64px; margin-bottom: 12px;">🔮</div>'
+    """로고 HTML 반환 (외부 URL 이미지)"""
+    # Vercel 배포 URL의 public 폴더 로고 이미지 사용
+    logo_url = "https://frontend-wheat-three-93.vercel.app/logo.png"
+    return f'<img src="{logo_url}" alt="Lucky Picky" style="width: 80px; height: 80px; margin-bottom: 12px;">'
 
 
 def attach_logo(email_message):
