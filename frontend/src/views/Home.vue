@@ -114,6 +114,14 @@ const featureVisible = reactive([false, false, false])
 // Lenis 인스턴스
 let lenis = null
 
+// iOS Safari 감지
+const isIOSSafari = () => {
+  const ua = navigator.userAgent
+  const isIOS = /iPad|iPhone|iPod/.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+  const isSafari = /Safari/.test(ua) && !/Chrome|CriOS|FxiOS/.test(ua)
+  return isIOS && isSafari
+}
+
 // 스크롤 시 애니메이션 처리
 const handleScroll = (scrollY) => {
   const windowHeight = window.innerHeight
@@ -153,10 +161,19 @@ const handleScroll = (scrollY) => {
 
 // 화살표 클릭 시 스크롤
 const scrollToFeatures = () => {
-  lenis?.scrollTo('#features', {
-    offset: -100,
-    duration: 1.5
-  })
+  if (lenis) {
+    lenis.scrollTo('#features', {
+      offset: -100,
+      duration: 1.5
+    })
+  } else {
+    // iOS Safari용 네이티브 스크롤
+    const el = document.getElementById('features')
+    if (el) {
+      const top = el.getBoundingClientRect().top + window.scrollY - 100
+      window.scrollTo({ top, behavior: 'smooth' })
+    }
+  }
 }
 
 // RAF 루프
@@ -165,33 +182,48 @@ const raf = (time) => {
   requestAnimationFrame(raf)
 }
 
+// 네이티브 스크롤 핸들러 (iOS Safari용)
+const nativeScrollHandler = () => {
+  handleScroll(window.scrollY)
+}
+
 onMounted(() => {
-  // 모바일 여부 확인
+  // iOS Safari 여부 확인
+  const useNativeScroll = isIOSSafari()
   const isMobile = window.innerWidth <= 768
 
-  // Lenis 초기화 - 부드러운 스크롤 (모바일에서 더 느리게)
-  lenis = new Lenis({
-    duration: isMobile ? 2.0 : 1.2,
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    orientation: 'vertical',
-    smoothWheel: true
-  })
+  if (useNativeScroll) {
+    // iOS Safari: 네이티브 스크롤 사용
+    window.addEventListener('scroll', nativeScrollHandler, { passive: true })
+  } else {
+    // 다른 브라우저: Lenis 사용
+    lenis = new Lenis({
+      duration: isMobile ? 2.0 : 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      smoothWheel: true
+    })
 
-  // 스크롤 이벤트 연결
-  lenis.on('scroll', ({ scroll }) => {
-    handleScroll(scroll)
-  })
+    // 스크롤 이벤트 연결
+    lenis.on('scroll', ({ scroll }) => {
+      handleScroll(scroll)
+    })
 
-  // RAF 시작
-  requestAnimationFrame(raf)
+    // RAF 시작
+    requestAnimationFrame(raf)
+  }
 
   // 초기 상태 설정
   handleScroll(window.scrollY)
 })
 
 onUnmounted(() => {
-  lenis?.destroy()
-  lenis = null
+  if (lenis) {
+    lenis.destroy()
+    lenis = null
+  } else {
+    window.removeEventListener('scroll', nativeScrollHandler)
+  }
 })
 </script>
 
