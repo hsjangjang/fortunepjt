@@ -625,8 +625,8 @@ onMounted(async () => {
 }
 
 .btn-period {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(167, 139, 250, 0.3);
+  background: rgba(40, 40, 50, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: rgba(255, 255, 255, 0.7);
   padding: 0.6rem 1.2rem;
   border-radius: 25px;
@@ -637,7 +637,7 @@ onMounted(async () => {
 }
 
 .btn-period:hover:not(:disabled) {
-  background: rgba(167, 139, 250, 0.2);
+  background: rgba(60, 60, 70, 0.9);
   border-color: rgba(167, 139, 250, 0.5);
   color: white;
 }
