@@ -1,6 +1,29 @@
 /* Celestial Premium Theme */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
+/* SF함박눈 - 메인 타이틀용 */
+@font-face {
+    font-family: 'SfHambakneun';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2106@1.1/SF_HambakSnow.woff') format('woff');
+    font-weight: normal;
+    font-display: swap;
+}
+
+/* 전남교육바른체 - 본문용 */
+@font-face {
+    font-family: 'JeonnamEducationBarun';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/JNE-Bareun-TTF-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'JeonnamEducationBarun';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/JNE-Bareun-TTF-Bold.woff2') format('woff2');
+    font-weight: 700;
+    font-display: swap;
+}
+
 :root {
     /* Color Palette - Midnight & Gold */
     --bg-dark: #0f172a;
@@ -33,7 +56,7 @@
 
 /* Reset & Base */
 body {
-    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family: 'Calibri', 'JeonnamEducationBarun', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
     background-color: var(--bg-darker);
     background-image:
         radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15), transparent 25%),
@@ -42,6 +65,22 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.6;
+    word-break: keep-all;
+}
+
+/* 한글은 JeonnamEducationBarun, 영어/숫자는 Calibri */
+@font-face {
+    font-family: 'Calibri';
+    src: local('Calibri');
+    unicode-range: U+0020-007F, U+2000-206F, U+20A0-20CF, U+2100-214F;
+}
+
+/* Pretendard Black - 로고용 */
+@font-face {
+    font-family: 'Pretendard-Black';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-display: swap;
 }
 
 /* ========================================
@@ -79,10 +118,12 @@ h6 { font-size: var(--font-size-base); }
 
 /* Display Title - 히어로 섹션용 */
 .display-title {
+    font-family: 'SfHambakneun', 'Pretendard', sans-serif;
     font-size: var(--font-size-display);
-    font-weight: 800;
+    font-weight: normal;
     line-height: 1.2;
     letter-spacing: -0.03em;
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.5);
     background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -188,7 +229,8 @@ h6 { font-size: var(--font-size-base); }
 }
 
 .navbar-brand {
-    font-weight: 700;
+    font-family: 'Pretendard-Black', 'Pretendard', sans-serif;
+    font-weight: 900;
     font-size: 1.5rem;
     color: white !important;
     display: flex;
@@ -198,7 +240,7 @@ h6 { font-size: var(--font-size-base); }
 
 .nav-link {
     color: var(--text-muted) !important;
-    font-weight: 500;
+    font-weight: 700;
     transition: color 0.2s, transform 0.2s ease;
     padding: 0.5rem 1rem !important;
     display: inline-block;

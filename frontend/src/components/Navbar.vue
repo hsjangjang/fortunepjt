@@ -32,11 +32,6 @@
                 <UtensilsCrossed class="me-1" :size="18" /> 메뉴 추천
               </router-link>
             </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/about">
-                <Info class="me-1" :size="18" /> 사이트 소개
-              </router-link>
-            </li>
             <li class="nav-item dropdown ms-lg-3">
               <a class="nav-link dropdown-toggle btn btn-outline-light px-3 py-2 rounded-pill" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" @click.prevent="toggleUserDropdown">
                 <UserCircle class="me-1" :size="18" /> {{ userFullName }}님
@@ -72,7 +67,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from '@/composables/useToast'
 import {
   Sparkles, Diamond, Shirt, UtensilsCrossed,
-  UserCircle, User, LogOut, Info
+  UserCircle, User, LogOut
 } from 'lucide-vue-next'
 
 const router = useRouter()

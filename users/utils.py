@@ -9,7 +9,7 @@ def get_logo_html():
     """로고 HTML 반환 (외부 URL 이미지)"""
     # Vercel 배포 URL의 public 폴더 로고 이미지 사용 (캐시 무효화용 버전 파라미터 추가)
     logo_url = "https://frontend-wheat-three-93.vercel.app/logo.png?v=2"
-    return f'<img src="{logo_url}" alt="Lucky Picky" style="width: 80px; height: 80px; margin-bottom: 12px;">'
+    return f'<img src="{logo_url}" alt="Lucky Picky" style="width: 80px; height: auto; margin-bottom: 12px;">'
 
 
 def get_email_base_template(content, title="Lucky Picky"):

@@ -7,7 +7,7 @@
           <h1 class="page-title">
             <img src="@/assets/images/item_check_icon.png" alt="" class="page-title-icon" />아이템 행운도 분석
           </h1>
-          <p class="page-subtitle">
+          <p class="page-subtitle item-check-subtitle">
             가지고 있는 아이템을 촬영하거나 업로드하여<br>
             오늘의 행운 아이템과 얼마나 일치하는지 확인해보세요!
           </p>
@@ -151,9 +151,10 @@
 
                 <!-- 추천할 좋은 아이템이 없을 때 새 아이템 등록 유도 -->
                 <div v-else-if="luckScore < 70 && noGoodItemAvailable" class="recommend-section no-item mt-3">
-                  <p class="recommend-text">
+                  <p class="recommend-text no-item-text">
                     <i class="fas fa-box-open text-info me-1"></i>
-                    오늘 당신에게 행운을 불러와줄만한 아이템이 아직 등록되지 않은 것 같아요. 당신이 가진 다른 아이템이 행운을 불러와줄지 확인해볼까요?
+                    오늘 당신에게 행운을 불러와줄만한<br>
+                    아이템이 아직 등록되지 않은 것 같아요.
                   </p>
                   <router-link to="/items/upload" class="btn btn-outline-primary btn-sm rounded-pill mt-2">
                     <i class="fas fa-plus me-1"></i> 아이템 등록하기
@@ -173,10 +174,10 @@
                       <span class="value">{{ luckyItems.zodiac }}</span>
                     </div>
                   </div>
-                  <div class="mt-3 d-flex align-items-center justify-content-center flex-nowrap gap-1">
-                    <span class="text-white opacity-75 me-2 lucky-color-label"><i class="fas fa-palette text-primary me-1"></i>행운색:</span>
+                  <div class="lucky-color-row">
+                    <span class="lucky-color-label"><i class="fas fa-palette text-primary me-1"></i>행운색:</span>
                     <span v-for="color in luckyColorsWithHex" :key="color.name"
-                          class="badge rounded-pill me-1 border border-light border-opacity-25 flex-shrink-0 px-2"
+                          class="badge rounded-pill border border-light border-opacity-25 lucky-color-badge"
                           :style="`background-color: ${color.hex}; color: ${getTextColor(color.hex)}; text-shadow: 0 1px 2px rgba(0,0,0,0.3);`">
                       {{ color.name }}
                     </span>
@@ -849,9 +850,26 @@ onMounted(() => {
   }
 }
 
-/* 오늘의 행운색 라벨 스타일 */
+/* 행운색 한 줄 표시 */
+.lucky-color-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}
+
 .lucky-color-label {
-  font-size: 0.875rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.75);
+  flex-shrink: 0;
+}
+
+.lucky-color-badge {
+  font-size: 0.75rem;
+  padding: 0.3rem 0.6rem;
 }
 
 /* 아이템 추천 섹션 */
@@ -883,6 +901,15 @@ onMounted(() => {
 .recommend-section.no-item {
   background: rgba(59, 130, 246, 0.1);
   border-color: rgba(59, 130, 246, 0.3);
+}
+
+.no-item-text {
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.item-check-subtitle {
+  font-size: 0.85rem;
 }
 
 .page-title-icon {
