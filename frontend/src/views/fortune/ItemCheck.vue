@@ -252,6 +252,85 @@
       </div>
     </Teleport>
 
+    <!-- 카테고리 선택 모달 -->
+    <Teleport to="body">
+      <div v-if="showCategoryModal" class="modal-overlay" @click.self="showCategoryModal = false">
+        <div class="modal-container category-modal-container">
+          <div class="modal-content-box">
+            <div class="modal-header border-bottom border-secondary border-opacity-25">
+              <h5 class="modal-title text-white"><i class="fas fa-folder me-2"></i> 카테고리 선택</h5>
+              <button type="button" class="btn-close btn-close-white" @click="showCategoryModal = false"></button>
+            </div>
+            <div class="modal-body">
+              <!-- 대분류 -->
+              <div class="mb-4">
+                <label class="form-label text-white">대분류 <span class="text-danger">*</span></label>
+                <select v-model="categoryForm.main_category" class="form-select category-select">
+                  <option value="">선택하세요</option>
+                  <option value="clothing">의류</option>
+                  <option value="accessories">악세서리</option>
+                  <option value="etc">기타</option>
+                </select>
+              </div>
+
+              <!-- 소분류 (의류/악세서리 선택 시) -->
+              <div v-if="showSubCategoryOptions" class="mb-4">
+                <label class="form-label text-white">소분류 <span class="text-danger">*</span></label>
+                <div class="sub-category-grid">
+                  <div v-for="sub in currentSubCategories" :key="sub" class="form-check sub-category-item">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="sub_category"
+                      :value="sub"
+                      :id="'modal_sub_' + sub"
+                      v-model="categoryForm.sub_category"
+                    >
+                    <label class="form-check-label text-white" :for="'modal_sub_' + sub">
+                      {{ sub }}
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 기타 - 직접 입력 -->
+              <div v-if="categoryForm.main_category === 'etc'" class="mb-4">
+                <label class="form-label text-white">카테고리 직접 입력 <span class="text-danger">*</span></label>
+                <input
+                  v-model="categoryForm.custom_category"
+                  type="text"
+                  class="form-control category-input"
+                  placeholder="예: 텀블러, 키링, 파우치 등"
+                >
+              </div>
+
+              <!-- 등록 버튼 -->
+              <div class="d-grid gap-2 mt-4">
+                <button
+                  class="btn btn-primary btn-lg rounded-pill"
+                  :disabled="!isCategoryValid || isRegistering"
+                  @click="submitWithCategory"
+                >
+                  <span v-if="isRegistering">
+                    <i class="fas fa-spinner fa-spin me-2"></i> 등록 중...
+                  </span>
+                  <span v-else>
+                    <i class="fas fa-check me-2"></i> 등록하기
+                  </span>
+                </button>
+                <button
+                  class="btn btn-outline-light rounded-pill"
+                  @click="showCategoryModal = false"
+                >
+                  취소
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
+
     <!-- 분석 중 오버레이 -->
     <Teleport to="body">
       <div v-if="isAnalyzing" class="analyzing-overlay">
@@ -299,6 +378,21 @@ const galleryInput = ref(null)
 const isDragging = ref(false)
 const showResult = ref(false)
 const showItemModal = ref(false)
+const showCategoryModal = ref(false)
+
+// 카테고리 선택 폼
+const categoryForm = ref({
+  main_category: '',
+  sub_category: '',
+  custom_category: ''
+})
+
+// 소분류 매핑 (Upload.vue와 동일)
+const subCategoryMap = {
+  'clothing': ['상의', '하의', '아우터', '원피스', '신발', '가방', '기타'],
+  'accessories': ['귀걸이', '목걸이', '반지', '팔찌', '지갑', '기타'],
+  'etc': []
+}
 const itemPreview = ref('')
 const detectedItem = ref('분석중...')
 const detectedColors = ref([])
@@ -324,6 +418,29 @@ const luckyColorsWithHex = ref([])
 const luckProgressOffset = computed(() => {
   const circumference = 2 * Math.PI * 90
   return circumference - (displayLuckScore.value / 100 * circumference)
+})
+
+// 현재 선택된 대분류에 따른 소분류 목록
+const currentSubCategories = computed(() => {
+  return subCategoryMap[categoryForm.value.main_category] || []
+})
+
+// 소분류 옵션 표시 여부 (의류/악세서리 선택 시)
+const showSubCategoryOptions = computed(() => {
+  return categoryForm.value.main_category &&
+         categoryForm.value.main_category !== 'etc' &&
+         currentSubCategories.value.length > 0
+})
+
+// 카테고리 유효성 검사
+const isCategoryValid = computed(() => {
+  if (!categoryForm.value.main_category) return false
+
+  if (categoryForm.value.main_category === 'etc') {
+    return categoryForm.value.custom_category.trim().length > 0
+  }
+
+  return categoryForm.value.sub_category !== ''
 })
 
 // 저장 가능 여부 (새로 업로드한 아이템만 저장 가능)
@@ -542,10 +659,33 @@ const resetUpload = () => {
   if (galleryInput.value) galleryInput.value.value = ''
 }
 
-// 내 아이템으로 바로 등록 (분석 결과 그대로 사용)
-const registerAsMyItem = async () => {
+// 등록하기 버튼 클릭 시 카테고리 선택 모달 표시
+const registerAsMyItem = () => {
   if (!currentAnalysisFile.value) {
     showToast('등록할 이미지가 없습니다.', 'error')
+    return
+  }
+
+  // 카테고리 폼 초기화
+  categoryForm.value = {
+    main_category: '',
+    sub_category: '',
+    custom_category: ''
+  }
+
+  // 카테고리 선택 모달 표시
+  showCategoryModal.value = true
+}
+
+// 카테고리 선택 후 실제 등록 (분석 결과 그대로 사용)
+const submitWithCategory = async () => {
+  if (!currentAnalysisFile.value) {
+    showToast('등록할 이미지가 없습니다.', 'error')
+    return
+  }
+
+  if (!isCategoryValid.value) {
+    showToast('카테고리를 선택해주세요.', 'error')
     return
   }
 
@@ -555,7 +695,14 @@ const registerAsMyItem = async () => {
     const formData = new FormData()
     formData.append('image', currentAnalysisFile.value)
     formData.append('item_name', detectedItem.value || '새 아이템')
-    formData.append('main_category', 'etc')  // 기본 카테고리
+    formData.append('main_category', categoryForm.value.main_category)
+
+    // 소분류 또는 기타 직접입력 처리
+    if (categoryForm.value.main_category === 'etc') {
+      formData.append('sub_category', categoryForm.value.custom_category.trim())
+    } else if (categoryForm.value.sub_category) {
+      formData.append('sub_category', categoryForm.value.sub_category)
+    }
 
     // 이미 분석된 색상과 AI 분석 결과를 함께 전송
     if (analysisResult.value) {
@@ -571,6 +718,7 @@ const registerAsMyItem = async () => {
 
     if (response.data.success) {
       showToast('아이템이 등록되었습니다!', 'success')
+      showCategoryModal.value = false
       // 마이페이지로 이동
       router.push('/mypage')
     } else {
@@ -630,6 +778,21 @@ watch(showItemModal, (isOpen) => {
   } else {
     document.body.style.overflow = ''
   }
+})
+
+// 카테고리 모달 열릴 때 body 스크롤 막기
+watch(showCategoryModal, (isOpen) => {
+  if (isOpen) {
+    document.body.style.overflow = 'hidden'
+  } else {
+    document.body.style.overflow = ''
+  }
+})
+
+// 대분류 변경 시 소분류 초기화
+watch(() => categoryForm.value.main_category, () => {
+  categoryForm.value.sub_category = ''
+  categoryForm.value.custom_category = ''
 })
 
 onMounted(() => {
@@ -1009,5 +1172,91 @@ onMounted(() => {
   color: rgba(255, 255, 255, 0.6);
   font-size: 1rem;
   margin: 0;
+}
+
+/* 카테고리 선택 모달 스타일 */
+.category-modal-container {
+  max-width: 500px;
+}
+
+.category-select {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.category-select:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+  color: #fff;
+}
+
+.category-select option {
+  background: #1e293b;
+  color: #fff;
+}
+
+.category-input {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+}
+
+.category-input:focus {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
+  color: #fff;
+}
+
+.category-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.sub-category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.sub-category-item {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 0.75rem;
+  transition: all 0.2s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sub-category-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(167, 139, 250, 0.5);
+}
+
+.sub-category-item .form-check-input {
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.sub-category-item .form-check-label {
+  margin: 0;
+  cursor: pointer;
+}
+
+.sub-category-item .form-check-input:checked {
+  background-color: #a78bfa;
+  border-color: #a78bfa;
+}
+
+.sub-category-item .form-check-input:checked + .form-check-label {
+  color: #c4b5fd;
 }
 </style>
