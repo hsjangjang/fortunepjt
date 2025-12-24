@@ -5,7 +5,7 @@
         <!-- 페이지 헤더 -->
         <div class="page-header">
           <h1 class="page-title">
-            <span class="page-title-emoji">🔍</span>
+            <img :src="itemCheckIcon" alt="" class="page-title-icon" />
             아이템 상세 분석
           </h1>
           <p class="page-subtitle">AI가 분석한 아이템의 상세 정보입니다</p>
@@ -262,6 +262,7 @@ import { calculateLuckScore, calculateLuckScoreAsync, getScoreMessage, getScoreC
 import { findBestLuckyItem, hasNoGoodItem, formatItemDate } from '@/utils/itemAnalysis'
 import { FORTUNE_CATEGORIES } from '@/utils/fortuneCategories'
 import { useFortuneStore } from '@/stores/fortune'
+import itemCheckIcon from '@/assets/images/item_check_icon.png'
 
 const route = useRoute()
 const router = useRouter()
@@ -935,5 +936,13 @@ watch(
 .recommend-section.no-item {
   background: rgba(59, 130, 246, 0.1);
   border-color: rgba(59, 130, 246, 0.3);
+}
+
+.page-title-icon {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  vertical-align: middle;
+  margin-right: 0.5rem;
 }
 </style>
