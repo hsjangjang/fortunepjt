@@ -101,8 +101,8 @@
                 <div v-else class="luck-score-section mb-4">
                   <h6 class="text-center mb-3"><i class="fas fa-magic text-primary me-2"></i>오늘의 행운 지수</h6>
 
-                  <!-- 행운 지수 원형 -->
-                  <div class="text-center mb-3">
+                  <!-- 행운 지수 원형 (ItemCheck.vue와 동일) -->
+                  <div class="text-center">
                     <div class="luck-score-circle mx-auto">
                       <svg width="200" height="200">
                         <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20"></circle>
@@ -117,8 +117,8 @@
                         </defs>
                       </svg>
                       <div class="luck-score-text">
-                        <span class="luck-score-number">{{ displayLuckScore }}</span>
-                        <span class="luck-score-label">점</span>
+                        <h1 class="text-white fw-bold mb-0">{{ displayLuckScore }}</h1>
+                        <p class="text-white opacity-75 mb-0">행운 지수</p>
                       </div>
                     </div>
                   </div>
@@ -763,10 +763,11 @@ watch(luckScore, (newScore) => {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* ItemCheck.vue와 동일한 스타일 */
 .luck-score-circle {
-  position: relative;
   width: 200px;
   height: 200px;
+  position: relative;
   display: inline-block;
 }
 
@@ -776,18 +777,6 @@ watch(luckScore, (newScore) => {
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-}
-
-.luck-score-number {
-  font-size: 3rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.luck-score-label {
-  font-size: 1rem;
-  color: rgba(255, 255, 255, 0.75);
-  margin-left: 2px;
 }
 
 /* 색상 비교 섹션 */
@@ -916,27 +905,9 @@ watch(luckScore, (newScore) => {
     font-size: 0.85rem;
   }
 
-  /* 행운 지수 섹션 모바일 */
+  /* 행운 지수 섹션 모바일 - ItemCheck.vue와 동일하게 크기 유지 */
   .luck-score-section {
     padding: 1rem;
-  }
-
-  .luck-score-circle {
-    width: 160px;
-    height: 160px;
-  }
-
-  .luck-score-circle svg {
-    width: 160px;
-    height: 160px;
-  }
-
-  .luck-score-number {
-    font-size: 2.2rem;
-  }
-
-  .luck-score-label {
-    font-size: 0.9rem;
   }
 
   .color-compare-section {
