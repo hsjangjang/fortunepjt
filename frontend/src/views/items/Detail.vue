@@ -101,18 +101,24 @@
                 <div v-else class="luck-score-section mb-4">
                   <h6 class="text-center mb-3"><i class="fas fa-magic text-primary me-2"></i>오늘의 행운 지수</h6>
 
-                  <!-- 행운 지수 원형 -->
-                  <div class="text-center mb-3">
+                  <!-- 행운 지수 원형 (ItemCheck.vue와 동일) -->
+                  <div class="text-center">
                     <div class="luck-score-circle mx-auto">
-                      <svg width="120" height="120">
-                        <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="12"></circle>
-                        <circle cx="60" cy="60" r="50" fill="none" :stroke="luckScoreColor"
-                                stroke-width="12" stroke-dasharray="314" :stroke-dashoffset="luckProgressOffset"
-                                style="transition: stroke-dashoffset 1s ease-out; transform: rotate(-90deg); transform-origin: center;"></circle>
+                      <svg width="200" height="200">
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="20"></circle>
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="url(#luckGradientDetail)"
+                                stroke-width="20" stroke-dasharray="565" :stroke-dashoffset="luckProgressOffset"
+                                style="transition: stroke-dashoffset 1.5s ease-out; transform: rotate(-90deg); transform-origin: center;"></circle>
+                        <defs>
+                          <linearGradient id="luckGradientDetail">
+                            <stop offset="0%" stop-color="#10b981"></stop>
+                            <stop offset="100%" stop-color="#3b82f6"></stop>
+                          </linearGradient>
+                        </defs>
                       </svg>
                       <div class="luck-score-text">
-                        <span class="luck-score-number">{{ luckScore }}</span>
-                        <span class="luck-score-label">점</span>
+                        <h1 class="text-white fw-bold mb-0">{{ displayLuckScore }}</h1>
+                        <p class="text-white opacity-75 mb-0">행운 지수</p>
                       </div>
                     </div>
                   </div>
@@ -277,6 +283,7 @@ const editForm = ref({
 const userItems = ref([]) // 다른 아이템 추천용
 const hybridScoreResult = ref(null) // 하이브리드 유사도 결과
 const isCalculatingScore = ref(false) // 점수 계산 중 상태
+const displayLuckScore = ref(0) // 애니메이션용 표시 점수
 
 // 카테고리 한글 매핑
 const categoryDisplayMap = {
@@ -384,8 +391,11 @@ const calculateHybridScore = async () => {
 // 행운 지수
 const luckScore = computed(() => colorMatchResult.value.score)
 
-// 행운 지수 원형 프로그레스 오프셋 (유틸리티 사용)
-const luckProgressOffset = computed(() => calculateProgressOffset(luckScore.value, 50))
+// 행운 지수 원형 프로그레스 오프셋 (100점 기준, ItemCheck.vue와 동일)
+const luckProgressOffset = computed(() => {
+  const circumference = 2 * Math.PI * 90 // 565.48
+  return circumference - (displayLuckScore.value / 100 * circumference)
+})
 
 // 행운 지수 색상 (유틸리티 사용)
 const luckScoreColor = computed(() => getScoreColor(luckScore.value))
@@ -582,10 +592,31 @@ watch(
   (newId, oldId) => {
     if (newId && newId !== oldId) {
       item.value = null // 로딩 상태 표시
+      displayLuckScore.value = 0 // 점수 애니메이션 초기화
       fetchItemDetail()
     }
   }
 )
+
+// 행운 점수 애니메이션 (ItemCheck.vue와 동일)
+const animateLuckScore = (targetScore) => {
+  let current = 0
+  const interval = setInterval(() => {
+    if (current < targetScore) {
+      current += 2
+      displayLuckScore.value = Math.min(current, targetScore)
+    } else {
+      clearInterval(interval)
+    }
+  }, 20)
+}
+
+// luckScore 변경 감지하여 애니메이션 실행
+watch(luckScore, (newScore) => {
+  if (newScore > 0) {
+    animateLuckScore(newScore)
+  }
+}, { immediate: true })
 </script>
 
 <style scoped>
@@ -733,10 +764,12 @@ watch(
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* ItemCheck.vue와 동일한 스타일 */
 .luck-score-circle {
+  width: 200px;
+  height: 200px;
   position: relative;
-  width: 120px;
-  height: 120px;
+  display: inline-block;
 }
 
 .luck-score-text {
@@ -745,18 +778,6 @@ watch(
   left: 50%;
   transform: translate(-50%, -50%);
   text-align: center;
-}
-
-.luck-score-number {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.luck-score-label {
-  font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.6);
-  margin-left: 2px;
 }
 
 /* 색상 비교 섹션 */
@@ -885,29 +906,9 @@ watch(
     font-size: 0.85rem;
   }
 
-  /* 행운 지수 섹션 모바일 */
+  /* 행운 지수 섹션 모바일 - ItemCheck.vue와 동일하게 크기 유지 */
   .luck-score-section {
     padding: 1rem;
-  }
-
-  .luck-score-circle {
-    width: 100px;
-    height: 100px;
-  }
-
-  .luck-score-circle svg {
-    width: 100px;
-    height: 100px;
-  }
-
-  .luck-score-circle svg circle {
-    cx: 50;
-    cy: 50;
-    r: 42;
-  }
-
-  .luck-score-number {
-    font-size: 1.6rem;
   }
 
   .color-compare-section {
