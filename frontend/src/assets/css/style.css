@@ -1,18 +1,11 @@
 /* Celestial Premium Theme */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
-/* 전남교육바른체 */
+/* 을타마눔궁서체 */
 @font-face {
-    font-family: 'JeonnamEducationBarun';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/JNE-Bareun-TTF-Light.woff2') format('woff2');
-    font-weight: 300;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'JeonnamEducationBarun';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/JNE-Bareun-TTF-Bold.woff2') format('woff2');
-    font-weight: 700;
+    font-family: 'EutmanGungseo';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKGUNG.woff2') format('woff2');
+    font-weight: normal;
     font-display: swap;
 }
 
@@ -48,7 +41,7 @@
 
 /* Reset & Base */
 body {
-    font-family: 'JeonnamEducationBarun', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family: 'EutmanGungseo', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
     background-color: var(--bg-darker);
     background-image:
         radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15), transparent 25%),
@@ -94,7 +87,7 @@ h6 { font-size: var(--font-size-base); }
 
 /* Display Title - 히어로 섹션용 */
 .display-title {
-    font-family: 'JeonnamEducationBarun', 'Pretendard', sans-serif;
+    font-family: 'EutmanGungseo', 'Pretendard', sans-serif;
     font-size: var(--font-size-display);
     font-weight: 700;
     line-height: 1.2;
