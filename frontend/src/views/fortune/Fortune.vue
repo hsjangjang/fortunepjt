@@ -209,9 +209,6 @@
                 </div>
               </div>
 
-              <p class="text-center text-white opacity-75 mt-4 mb-0">
-                이 색상들은 오늘 하루 당신을 지켜주고 자신감을 불어넣어 줄 것입니다!
-              </p>
       </div>
 
       <!-- Lucky Item Section (일간 운세에서만 표시) -->
@@ -319,7 +316,7 @@
                   <img src="@/assets/images/recommendations_menu_icon.png" alt="" class="recommend-icon" />
                 </div>
                 <h5 class="text-white recommend-title">오늘의 메뉴 추천 받기</h5>
-                <p class="text-white opacity-75 small recommend-desc">운세에 맞는 행운의 메뉴</p>
+                <p class="text-white opacity-75 small recommend-desc">운세에 맞는<br>행운의 메뉴</p>
                 <span class="btn btn-outline-light rounded-pill px-4 recommend-btn">
                   추천 받기 →
                 </span>
@@ -631,7 +628,7 @@ onMounted(async () => {
   padding: 0.6rem 1.2rem;
   border-radius: 25px;
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 700;
   transition: all 0.3s ease;
   cursor: pointer;
 }
@@ -982,7 +979,7 @@ onMounted(async () => {
 }
 
 .fortune-tab-pill .tab-label {
-  font-weight: 500;
+  font-weight: 700;
   white-space: nowrap;
 }
 
