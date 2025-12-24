@@ -1,11 +1,26 @@
 /* Celestial Premium Theme */
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css");
 
-/* 을타마눔궁서체 */
+/* SF함박눈 - 메인 타이틀용 */
 @font-face {
-    font-family: 'EutmanGungseo';
-    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2206-02@1.0/OKGUNG.woff2') format('woff2');
+    font-family: 'SfHambakneun';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2106@1.1/SF_HambakSnow.woff') format('woff');
     font-weight: normal;
+    font-display: swap;
+}
+
+/* 전남교육바른체 - 본문용 */
+@font-face {
+    font-family: 'JeonnamEducationBarun';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/JNE-Bareun-TTF-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: 'JeonnamEducationBarun';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2408-1@1.0/JNE-Bareun-TTF-Bold.woff2') format('woff2');
+    font-weight: 700;
     font-display: swap;
 }
 
@@ -41,7 +56,7 @@
 
 /* Reset & Base */
 body {
-    font-family: 'EutmanGungseo', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family: 'JeonnamEducationBarun', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
     background-color: var(--bg-darker);
     background-image:
         radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15), transparent 25%),
@@ -87,11 +102,12 @@ h6 { font-size: var(--font-size-base); }
 
 /* Display Title - 히어로 섹션용 */
 .display-title {
-    font-family: 'EutmanGungseo', 'Pretendard', sans-serif;
+    font-family: 'SfHambakneun', 'Pretendard', sans-serif;
     font-size: var(--font-size-display);
-    font-weight: 700;
+    font-weight: normal;
     line-height: 1.2;
     letter-spacing: -0.03em;
+    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.5);
     background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
     -webkit-background-clip: text;
     background-clip: text;
@@ -197,7 +213,8 @@ h6 { font-size: var(--font-size-base); }
 }
 
 .navbar-brand {
-    font-weight: 700;
+    font-family: 'SfHambakneun', 'Pretendard', sans-serif;
+    font-weight: normal;
     font-size: 1.5rem;
     color: white !important;
     display: flex;
