@@ -195,16 +195,18 @@ const handleScroll = (scrollY) => {
   const windowHeight = window.innerHeight
 
   // === Hero 섹션 애니메이션 ===
-  const heroEnd = windowHeight * 0.6
+  // feature 카드가 20% 정도 올라오면 배경이 완전히 사라지도록
+  // 모바일에서는 더 빨리 사라지도록 조정
+  const isMobile = window.innerWidth <= 768
+  const heroEnd = isMobile ? windowHeight * 0.25 : windowHeight * 0.3
   const progress = Math.min(scrollY / heroEnd, 1)
-  heroOpacity.value = 1 - progress
-  heroScale.value = 1 - (progress * 0.1)
-  heroTranslate.value = -scrollY * 0.3
+  // easeOutQuad로 처음엔 빠르게, 끝에선 부드럽게 사라짐
+  const easedProgress = 1 - Math.pow(1 - progress, 2)
+  heroOpacity.value = 1 - easedProgress
+  heroScale.value = 1 - (easedProgress * 0.15)
+  heroTranslate.value = -scrollY * 0.4
 
   // === Feature 카드 애니메이션 ===
-  // 모바일 여부 확인 (768px 이하)
-  const isMobile = window.innerWidth <= 768
-
   // 모바일에서는 카드가 세로로 배치되므로 트리거 간격을 더 넓게
   const triggers = isMobile
     ? [

@@ -123,12 +123,16 @@ h6 { font-size: var(--font-size-base); }
     font-weight: normal;
     line-height: 1.2;
     letter-spacing: -0.03em;
-    -webkit-text-stroke: 0.5px rgba(255, 255, 255, 0.5);
+    -webkit-text-stroke: 1px rgba(255, 255, 255, 0.3);
     background: linear-gradient(135deg, #fff 0%, #a78bfa 100%);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     text-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+    /* iOS/Android 일관된 렌더링 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: geometricPrecision;
 }
 
 /* Section Title - 섹션 헤더용 */
