@@ -427,6 +427,7 @@ onUnmounted(() => {
   pointer-events: none;
 }
 
+
 /* 스크롤 안내 화살표 */
 .scroll-indicator {
   position: absolute;
@@ -467,8 +468,26 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   padding: 0 1rem;
-  background: transparent;
   pointer-events: none; /* Hero 버튼 클릭 통과 허용 */
+}
+
+/* Features 배경 - 상단 투명 -> 하단 불투명 그라데이션 */
+.features-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg,
+    transparent 0%,
+    rgba(0, 0, 5, 0.5) 10%,
+    rgba(2, 6, 23, 0.9) 25%,
+    #020617 40%,
+    #0a0a1a 100%
+  );
+  z-index: -1;
+  pointer-events: none;
 }
 
 /* Features 내부 카드들은 클릭 가능 */
@@ -481,6 +500,8 @@ onUnmounted(() => {
   max-width: 1200px;
   width: 100%;
   margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
 /* Feature Item - 슈우웅 부드러운 애니메이션 */
