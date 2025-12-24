@@ -65,6 +65,7 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.6;
+    word-break: keep-all;
 }
 
 /* 한글은 JeonnamEducationBarun, 영어/숫자는 Calibri */
