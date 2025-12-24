@@ -636,52 +636,18 @@ onMounted(async () => {
   cursor: pointer;
 }
 
-/* 오늘의 운세 버튼 - 노란색/주황색 (태양) */
-.btn-daily {
-  border-color: rgba(251, 191, 36, 0.3);
-}
-.btn-daily:hover:not(:disabled) {
-  background: rgba(251, 191, 36, 0.2);
-  border-color: rgba(251, 191, 36, 0.5);
-  color: white;
-}
-.btn-daily.active {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.4), rgba(251, 191, 36, 0.4));
-  border-color: #fbbf24;
-  color: white;
-  box-shadow: 0 0 15px rgba(251, 191, 36, 0.3);
-}
-
-/* 이 주의 운세 버튼 - 파란색 (달력) */
-.btn-weekly {
-  border-color: rgba(96, 165, 250, 0.3);
-}
-.btn-weekly:hover:not(:disabled) {
-  background: rgba(96, 165, 250, 0.2);
-  border-color: rgba(96, 165, 250, 0.5);
-  color: white;
-}
-.btn-weekly.active {
-  background: linear-gradient(135deg, rgba(59, 130, 246, 0.4), rgba(96, 165, 250, 0.4));
-  border-color: #60a5fa;
-  color: white;
-  box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
-}
-
-/* 이 달의 운세 버튼 - 보라색 (달) */
-.btn-monthly {
-  border-color: rgba(167, 139, 250, 0.3);
-}
-.btn-monthly:hover:not(:disabled) {
+.btn-period:hover:not(:disabled) {
   background: rgba(167, 139, 250, 0.2);
   border-color: rgba(167, 139, 250, 0.5);
   color: white;
 }
-.btn-monthly.active {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.4), rgba(167, 139, 250, 0.4));
+
+.btn-period.active {
+  background: linear-gradient(135deg, #7c3aed, #a78bfa);
   border-color: #a78bfa;
   color: white;
-  box-shadow: 0 0 15px rgba(167, 139, 250, 0.3);
+  font-weight: 600;
+  box-shadow: 0 0 15px rgba(167, 139, 250, 0.4);
 }
 
 .btn-period:disabled {

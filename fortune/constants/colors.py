@@ -141,12 +141,15 @@ LUCKY_COLOR_TO_FOOD = {
     '주황색': ['orange', 'coral'],
     '초록색': ['green', 'lime'],
     '파란색': ['blue', 'navy', 'cyan'],
+    '로열블루': ['blue', 'navy', 'cyan'],
+    '하늘색': ['blue', 'cyan', 'white'],
+    '남색': ['navy', 'blue', 'dark'],
     '보라색': ['purple', 'violet'],
     '흰색': ['white', 'ivory', 'cream'],
     '분홍색': ['pink', 'rose'],
     '갈색': ['brown', 'chocolate'],
     '회색': ['gray', 'grey', 'silver'],
-    '금색': ['gold', 'golden'],
+    '금색': ['gold', 'golden', 'yellow'],
 }
 
 # 영어 색상 -> 한글 매핑

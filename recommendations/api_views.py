@@ -402,10 +402,13 @@ class MenuRecommendationAPIView(APIView):
             # 새로 생성
             all_foods = load_food_data()
 
-            # 3개 행운색 모두 고려하여 음식 찾기
+            # 3개 행운색 모두 고려하여 음식 찾기 (매칭되는 색상만 사용)
             matching_foods = []
+            matched_colors = []  # 실제 매칭된 행운색 저장
             for lucky_color in lucky_colors:
                 color_foods = self._get_food_by_color(lucky_color, all_foods)
+                if color_foods:  # 매칭되는 음식이 있는 경우만
+                    matched_colors.append(lucky_color)
                 for food in color_foods:
                     if food not in matching_foods:
                         matching_foods.append(food)
@@ -414,6 +417,8 @@ class MenuRecommendationAPIView(APIView):
             if len(matching_foods) >= 2:
                 # 행운색 음식이 2개 이상이면 그 중에서 2개 선택
                 recommended_list = random.sample(matching_foods, 2)
+                # 매칭된 행운색 목록 사용
+                lucky_colors = matched_colors if matched_colors else lucky_colors
             else:
                 # 행운색 음식이 부족하면 전체에서 2개 선택
                 recommended_list = random.sample(all_foods, min(2, len(all_foods)))

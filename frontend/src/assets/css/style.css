@@ -56,7 +56,7 @@
 
 /* Reset & Base */
 body {
-    font-family: 'JeonnamEducationBarun', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
+    font-family: 'Calibri', 'JeonnamEducationBarun', 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
     background-color: var(--bg-darker);
     background-image:
         radial-gradient(circle at 15% 50%, rgba(124, 58, 237, 0.15), transparent 25%),
@@ -65,6 +65,21 @@ body {
     min-height: 100vh;
     overflow-x: hidden;
     line-height: 1.6;
+}
+
+/* 한글은 JeonnamEducationBarun, 영어/숫자는 Calibri */
+@font-face {
+    font-family: 'Calibri';
+    src: local('Calibri');
+    unicode-range: U+0020-007F, U+2000-206F, U+20A0-20CF, U+2100-214F;
+}
+
+/* Pretendard Black - 로고용 */
+@font-face {
+    font-family: 'Pretendard-Black';
+    src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/pretendard@1.0/Pretendard-Black.woff2') format('woff2');
+    font-weight: 900;
+    font-display: swap;
 }
 
 /* ========================================
@@ -213,8 +228,8 @@ h6 { font-size: var(--font-size-base); }
 }
 
 .navbar-brand {
-    font-family: 'SfHambakneun', 'Pretendard', sans-serif;
-    font-weight: normal;
+    font-family: 'Pretendard-Black', 'Pretendard', sans-serif;
+    font-weight: 900;
     font-size: 1.5rem;
     color: white !important;
     display: flex;
