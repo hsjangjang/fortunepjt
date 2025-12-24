@@ -643,11 +643,11 @@ onMounted(async () => {
 }
 
 .btn-period.active {
-  background: linear-gradient(135deg, #7c3aed, #a78bfa);
-  border-color: #a78bfa;
-  color: white;
+  background: linear-gradient(135deg, #7c3aed, #a78bfa) !important;
+  border-color: #a78bfa !important;
+  color: white !important;
   font-weight: 600;
-  box-shadow: 0 0 15px rgba(167, 139, 250, 0.4);
+  box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
 }
 
 .btn-period:disabled {
