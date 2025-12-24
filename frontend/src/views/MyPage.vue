@@ -57,7 +57,7 @@
               </div>
 
               <!-- 오늘의 행운색 표시 -->
-              <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4">
+              <div v-if="luckyColors.length > 0" class="card-base card-sm mb-4 lucky-colors-card">
                 <div class="lucky-colors-container">
                   <span class="text-white-50 fortune-label d-flex align-items-center justify-content-center">
                     <img src="@/assets/images/pallete.png" alt="" class="lucky-color-palette-icon me-2" />오늘의 행운색:
@@ -1137,13 +1137,18 @@ onMounted(() => {
   font-weight: 500;
 }
 
+/* 행운색 카드 - 패딩 줄임 */
+.lucky-colors-card {
+  padding: 0.5rem 1rem !important;
+}
+
 /* 행운색 컨테이너 - 항상 세로 2줄 배치 */
 .lucky-colors-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 
 .lucky-colors-list {
