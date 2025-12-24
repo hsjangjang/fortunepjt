@@ -1,6 +1,7 @@
 """
 사용자 관련 유틸리티 함수
 """
+import threading
 from django.core.mail import send_mail, EmailMultiAlternatives
 from django.conf import settings
 
@@ -84,18 +85,8 @@ def get_from_email():
     return getattr(settings, 'DEFAULT_FROM_EMAIL', 'noreply@fortunelife.com')
 
 
-def send_fortune_email(subject, message, recipient_email, html_message=None):
-    """Lucky Picky 이메일 전송
-
-    Args:
-        subject: 이메일 제목
-        message: 이메일 본문 (텍스트)
-        recipient_email: 수신자 이메일
-        html_message: HTML 본문 (선택)
-
-    Returns:
-        bool: 전송 성공 여부
-    """
+def _send_email_sync(subject, message, recipient_email, html_message=None):
+    """이메일 실제 전송 (동기)"""
     try:
         if html_message:
             email = EmailMultiAlternatives(
@@ -114,9 +105,30 @@ def send_fortune_email(subject, message, recipient_email, html_message=None):
                 recipient_list=[recipient_email],
                 fail_silently=False,
             )
-        return True
-    except Exception:
-        return False
+    except Exception as e:
+        print(f"[Email Error] {e}")
+
+
+def send_fortune_email(subject, message, recipient_email, html_message=None):
+    """Lucky Picky 이메일 전송 (비동기 - 백그라운드 스레드)
+
+    Args:
+        subject: 이메일 제목
+        message: 이메일 본문 (텍스트)
+        recipient_email: 수신자 이메일
+        html_message: HTML 본문 (선택)
+
+    Returns:
+        bool: 항상 True (비동기 전송이므로 즉시 반환)
+    """
+    # 백그라운드 스레드에서 이메일 전송 (API 응답 지연 방지)
+    thread = threading.Thread(
+        target=_send_email_sync,
+        args=(subject, message, recipient_email, html_message)
+    )
+    thread.daemon = True
+    thread.start()
+    return True
 
 
 def create_username_email(user, email):
