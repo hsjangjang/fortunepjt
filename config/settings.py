@@ -298,6 +298,14 @@ SIMPLE_JWT = {
 # CORS Settings
 CORS_ALLOW_ALL_ORIGINS = True  # 모든 Origin 허용
 CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 CORS_ALLOW_HEADERS = [
     'accept',
     'accept-encoding',
@@ -310,6 +318,7 @@ CORS_ALLOW_HEADERS = [
     'x-requested-with',
     'x-session-key',
 ]
+CORS_PREFLIGHT_MAX_AGE = 86400  # preflight 캐시 24시간
 
 # Cache Configuration
 CACHES = {
