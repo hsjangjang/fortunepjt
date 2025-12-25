@@ -161,13 +161,13 @@ class ItemAnalyzer:
             - 반드시 유효한 JSON만 응답
             - 마크다운 코드 블록(```) 사용 금지
 
-            예시 (흰 배경의 주황색 향수병):
+            예시 (흰 배경의 검은색 지갑):
             {
-              "item_name": "향수",
-              "primary_colors": ["주황색", "금색"],
+              "item_name": "지갑",
+              "primary_colors": ["검은색"],
               "accent_colors": [],
-              "tags": ["향수", "애정운", "고급스러움"],
-              "fortune_scores": {"love": 85, "money": 40, "work": 30, "health": 20, "study": 15}
+              "tags": ["지갑", "금전운", "고급스러움"],
+              "fortune_scores": {"love": 20, "money": 90, "work": 50, "health": 10, "study": 15}
             }
             """
             
