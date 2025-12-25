@@ -1008,6 +1008,15 @@ onMounted(() => {
   background: rgba(30, 41, 59, 0.8);
 }
 
+/* 아이템 카드 텍스트 가운데 정렬 */
+.item-body {
+  text-align: center;
+}
+
+.item-body .badge {
+  display: inline-block;
+}
+
 .btn-delete {
   position: absolute;
   top: 8px;
