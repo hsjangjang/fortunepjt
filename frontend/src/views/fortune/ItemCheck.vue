@@ -13,8 +13,8 @@
           </p>
         </div>
 
-        <!-- 오늘의 행운템 카드 -->
-        <div v-if="!showResult && (luckyItems.main || luckyItems.zodiac || luckyItems.special)" class="card-base card-sm text-center mb-4 lucky-item-card">
+        <!-- 오늘의 행운템 카드 (메인, 별자리 2개만 표시) -->
+        <div v-if="!showResult && (luckyItems.main || luckyItems.zodiac)" class="card-base card-sm text-center mb-4 lucky-item-card">
           <div class="d-flex flex-wrap align-items-center justify-content-center gap-2">
             <span class="text-white opacity-75 d-flex align-items-center lucky-item-label">
               <i class="fas fa-gem text-warning me-2"></i>
@@ -23,7 +23,6 @@
             <div class="lucky-item-list">
               <span v-if="luckyItems.main" class="lucky-item-badge">{{ luckyItems.main }}</span>
               <span v-if="luckyItems.zodiac" class="lucky-item-badge">{{ luckyItems.zodiac }}</span>
-              <span v-if="luckyItems.special" class="lucky-item-badge">{{ luckyItems.special }}</span>
             </div>
           </div>
         </div>
