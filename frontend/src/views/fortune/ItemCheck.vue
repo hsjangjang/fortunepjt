@@ -536,7 +536,7 @@ const analyzeItem = async (file, imageData) => {
   try {
     const response = await api.post('/api/items/analyze/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 60000 // 파일 업로드는 60초 타임아웃
+      timeout: 240000 // 파일 업로드는 240초 타임아웃 (rembg 초기 모델 다운로드 대응)
     })
     const data = response.data
 
@@ -713,7 +713,7 @@ const submitWithCategory = async () => {
 
     const response = await api.post('/api/items/', formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
-      timeout: 30000
+      timeout: 120000 // 4배 증가
     })
 
     if (response.data.success) {
