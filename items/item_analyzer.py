@@ -1,6 +1,6 @@
 """
 아이템 이미지 분석 모듈
-- 색상 분석: Pillow + 색상 클러스터링
+- 색상 분석: rembg 배경제거 + Pillow 픽셀 분석
 - AI 분석: Google Gemini Vision API
   - 아이템 이름 자동 감지
   - 관련 태그 생성
@@ -11,6 +11,7 @@ from collections import Counter
 import colorsys
 import json
 import os
+import io
 
 from .color_data import (
     color_name_to_hex,
@@ -201,11 +202,30 @@ class ItemAnalyzer:
                     color_analysis = [{"color": c, "percentage": pct_each} for c in primary_colors]
                     print(f"[DEBUG] primary_colors -> color_analysis 변환: {color_analysis}")
 
-            print(f"[DEBUG] 색상 분석 결과: {color_analysis}")
+            print(f"[DEBUG] Gemini 색상 분석 결과: {color_analysis}")
+
+            # rembg + Pillow로 정확한 퍼센티지 계산
+            pillow_analysis = self.analyze_with_background_removal(image_path)
+            if pillow_analysis:
+                print(f"[DEBUG] Pillow 색상 분석 결과: {pillow_analysis}")
+                # Gemini가 반환한 색상 목록은 유지하되, 퍼센티지는 Pillow 결과로 대체
+                pillow_dict = {c['color']: c['percentage'] for c in pillow_analysis}
+                for ca in color_analysis:
+                    if ca['color'] in pillow_dict:
+                        ca['percentage'] = pillow_dict[ca['color']]
+                # Pillow에만 있는 색상 추가 (10% 이상)
+                gemini_colors = {ca['color'] for ca in color_analysis}
+                for pc in pillow_analysis:
+                    if pc['color'] not in gemini_colors and pc['percentage'] >= 10:
+                        color_analysis.append(pc)
+                # 퍼센티지 기준으로 재정렬
+                color_analysis.sort(key=lambda x: x['percentage'], reverse=True)
+                print(f"[DEBUG] 최종 색상 분석 결과: {color_analysis}")
 
             # 프론트엔드 호환성을 위해 all_colors도 저장
             ai_result['all_colors'] = [ca['color'] for ca in color_analysis]
             ai_result['primary_colors'] = ai_result['all_colors']
+            ai_result['color_analysis'] = color_analysis
 
             color_count = len(color_analysis)
 
@@ -220,7 +240,7 @@ class ItemAnalyzer:
                 })
                 print(f"[DEBUG] 색상 4개 이상 ({color_count}개) → '다양'으로 자동 변환")
             else:
-                # 1-3개 색상: 상위 2개만 표시, Gemini가 반환한 퍼센티지 사용
+                # 1-3개 색상: 상위 2개만 표시
                 for idx, color_info in enumerate(color_analysis[:2]):
                     color_name = color_info.get('color', '')
                     percentage = color_info.get('percentage', 50.0)
@@ -269,7 +289,74 @@ class ItemAnalyzer:
     def _color_name_to_hex(self, color_name):
         """색상 이름을 HEX로 변환 (color_data.py 사용)"""
         return color_name_to_hex(color_name)
-    
+
+    def analyze_with_background_removal(self, image_path):
+        """rembg로 배경 제거 후 Pillow로 픽셀 단위 색상 분석"""
+        try:
+            from rembg import remove
+            print("[DEBUG] rembg 배경 제거 시작")
+
+            # 이미지 로드
+            with open(image_path, 'rb') as f:
+                input_data = f.read()
+
+            # 배경 제거 (RGBA 이미지 반환)
+            output_data = remove(input_data)
+            img = Image.open(io.BytesIO(output_data))
+
+            # RGBA 모드 확인 (투명 배경)
+            if img.mode != 'RGBA':
+                img = img.convert('RGBA')
+
+            # 리사이즈 (성능)
+            img.thumbnail((200, 200))
+
+            # 투명하지 않은 픽셀만 추출 (alpha > 128)
+            pixels = list(img.getdata())
+            non_transparent_pixels = [
+                (r, g, b) for r, g, b, a in pixels if a > 128
+            ]
+
+            if not non_transparent_pixels:
+                print("[DEBUG] 배경 제거 후 픽셀이 없음")
+                return None
+
+            print(f"[DEBUG] 배경 제거 완료, 유효 픽셀: {len(non_transparent_pixels)}개")
+
+            # 색상 그룹화
+            color_counter = Counter()
+            for rgb in non_transparent_pixels:
+                color_name = self.get_color_name(rgb)
+                korean_name = self.color_names.get(color_name, color_name)
+                color_counter[korean_name] += 1
+
+            # 퍼센티지 계산
+            total = len(non_transparent_pixels)
+            color_analysis = []
+            for color_name, count in color_counter.most_common():
+                percentage = round((count / total) * 100, 1)
+                if percentage >= 5:  # 5% 이상만 포함
+                    color_analysis.append({
+                        'color': color_name,
+                        'percentage': percentage
+                    })
+
+            # 합계 100%로 정규화
+            total_pct = sum(c['percentage'] for c in color_analysis)
+            if total_pct > 0:
+                for c in color_analysis:
+                    c['percentage'] = round((c['percentage'] / total_pct) * 100, 1)
+
+            print(f"[DEBUG] Pillow 색상 분석 결과: {color_analysis}")
+            return color_analysis
+
+        except ImportError:
+            print("[DEBUG] rembg 미설치, 배경 제거 건너뜀")
+            return None
+        except Exception as e:
+            print(f"[DEBUG] 배경 제거 분석 실패: {e}")
+            return None
+
     def analyze_image(self, image_path):
         """이미지 분석 메인 함수"""
         try:
