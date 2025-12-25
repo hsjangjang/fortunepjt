@@ -408,9 +408,8 @@ const isRegistering = ref(false)  // 등록 중 상태
 const isAnalyzing = ref(false)  // 분석 중 상태
 const analysisResult = ref(null)  // AI 분석 결과 저장
 const luckyItems = ref({
-  main: '열쇠고리',
-  zodiac: '실버 키링',
-  special: '폰 스트랩'
+  main: '',
+  zodiac: ''
 })
 const luckyColorsWithHex = ref([])
 
@@ -454,8 +453,7 @@ const canSaveItem = computed(() => {
 // 행운 아이템 목록 가져오기 헬퍼
 const getLuckyItemList = () => [
   luckyItems.value.main,
-  luckyItems.value.zodiac,
-  luckyItems.value.special
+  luckyItems.value.zodiac
 ].filter(Boolean)
 
 // 내 아이템 중 행운 점수가 가장 높은 아이템 추천
@@ -741,9 +739,8 @@ const fetchFortuneData = async () => {
 
     if (fortune.lucky_item) {
       luckyItems.value = {
-        main: fortune.lucky_item.main || '열쇠고리',
-        zodiac: fortune.lucky_item.zodiac || '실버 키링',
-        special: fortune.lucky_item.today_special || '폰 스트랩'
+        main: fortune.lucky_item.main || '',
+        zodiac: fortune.lucky_item.zodiac || ''
       }
     }
 
