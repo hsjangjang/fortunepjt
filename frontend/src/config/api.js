@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ||
 // Axios 인스턴스 생성
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 480000, // 4배 증가 (rembg 초기 모델 다운로드 대응)
+  timeout: 120000,
   headers: {
     'Content-Type': 'application/json',
   },
