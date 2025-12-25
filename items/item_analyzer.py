@@ -125,7 +125,7 @@ class ItemAnalyzer:
             이 이미지에 있는 **물체**를 분석해주세요.
 
             **★ 중요: 반드시 제외할 것 ★**
-            - 배경색 (흰색, 검은색, 회색 등 배경)
+            - 배경색 (흰색, 검은색, 회색 등 이미지 배경)
             - 물체 면적의 5% 이하를 차지하는 작은 무늬, 패턴, 스티칭, 테두리
             - 로고, 글자, 라벨의 색상
 
@@ -134,40 +134,40 @@ class ItemAnalyzer:
             1. item_name: 물체의 구체적인 이름 (한글로, 2-4글자)
                - 예시: '마우스', '향수', '지갑', '키링', '인형', '이어폰', '목걸이', '반지', '립스틱', '텀블러' 등
 
-            2. primary_colors: 물체 자체의 **주요 색상만** (배경 제외!)
+            2. color_analysis: 물체의 색상 분석 (배경 제외, 물체만!)
+               - 각 색상별로 **물체 내에서 차지하는 면적 비율(%)**을 정확히 계산
                - **반드시 아래 15가지 색상만 사용**:
                  '빨간색', '주황색', '노란색', '초록색', '파란색', '보라색', '분홍색', '갈색', '베이지색', '회색', '검은색', '흰색', '남색', '하늘색', '금색'
-               - **물체 면적의 10% 이상**을 차지하는 색상만 포함
-               - 배경색은 절대 포함하지 마세요!
+               - 물체 면적의 10% 이상인 색상만 포함
+               - 모든 색상의 percentage 합계는 100이어야 함
+               - 형식: [{"color": "색상명", "percentage": 숫자}, ...]
 
-               **색상 개수 기준:**
-               - 단색 물체: 1개
-               - 2색 물체: 2개
-               - 다색/무지개: 주요 색상들만
-
-            3. accent_colors: 보조/악센트 색상 (작은 장식)
-               - 물체 면적의 5~10%를 차지하는 부가 색상
-               - 없으면 빈 배열 []
-
-            4. tags: 해시태그 3개
+            3. tags: 해시태그 3개
                - 첫 번째: 아이템 종류
                - 두 번째: '애정운', '금전운', '직장운', '건강운', '학업운' 중 하나
                - 세 번째: 아이템 느낌
 
-            5. fortune_scores: 각 운세 점수 (0~100)
+            4. fortune_scores: 각 운세 점수 (0~100)
                - love, money, work, health, study
 
             **응답 형식**:
             - 반드시 유효한 JSON만 응답
             - 마크다운 코드 블록(```) 사용 금지
 
-            예시 (흰 배경의 검은색 지갑):
+            예시 1 (흰 배경의 검은색 지갑 - 단색):
             {
               "item_name": "지갑",
-              "primary_colors": ["검은색"],
-              "accent_colors": [],
+              "color_analysis": [{"color": "검은색", "percentage": 100}],
               "tags": ["지갑", "금전운", "고급스러움"],
               "fortune_scores": {"love": 20, "money": 90, "work": 50, "health": 10, "study": 15}
+            }
+
+            예시 2 (남색 바탕에 흰색 도트 무늬 손수건):
+            {
+              "item_name": "손수건",
+              "color_analysis": [{"color": "남색", "percentage": 85}, {"color": "흰색", "percentage": 15}],
+              "tags": ["손수건", "직장운", "세련됨"],
+              "fortune_scores": {"love": 30, "money": 40, "work": 80, "health": 20, "study": 25}
             }
             """
             
@@ -205,26 +205,27 @@ class ItemAnalyzer:
 
             # 색상 정보를 표준 형식으로 변환
             colors = []
-            primary_colors = ai_result.get('primary_colors', [])
-            accent_colors = ai_result.get('accent_colors', [])
+            color_analysis = ai_result.get('color_analysis', [])
 
-            # 하위 호환성: 기존 all_colors 형식도 지원
-            if not primary_colors:
-                all_colors = ai_result.get('all_colors', [])
-                if all_colors:
-                    primary_colors = all_colors
-                    ai_result['primary_colors'] = primary_colors
-                    print(f"[DEBUG] all_colors -> primary_colors 변환: {primary_colors}")
+            # 하위 호환성: 기존 primary_colors 형식도 지원
+            if not color_analysis:
+                primary_colors = ai_result.get('primary_colors', [])
+                if primary_colors:
+                    # 기존 형식을 새 형식으로 변환 (균등 분배)
+                    pct_each = 100.0 / len(primary_colors)
+                    color_analysis = [{"color": c, "percentage": pct_each} for c in primary_colors]
+                    print(f"[DEBUG] primary_colors -> color_analysis 변환: {color_analysis}")
 
-            # all_colors는 primary_colors + accent_colors 합친 것으로 저장 (프론트엔드 호환성)
-            ai_result['all_colors'] = primary_colors + accent_colors
+            print(f"[DEBUG] 색상 분석 결과: {color_analysis}")
 
-            primary_count = len(primary_colors)
-            print(f"[DEBUG] 주요 색상 {primary_count}개: {primary_colors}")
-            print(f"[DEBUG] 악센트 색상 {len(accent_colors)}개: {accent_colors}")
+            # 프론트엔드 호환성을 위해 all_colors도 저장
+            ai_result['all_colors'] = [ca['color'] for ca in color_analysis]
+            ai_result['primary_colors'] = ai_result['all_colors']
 
-            # primary_colors가 4개 이상이면 '다양'으로 처리
-            if primary_count >= 4:
+            color_count = len(color_analysis)
+
+            # 색상이 4개 이상이면 '다양'으로 처리
+            if color_count >= 4:
                 colors.append({
                     'name': 'primary',
                     'korean_name': '다양',
@@ -232,17 +233,19 @@ class ItemAnalyzer:
                     'rgb': (128, 128, 128),
                     'percentage': 100.0
                 })
-                print(f"[DEBUG] 주요 색상 4개 이상 ({primary_count}개) → '다양'으로 자동 변환")
+                print(f"[DEBUG] 색상 4개 이상 ({color_count}개) → '다양'으로 자동 변환")
             else:
-                # 1-3개 주요 색상: 상위 2개만 표시
-                for idx, color_name in enumerate(primary_colors[:2]):
+                # 1-3개 색상: 상위 2개만 표시, Gemini가 반환한 퍼센티지 사용
+                for idx, color_info in enumerate(color_analysis[:2]):
+                    color_name = color_info.get('color', '')
+                    percentage = color_info.get('percentage', 50.0)
                     if color_name:
                         colors.append({
                             'name': 'primary' if idx == 0 else 'secondary',
                             'korean_name': color_name,
                             'hex': self._color_name_to_hex(color_name),
                             'rgb': (128, 128, 128),
-                            'percentage': 80.0 if idx == 0 else 20.0
+                            'percentage': float(percentage)
                         })
             
             print("[DEBUG] AI 분석 성공!")
