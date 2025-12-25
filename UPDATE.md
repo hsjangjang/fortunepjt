@@ -1,5 +1,23 @@
 # 📋 업데이트 내역
 
+## v1.8.7 (25.12.25)
+
+### 장하선
+- Backend
+  - rembg + Pillow 기반 색상 분석 시도 후 롤백
+    - rembg를 통한 배경 제거 + Pillow 픽셀 분석으로 정확한 색상 비율 계산 시도
+    - EC2 인스턴스 리소스 부족으로 504 Gateway Timeout 발생
+    - Gemini 단독 분석으로 롤백
+  - 아이템 분석 프롬프트 개선 (`items/item_analyzer.py`)
+    - 배경색, 작은 무늬, 라벨, 로고 등 무시하도록 프롬프트 강화
+  - CORS 인증 실패 문제 수정 (`config/settings.py`)
+- Frontend
+  - 마이페이지 아이템 카드 텍스트 가운데 정렬 (`MyPage.vue`)
+  - 아이템 체크 페이지 추천 아이템 2개로 제한 (`ItemCheck.vue`)
+  - 스페셜 아이템 추천 로직 제거
+
+---
+
 ## v1.8.6 (25.12.23)
 
 ### 장하선
