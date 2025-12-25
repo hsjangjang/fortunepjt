@@ -52,4 +52,6 @@ nul
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
-env.txt
+# Elastic Beanstalk
+.elasticbeanstalk/logs/
+.elasticbeanstalk/saved_configs/

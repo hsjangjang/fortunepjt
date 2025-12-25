@@ -63,7 +63,7 @@ cd frontend && npm run dev  # Vue 개발 서버 (localhost:5173)
 |---------|----------|
 | Django 5.2 + DRF | Vue 3 (Composition API) |
 | Google Gemini AI | Vite + Pinia |
-| OpenCV | Bootstrap 5 |
+| Pillow | Bootstrap 5 |
 | PostgreSQL (배포) / SQLite (개발) | Axios |
 
 ## API 엔드포인트
@@ -102,7 +102,7 @@ fortunepjt/
 │
 ├── fortune/                 # 운세 앱 (핵심 기능)
 │   ├── api_views.py         # REST API 뷰
-│   ├── services.py          # 운세 계산 비즈니스 로직
+│   ├── services/            # 운세 계산 비즈니스 로직 패키지
 │   ├── saju_calculator.py   # 사주/오행 계산
 │   ├── lunar_converter.py   # 음력 변환
 │   ├── models.py            # 운세 캐시 모델
@@ -134,7 +134,7 @@ fortunepjt/
 │   ├── src/
 │   │   ├── views/           # 페이지 컴포넌트
 │   │   │   ├── fortune/     # 운세 관련 (Fortune.vue, Loading.vue)
-│   │   │   ├── items/       # 아이템 관련 (List.vue, Detail.vue)
+│   │   │   ├── items/       # 아이템 관련 (Detail.vue, ItemCheck.vue, Upload.vue)
 │   │   │   ├── auth/        # 인증 (Login.vue, Register.vue)
 │   │   │   └── recommendations/  # 추천 (OOTD.vue, Menu.vue)
 │   │   ├── stores/          # Pinia 상태 관리
@@ -145,7 +145,7 @@ fortunepjt/
 │   │   │   └── itemSimilarity.js  # FastText 유사도
 │   │   ├── data/            # 정적 데이터
 │   │   │   └── itemSimilarity.json  # 유사도 매트릭스
-│   │   ├── api/             # API 클라이언트
+│   │   ├── config/          # 설정 (api.js)
 │   │   ├── router/          # Vue Router 설정
 │   │   └── assets/          # 이미지 리소스
 │   │       ├── images/food/       # 음식 이미지
