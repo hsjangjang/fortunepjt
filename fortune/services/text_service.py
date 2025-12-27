@@ -233,8 +233,9 @@ class TextService:
         zodiac_item_name: Optional[str] = None,
         period_type: str = 'daily'
     ) -> Optional[Dict]:
-        """GMS API (Claude/GPT)를 사용한 운세 텍스트 생성"""
+        """Gemini API를 사용한 운세 텍스트 생성"""
         import time
+        import google.generativeai as genai
 
         cache_key = f"fortune_text_v6_{birth_date}_{gender}_{zodiac}_{chinese_zodiac}_{mbti}_{lucky_item_name}_{date.today()}_{period_type}"
         cached_result = cache.get(cache_key)
@@ -243,11 +244,10 @@ class TextService:
             print("[DEBUG] 캐시된 운세 텍스트 사용")
             return cached_result
 
-        gms_api_key = getattr(settings, 'GMS_API_KEY', '')
-        gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+        gemini_api_key = getattr(settings, 'GEMINI_API_KEY', '')
 
-        if not gms_api_key:
-            print("[ERROR] GMS_API_KEY가 설정되지 않음")
+        if not gemini_api_key:
+            print("[ERROR] GEMINI_API_KEY가 설정되지 않음")
             return None
 
         max_retries = 1
@@ -265,21 +265,21 @@ class TextService:
 
         for attempt in range(max_retries + 1):
             try:
-                from openai import OpenAI
-                client = OpenAI(api_key=gms_api_key, base_url=gms_api_base)
+                genai.configure(api_key=gemini_api_key)
+                model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
 
-                print(f"[DEBUG] GMS API gpt-4o-mini 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
-                response = client.chat.completions.create(
-                    model="gpt-4o-mini",
-                    messages=[
-                        {"role": "system", "content": system_msg},
-                        {"role": "user", "content": prompt}
-                    ],
-                    temperature=0.85,
-                    max_tokens=2500
+                print(f"[DEBUG] Gemini API gemini-2.5-flash 운세 생성 요청 (시도: {attempt + 1}/{max_retries + 1})...")
+
+                full_prompt = f"{system_msg}\n\n{prompt}"
+                response = model.generate_content(
+                    full_prompt,
+                    generation_config=genai.types.GenerationConfig(
+                        temperature=0.85,
+                        max_output_tokens=2500
+                    )
                 )
 
-                text = response.choices[0].message.content.strip()
+                text = response.text.strip()
 
                 if text.startswith('```json'):
                     text = text[7:]
@@ -289,7 +289,7 @@ class TextService:
                     text = text[:-3]
 
                 result = json.loads(text.strip())
-                print("[DEBUG] GMS API gpt-4o-mini 운세 생성 성공!")
+                print("[DEBUG] Gemini API gemini-2.5-flash 운세 생성 성공!")
 
                 if period_type in ['weekly', 'monthly']:
                     result = self.combine_period_fortune_text(result, period_type)
@@ -299,16 +299,16 @@ class TextService:
 
             except Exception as e:
                 error_str = str(e)
-                print(f"[ERROR] GMS API gpt-4o-mini 운세 생성 오류 (시도: {attempt + 1}): {e}")
+                print(f"[ERROR] Gemini API gemini-2.5-flash 운세 생성 오류 (시도: {attempt + 1}): {e}")
 
                 if 'insufficient_quota' in error_str or '429' in error_str or 'quota' in error_str.lower():
-                    send_api_quota_alert('GMS API (OpenAI gpt-4o-mini)', error_str)
+                    send_api_quota_alert('Gemini API (gemini-2.5-flash)', error_str)
 
                 if attempt < max_retries:
                     time.sleep(retry_delay)
                 continue
 
-        print("[ERROR] GMS API 시도 실패, 동적 텍스트 생성으로 대체")
+        print("[ERROR] Gemini API 시도 실패, 동적 텍스트 생성으로 대체")
         return None
 
     def _get_system_message(self, period_type: str) -> str:

@@ -58,17 +58,11 @@ def get_database_config():
 class APIConfig:
     """API 관련 설정"""
 
-    # GMS API (OpenAI/Claude 대체)
-    GMS_API_KEY = os.environ.get('GMS_API_KEY', '')
-    GMS_OPENAI_BASE_URL = os.environ.get('GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
-    GMS_GEMINI_BASE_URL = os.environ.get('GMS_GEMINI_BASE_URL', 'https://gms.ssafy.io/gmsapi/generativelanguage.googleapis.com')
+    # Google Gemini API (운세 생성, 요약, 임베딩에 사용)
+    GEMINI_API_KEY = os.environ.get('GEMINI_API_KEY', '')
 
     # OpenAI (직접 사용 시)
     OPENAI_API_KEY = os.environ.get('OPENAI_API_KEY', '')
-
-    # Google Gemini
-    GOOGLE_API_KEY = os.environ.get('GOOGLE_API_KEY', '')
-    GEMINI_PROJECT_ID = os.environ.get('GEMINI_PROJECT_ID', '')
 
 
 # ============================================================

@@ -22,7 +22,7 @@ from config.weather_config import DEFAULT_LOCATION
 
 
 def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int = None) -> str:
-    """GMS GPT-5-nano를 사용해 종합운을 한 문장으로 요약"""
+    """Gemini API를 사용해 종합운을 한 문장으로 요약"""
     if not total_text:
         print("[Fortune Summary] Empty total_text received")
         return ''
@@ -34,19 +34,19 @@ def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int =
         print(f"[Fortune Summary] Using cached result: {cached_result}")
         return cached_result
 
-    # GMS API 설정 (OpenAI 모델용 URL 사용)
-    gms_api_key = getattr(settings, 'GMS_API_KEY', '')
-    gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+    # Gemini API 설정
+    gemini_api_key = getattr(settings, 'GEMINI_API_KEY', '')
 
-    print(f"[Fortune Summary] GMS API Key exists: {bool(gms_api_key)}, Base URL: {gms_api_base}")
+    print(f"[Fortune Summary] Gemini API Key exists: {bool(gemini_api_key)}")
 
-    if not gms_api_key:
-        print("[Fortune Summary] No GMS API key, using fallback")
+    if not gemini_api_key:
+        print("[Fortune Summary] No Gemini API key, using fallback")
         return total_text.split('.')[0] + '.' if total_text else ''
 
     try:
-        from openai import OpenAI
-        client = OpenAI(api_key=gms_api_key, base_url=gms_api_base)
+        import google.generativeai as genai
+        genai.configure(api_key=gemini_api_key)
+        model = genai.GenerativeModel('gemini-2.5-flash-preview-05-20')
 
         prompt = f"""다음 오늘의 종합운세 텍스트를 읽고, 핵심 키워드를 뽑아서 **한 문장(30자 이내)**으로 요약해주세요.
 
@@ -67,14 +67,15 @@ def summarize_fortune_with_llm(total_text: str, zodiac_sign: str, user_id: int =
 
 한 문장만 출력하세요:"""
 
-        print(f"[Fortune Summary] Calling GMS API with gpt-5-nano...")
-        response = client.chat.completions.create(
-            model="gpt-5-nano",
-            messages=[{"role": "user", "content": prompt}],
-            max_completion_tokens=100
+        print(f"[Fortune Summary] Calling Gemini API with gemini-2.5-flash...")
+        response = model.generate_content(
+            prompt,
+            generation_config=genai.types.GenerationConfig(
+                max_output_tokens=100
+            )
         )
-        summary = response.choices[0].message.content.strip().strip('"').strip("'")
-        print(f"[Fortune Summary] GMS API success: {summary}")
+        summary = response.text.strip().strip('"').strip("'")
+        print(f"[Fortune Summary] Gemini API success: {summary}")
 
         # 캐시에 저장 (24시간)
         cache.set(cache_key, summary, 60 * 60 * 24)

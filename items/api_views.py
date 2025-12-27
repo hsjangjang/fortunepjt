@@ -302,43 +302,33 @@ class ItemFavoriteAPIView(APIView):
 
 
 class ItemSimilarityAPIView(APIView):
-    """GMS Embedding API를 사용한 아이템 유사도 계산"""
+    """Gemini Embedding API를 사용한 아이템 유사도 계산"""
     permission_classes = [AllowAny]  # 비로그인 사용자도 사용 가능
 
     def _get_embeddings(self, texts: list) -> dict:
-        """GMS API로 텍스트 임베딩 벡터 조회"""
-        gms_api_key = getattr(settings, 'GMS_API_KEY', '')
-        gms_api_base = getattr(settings, 'GMS_OPENAI_BASE_URL', 'https://gms.ssafy.io/gmsapi/api.openai.com/v1')
+        """Gemini API로 텍스트 임베딩 벡터 조회"""
+        gemini_api_key = getattr(settings, 'GEMINI_API_KEY', '')
 
-        if not gms_api_key:
-            return {'success': False, 'error': 'GMS_API_KEY not configured'}
+        if not gemini_api_key:
+            return {'success': False, 'error': 'GEMINI_API_KEY not configured'}
 
         try:
-            response = requests.post(
-                f"{gms_api_base}/embeddings",
-                headers={
-                    'Authorization': f'Bearer {gms_api_key}',
-                    'Content-Type': 'application/json'
-                },
-                json={
-                    'model': 'text-embedding-3-small',
-                    'input': texts
-                },
-                timeout=10
-            )
+            import google.generativeai as genai
+            genai.configure(api_key=gemini_api_key)
 
-            if response.status_code != 200:
-                print(f"[ItemSimilarity] GMS API Error: {response.status_code} - {response.text}")
-                return {'success': False, 'error': f'API error: {response.status_code}'}
+            embeddings = []
+            for text in texts:
+                result = genai.embed_content(
+                    model="models/text-embedding-004",
+                    content=text,
+                    task_type="semantic_similarity"
+                )
+                embeddings.append(result['embedding'])
 
-            data = response.json()
-            embeddings = [item['embedding'] for item in data['data']]
             return {'success': True, 'embeddings': embeddings}
 
-        except requests.exceptions.Timeout:
-            return {'success': False, 'error': 'API timeout'}
         except Exception as e:
-            print(f"[ItemSimilarity] Error: {str(e)}")
+            print(f"[ItemSimilarity] Gemini API Error: {e}")
             return {'success': False, 'error': str(e)}
 
     def _cosine_similarity(self, vec1: list, vec2: list) -> float:

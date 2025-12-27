@@ -359,17 +359,8 @@ ALERT_RECIPIENT_LIST = config('ALERT_RECIPIENT_LIST', default='', cast=Csv())
 OPENAI_API_KEY = config('OPENAI_API_KEY', default='')
 OPENAI_MODEL = config('OPENAI_MODEL', default='gpt-3.5-turbo')
 
-# Google Cloud Gemini API (직접 연결 - 우선 사용)
+# Google Cloud Gemini API (운세 생성, 요약, 임베딩에 사용)
 GEMINI_API_KEY = config('GEMINI_API_KEY', default='')
-
-# GMS (Gen AI Management System) API (fallback)
-GMS_API_KEY = config('GMS_API_KEY', default='')  # GMS API 키
-# OpenAI 모델용 (gpt-4o-mini, gpt-5-nano 등)
-GMS_OPENAI_BASE_URL = config('GMS_OPENAI_BASE_URL', default='https://gms.ssafy.io/gmsapi/api.openai.com/v1')
-# Gemini 모델용 (gemini-2.0-flash 등) - 이미지 분석에 사용
-GMS_GEMINI_BASE_URL = config('GMS_GEMINI_BASE_URL', default='https://gms.ssafy.io/gmsapi/gemini.googleapis.com/v1beta')
-# 기존 호환성 유지 (deprecated)
-GMS_API_BASE_URL = config('GMS_API_BASE_URL', default='https://gms.ssafy.io/gmsapi/')
 
 # Kakao API Key (for location services)
 KAKAO_REST_API_KEY = config('KAKAO_REST_API_KEY', default='')
